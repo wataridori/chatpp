@@ -3,7 +3,7 @@ var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
 var CHROME_SYNC_KEY = "YACEP_CHROME_SYNC_DATA";
 
 var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
-var DEFAULT_IMG_HOST = "http://yacep.thangtd.com/";
+var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
 
 $(function() {
     chrome.storage.sync.get(CHROME_SYNC_KEY, function(info) {

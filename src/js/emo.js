@@ -1,6 +1,6 @@
 // Const
 var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
-var DEFAULT_IMG_HOST = "http://yacep.thangtd.com/";
+var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
 var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
 var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
 
