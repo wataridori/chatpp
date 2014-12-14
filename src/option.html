@@ -1,0 +1,70 @@
+<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title id="title"></title>
+    <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/option.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/bootbox.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+</head><body>
+<div class="container">
+    <h1 class="text-primary">
+        <img src="icon64.png" id="popup_page" alt="Angelic">
+        <strong>Chat++ <span id="chatpp_version"></span></strong><br>
+    </h1>
+    <h3 class="text-info">*** A Chatwork Enhancement Toolkit ***</h3>
+    <hr>
+    <div class="row">
+        <h3 class="text-primary">Choose Emoticon version: </h3>
+        <div class="col-sm-6 col-lg-4">
+            <select class="form-control" id="data-select">
+                <option value="default">Default</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
+    </div>
+    <br>
+    <div class="row" id="url-input-div" hidden>
+        <div class="col-sm-12 col-lg-6">
+            <input class="form-control" id="data-url" placeholder="Enter Your Emoticons Data URL here!">
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <button class="btn btn-success btn-sm" id="btn-load">Load</button>
+        <button class="btn btn-danger btn-sm" id="btn-reset">Reset</button>
+    </div>
+    <hr>
+    <div class="row">
+        <button class="btn btn-success btn-sm" id="btn-show-changelog" hidden>Show Changelog</button>
+        <br>
+        <br>
+        <div class="jumbotron" style="background-color: rgb(34, 34, 34);" id="changelog" hidden>
+            <h3>Change log</h3>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div id="emoticions-table">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                All Emoticons <span class="text-danger" id="data-version"></span>
+            </div>
+
+            <table class="table table-bordered" id="table-emo">
+                <thead>
+                    <tr class="success text-center">
+                        <th colspan="2" class="text-center">Emo</th>
+                        <th colspan="2" class="text-center">Emo</th>
+                        <th colspan="2" class="text-center">Emo</th>
+                        <th colspan="2" class="text-center">Emo</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body></html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title id="title"></title>
+        <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="js/popup.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <style>
+            .text-black {
+                color: rgb(34, 34, 34);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="media" style="min-width: 300px; margin-top: 20px">
+                <div class="media-left pull-left" href="#">
+                    <img src="icon64.png" id="popup_page" alt="Angelic">
+                </div>
+                <div class="media-body pull-left">
+                    <h4 class="media-heading text-danger"><strong>Chat++ <span id="chatpp_version"></span></strong></h4>
+                    <h5 class="media-heading text-info"><strong>A Chatwork Enhancement Toolkit</strong></h5>
+                    <button type="button" class="btn btn-primary btn-xs" id="option_page" style="margin-bottom: 10px">Option Page</button>
+                </div>
+            </div>
+            <br>
+            <p class="text-success">Homepage: <a id="homepage" href="http://chatpp.thangtd.com">http://chatpp.thangtd.com</a></p>
+            <p class="text-success">Author: <span class="text-danger"><strong>Tran Duc Thang</strong> - <strong>Nguyen Anh Tien</strong></span></p>
+            <p class="text-success">Current Emoticon Data: <span class="text-danger" id="current-data-info"></span></p>
+            <p class="text-success">Date Sync: <span class="text-danger" id="date-sync-info"></span><button type="button" class="btn btn-warning btn-xs" style="margin-left: 10px" id="btn-emo-data">Reload</button></p>
+            <p class="text-success">Status: <span class="text-danger" id="status"></span><button type="button" class="btn btn-warning btn-xs" style="margin-left: 10px" id="btn-status">Disable</button></p>
+            <p class="text-success">Code Version: <span class="text-info" id="code-type"></span><button type="button" class="btn btn-warning btn-xs" style="margin-left: 10px" id="btn-code-type">Switch</button></p>
+            <p class="text-warning">Try to switch to other Code Version if and only if the Chatwork's texts are not displayed correctly!!!</p>
+            <hr/>
+            <p class="text-black">ChatPP icon designed by <span class="text-danger">Tran Ba Trong</span>, based on original Chatwork Icon.</p>
+        </div>
+    </body>
+</html>
