@@ -139,11 +139,16 @@ $(window).ready(function(){
         if (current_index < 0) current_index = 0;
         if (current_index >= results.length) current_index = results.length - 1;
 
-        if (results.length <= DISPLAY_NUMS) return results;
+        if (results.length <= DISPLAY_NUMS) {
+            is_outbound_of_list = true;
+            return results;
+        }
         if (current_index >= results.length - DISPLAY_NUMS) {
             is_outbound_of_list = true;
             return results.slice(DISPLAY_NUMS * -1);
-        } else return results.slice(current_index, current_index + DISPLAY_NUMS);
+        } else {
+            return results.slice(current_index, current_index + DISPLAY_NUMS);
+        }
     }
 
     // hide suggestion box when cick in textarea or outside
@@ -190,9 +195,9 @@ $(window).ready(function(){
                     selected_index -= 1;
                     if (selected_index < 0) selected_index = 0;
                 }
-                if (e.which == 40 && is_outbound_of_list) {
+                if (e.which == 40 && current_index > raw_results.length - filtered_results.length) {
                     selected_index += 1;
-                    if (selected_index >= DISPLAY_NUMS) selected_index = DISPLAY_NUMS - 1;
+                    if (selected_index >= Math.min(DISPLAY_NUMS, filtered_results.length)) selected_index = Math.min(DISPLAY_NUMS, filtered_results.length) - 1;
                 }
 
                 showSuggestionBox(buildList(filtered_results));
