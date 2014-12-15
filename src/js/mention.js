@@ -46,7 +46,7 @@ $(window).ready(function(){
         start_pos = content.lastIndexOf("@");
         if (start_pos == -1) return '';
         end_pos = doGetCaretPosition(chat_text_element);
-        txt = content.substr(start_pos, end_pos);
+        txt = content.substr(start_pos, end_pos - start_pos);
         if (txt) {
             return txt;
         } else {
@@ -179,9 +179,10 @@ $(window).ready(function(){
                 is_displayed = true;
             }
 
-            if (getTypedText().length) {
-                if (getTypedText().substring(1)) {
-                    raw_results = fuse.search(getTypedText().substring(1));
+            typed_texts = getTypedText();
+            if (typed_texts.length) {
+                if (typed_texts.substring(1)) {
+                    raw_results = fuse.search(typed_texts.substring(1));
                 } else {
                     raw_results = member_objects;
                 }
@@ -245,11 +246,12 @@ $(window).ready(function(){
     });
 
     function setSuggestedChatText(entered_text, target_name, cwid){
+        current_pos = doGetCaretPosition(chat_text_element);
         var old = chat_text_jquery.val();
-        var content = old.replace(entered_text, "");
         var E = "[To:" + cwid + "] " + target_name;
-        chat_text_jquery.val(content + E + " ");
-        chat_text_jquery.focus();
+        var content = old.replace(entered_text, E + '\n');
+        chat_text_jquery.val(content);
+        setCaretPosition(chat_text_element, current_pos + E.length);
         hideSuggestionBox();
     }
 
