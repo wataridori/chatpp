@@ -1,157 +1,233 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
+<!doctype html>
+<html>
+<head lang="en">
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
     <title>Chat++</title>
+    <meta name="description" content="Chatpp, A Chatwork Enhancement Toolkit" />
+    <meta name="keywords" content="chatwork, emoticons, chrome extension, framgia">
+    <meta property="og:title" content="">
 
-    <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
-
-    <!-- Fonts -->
-    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-
-    <!-- Custom Theme CSS -->
-    <link href="css/yacep.css" rel="stylesheet">
-
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="fancybox/jquery.fancybox-v=2.1.5.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link href='http://fonts.googleapis.com/css?family=Titillium+Web:400,600,300,200&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <link rel="prefetch" href="img/zoom.png">
 </head>
 
-<body id="page-top" data-spy="scroll" data-target=".navbar-custom">
+<body>
+<div class="navbar navbar-fixed-top" data-activeslide="1">
+    <div class="container-fluid">
 
-    <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
-        <div class="container">
-            <div class="navbar-header page-scroll">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
-                    <i class="fa fa-bars"></i>
-                </button>
-                <a class="navbar-brand" href="#page-top">
-                    <i class="fa fa-play-circle"></i>  <span class="light">Chat++</span>
-                </a>
+        <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+
+
+        <div class="nav-collapse collapse navbar-responsive-collapse">
+            <ul class="nav row">
+                <li data-slide="1" class="col-12 col-sm-2"><a id="menu-link-1" href="#slide-1" title="Next Section"><span class="icon icon-home"></span> <span class="text">Chat++</span></a></li>
+                <li data-slide="2" class="col-12 col-sm-2"><a id="menu-link-2" href="#slide-2" title="Next Section"><span class="icon icon-comment"></span> <span class="text">About</span></a></li>
+                <li data-slide="3" class="col-12 col-sm-2"><a id="menu-link-3" href="#slide-3" title="Next Section"><span class="icon icon-briefcase"></span> <span class="text">Features</span></a></li>
+                <li data-slide="4" class="col-12 col-sm-2"><a id="menu-link-4" href="#slide-4" title="Next Section"><span class="icon icon-download"></span> <span class="text">Install</span></a></li>
+                <li data-slide="5" class="col-12 col-sm-2"><a id="menu-link-5" href="#slide-5" title="Next Section"><span class="icon icon-pencil"></span> <span class="text">Create Own Emoticons Data</span></a></li>
+                <li data-slide="6" class="col-12 col-sm-2"><a id="menu-link-6" href="#slide-6" title="Next Section"><span class="icon icon-envelope"></span> <span class="text">Contact</span></a></li>
+            </ul>
+            <div class="row">
+                <div class="col-sm-2 active-menu"></div>
             </div>
+        </div><!-- /.nav-collapse -->
+    </div><!-- /.container -->
+</div><!-- /.navbar -->
 
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
-                <ul class="nav navbar-nav">
-                    <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
-                    <li class="hidden">
-                        <a href="#page-top"></a>
-                    </li>
-                    <li class="page-scroll">
-                        <a href="#about">About</a>
-                    </li>
-                    <li class="page-scroll">
-                        <a href="#download">Download</a>
-                    </li>
-                    <li class="page-scroll">
-                        <a href="#emoticons">Create Own Emoticons Data</a>
-                    </li>
-                    <li class="page-scroll">
-                        <a href="#contact">Contact</a>
-                    </li>
-                </ul>
-            </div>
-            <!-- /.navbar-collapse -->
-        </div>
-        <!-- /.container -->
-    </nav>
 
-    <section class="intro">
-        <div class="intro-body">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-8 col-md-offset-2">
-                        <h1 class="brand-heading text-primary">Chat++</h1>
-                        <p class="intro-text">A free, Must-have Chrome extension for Framgia's Members.<br/>
-                        Made by <span class="text-danger">Tran Duc Thang & Nguyen Anh Tien</span></p>
-                        <div class="page-scroll">
-                            <a href="#about" class="btn btn-circle">
-                                <i class="fa fa-angle-double-down animated"></i>
-                            </a>
-                        </div>
-                    </div>
+<!-- === Arrows === -->
+<div id="arrows">
+    <div id="arrow-up" class="disabled"></div>
+    <div id="arrow-down"></div>
+</div><!-- /.arrows -->
+
+
+<!-- === MAIN Background === -->
+<div class="slide story" id="slide-1" data-slide="1">
+    <div class="container">
+        <div id="home-row-1" class="row clearfix">
+            <div class="col-12">
+                <h1 class="font-semibold">
+                    <img src="src/icon64.png"> Chat++
+                </h1>
+                <br>
+                <div class="row line-row">
+                    <div class="hr">&nbsp;</div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="about" class="container content-section text-center">
-        <div class="row">
-            <div class="col-lg-8 col-lg-offset-2">
-                <h2 class="text-success">About Chat++</h2>
-                <p class="text-info">Chat++ is an all-in-one Chatwork Enhancement Toolkit. It is a free Chrome Extension which provides more funny emoticons as well as many other features for Chatwork. It is made by Framgia's Members, and for Framgia's Members.</p>
-                <p class="text-info">Chat++ is a big innovation of the well known extension YACEP!<br>
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <section id="download" class="content-section text-center">
-        <div class="download-section">
-            <div class="container">
-                <div class="col-lg-8 col-lg-offset-2">
-                    <h2 class="text-success">Download Chat++</h2>
-                    <p class="text-info">You can download and install Chat++ via the Google Chrome Web Store!</p>
+                <br>
+                <h4 class="font-thin">An all-in-one <span class="font-semibold">Chatwork Enhancement Toolkit </span>
                     <br>
-                    <div><a href="https://chrome.google.com/webstore/detail/chat%20%20/peoocleknbnndibfimcdphmgoijdeijk" target="_blank" class="btn btn-default btn-lg">Check It Out!</a></div><br>
-                </div>
-            </div>
-        </div>
-    </section>
+                    <br>
+                    made by <span class="font-semibold">Tran Duc Thang</span> & <span class="font-semibold">Nguyen Anh Tien</span>.</h4>
+                <br>
+                <br>
+            </div><!-- /col-12 -->
+        </div><!-- /row -->
+    </div><!-- /container -->
+</div><!-- /slide1 -->
 
-    <section id="emoticons" class="container content-section text-center">
-        <div class="row">
-            <div class="col-lg-8 col-lg-offset-2">
-                <h2 class="text-success">Create Your Own Emoticons Data</h2>
-                <p class="text-info">You can create your own Emoticons data file and then share it with your friends.
-                    Of course if you and your friends have the same data, you will see the same emoticons on Chatwork!
-                    You can easily create a Emoticons Data file for Chat++ by following the below rules: </p>
-                <ul class="text-left text-danger">
-                    <li>The data file (as well as the change log file) must be written in json format.</li>
-                    <li>The data file must have the following data:
-                        <ul>
-                            <li>data_name: Your data name (It should not be updated when you update your data file)</li>
-                            <li>data_version: Your data version (It should be updated when you update your data file)</li>
-                            <li>data_changelog (optional): The link to where the change log file is hosted</li>
-                            <li>emoticons: Emoticons data. It is an array with each element is an emoticon's data. </li>
-                            <li>You can refer the <a href="https://www.dropbox.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=0" target="_blank">default emoticons data</a>
-                                as well as the <a href="https://www.dropbox.com/sh/rnyip87zzjyxaev/AACNoqhwrVRGDT2sXRIcx2Pga/changelog.json?dl=0" target="_blank">change log file</a> of YACEP for more details.</li>
-                        </ul>
-                    </li>
-                    <li>You need to host your data file on the internet so Chat++ can access it! (<strong>https</strong> is required! So we suggest <strong>Dropbox</strong>!)</li>
-                    <li>Finally, share the link to your data file with your friends and enjoy your own funny Emoticons!</li>
+<!-- === Slide 2 === -->
+<div class="slide story" id="slide-2" data-slide="2">
+    <div class="container">
+        <div class="row title-row">
+            <div class="col-12 font-thin">About <span class="font-semibold">Chat++</span></div>
+        </div><!-- /row -->
+        <div class="row line-row">
+            <div class="hr">&nbsp;</div>
+        </div><!-- /row -->
+        <div class="subtitle-row font-thin">Chat++ is an all-in-one <span class="font-semibold">Chatwork Enhancement Toolkit</span>.
+            It is a free <span class="font-semibold">Chrome Extension</span> which provides more funny emoticons as well as many other features for Chatwork.<br>
+            It is made by <span class="font-semibold">Framgia's Members</span>, and for <span class="font-semibold">Framgia's Members</span>.</div>
+    </div><!-- /container -->
+</div><!-- /slide2 -->
+
+<!-- === SLide 3 -->
+<div class="slide story" id="slide-3" data-slide="3">
+    <div class="container">
+        <div class="row title-row">
+            <div class="col-12 font-thin"><span class="font-semibold">Chat++</span> Features</div>
+        </div><!-- /row -->
+    </div><!-- /row -->
+</div><!-- /slide3 -->
+
+<!-- === Slide 4 === -->
+<div class="slide story" id="slide-4" data-slide="4">
+    <div class="container">
+        <div class="row title-row">
+            <div class="col-12 font-thin">Install <span class="font-semibold">Chat++</span></div>
+        </div><!-- /row -->
+        <div class="row line-row">
+            <div class="hr">&nbsp;</div>
+        </div><!-- /row -->
+        <div class="row subtitle-row">
+            <div class="col-sm-1 hidden-sm">&nbsp;</div>
+            <div class="col-12 col-sm-10 font-light">You can download and install <span class="font-semibold">Chat++</span> via the <span class="font-semibold">Google Chrome Web Store</span>!</div>
+            <div class="col-sm-1 hidden-sm">&nbsp;</div>
+        </div><!-- /row -->
+        <div class="row subtitle-row">
+            <a href="https://chrome.google.com/webstore/detail/chat%20%20/peoocleknbnndibfimcdphmgoijdeijk" target="_blank" class="btn btn-default btn-lg">Check It Out!</a>
+        </div><!-- /row -->
+    </div><!-- /container -->
+</div><!-- /slide4 -->
+
+<!-- === Slide 5 === -->
+<div class="slide story" id="slide-5" data-slide="5">
+    <div class="container">
+        <div class="row title-row">
+            <div class="col-12 font-thin">CREATE YOUR OWN <span class="font-semibold">EMOTICONS</span> DATA</div>
+        </div><!-- /row -->
+        <div class="row line-row">
+            <div class="hr">&nbsp;</div>
+        </div><!-- /row -->
+        <div class="row subtitle-row">You can create your own Emoticons data file and then share it with your friends.
+            Of course if you and your friends have the same data, you will see the same emoticons on Chatwork!
+            You can easily create a Emoticons Data file for Chat++ by following the below rules: </div>
+        <ul class="text-left">
+            <li>The data file (as well as the change log file) must be written in json format.</li>
+            <li>The data file must have the following data:
+                <ul>
+                    <li>data_name: Your data name (It should not be updated when you update your data file)</li>
+                    <li>data_version: Your data version (It should be updated when you update your data file)</li>
+                    <li>data_changelog (optional): The link to where the change log file is hosted</li>
+                    <li>emoticons: Emoticons data. It is an array with each element is an emoticon's data. </li>
+                    <li>You can refer the <a href="https://www.dropbox.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=0" target="_blank">default emoticons data</a>
+                        as well as the <a href="https://www.dropbox.com/sh/rnyip87zzjyxaev/AACNoqhwrVRGDT2sXRIcx2Pga/changelog.json?dl=0" target="_blank">change log file</a> of YACEP for more details.</li>
                 </ul>
+            </li>
+            <li>You need to host your data file on the internet so Chat++ can access it! (<strong>https</strong> is required! So we suggest <strong>Dropbox</strong>!)</li>
+            <li>Finally, share the link to your data file with your friends and enjoy your own funny Emoticons!</li>
+        </ul>
+    </div><!-- /container -->
+</div><!-- /slide5 -->
 
-            </div>
-        </div>
-    </section>
+<!-- === Slide 6 / Contact === -->
+<div class="slide story" id="slide-6" data-slide="6">
+    <div class="container">
+        <div class="row title-row">
+            <div class="col-12 font-light">CONTACT <span class="font-semibold">DEV TEAM</span></div>
+        </div><!-- /row -->
+        <div class="row line-row">
+            <div class="hr">&nbsp;</div>
+        </div><!-- /row -->
+        <div class="row subtitle-row">
+            <div class="col-sm-12 font-light">Feel free to email us to provide some <span class="font-semibold">feedback</span>
+                on our extension, give us suggestions for <span class="font-semibold">new features</span>,
+                or to just <span class="font-semibold">say hello</span>!</div>
+        </div><!-- /row -->
+        <div class="contact-row row text-center">
+            <div class="col-lg-2 col-lg-offset-1 hidden-sm">&nbsp;</div>
+            <div class="col-12 col-sm-2 with-hover-text">
+                <p><a target="_blank" href="http://thangtd.com"><i class="icon icon-home"></i></a></p>
+                <span class="hover-text font-light ">Tran Duc Thang</span></a>
+            </div><!-- /col12 -->
+            <div class="col-12 col-sm-2 with-hover-text">
+                <p><a target="_blank" href="mailto:tran.duc.thang@framgia.com"><i class="icon icon-envelope"></i></a></p>
+                <span class="hover-text hover-text-email font-light ">tran.duc.thang@framgia.com</span></a>
+            </div><!-- /col12 -->
+            <div class="col-12 col-sm-2 with-hover-text">
+                <p><a target="_blank" href="http://github.com/wataridori"><i class="icon icon-github"></i></a></p>
+                <span class="hover-text font-light ">wataridori</span></a>
+            </div><!-- /col12 -->
+            <div class="col-lg-2 col-lg-offset-1 hidden-sm">&nbsp;</div>
+        </div><!-- /row -->
 
-    <section id="contact" class="container content-section text-center">
-        <div class="row">
-            <div class="col-lg-8 col-lg-offset-2">
-                <h2 class="text-success">Contact Dev Team</h2>
-                <p>Feel free to email us to provide some feedback on our extension, give us suggestions for new emoticons, or to just say hello!</p>
-                <p>
-                    <a href="mailto:tran.duc.thang@framgia.com">■　tran.duc.thang@framgia.com</a> or
-                    <a href="mailto:345@thangtd.com"> 345@thangtd.com</a></p>
-                    <p><a href="mailto:nguyen.anh.tien@framgia.com">■　nguyen.anh.tien@framgia.com</a></p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Core JavaScript Files -->
-    <script src="js/jquery-1.10.2.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="js/yacep.js"></script>
+        <div class="contact-row row ">
+            <div class="col-lg-2 col-lg-offset-1 hidden-sm">&nbsp;</div>
+            <div class="col-12 col-sm-2 with-hover-text">
+                <p><a target="_blank" href="#"><i class="icon icon-home"></i></a></p>
+                <span class="hover-text font-light ">Nguyen Anh Tien</span></a>
+            </div><!-- /col12 -->
+            <div class="col-12 col-sm-2 with-hover-text">
+                <p><a target="_blank" href="mailto:nguyen.anh.tien@framgia.com  "><i class="icon icon-envelope"></i></a></p>
+                <span class="hover-text hover-text-email font-light ">nguyen.anh.tien@framgia.com</span></a>
+            </div><!-- /col12 -->
+            <div class="col-12 col-sm-2 with-hover-text">
+                <p><a target="_blank" href="http://github.com/vigov5"><i class="icon icon-github"></i></a></p>
+                <span class="hover-text font-light ">vigov5</span></a>
+            </div><!-- /col12 -->
+            <div class="col-lg-2 col-lg-offset-1 hidden-sm">&nbsp;</div>
+        </div><!-- /row -->
+    </div><!-- /container -->
+</div><!-- /Slide 6 -->
 
 </body>
+
+<!-- SCRIPTS -->
+<script src="js/html5shiv.js"></script>
+<script src="js/jquery-1.10.2.js"></script>
+<script src="js/jquery-migrate-1.2.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="fancybox/jquery.fancybox.pack-v=2.1.5.js"></script>
+<script src="js/script.js"></script>
+
+<!-- fancybox init -->
+<script>
+    $(document).ready(function(e) {
+        var lis = $('.nav > li');
+        menu_focus( lis[0], 1 );
+
+        $(".fancybox").fancybox({
+            padding: 10,
+            helpers: {
+                overlay: {
+                    locked: false
+                }
+            }
+        });
+
+    });
+</script>
 
 </html>
