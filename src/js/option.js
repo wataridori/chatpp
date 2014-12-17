@@ -173,11 +173,12 @@ function showChangelog() {
                 if (data.data_name !== undefined && data.changelog !== undefined) {
                     var html = "";
                     $.each(data.changelog, function(version, changes) {
-                        html += '<h4 class="text-danger">' + version + '</h4><ul>';
+                        var log = '<h4 class="text-danger">' + version + '</h4><ul>';
                         $.each(changes, function(index, change) {
-                            html += '<li class="text-primary">' + change + '</li>';
+                            log += '<li class="text-primary">' + change + '</li>';
                         });
-                        html += '</ul>';
+                        log += '</ul>';
+                        html = log + html;
                     });
                     changelog_div.html(html);
                     changelog_div.show('slow', function(){

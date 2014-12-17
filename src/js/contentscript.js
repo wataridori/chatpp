@@ -1,6 +1,7 @@
 // Const
 var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
 var LOCAL_STORAGE_INFO_KEY = "YACEP_EMO_INFO";
+var LOCAL_STORAGE_MENTION_STATUS = "CHATPP_MENTION_STATUS";
 
 var CHROME_SYNC_KEY = "YACEP_CHROME_SYNC_DATA";
 var CHROME_LOCAL_KEY = "YACEP_CHROME_LOCAL_DATA";
@@ -35,9 +36,15 @@ function init(inject_script) {
             info = {};
         }
         if (info.ext_status == false) {
-            console.log("YACEP is disabled!");
+            console.log("Emoticons is disabled!");
         } else {
             getData(url, info, inject_script);
+        }
+        if (info.mention_status == false) {
+            console.log("Mention feature is disabled!");
+            localStorage[LOCAL_STORAGE_MENTION_STATUS] = false;
+        } else {
+            localStorage[LOCAL_STORAGE_MENTION_STATUS] = true;
         }
     });
 }
@@ -73,7 +80,7 @@ function getData(url, info, inject_script) {
                     if (inject_script != undefined && inject_script) {
                         addInjectedScript();
                     } else {
-                        runFunction('setYacepTextLabel()');
+                        // runFunction('reloadEmoticions()');
                     }
                 });
             }

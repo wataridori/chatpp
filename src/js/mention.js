@@ -12,7 +12,7 @@ $(window).ready(function(){
     var fuse = null;
     var DISPLAY_NUMS = 3;
     var options = {
-        keys: ['keys'],
+        keys: ['keys']
     };
     var chat_text_jquery = $('#_chatText');
     var chat_text_element = document.getElementById('_chatText');
@@ -166,6 +166,10 @@ $(window).ready(function(){
 
 
     chat_text_jquery.keyup(function(e) {
+        if (!mention_status) {
+            return;
+        }
+
         if (current_RM != RM.id) {
             member_objects = buildMemberListData();
             fuse = new Fuse(member_objects, options);
@@ -237,6 +241,9 @@ $(window).ready(function(){
     }
 
     chat_text_jquery.keydown(function (e) {
+        if (!mention_status) {
+            return;
+        }
         if ((e.which == 9 || e.which == 13 || e.which == 38 || e.which == 40) && is_displayed) {
             is_navigated = true;
             holdCaretPosition(e);

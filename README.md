@@ -14,6 +14,11 @@ Main Features
 * Emoticon Feature (Base on [YACEP](http://yacep.thangtd.com/))
 * And more coming soon ...
 
+
+Change Logs
+--------------
+View all change logs [here](./changelogs.md)
+
 External Links
 --------------
 
