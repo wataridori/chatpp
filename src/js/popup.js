@@ -17,12 +17,12 @@ $(function() {
         chrome.tabs.create({url: $(this).attr('href')});
     });
 
-    $('#btn-emo-data').click(function() {
-        chrome.tabs.executeScript({code: 'init()'}, function() {});
+    $('#btn-emo-status').click(function() {
+        switchEmoticonStatus();
     });
 
-    $('#btn-status').click(function() {
-        switchStatus();
+    $('#btn-mention-status').click(function() {
+        switchMentionStatus();
     });
 
     $('#btn-code-type').click(function() {
@@ -36,19 +36,31 @@ $(function() {
             var text = data.data_name + "_" + data.data_version;
             $('#current-data-info').html(text);
             $('#date-sync-info').html(data.date_sync);
-            loadStatus(data.ext_status);
+            loadEmoticonStatus(data.emoticon_status);
+            loadMentionStatus(data.mention_status);
         }
     });
     loadYacepDataStatus();
 });
 
-function loadStatus(status) {
-    if (status != undefined && status == false) {
-        $('#status').removeClass().addClass('text-danger').html('DISABLED');
-        $('#btn-status').html('Enable');
+function loadEmoticonStatus(status) {
+    if (status !== undefined && status == false) {
+        $('#emo-status').removeClass().addClass('text-danger').html('DISABLED');
+        $('#btn-emo-status').html('Enable');
     } else {
-        $('#status').removeClass().addClass('text-primary').html('ENABLED');
-        $('#btn-status').html('Disable');
+        $('#emo-status').removeClass().addClass('text-primary').html('ENABLED');
+        $('#btn-emo-status').html('Disable');
+    }
+}
+
+function loadMentionStatus(status) {
+    console.log(status);
+    if (status !== undefined && status == false) {
+        $('#mention-status').removeClass().addClass('text-danger').html('DISABLED');
+        $('#btn-mention-status').html('Enable');
+    } else {
+        $('#mention-status').removeClass().addClass('text-primary').html('ENABLED');
+        $('#btn-mention-status').html('Disable');
     }
 }
 
@@ -68,14 +80,15 @@ function loadYacepDataStatus() {
             var text = data.data_name + "_" + data.data_version;
             $('#current-data-info').html(text);
             $('#date-sync-info').html(data.date_sync);
-            loadStatus(data.ext_status);
+            loadEmoticonStatus(data.emoticon_status);
+            loadMentionStatus(data.mention_status);
         }
     });
 
     chrome.storage.local.get(CHROME_LOCAL_KEY, function(data) {
         local_stored_data = data;
         data = data[CHROME_LOCAL_KEY];
-        var type = CODE_TYPE_OFFENSIVE;
+        var type = CODE_TYPE_DEFENSIVE;
         if (!$.isEmptyObject(data)) {
             type = data.code_type;
         }
@@ -83,17 +96,30 @@ function loadYacepDataStatus() {
     });
 }
 
-function switchStatus() {
+function switchEmoticonStatus() {
     var status = true;
-    if ($('#status').html() == 'ENABLED') {
+    if ($('#emo-status').html() == 'ENABLED') {
         chrome.tabs.executeScript({code: 'runFunction("disableYacep")'});
         status = false;
     } else {
         chrome.tabs.executeScript({code: 'runFunction("enableYacep")'});
     }
-    stored_data[CHROME_SYNC_KEY]['ext_status'] = status;
+    stored_data[CHROME_SYNC_KEY]['emoticon_status'] = status;
     chrome.storage.sync.set(stored_data, function() {
-        loadStatus(status);
+        loadEmoticonStatus(status);
+    });
+}
+
+function switchMentionStatus() {
+    var status = true;
+    if ($('#mention-status').html() == 'ENABLED') {
+        status = false;
+    } else {
+
+    }
+    stored_data[CHROME_SYNC_KEY]['mention_status'] = status;
+    chrome.storage.sync.set(stored_data, function() {
+        loadMentionStatus(status);
     });
 }
 

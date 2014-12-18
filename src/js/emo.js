@@ -3,12 +3,13 @@ var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
 var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
 var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
 var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
+var LOCAL_STORAGE_EMOTICON_STATUS = "CHATPP_EMOTICON_STATUS";
 var LOCAL_STORAGE_MENTION_STATUS = "CHATPP_MENTION_STATUS";
 
 var yacep_status = false;
 var cw_timer;
 
-var mention_status = localStorage[LOCAL_STORAGE_MENTION_STATUS] == 'true';
+var mention_status = false;
 
 $(function(){
     cw_timer = setInterval(
@@ -16,15 +17,21 @@ $(function(){
             if (typeof CW != 'undefined' && typeof CW.reg_cmp != 'undefined') {
                 window.clearInterval(cw_timer);
                 addStyle();
-                addYacepText();
-                addMentionText();
-                addAdvertistment();
-                var code_type = localStorage['yacep_code_type'];
-                if (code_type === CODE_TYPE_OFFENSIVE) {
-                    CW.prepareRegExp();
+                if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
+                    addYacepText();
                 }
-                addExternalEmo();
-                console.log('Data loaded !');
+                if (localStorage[LOCAL_STORAGE_MENTION_STATUS] === 'true') {
+                    mention_status = true;
+                    addMentionText();
+                }
+                addAdvertistment();
+                if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
+                    var code_type = localStorage['yacep_code_type'];
+                    if (code_type === CODE_TYPE_OFFENSIVE) {
+                        CW.prepareRegExp();
+                    }
+                    addExternalEmo();
+                }
             }
         },
         100
