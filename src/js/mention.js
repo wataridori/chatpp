@@ -151,7 +151,7 @@ $(window).ready(function(){
         }
     }
 
-    // hide suggestion box when cick in textarea or outside
+    // hide suggestion box when click in textarea or outside
     chat_text_jquery.click(function(){
         hideSuggestionBox();
     });
@@ -164,6 +164,12 @@ $(window).ready(function(){
         hideSuggestionBox();
     });
 
+    // when user press ESC, we hide suggestion box
+    $(document).keyup(function(e){
+        if (e.which == 27) {
+            hideSuggestionBox();
+        }
+    });
 
     chat_text_jquery.keyup(function(e) {
         if (!mention_status) {
