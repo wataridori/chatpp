@@ -11,6 +11,7 @@ $(window).ready(function(){
     var member_objects = [];
     var fuse = null;
     var DISPLAY_NUMS = 3;
+    var cached_enter_action = ST.data.enter_action;
     var options = {
         keys: ['keys']
     };
@@ -97,11 +98,24 @@ $(window).ready(function(){
     function hideSuggestionBox(content){
         $("#suggestion-container").html(content).hide();
         $("#suggestion-container").css('visibility', 'hidden');
+        cleanUp();
+    }
+
+    function cleanUp(){
         is_displayed = false;
         is_navigated = false;
         current_index = 0;
         selected_index = 0;
+        $("#suggestion-container").html('');
+        // restore setting to correct value
+        if (cached_enter_action != ST.data.enter_action && cached_enter_action == 'send') {
+            ST.data.enter_action = cached_enter_action;
+        }
     }
+
+    $("#_sendEnterActionArea").click(function() {
+        cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? 'send' : 'br';
+    });
 
     // http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
     function doGetCaretPosition(ctrl){
@@ -171,6 +185,26 @@ $(window).ready(function(){
         }
     });
 
+    chat_text_jquery.keydown(function(e) {
+        if (e.which == 9 || e.which == 13) {
+            if ($(".suggested-name").first().length) {
+                if (is_navigated) {
+                    $(".suggested-name").eq(selected_index).click();
+                } else {
+                    $(".suggested-name").first().click();
+                }
+                // dirty hack to prevent message to be sent
+                if (cached_enter_action == 'send') {
+                    ST.data.enter_action = 'br';
+                }
+                e.preventDefault();
+            } else {
+                // there's no thing after @ symbol
+                hideSuggestionBox();
+            }
+        }
+    });
+
     chat_text_jquery.keyup(function(e) {
         if (!mention_status) {
             return;
@@ -212,19 +246,6 @@ $(window).ready(function(){
                 }
 
                 showSuggestionBox(buildList(filtered_results));
-            }
-
-            if (e.which == 9 || e.which == 13) {
-                if ($(".suggested-name").first().length) {
-                    if (is_navigated) {
-                        $(".suggested-name").eq(selected_index).click();
-                    } else {
-                        $(".suggested-name").first().click();
-                    }
-                } else {
-                    // there's no thing after @ symbol
-                    hideSuggestionBox();
-                }
             }
 
             if (e.which == 27) {
