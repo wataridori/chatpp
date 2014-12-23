@@ -67,6 +67,9 @@ $(window).ready(function(){
         position = Measurement.caretPos(chat_text_jquery);
         position.top += parseInt(chat_text_jquery.css('font-size')) - rect.top + 2;
         position.left -= rect.left;
+        if (rect.width - position.left < 236) {
+            position.left -= 236;
+        }
         $("#suggestion-container").parent().css({position: 'relative'});
         $("#suggestion-container").css({top: position.top, left: position.left, position:'absolute'});
         setCaretPosition(chat_text_element, current_pos);
