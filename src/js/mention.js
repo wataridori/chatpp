@@ -9,6 +9,7 @@ $(window).ready(function(){
     var selected_index = 0;
     var current_RM = null;
     var member_objects = [];
+    var insert_mode = 'normal';
     var fuse = null;
     var DISPLAY_NUMS = 3;
     var cached_enter_action = ST.data.enter_action;
@@ -165,6 +166,15 @@ $(window).ready(function(){
         }
     }
 
+    function getRawResultsAndSetMode(typed_text){
+        if (typed_text == 'me') {
+            insert_mode = 'me';
+            return [getMemberObject(AC.myid)];
+        }
+        insert_mode = 'normal';
+        return fuse.search(typed_text);
+    }
+
     // hide suggestion box when click in textarea or outside
     chat_text_jquery.click(function(){
         hideSuggestionBox();
@@ -223,10 +233,10 @@ $(window).ready(function(){
                 is_displayed = true;
             }
 
-            typed_texts = getTypedText();
-            if (typed_texts.length) {
-                if (typed_texts.substring(1)) {
-                    raw_results = fuse.search(typed_texts.substring(1));
+            typed_text = getTypedText();
+            if (typed_text.length) {
+                if (typed_text.substring(1)) {
+                    raw_results = getRawResultsAndSetMode(typed_text.substring(1));
                 } else {
                     raw_results = member_objects;
                 }
@@ -308,22 +318,24 @@ $(window).ready(function(){
         sorted_member_list = RM.getSortedMemberList(),
         b = [],
         sorted_members_length = sorted_member_list.length;
-        aid2name = {};
         for (var index = 0; index < sorted_members_length; index++) {
             var member = sorted_member_list[index];
             if (member != AC.myid) {
-                var h = CW.is_business && ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(member) : AC.getNickName(member);
-                aid2name[member] = h;
-                b.push({
-                    keys: AC.getSearchKeys(member)[0],
-                    value: member,
-                    label: CW.getAvatarPanel(member, {
-                        clicktip: !1,
-                        size: "small"
-                    }) + '<p class="autotrim">' + escape_html(h) + "</p>"
-                })
+                b.push(getMemberObject(member));
             }
         }
         return b;
+    }
+
+    function getMemberObject(member){
+        var h = CW.is_business && ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(member) : AC.getNickName(member);
+        return {
+            keys: AC.getSearchKeys(member)[0],
+            value: member,
+            label: CW.getAvatarPanel(member, {
+                clicktip: !1,
+                size: "small"
+            }) + '<p class="autotrim">' + escape_html(h) + "</p>"
+        }
     }
 });
