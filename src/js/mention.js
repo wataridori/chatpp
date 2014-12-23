@@ -18,6 +18,10 @@ $(window).ready(function(){
     };
     var chat_text_jquery = $('#_chatText');
     var chat_text_element = document.getElementById('_chatText');
+    var suggestion_messages = {
+        normal: {ja: '\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093', en: 'No Matching Results'},
+        all: {ja: '\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059', en: 'Select All Members'}
+    }
 
     $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");
     hideSuggestionBox();
@@ -107,6 +111,7 @@ $(window).ready(function(){
         is_navigated = false;
         current_index = 0;
         selected_index = 0;
+        insert_mode = 'normal';
         $("#suggestion-container").html('');
         // restore setting to correct value
         if (cached_enter_action != ST.data.enter_action && cached_enter_action == 'send') {
@@ -171,6 +176,10 @@ $(window).ready(function(){
             insert_mode = 'me';
             return [getMemberObject(AC.myid)];
         }
+        if (typed_text == 'all') {
+            insert_mode = 'all';
+            return [];
+        }
         insert_mode = 'normal';
         return fuse.search(typed_text);
     }
@@ -197,20 +206,24 @@ $(window).ready(function(){
 
     chat_text_jquery.keydown(function(e) {
         if (e.which == 9 || e.which == 13) {
-            if ($(".suggested-name").first().length) {
-                if (is_navigated) {
-                    $(".suggested-name").eq(selected_index).click();
-                } else {
-                    $(".suggested-name").first().click();
-                }
+            if (insert_mode == 'all') {
+                setSuggestedChatText(getTypedText(), null, null);
                 // dirty hack to prevent message to be sent
-                if (cached_enter_action == 'send') {
-                    ST.data.enter_action = 'br';
-                }
-                e.preventDefault();
+                if (cached_enter_action == 'send') ST.data.enter_action = 'br';
             } else {
-                // there's no thing after @ symbol
-                hideSuggestionBox();
+                if ($(".suggested-name").first().length) {
+                    if (is_navigated) {
+                        $(".suggested-name").eq(selected_index).click();
+                    } else {
+                        $(".suggested-name").first().click();
+                    }
+                    // dirty hack to prevent message to be sent
+                    if (cached_enter_action == 'send') ST.data.enter_action = 'br';
+                    e.preventDefault();
+                } else {
+                    // there's no thing after @ symbol
+                    hideSuggestionBox();
+                }
             }
         }
     });
@@ -292,25 +305,49 @@ $(window).ready(function(){
     function setSuggestedChatText(entered_text, target_name, cwid){
         current_pos = doGetCaretPosition(chat_text_element);
         var old = chat_text_jquery.val();
-        var E = "[To:" + cwid + "] " + target_name;
-        var content = old.replace(entered_text, E + '\n');
+        var replace_text = '';
+        switch (insert_mode){
+            case 'normal':
+            case 'me':
+                replace_text = "[To:" + cwid + "] " + target_name + '\n';
+                break;
+            case 'all':
+                for (var i = 0; i < member_objects.length; i++) {
+                    replace_text += "[To:" + member_objects[i].value + "] " + member_objects[i].aid2name + '\n';
+                };
+                break;
+            default:
+                break;
+        }
+        var content = old.replace(entered_text, replace_text);
         chat_text_jquery.val(content);
-        setCaretPosition(chat_text_element, current_pos + E.length);
+        setCaretPosition(chat_text_element, current_pos + replace_text.length);
         hideSuggestionBox();
     }
 
     function buildList(members){
-        if (members.length) {
-            txt = '<ul>';
-            for (var i = 0; i < members.length; i++) {
-                txt += '<li class="suggested-name" role="listitem" data-cwui-lt-value="' + members[i].value + '">' + members[i].label + "</li>"
-            };
-            txt + '</ul>';
-            return txt;
-        } else {
-            message = (LANGUAGE == 'ja') ? '\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093' : 'No Matching Results';
-            return '<ul><li>' + message + '</li></ul>';
+        switch (insert_mode){
+            case 'normal':
+            case 'me':
+                if (members.length) {
+                    txt = '<ul>';
+                    for (var i = 0; i < members.length; i++) {
+                        txt += '<li class="suggested-name" role="listitem" data-cwui-lt-value="' + members[i].value + '">' + members[i].label + "</li>"
+                    };
+                    txt + '</ul>';
+                    return txt;
+                } else {
+                    message = (LANGUAGE == 'ja') ? '\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093' : 'No Matching Results';
+                    return '<ul><li>' + suggestion_messages[insert_mode][LANGUAGE] + '</li></ul>';
+                }
+                break;
+            case 'all':
+                return '<ul><li>' + suggestion_messages[insert_mode][LANGUAGE] + '</li></ul>';
+                break;
+            default:
+                break;
         }
+
     }
 
     function buildMemberListData() {
@@ -335,7 +372,8 @@ $(window).ready(function(){
             label: CW.getAvatarPanel(member, {
                 clicktip: !1,
                 size: "small"
-            }) + '<p class="autotrim">' + escape_html(h) + "</p>"
+            }) + '<p class="autotrim">' + escape_html(h) + "</p>",
+            aid2name: escape_html(h)
         }
     }
 });
