@@ -180,8 +180,12 @@ $(window).ready(function(){
             insert_mode = 'all';
             return [];
         }
+        if (typed_text.slice(0, 2) == '__') {
+            insert_mode = 'picon';
+            return typed_text.substring(2) ? fuse.search(typed_text.substring(2)) : member_objects;
+        }
         insert_mode = 'normal';
-        return fuse.search(typed_text);
+        return typed_text ? fuse.search(typed_text) : member_objects;
     }
 
     // hide suggestion box when click in textarea or outside
@@ -248,11 +252,7 @@ $(window).ready(function(){
 
             typed_text = getTypedText();
             if (typed_text.length) {
-                if (typed_text.substring(1)) {
-                    raw_results = getRawResultsAndSetMode(typed_text.substring(1));
-                } else {
-                    raw_results = member_objects;
-                }
+                raw_results = getRawResultsAndSetMode(typed_text.substring(1));
 
                 if (e.which == 38) current_index -= 1;
                 if (e.which == 40) current_index += 1;
@@ -307,6 +307,9 @@ $(window).ready(function(){
         var old = chat_text_jquery.val();
         var replace_text = '';
         switch (insert_mode){
+            case 'picon':
+                replace_text = "[picon:" + cwid + "]" + '\n';
+                break;
             case 'normal':
             case 'me':
                 replace_text = "[To:" + cwid + "] " + target_name + '\n';
@@ -329,6 +332,7 @@ $(window).ready(function(){
         switch (insert_mode){
             case 'normal':
             case 'me':
+            case 'picon':
                 if (members.length) {
                     txt = '<ul>';
                     for (var i = 0; i < members.length; i++) {
@@ -338,7 +342,7 @@ $(window).ready(function(){
                     return txt;
                 } else {
                     message = (LANGUAGE == 'ja') ? '\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093' : 'No Matching Results';
-                    return '<ul><li>' + suggestion_messages[insert_mode][LANGUAGE] + '</li></ul>';
+                    return '<ul><li>' + suggestion_messages['normal'][LANGUAGE] + '</li></ul>';
                 }
                 break;
             case 'all':
