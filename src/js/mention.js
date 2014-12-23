@@ -184,6 +184,10 @@ $(window).ready(function(){
             insert_mode = 'picon';
             return typed_text.substring(2) ? fuse.search(typed_text.substring(2)) : member_objects;
         }
+        if (typed_text.slice(0, 1) == '_') {
+            insert_mode = 'to';
+            return typed_text.substring(1) ? fuse.search(typed_text.substring(1)) : member_objects;
+        }
         insert_mode = 'normal';
         return typed_text ? fuse.search(typed_text) : member_objects;
     }
@@ -307,6 +311,9 @@ $(window).ready(function(){
         var old = chat_text_jquery.val();
         var replace_text = '';
         switch (insert_mode){
+            case 'to':
+                replace_text = "[To:" + cwid + "]" + '\n';
+                break;
             case 'picon':
                 replace_text = "[picon:" + cwid + "]" + '\n';
                 break;
