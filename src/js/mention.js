@@ -9,7 +9,8 @@ $(window).ready(function(){
     var selected_index = 0;
     var current_RM = null;
     var member_objects = [];
-    var insert_mode = 'normal';
+    var insert_mode = 'normal'; // normal, to, picon
+    var insert_type = 'one'; // one, me, all
     var fuse = null;
     var DISPLAY_NUMS = 3;
     var cached_enter_action = ST.data.enter_action;
@@ -19,7 +20,7 @@ $(window).ready(function(){
     var chat_text_jquery = $('#_chatText');
     var chat_text_element = document.getElementById('_chatText');
     var suggestion_messages = {
-        normal: {ja: '\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093', en: 'No Matching Results'},
+        one: {ja: '\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093', en: 'No Matching Results'},
         all: {ja: '\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059', en: 'Select All Members'}
     }
 
@@ -115,6 +116,7 @@ $(window).ready(function(){
         current_index = 0;
         selected_index = 0;
         insert_mode = 'normal';
+        insert_type = 'one';
         $("#suggestion-container").html('');
         // restore setting to correct value
         if (cached_enter_action != ST.data.enter_action && cached_enter_action == 'send') {
@@ -156,6 +158,20 @@ $(window).ready(function(){
         }
     }
 
+    // http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
+    // First, checks if it isn't implemented yet.
+    if (!String.prototype.format) {
+      String.prototype.format = function() {
+        var args = arguments;
+        return this.replace(/{(\d+)}/g, function(match, number) {
+          return typeof args[number] != 'undefined'
+            ? args[number]
+            : match
+          ;
+        });
+      };
+    }
+
     function filterDisplayResults(results){
         is_outbound_of_list = false;
         if (!is_navigated) return results.slice(0, DISPLAY_NUMS);
@@ -174,25 +190,30 @@ $(window).ready(function(){
         }
     }
 
-    function getRawResultsAndSetMode(typed_text){
+    function getRawResultsAndSetType(typed_text){
         if (typed_text == 'me') {
-            insert_mode = 'me';
+            insert_type = 'me';
             return [getMemberObject(AC.myid)];
         }
         if (typed_text == 'all') {
-            insert_mode = 'all';
+            insert_type = 'all';
             return [];
         }
+        insert_type = 'one';
+        return typed_text ? fuse.search(typed_text) : member_objects;
+    }
+
+    function getRawResultsAndSetMode(typed_text){
         if (typed_text.slice(0, 2) == '__') {
             insert_mode = 'picon';
-            return typed_text.substring(2) ? fuse.search(typed_text.substring(2)) : member_objects;
+            return getRawResultsAndSetType(typed_text.substring(2));
         }
         if (typed_text.slice(0, 1) == '_') {
             insert_mode = 'to';
-            return typed_text.substring(1) ? fuse.search(typed_text.substring(1)) : member_objects;
+            return getRawResultsAndSetType(typed_text.substring(1));
         }
         insert_mode = 'normal';
-        return typed_text ? fuse.search(typed_text) : member_objects;
+        return getRawResultsAndSetType(typed_text);
     }
 
     // hide suggestion box when click in textarea or outside
@@ -217,10 +238,11 @@ $(window).ready(function(){
 
     chat_text_jquery.keydown(function(e) {
         if (e.which == 9 || e.which == 13) {
-            if (insert_mode == 'all') {
+            if (insert_type == 'all' && is_displayed) {
                 setSuggestedChatText(getTypedText(), null, null);
                 // dirty hack to prevent message to be sent
                 if (cached_enter_action == 'send') ST.data.enter_action = 'br';
+                e.preventDefault();
             } else {
                 if ($(".suggested-name").first().length) {
                     if (is_navigated) {
@@ -309,25 +331,37 @@ $(window).ready(function(){
         }
     });
 
+    function getReplaceText(format_string, target_name, cwid, member_objects){
+        replace_text = '';
+        switch (insert_type){
+            case 'me':
+            case 'one':
+                replace_text = format_string.format(cwid, target_name);
+                break;
+            case 'all':
+                for (var i = 0; i < member_objects.length; i++) {
+                    replace_text += format_string.format(member_objects[i].value, member_objects[i].aid2name);
+                };
+                break;
+            default:
+                break;
+        }
+        return replace_text;
+    }
+
     function setSuggestedChatText(entered_text, target_name, cwid){
         current_pos = doGetCaretPosition(chat_text_element);
         var old = chat_text_jquery.val();
         var replace_text = '';
         switch (insert_mode){
             case 'to':
-                replace_text = "[To:" + cwid + "]" + '\n';
-                break;
-            case 'picon':
-                replace_text = "[picon:" + cwid + "]" + '\n';
+                replace_text = getReplaceText("[To:{0}]", target_name, cwid, member_objects);
                 break;
             case 'normal':
-            case 'me':
-                replace_text = "[To:" + cwid + "] " + target_name + '\n';
+                replace_text = getReplaceText("[To:{0}] {1}\n", target_name, cwid, member_objects);
                 break;
-            case 'all':
-                for (var i = 0; i < member_objects.length; i++) {
-                    replace_text += "[To:" + member_objects[i].value + "] " + member_objects[i].aid2name + '\n';
-                };
+            case 'picon':
+                replace_text = getReplaceText("[picon:{0}]", target_name, cwid, member_objects);
                 break;
             default:
                 break;
@@ -339,10 +373,9 @@ $(window).ready(function(){
     }
 
     function buildList(members){
-        switch (insert_mode){
-            case 'normal':
+        switch (insert_type){
             case 'me':
-            case 'picon':
+            case 'one':
                 if (members.length) {
                     txt = '<ul>';
                     for (var i = 0; i < members.length; i++) {
@@ -352,11 +385,11 @@ $(window).ready(function(){
                     return txt;
                 } else {
                     message = (LANGUAGE == 'ja') ? '\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093' : 'No Matching Results';
-                    return '<ul><li>' + suggestion_messages['normal'][LANGUAGE] + '</li></ul>';
+                    return '<ul><li>' + suggestion_messages['one'][LANGUAGE] + '</li></ul>';
                 }
                 break;
             case 'all':
-                return '<ul><li>' + suggestion_messages[insert_mode][LANGUAGE] + '</li></ul>';
+                return '<ul><li>' + suggestion_messages[insert_type][LANGUAGE] + '</li></ul>';
                 break;
             default:
                 break;
