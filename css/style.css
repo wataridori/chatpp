@@ -116,7 +116,7 @@ body {
 }
 
 #special-active-menu-3 {
-    background-color: #e74c3c !important;
+    background-color: #3D3998 !important;
 }
 
 #special-active-menu-4 {
@@ -177,7 +177,7 @@ body {
     }
 
     .nav li[data-slide="3"] {
-        background-color: #e74c3c;
+        background-color: #3D3998;
     }
 
     .nav li[data-slide="4"] {
@@ -363,6 +363,12 @@ body {
     padding-top: 40px;
 }
 
+.subtitle-row-small {
+    font-size: 25px;
+    padding-bottom: 30px;
+    padding-top: 30px;
+}
+
 .content-row {
     padding-top: 45px;
 }
@@ -403,6 +409,12 @@ i {
         padding-top: 26px;
     }
 
+    .subtitle-row-small {
+        font-size: 20px;
+        padding-bottom: 20px;
+        padding-top: 20px;
+    }
+
     .content-row {
         padding-top: 29px;
     }
@@ -418,7 +430,7 @@ i {
 }
 
 #slide-3 {
-    background-color: #e74c3c;
+    background-color: #3D2298;
     color: #ffffff;
     padding-top: 90px;
 }
