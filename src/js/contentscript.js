@@ -56,9 +56,11 @@ function getData(url, info, inject_script) {
         .done(function(data) {
             if (typeof(data.data_version) !== 'undefined' && typeof(data.emoticons) !== 'undefined') {
                 chrome.storage.local.get(CHROME_LOCAL_KEY, function(local_data) {
-                    var code_type = "";
+                    var code_type = '';
+                    var version_type = '';
                     if (!$.isEmptyObject(local_data[CHROME_LOCAL_KEY])) {
                         code_type = local_data[CHROME_LOCAL_KEY]['code_type'];
+                        version_type = local_data[CHROME_LOCAL_KEY]['version_type'];
                     }
                     if (code_type == undefined || code_type == "") {
                         code_type = CODE_TYPE_DEFENSIVE;
@@ -69,6 +71,7 @@ function getData(url, info, inject_script) {
                         + data.data_version + ". Date sync: " + current_time + ". Code Version: " + code_type);
                     localStorage[LOCAL_STORAGE_DATA_KEY] = JSON.stringify(data.emoticons);
                     localStorage['yacep_code_type'] = code_type;
+                    localStorage['chatpp_version_type'] = version_type;
                     localStorage['yacep_data_version'] = data.data_name + ' ' + data.data_version + ' ' + current_time;
                     info.data_name = data.data_name;
                     info.data_version = data.data_version;

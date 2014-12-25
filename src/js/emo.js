@@ -10,8 +10,10 @@ var yacep_status = false;
 var cw_timer;
 
 var mention_status = false;
+var VERSION_TYPE_DEV = 'dev';
 
 $(function(){
+
     cw_timer = setInterval(
         function(){
             if (typeof CW != 'undefined' && typeof CW.reg_cmp != 'undefined') {
@@ -91,6 +93,11 @@ function removeExternalEmo() {
 function addExternalEmo() {
     var emodata = JSON.parse(localStorage[LOCAL_STORAGE_DATA_KEY]);
     addEmo(emodata);
+    var version_type = localStorage['chatpp_version_type'];
+    if (version_type === VERSION_TYPE_DEV) {
+        var secret_emos = getSecretEmos();
+        addEmo(secret_emos);
+    }
     yacep_status = true;
     updateYacepText();
     console.log('Yacep emo added!');
@@ -191,6 +198,13 @@ function updateMentionText() {
         $('#_chatppMentionText').attr('aria-label', 'Click to enable Mention Feature');
         div.removeClass('yacepTextEnable');
     }
+}
+
+function getSecretEmos() {
+    return [
+        {"key": "(ngotlong)", "regex": "\\(ngotlong\\)", "src": "ngotlong.png"},
+        {"key": "(chatpp)", "regex": "\\(chatpp\\)", "src": "chatpp.png"}
+    ];
 }
 
 function disableYacep() {

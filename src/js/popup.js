@@ -2,13 +2,23 @@ var CHROME_SYNC_KEY = "YACEP_CHROME_SYNC_DATA";
 var CHROME_LOCAL_KEY = "YACEP_CHROME_LOCAL_DATA";
 var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
 var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
+var VERSION_TYPE_DEV = 'dev';
+var VERSION_TYPE_RELEASE = 'release';
+var version_type;
 var stored_data = {};
 var local_stored_data = {};
 
 $(function() {
     var app_detail = chrome.app.getDetails();
     var version = app_detail.version;
-    $('#chatpp_version').html(version);
+    version_type = app_detail.version_type;
+    if (version_type !== VERSION_TYPE_DEV) {
+        version_type = VERSION_TYPE_RELEASE;
+    }
+
+    setVersionType();
+
+    $('#chatpp_version').html(version + ' ' + version_type);
     $('#option_page').click(function () {
         chrome.tabs.create({url:chrome.extension.getURL(app_detail.options_page)});
     });
@@ -135,4 +145,12 @@ function switchCodeType() {
     chrome.storage.local.set(local_stored_data, function() {
         loadCodeType(code_type);
     });
+}
+
+function setVersionType() {
+    if (local_stored_data[CHROME_LOCAL_KEY] == undefined) {
+        local_stored_data[CHROME_LOCAL_KEY] = {};
+    }
+    local_stored_data[CHROME_LOCAL_KEY]['version_type'] = version_type;
+    chrome.storage.local.set(local_stored_data);
 }
