@@ -1,6 +1,9 @@
 Chat++ Change Logs
 =================
 
+## 0.1.0
+* [issue #14](../../issues/14): Add secret emoticons
+
 ## 0.0.9
 * [issue #11](../../issues/11): Add `@_all` and `@__all` feature
 * [issue #12](../../issues/12): Add `@_me` and `@__me` feature
