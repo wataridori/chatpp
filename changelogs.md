@@ -1,6 +1,9 @@
 Chat++ Change Logs
 =================
 
+## 0.1.1
+* [issue #15](../../issues/15): Fix bug with `version_type` in Manifest
+
 ## 0.1.0
 * [issue #14](../../issues/14): Add secret emoticons
 

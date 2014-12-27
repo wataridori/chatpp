@@ -10,9 +10,20 @@ Chat++ is a big innovation of the well known extension [YACEP](http://yacep.than
 
 Main Features
 --------------
-* Mention Feature (Easy to mention people by typing `@`)
-* Emoticon Feature (Base on [YACEP](http://yacep.thangtd.com/))
-* And more coming soon ...
+
+* Additional Emoticons for Chatwork.
+
+* Easily Mention a person by typing `@` (like the way you mention person in Facebook, Twitter or Github ...).
+
+* Mention all people in a group by typing `@all`.
+
+* Mention your self by typing `@me` (originally not supported by Chatwork).
+
+* Mention a person or all people __without name__ by typing `@_`, `@_me` or `@_all` (originally not supported by Chatwork).
+
+* Just display user picon __(without mentioning)__ by typing `@__`, `@__me` or `@__all` (originally not supported by Chatwork).
+
+* And more awesome features coming soon ...
 
 
 Change Logs
