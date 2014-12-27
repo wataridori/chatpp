@@ -2,23 +2,25 @@ var CHROME_SYNC_KEY = "YACEP_CHROME_SYNC_DATA";
 var CHROME_LOCAL_KEY = "YACEP_CHROME_LOCAL_DATA";
 var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
 var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
-var VERSION_TYPE_DEV = 'dev';
-var VERSION_TYPE_RELEASE = 'release';
-var version_type;
+var VERSION_NAME_DEV = 'dev';
+var VERSION_NAME_RELEASE = 'release';
+var version_name;
 var stored_data = {};
 var local_stored_data = {};
 
 $(function() {
     var app_detail = chrome.app.getDetails();
     var version = app_detail.version;
-    version_type = app_detail.version_type;
-    if (version_type !== VERSION_TYPE_DEV) {
-        version_type = VERSION_TYPE_RELEASE;
+    var version_full_name = app_detail.version_name;
+    if (isDevVersion(version_full_name)) {
+        version_name = VERSION_NAME_DEV;
+    } else {
+        version_name = VERSION_NAME_RELEASE;
     }
 
     setVersionType();
 
-    $('#chatpp_version').html(version + ' ' + version_type);
+    $('#chatpp_version').html(version + ' ' + version_name);
     $('#option_page').click(function () {
         chrome.tabs.create({url:chrome.extension.getURL(app_detail.options_page)});
     });
@@ -75,10 +77,10 @@ function loadMentionStatus(status) {
 }
 
 function loadCodeType(type) {
-    if (type == CODE_TYPE_DEFENSIVE) {
-        $('#code-type').removeClass().addClass('text-danger').html('DEFENSIVE');
+    if (type == CODE_TYPE_OFFENSIVE) {
+        $('#code-type').removeClass().addClass('text-danger').html('OFFENSIVE');
     } else {
-        $('#code-type').removeClass().addClass('text-primary').html('OFFENSIVE');
+        $('#code-type').removeClass().addClass('text-primary').html('DEFENSIVE');
     }
 }
 
@@ -99,7 +101,7 @@ function loadYacepDataStatus() {
         local_stored_data = data;
         data = data[CHROME_LOCAL_KEY];
         var type = CODE_TYPE_DEFENSIVE;
-        if (!$.isEmptyObject(data)) {
+        if (!$.isEmptyObject(data) && data.code_type !== undefined) {
             type = data.code_type;
         }
         loadCodeType(type);
@@ -151,6 +153,10 @@ function setVersionType() {
     if (local_stored_data[CHROME_LOCAL_KEY] == undefined) {
         local_stored_data[CHROME_LOCAL_KEY] = {};
     }
-    local_stored_data[CHROME_LOCAL_KEY]['version_type'] = version_type;
+    local_stored_data[CHROME_LOCAL_KEY]['version_name'] = version_name;
     chrome.storage.local.set(local_stored_data);
+}
+
+function isDevVersion(version_name) {
+    return version_name.indexOf(VERSION_NAME_DEV, version_name.length - VERSION_NAME_DEV.length) !== -1;
 }

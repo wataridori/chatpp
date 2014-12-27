@@ -10,7 +10,7 @@ var yacep_status = false;
 var cw_timer;
 
 var mention_status = false;
-var VERSION_TYPE_DEV = 'dev';
+var VERSION_NAME_DEV = 'dev';
 
 $(function(){
 
@@ -93,8 +93,8 @@ function removeExternalEmo() {
 function addExternalEmo() {
     var emodata = JSON.parse(localStorage[LOCAL_STORAGE_DATA_KEY]);
     addEmo(emodata);
-    var version_type = localStorage['chatpp_version_type'];
-    if (version_type === VERSION_TYPE_DEV) {
+    var version_name = localStorage['chatpp_version_name'];
+    if (version_name === VERSION_NAME_DEV) {
         var secret_emos = getSecretEmos();
         addEmo(secret_emos);
     }
