@@ -1,7 +1,7 @@
 Chat++ Change Logs
 =================
 
-## 0.1.1
+## 0.1.2
 * [issue #15](../../issues/15): Fix bug with `version_type` in Manifest
 
 ## 0.1.0
