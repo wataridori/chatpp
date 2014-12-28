@@ -1,4 +1,4 @@
-var CHROME_SYNC_KEY = "YACEP_CHROME_SYNC_DATA";
+var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
 var CHROME_LOCAL_KEY = "YACEP_CHROME_LOCAL_DATA";
 var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
 var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
@@ -15,7 +15,7 @@ $(function() {
     if (isDevVersion(app_name)) {
         version_name = VERSION_NAME_DEV;
     } else {
-        version_name = VERSION_NAME_RELEASE;
+        version_name = '';
     }
 
     setVersionType();

@@ -1,36 +1,48 @@
 var LOCAL_STORAGE_INFO_KEY = "YACEP_EMO_INFO";
 var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
-var CHROME_SYNC_KEY = "YACEP_CHROME_SYNC_DATA";
+var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
 
 var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
 var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
 
+var emo_storage;
+var emoticons = [];
+var emo_info = {};
+
 $(function() {
+    var urls = {};
     chrome.storage.sync.get(CHROME_SYNC_KEY, function(info) {
-        var url = "";
         if (!$.isEmptyObject(info)) {
             info = info[CHROME_SYNC_KEY];
-            if (info.data_name == 'Default' && info.data_url != DEFAULT_DATA_URL) {
-                url = DEFAULT_DATA_URL;
-            } else {
-                url = info.data_url;
+            emo_info = info;
+            console.log(info);
+            for (key in info) {
+                var emo_data = info[key];
+                if (emo_data.data_name == 'Default' && emo_data.data_url != DEFAULT_DATA_URL) {
+                    url = DEFAULT_DATA_URL;
+                } else {
+                    url = emo_data.data_url;
+                }
+                urls[emo_data.data_name] = url;
             }
         }
-        if (!url) {
-            url = DEFAULT_DATA_URL;
+        if ($.isEmptyObject(urls)) {
+            urls['Default'] = DEFAULT_DATA_URL;
         }
-        getData(url, fillTable);
+        fillDataTable(info);
+        getData(urls, fillTable);
     });
 
     var app_detail = chrome.app.getDetails();
     var version = app_detail.version;
     $('#chatpp_version').html(version);
     $('#btn-reset').click(function() {
-        getData(DEFAULT_DATA_URL, fillTable);
+        emo_info = {};
+        getData({}, reload);
     });
     $('#btn-load').click(function() {
         if ($('#data-select').val() == 'default') {
-            getData(DEFAULT_DATA_URL, fillTable);
+            getData(DEFAULT_DATA_URL, reload);
         } else {
             var url = $('#data-url').val();
             if (!validateUrl(url)) {
@@ -44,7 +56,8 @@ $(function() {
                             label: "OK!",
                             className: "btn-success",
                             callback: function() {
-                                getData(url, fillTable);
+                                urls['added'] = url;
+                                getData(urls, reload);
                             }
                         },
                         danger: {
@@ -94,21 +107,85 @@ function verifyDataLocalStorage() {
     return localStorage[LOCAL_STORAGE_DATA_KEY] != 'undefined' && !$.isEmptyObject(localStorage[LOCAL_STORAGE_DATA_KEY]);
 }
 
-function getData(url, callback) {
-    $.getJSON(url)
-        .done(function(data) {
-            if (typeof(data.data_version) !== 'undefined' && typeof(data.emoticons) !== 'undefined') {
-                data.data_url = url;
-                var emo = new EmoStorage(data);
-                emo.syncData(callback);
-                localStorage[LOCAL_STORAGE_DATA_KEY] = JSON.stringify(data.emoticons);
-            } else {
-                bootbox.alert("Invalid data structure!");
+function getData(urls, callback) {
+    if ($.isEmptyObject(urls)) {
+        urls['Default'] = DEFAULT_DATA_URL;
+    }
+    emo_storage = new EmoStorage();
+    var loaded_urls = [];
+    for (var i in urls) {
+        var url = urls[i];
+        if (loaded_urls.indexOf(url) === -1) {
+            loaded_urls.push(url);
+        } else {
+            continue;
+        }
+        $.getJSON(url)
+            .done(function(data) {
+                if (typeof(data.data_version) !== 'undefined' && typeof(data.emoticons) !== 'undefined') {
+                    var index = getObjectLenght(emo_storage.data);
+                    var last = index === getObjectLenght(urls) - 1;
+                    data.data_url = urls[data.data_name] ? urls[data.data_name] : urls['added'];
+                    var priority = getPriority(data.data_name);
+                    emo_storage.pushData(data, priority);
+                    pushEmoticons(data.emoticons, priority);
+                    if (last) {
+                        emo_storage.syncData(callback);
+                    }
+                } else {
+                    bootbox.alert("Invalid data structure!");
+                }
+            }).fail(function( jqxhr, textStatus, error ) {
+                var err = textStatus + ", " + error;
+                bootbox.alert("Request Failed: " + err);
+            });
+    }
+}
+
+function reload() {
+    location.reload();
+}
+
+function getObjectLenght(object) {
+    return Object.keys(object).length;
+}
+
+function getPriority(data_name) {
+    var max = 0;
+    for (key in emo_info) {
+        var val = emo_info[key];
+        if (val.data_name === data_name) {
+            return val.priority;
+        }
+        if (val.priority >= max) {
+            max = val.priority + 1;
+        }
+    }
+
+    return max;
+}
+
+function validateEmoData(data) {
+    return !$.isEmptyObject(data) && $.isArray(data.data) && data.date_sync !== undefined;
+}
+
+function pushEmoticons(emos, priority) {
+    for (var i = 0; i < emos.length; i++) {
+        var repeated = false;
+        emos[i].priority = priority;
+        for (var j = 0; j < emoticons.length; j++) {
+            if (emoticons[j].regex === emos[i].regex) {
+                if (emoticons[j].src !== emos[i].src && emoticons[j].priority < emos[i].priority) {
+                    emoticons[j] = emos[i];
+                }
+                repeated = true;
+                break;
             }
-        }).fail(function( jqxhr, textStatus, error ) {
-            var err = textStatus + ", " + error;
-            bootbox.alert("Request Failed: " + err);
-        });
+        }
+        if (!repeated) {
+            emoticons.push(emos[i]);
+        }
+    }
 }
 
 function clearTable() {
@@ -125,7 +202,6 @@ function fillTable() {
         $('#url-input-div').show("slow");
         $('#btn-show-changelog').show("slow");
     }
-    var emoticons = JSON.parse(localStorage[LOCAL_STORAGE_DATA_KEY]);
     var table_text = '';
     $.each(emoticons, function(key, emo) {
         if (key % 4 === 0) {
@@ -136,7 +212,7 @@ function fillTable() {
             table_text += "</tr>";
         }
     });
-    $('#table-emo > tbody').append(table_text);
+    $('#table-emo').find('tbody').append(table_text);
 }
 
 function createTableTd(data) {
@@ -146,6 +222,31 @@ function createTableTd(data) {
     row += "<td class='text-center'><img src='" + src + "'/> </td>";
     //row += "<td><button class='btn btn-warning btn-sm action' id='btn-" + data.key + "'> Hide </button></td>";
     return row;
+}
+
+function fillDataTable(info) {
+    var table_text = '';
+    $.each(info, function(key, data) {
+        table_text += "<tr>";
+        table_text += "<td class='text-center'>" + data.data_name + "</td>";
+        table_text += "<td class='text-center'>" + data.data_version + "</td>";
+        table_text += "<td class='text-center'>" + createATag(data.data_url) + "</td>";
+        table_text += "<td class='text-center'>" + createATag(data.data_changelog) + "</td>";
+        table_text += "<td class='text-center'><button class='btn btn-warning btn-sm action' id='btn-" + data.data_name + "'> Remove </button></td>";
+        table_text += "</tr>";
+    });
+    $('#table-data').find('tbody').append(table_text);
+}
+
+function createATag(url) {
+    if (!url) {
+        return '';
+    }
+    return $('<a>', {
+        href: url,
+        text: url,
+        target: '_blank'
+    }).prop('outerHTML');;
 }
 
 function getEmoUrl(img) {
@@ -169,7 +270,6 @@ function showChangelog() {
     if (changelog_url !== undefined && changelog_url !== "") {
         $.getJSON(changelog_url)
             .done(function(data) {
-                console.log(data);
                 if (data.data_name !== undefined && data.changelog !== undefined) {
                     var html = "";
                     $.each(data.changelog, function(version, changes) {
@@ -196,19 +296,19 @@ function showChangelog() {
     }
 }
 
-function EmoStorage(inputed_data, data_custom) {
-    this.data = {
+function EmoStorage() {
+    this.data = {};
+}
+
+EmoStorage.prototype.pushData = function(inputed_data, priority) {
+    this.data[inputed_data.data_name] = {
+        priority: priority,
         data_name: inputed_data.data_name,
         data_url: inputed_data.data_url,
         data_changelog: inputed_data.data_changelog,
         data_version: inputed_data.data_version,
-        data_custom: data_custom,
         date_sync: (new Date()).toLocaleString()
     };
-}
-
-EmoStorage.prototype.getDataCustom = function() {
-    return this.data.data_custom;
 };
 
 EmoStorage.prototype.syncData = function(callback) {

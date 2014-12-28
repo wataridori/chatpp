@@ -7,44 +7,60 @@
     <script type="text/javascript" src="js/bootbox.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 </head><body>
-<div class="container">
-    <h1 class="text-primary">
-        <img src="icon64.png" id="popup_page" alt="Angelic">
-        <strong>Chat++ <span id="chatpp_version"></span></strong><br>
-    </h1>
-    <h3 class="text-info">*** A Chatwork Enhancement Toolkit ***</h3>
-    <hr>
+<div class="container-fluid">
     <div class="row">
-        <h3 class="text-primary">Choose Emoticon version: </h3>
-        <div class="col-sm-6 col-lg-4">
-            <select class="form-control" id="data-select">
-                <option value="default">Default</option>
-                <option value="custom">Custom</option>
-            </select>
+        <div class="col-lg-10 col-lg-offset-1">
+            <h1 class="text-primary">
+                <img src="icon64.png" id="popup_page" alt="Angelic">
+                <strong>Chat++ <span id="chatpp_version"></span></strong><br>
+            </h1>
+            <h3 class="text-info">*** A Chatwork Enhancement Toolkit ***</h3>
+            <hr>
+            <div class="row">
+                <h3 class="text-primary">Add new Emoticons Data</h3>
+                <div class="col-sm-12 col-lg-6" id="url-input-div">
+                    <input class="form-control" id="data-url" placeholder="Enter Your Emoticons Data URL here!">
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row">
+                <button class="btn btn-success btn-sm" id="btn-load">Load</button>
+                <button class="btn btn-danger btn-sm" id="btn-reset">Reset</button>
+            </div>
+
+            <div class="row">
+                <h3 class="text-primary">Emoticons Data</h3>
+                <div class="col-sm-12" id="emo-data-div">
+                    <table class="table table-bordered" id="table-data">
+                        <thead>
+                        <tr class="success text-center">
+                            <th class="text-center">Data Name</th>
+                            <th class="text-center">Data Version</th>
+                            <th class="text-center">Data URL</th>
+                            <th class="text-center">Data Change log</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <button class="btn btn-success btn-sm" id="btn-show-changelog" hidden>Show Changelog</button>
+                <br>
+                <br>
+                <div class="jumbotron" style="background-color: rgb(34, 34, 34);" id="changelog" hidden>
+                    <h3>Change log</h3>
+                </div>
+            </div>
+            <br>
+            <br>
         </div>
     </div>
-    <br>
-    <div class="row" id="url-input-div" hidden>
-        <div class="col-sm-12 col-lg-6">
-            <input class="form-control" id="data-url" placeholder="Enter Your Emoticons Data URL here!">
-        </div>
-    </div>
-    <br>
-    <div class="row">
-        <button class="btn btn-success btn-sm" id="btn-load">Load</button>
-        <button class="btn btn-danger btn-sm" id="btn-reset">Reset</button>
-    </div>
-    <hr>
-    <div class="row">
-        <button class="btn btn-success btn-sm" id="btn-show-changelog" hidden>Show Changelog</button>
-        <br>
-        <br>
-        <div class="jumbotron" style="background-color: rgb(34, 34, 34);" id="changelog" hidden>
-            <h3>Change log</h3>
-        </div>
-    </div>
-    <br>
-    <br>
     <div id="emoticions-table">
         <div class="panel panel-warning">
             <div class="panel-heading">
