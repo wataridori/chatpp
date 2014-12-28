@@ -11,8 +11,8 @@ var local_stored_data = {};
 $(function() {
     var app_detail = chrome.app.getDetails();
     var version = app_detail.version;
-    var version_full_name = app_detail.version_name;
-    if (isDevVersion(version_full_name)) {
+    var app_name = app_detail.name;
+    if (isDevVersion(app_name)) {
         version_name = VERSION_NAME_DEV;
     } else {
         version_name = VERSION_NAME_RELEASE;
@@ -157,6 +157,6 @@ function setVersionType() {
     chrome.storage.local.set(local_stored_data);
 }
 
-function isDevVersion(version_name) {
-    return version_name.indexOf(VERSION_NAME_DEV, version_name.length - VERSION_NAME_DEV.length) !== -1;
+function isDevVersion(app_name) {
+    return app_name.indexOf(VERSION_NAME_DEV, app_name.length - VERSION_NAME_DEV.length) !== -1;
 }
