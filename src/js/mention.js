@@ -41,6 +41,10 @@ $(window).ready(function(){
             if (spaces && spaces.length > 2) {
                 return false;
             }
+            // text contain new line character
+            if (getTypedText().indexOf("\n") != -1){
+                return false;
+            }
             return true;
         } else{
             // There is no @ symbol
@@ -231,12 +235,22 @@ $(window).ready(function(){
 
     // when user press ESC, we hide suggestion box
     $(document).keyup(function(e){
+        if (!mention_status) {
+            return;
+        }
         if (e.which == 27) {
             hideSuggestionBox();
         }
     });
 
+    function isTriggerKeyCode(keyCode){
+        return [37, 38, 39, 40].indexOf(keyCode) == -1;
+    }
+
     chat_text_jquery.keydown(function(e) {
+        if (!mention_status) {
+            return;
+        }
         if (e.which == 9 || e.which == 13) {
             if (insert_type == 'all' && is_displayed) {
                 setSuggestedChatText(getTypedText(), null, null);
@@ -274,6 +288,9 @@ $(window).ready(function(){
 
         if (findAtmark()) {
             if (!is_displayed) {
+                if (!isTriggerKeyCode(e.which)) {
+                    return;
+                }
                 setSuggestionBoxPosition();
                 showSuggestionBox(buildList(filterDisplayResults(member_objects)));
                 is_displayed = true;
