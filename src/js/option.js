@@ -23,7 +23,9 @@ $(function() {
                 } else {
                     url = emo_data.data_url;
                 }
-                urls[emo_data.data_name] = url;
+                if (url) {
+                    urls[emo_data.data_name] = url;
+                }
             }
         }
         if ($.isEmptyObject(urls)) {
@@ -227,15 +229,23 @@ function createTableTd(data) {
 function fillDataTable(info) {
     var table_text = '';
     $.each(info, function(key, data) {
-        table_text += "<tr>";
-        table_text += "<td class='text-center'>" + data.data_name + "</td>";
-        table_text += "<td class='text-center'>" + data.data_version + "</td>";
-        table_text += "<td class='text-center'>" + createATag(data.data_url) + "</td>";
-        table_text += "<td class='text-center'>" + createATag(data.data_changelog) + "</td>";
-        table_text += "<td class='text-center'><button class='btn btn-warning btn-sm action' id='btn-" + data.data_name + "'> Remove </button></td>";
-        table_text += "</tr>";
+        if (data.data_name !== undefined && data.data_url !== undefined) {
+            table_text += "<tr>";
+            table_text += "<td class='text-center'>" + data.data_name + "</td>";
+            table_text += "<td class='text-center'>" + data.data_version + "</td>";
+            table_text += "<td class='text-center'>" + createATag(data.data_url) + "</td>";
+            table_text += "<td class='text-center'>" + createATag(data.data_changelog) + "</td>";
+            table_text += "<td class='text-center'><button class='btn btn-warning btn-sm btn-data-remove' data-name='" + data.data_name
+            + "' id='btn-" + data.data_name + "'> Remove </button></td>";
+            table_text += "</tr>";
+        }
     });
     $('#table-data').find('tbody').append(table_text);
+    $('.btn-data-remove').click(function() {
+        var name = $(this).data('name');
+        emo_storage.removeData(name);
+        emo_storage.syncData(reload);
+    });
 }
 
 function createATag(url) {
@@ -309,6 +319,12 @@ EmoStorage.prototype.pushData = function(inputed_data, priority) {
         data_version: inputed_data.data_version,
         date_sync: (new Date()).toLocaleString()
     };
+};
+
+EmoStorage.prototype.removeData = function(data_name) {
+    if (this.data[data_name] !== undefined) {
+        delete this.data[data_name];
+    }
 };
 
 EmoStorage.prototype.syncData = function(callback) {

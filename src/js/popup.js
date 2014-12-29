@@ -1,9 +1,9 @@
 var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
-var CHROME_LOCAL_KEY = "YACEP_CHROME_LOCAL_DATA";
+var CHROME_LOCAL_KEY = "CHATPP_CHROME_LOCAL_DATA";
 var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
 var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
 var VERSION_NAME_DEV = 'dev';
-var VERSION_NAME_RELEASE = 'release';
+var VERSION_NAME_RELEASE = 'final';
 var version_name;
 var stored_data = {};
 var local_stored_data = {};
@@ -15,7 +15,7 @@ $(function() {
     if (isDevVersion(app_name)) {
         version_name = VERSION_NAME_DEV;
     } else {
-        version_name = '';
+        version_name = VERSION_NAME_RELEASE;
     }
 
     setVersionType();
@@ -45,14 +45,11 @@ $(function() {
         var data = changes[CHROME_SYNC_KEY];
         if (!$.isEmptyObject(data) && !$.isEmptyObject(data.newValue)) {
             data = data.newValue;
-            var text = data.data_name + "_" + data.data_version;
-            $('#current-data-info').html(text);
-            $('#date-sync-info').html(data.date_sync);
-            loadEmoticonStatus(data.emoticon_status);
-            loadMentionStatus(data.mention_status);
+            updateViewData(data);
         }
     });
-    loadYacepDataStatus();
+
+    loadChatppEmoData();
 });
 
 function loadEmoticonStatus(status) {
@@ -66,7 +63,6 @@ function loadEmoticonStatus(status) {
 }
 
 function loadMentionStatus(status) {
-    console.log(status);
     if (status !== undefined && status == false) {
         $('#mention-status').removeClass().addClass('text-danger').html('DISABLED');
         $('#btn-mention-status').html('Enable');
@@ -77,23 +73,19 @@ function loadMentionStatus(status) {
 }
 
 function loadCodeType(type) {
-    if (type == CODE_TYPE_OFFENSIVE) {
+    if (type === CODE_TYPE_OFFENSIVE) {
         $('#code-type').removeClass().addClass('text-danger').html('OFFENSIVE');
     } else {
         $('#code-type').removeClass().addClass('text-primary').html('DEFENSIVE');
     }
 }
 
-function loadYacepDataStatus() {
+function loadChatppEmoData() {
     chrome.storage.sync.get(CHROME_SYNC_KEY, function(data) {
         stored_data = data;
         data = data[CHROME_SYNC_KEY];
         if (!$.isEmptyObject(data)) {
-            var text = data.data_name + "_" + data.data_version;
-            $('#current-data-info').html(text);
-            $('#date-sync-info').html(data.date_sync);
-            loadEmoticonStatus(data.emoticon_status);
-            loadMentionStatus(data.mention_status);
+            updateViewData(data);
         }
     });
 
@@ -106,6 +98,41 @@ function loadYacepDataStatus() {
         }
         loadCodeType(type);
     });
+}
+
+function updateViewData(data) {
+    var name = parseDataName(data);
+    var date_sync = parseDateSynce(data);
+    $('#current-data-info').html(name);
+    $('#date-sync-info').html(date_sync);
+    loadEmoticonStatus(data.emoticon_status);
+    loadMentionStatus(data.mention_status);
+}
+
+function parseDataName(data) {
+    if (data.data_name !== undefined && data.data_version !== undefined) {
+        return data.data_name + "_" + data.data_version;
+    }
+    var data_name = '';
+    for (key in data) {
+        if (data[key].data_name !== undefined) {
+            data_name += data[key].data_name + '_' + data[key].data_version + '  ';
+        }
+    }
+    return data_name;
+}
+
+function parseDateSynce(data) {
+    if (data.date_sync !== undefined) {
+        return data.date_sync;
+    }
+    var date_sync;
+    for (key in data) {
+        if (data[key].date_sync !== undefined) {
+            date_sync = data[key].date_sync;
+        }
+    }
+    return date_sync;
 }
 
 function switchEmoticonStatus() {
@@ -136,25 +163,33 @@ function switchMentionStatus() {
 }
 
 function switchCodeType() {
-    var code_type = CODE_TYPE_OFFENSIVE;
-    if ($('#code-type').html() == 'OFFENSIVE') {
-        code_type = CODE_TYPE_DEFENSIVE;
+    var code_type = CODE_TYPE_DEFENSIVE;
+    if ($('#code-type').html() === 'DEFENSIVE') {
+        code_type = CODE_TYPE_OFFENSIVE;
     }
-    if (local_stored_data[CHROME_LOCAL_KEY] == undefined) {
-        local_stored_data[CHROME_LOCAL_KEY] = {};
-    }
-    local_stored_data[CHROME_LOCAL_KEY]['code_type'] = code_type;
-    chrome.storage.local.set(local_stored_data, function() {
-        loadCodeType(code_type);
+
+    chrome.storage.local.get(CHROME_LOCAL_KEY, function(data) {
+        local_stored_data = data;
+        if (local_stored_data[CHROME_LOCAL_KEY] === undefined) {
+            local_stored_data[CHROME_LOCAL_KEY] = {};
+        }
+        local_stored_data[CHROME_LOCAL_KEY]['code_type'] = code_type;
+        chrome.storage.local.set(local_stored_data, function() {
+            loadCodeType(code_type);
+        });
     });
+
 }
 
 function setVersionType() {
-    if (local_stored_data[CHROME_LOCAL_KEY] == undefined) {
-        local_stored_data[CHROME_LOCAL_KEY] = {};
-    }
-    local_stored_data[CHROME_LOCAL_KEY]['version_name'] = version_name;
-    chrome.storage.local.set(local_stored_data);
+    chrome.storage.local.get(CHROME_LOCAL_KEY, function(data) {
+        local_stored_data = data;
+        if (local_stored_data[CHROME_LOCAL_KEY] === undefined) {
+            local_stored_data[CHROME_LOCAL_KEY] = {};
+        }
+        local_stored_data[CHROME_LOCAL_KEY]['version_name'] = version_name;
+        chrome.storage.local.set(local_stored_data);
+    });
 }
 
 function isDevVersion(app_name) {
