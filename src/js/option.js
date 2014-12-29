@@ -125,8 +125,8 @@ function getData(urls, callback) {
         $.getJSON(url)
             .done(function(data) {
                 if (typeof(data.data_version) !== 'undefined' && typeof(data.emoticons) !== 'undefined') {
-                    var index = getObjectLenght(emo_storage.data);
-                    var last = index === getObjectLenght(urls) - 1;
+                    var index = getObjectLength(emo_storage.data);
+                    var last = index === getObjectLength(urls) - 1;
                     data.data_url = urls[data.data_name] ? urls[data.data_name] : urls['added'];
                     var priority = getPriority(data.data_name);
                     emo_storage.pushData(data, priority);
@@ -148,7 +148,7 @@ function reload() {
     location.reload();
 }
 
-function getObjectLenght(object) {
+function getObjectLength(object) {
     return Object.keys(object).length;
 }
 
@@ -197,7 +197,6 @@ function clearTable() {
 function fillTable() {
     clearTable();
     var info = JSON.parse(localStorage[LOCAL_STORAGE_INFO_KEY]);
-    $('#data-version').html(" (Version: " + info.data_name + "_" + info.data_version + " " + info.date_sync+ ")");
     if (info.data_name != "Default" && info.data_url) {
         $('#data-select').val('custom');
         $('#data-url').val(info.data_url);
@@ -231,6 +230,7 @@ function fillDataTable(info) {
     $.each(info, function(key, data) {
         if (data.data_name !== undefined && data.data_url !== undefined) {
             table_text += "<tr>";
+            table_text += "<td class='text-center'>" + data.priority + "</td>";
             table_text += "<td class='text-center'>" + data.data_name + "</td>";
             table_text += "<td class='text-center'>" + data.data_version + "</td>";
             table_text += "<td class='text-center'>" + createATag(data.data_url) + "</td>";
