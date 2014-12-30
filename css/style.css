@@ -440,7 +440,7 @@ i {
     display: inline-block;
     height: 100%;
     margin: 0 auto;
-    width: 100%;
+    padding: 10px;
 }
 
 @media (max-width: 991px) {

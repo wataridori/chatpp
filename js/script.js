@@ -66,6 +66,19 @@ $(document).ready(function (e) {
     });
     $(document).scroll();
 
+    $('.btn-show').click(function() {
+        var me = $(this);
+        var img_div_id = me.data(('div'));
+        var img_div = $('#' + img_div_id);
+        if (img_div.is(':visible')) {
+            img_div.hide('slow');
+            me.html('Show').removeClass('btn-danger').addClass('btn-success');
+        } else {
+            img_div.show('slow');
+            me.html('Hide').removeClass('btn-success').addClass('btn-danger');
+        }
+    });
+
 });
 
 var delay = (function () {

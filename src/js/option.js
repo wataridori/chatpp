@@ -52,7 +52,7 @@ $(function() {
             } else {
                 bootbox.dialog({
                     message: 'The data from <a href="' + url + '">' + url + '</a> may contain undesirable emoticons and we will not be responsible for it' ,
-                    title: "<span class='text-danger'>Your are trying to load data that is not officially supported by YACEP.<br/> Do you want to continue ?</span>",
+                    title: "<span class='text-danger'>Your are trying to load data that is not officially supported by Chat++.<br/> Do you want to continue ?</span>",
                     buttons: {
                         success: {
                             label: "OK!",
