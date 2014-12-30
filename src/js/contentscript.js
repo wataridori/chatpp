@@ -25,7 +25,6 @@ function init(inject_script) {
     chrome.storage.sync.get(CHROME_SYNC_KEY, function(info) {
         info = info[CHROME_SYNC_KEY];
         emo_info = info;
-        console.log(info);
         var url = "";
         if (!$.isEmptyObject(info)) {
             for (key in info) {
@@ -76,7 +75,6 @@ function getData(info, inject_script) {
                 if (typeof(data.data_version) !== 'undefined' && typeof(data.emoticons) !== 'undefined') {
                     data.data_url = urls[data.data_name];
                     var priority = (emo_info[data.data_name] && emo_info[data.data_name].priority) ? emo_info[data.data_name].priority : 0;
-                    console.log(priority);
                     emo_storage.pushData(data, priority);
                     pushEmoticons(data.emoticons, priority);
                     if (last) {
@@ -96,7 +94,7 @@ function getData(info, inject_script) {
                             localStorage[LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
                             localStorage['yacep_code_type'] = code_type;
                             localStorage['chatpp_version_name'] = version_name;
-                            localStorage['yacep_data_version'] = 'test';
+                            localStorage['yacep_data_version'] = parseDataName(emo_info);
                             if (inject_script !== undefined && inject_script) {
                                 addInjectedScript();
                             } else {
@@ -110,6 +108,19 @@ function getData(info, inject_script) {
                 console.log( "Request Failed: " + err );
             });
     }
+}
+
+function parseDataName(data) {
+    if (data.data_name !== undefined && data.data_version !== undefined) {
+        return data.data_name + "_" + data.data_version;
+    }
+    var data_name = '';
+    for (key in data) {
+        if (data[key].data_name !== undefined) {
+            data_name += data[key].data_name + '_' + data[key].data_version + '  ';
+        }
+    }
+    return data_name;
 }
 
 function getObjectLength(object) {
