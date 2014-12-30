@@ -1,6 +1,10 @@
 Chat++ Change Logs
 =================
 
+## 0.1.3
+* [issue #13](../../issues/13): Fix bug with arrows inputted
+* [issue #9](../../issues/9): Apply multiple emoticons data
+
 ## 0.1.2
 * [issue #15](../../issues/15): Fix bug with `version_type` in Manifest
 

@@ -1,4 +1,4 @@
-Chat++
+![chatpp](./src/icon32.png) Chat++
 =================
 
 Chat++ is an all-in-one Chatwork Enhancement Toolkit.
