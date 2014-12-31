@@ -15,7 +15,7 @@ $(window).ready(function(){
     var DISPLAY_NUMS = 3;
     var cached_enter_action = ST.data.enter_action;
     var options = {
-        keys: ['keys']
+        keys: ['aid2name']
     };
     var chat_text_jquery = $('#_chatText');
     var chat_text_element = document.getElementById('_chatText');
@@ -431,7 +431,6 @@ $(window).ready(function(){
     function getMemberObject(member){
         var h = CW.is_business && ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(member) : AC.getNickName(member);
         return {
-            keys: AC.getSearchKeys(member)[0],
             value: member,
             label: CW.getAvatarPanel(member, {
                 clicktip: !1,
