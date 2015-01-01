@@ -72,7 +72,7 @@ function getEmoUrl(img) {
 }
 
 function isSpecialEmo(emo) {
-    var special_emo = [':-ss', ':-??'];
+    var special_emo = [':-ss', ':-??', '~:>'];
     return special_emo.indexOf(emo) > -1;
 }
 

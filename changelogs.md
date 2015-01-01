@@ -1,6 +1,14 @@
 Chat++ Change Logs
 =================
 
+## 1.0.1
+* Mention user with Nickname.
+* Fix bug: Can not initialize Default Emoticons Data at the first load.
+* Fix bug: Two emoticons data have the same priority.
+
+## 1.0.0
+* Change version for release purpose.
+
 ## 0.1.3
 * [issue #13](../../issues/13): Fix bug with arrows inputted
 * [issue #9](../../issues/9): Apply multiple emoticons data
