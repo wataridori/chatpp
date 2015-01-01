@@ -227,7 +227,11 @@ body {
 }
 
 #slide-1 h1 {
-    padding-top: 130px;
+    padding-top: 30px;
+}
+
+#slide-1 .fancybox-thumb {
+    padding-right: 30px;
 }
 
 @media (max-height: 700px) {
@@ -265,6 +269,14 @@ body {
 @media (min-height: 900px) {
     #slide-1, #slide-2, #slide-3, #slide-4, #slide-5, #slide-6 {
         min-height: 1000px;
+    }
+
+    #slide-1 h1 {
+        padding-top: 100px;
+    }
+
+    #slide-1 .line-row {
+        margin-bottom: 50px;
     }
 }
 

@@ -83,6 +83,18 @@
                     <div class="hr">&nbsp;</div>
                 </div>
                 <br>
+                <div class="row line-row">
+                    <a class="fancybox-thumb" rel="fancybox-thumb" href="img/1.png" title="Additional Emoticons Feature">
+                        <img src="img/1_thumb.png" alt="" />
+                    </a>
+                    <a class="fancybox-thumb" rel="fancybox-thumb" href="img/2.png" title="Mention Features">
+                        <img src="img/2_thumb.png" alt="" />
+                    </a>
+                    <a class="fancybox-thumb" rel="fancybox-thumb" href="img/3.png" title="Easily turn Feature ON or OFF">
+                        <img src="img/3_thumb.png" alt="" />
+                    </a>
+                </div>
+                <br>
                 <h4 class="font-thin">An all-in-one <span class="font-semibold">Chatwork Enhancement Toolkit </span>
                     <br>
                     <br>
@@ -313,11 +325,12 @@
         var lis = $('.nav > li');
         menu_focus(lis[0], 1);
 
-        $(".fancybox").fancybox({
-            padding: 10,
-            helpers: {
-                overlay: {
-                    locked: false
+        $(".fancybox-thumb").fancybox({
+            prevEffect	: 'elastic',
+            nextEffect	: 'elastic',
+            helpers	: {
+                title	: {
+                    type: 'inside'
                 }
             }
         });
