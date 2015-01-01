@@ -9,6 +9,8 @@ var emo_storage;
 var emoticons = [];
 var emo_info = {};
 
+var init = false;
+
 $(function() {
     var urls = {};
     chrome.storage.sync.get(CHROME_SYNC_KEY, function(info) {
@@ -29,10 +31,16 @@ $(function() {
             }
         }
         if ($.isEmptyObject(urls)) {
+            init = true;
             urls['Default'] = DEFAULT_DATA_URL;
         }
         fillDataTable(info);
-        getData(urls, fillTable);
+
+        if (init) {
+            getData(urls, reload);
+        } else {
+            getData(urls, fillTable);
+        }
     });
 
     var app_detail = chrome.app.getDetails();

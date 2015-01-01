@@ -7,9 +7,10 @@ var VERSION_NAME_RELEASE = 'final';
 var version_name;
 var stored_data = {};
 var local_stored_data = {};
+var app_detail;
 
 $(function() {
-    var app_detail = chrome.app.getDetails();
+    app_detail = chrome.app.getDetails();
     var version = app_detail.version;
     var app_name = app_detail.name;
     if (isDevVersion(app_name)) {
@@ -84,7 +85,9 @@ function loadChatppEmoData() {
     chrome.storage.sync.get(CHROME_SYNC_KEY, function(data) {
         stored_data = data;
         data = data[CHROME_SYNC_KEY];
-        if (!$.isEmptyObject(data)) {
+        if ($.isEmptyObject(data)) {
+            chrome.tabs.create({url:chrome.extension.getURL(app_detail.options_page)});
+        } else {
             updateViewData(data);
         }
     });

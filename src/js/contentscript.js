@@ -39,7 +39,7 @@ function init(inject_script) {
                 }
             }
         }
-        if (urls.length === 0) {
+        if ($.isEmptyObject(urls)) {
             urls['Default'] = DEFAULT_DATA_URL;
         }
         if (info === undefined) {
