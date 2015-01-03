@@ -8,11 +8,23 @@ var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
 var emo_storage;
 var emoticons = [];
 var emo_info = {};
-
+var urls = {};
 var init = false;
 
+var offical_emos = {
+    Default: {
+        name: 'Default',
+        link: 'https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1',
+        description: 'The default Emoticons data of Chat++'
+    },
+    Japanese: {
+        name: 'Japanese',
+        link: 'https://dl.dropboxusercontent.com/s/59gwiqg9bipvz40/jp-emo.json?dl=1',
+        description: 'Yet another data for people who want to use Japanese Emoticons'
+    }
+};
+
 $(function() {
-    var urls = {};
     chrome.storage.sync.get(CHROME_SYNC_KEY, function(info) {
         if (!$.isEmptyObject(info)) {
             info = info[CHROME_SYNC_KEY];
@@ -40,6 +52,7 @@ $(function() {
             getData(urls, reload);
         } else {
             getData(urls, fillTable);
+            showOfficialData();
         }
     });
 
@@ -173,6 +186,28 @@ function getPriority(data_name) {
     }
 
     return max;
+}
+
+function showOfficialData() {
+    var official = $('#official-data');
+    for (var data_name in offical_emos) {
+        if (emo_info[data_name] === undefined) {
+            var new_button = '<div class="col-md-12"><button class="btn btn-info btn-sm btn-official-data" data-name="' + data_name + '">Add ' + data_name + '</button>'
+                + '<span class="text-primary" style="padding-left: 20px"><strong>' + offical_emos[data_name].description + '</strong></span>'
+                + '</div>';
+            official.append(new_button);
+        }
+    }
+
+    $('.btn-official-data').click(function() {
+        var data_name = $(this).data('name');
+        var url = offical_emos[data_name].link;
+        if (validateUrl(url)) {
+            urls[data_name] = url;
+            console.log(urls);
+            getData(urls, reload);
+        }
+    });
 }
 
 function validateEmoData(data) {
