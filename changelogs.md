@@ -1,6 +1,10 @@
 Chat++ Change Logs
 =================
 
+## 1.0.2
+* Add official emoticons data list in option page
+* Temporarily remove change log
+
 ## 1.0.1
 * Mention user with Nickname.
 * Fix bug: Can not initialize Default Emoticons Data at the first load.
