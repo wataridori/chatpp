@@ -277,7 +277,6 @@ function fillDataTable(info) {
             table_text += "<td class='text-center'>" + data.data_name + "</td>";
             table_text += "<td class='text-center'>" + data.data_version + "</td>";
             table_text += "<td class='text-center'>" + createATag(data.data_url) + "</td>";
-            table_text += "<td class='text-center'>" + createATag(data.data_changelog) + "</td>";
             table_text += "<td class='text-center'><button class='btn btn-warning btn-sm btn-data-remove' data-name='" + data.data_name
             + "' id='btn-" + data.data_name + "'> Remove </button></td>";
             table_text += "</tr>";
