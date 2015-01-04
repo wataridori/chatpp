@@ -118,9 +118,6 @@ var DOM_VK_CANCEL = 3,
     DOM_VK_META = 224;
 
 var shortcuts_default = {
-    search: DOM_VK_S,
-    chat: DOM_VK_C,
-    my_chat: DOM_VK_M,
     reply: DOM_VK_R,
     quote: DOM_VK_Q,
     link: DOM_VK_L,
@@ -146,14 +143,6 @@ $(function(){
 
 function registerShortcut() {
     console.log('Registering ShortCut');
-    CW.view.registerKeyboardShortcut(shortcuts_default.search, !1, !1, !1, !1, function() {
-        $('#_search').focus()
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.chat, !1, !1, !1, !1, function() {
-        $('#_chatText').focus()
-    });
-
     CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function() {
         triggerDefaultAction('reply')
     });
