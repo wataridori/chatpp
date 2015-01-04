@@ -156,6 +156,7 @@ function addInjectedScript() {
                 window.clearInterval(inject_script_timer);
                 injectJsFile('emo.js');
                 injectJsFile('mention.js');
+                injectJsFile('shortcut.js');
             } else {
                 counter++;
             }
