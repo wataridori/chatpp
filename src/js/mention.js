@@ -70,10 +70,18 @@ $(window).ready(function(){
         var current_pos = doGetCaretPosition(chat_text_element);
         setCaretPosition(chat_text_element, chat_text_jquery.val().lastIndexOf('@') + 1)
         position = Measurement.caretPos(chat_text_jquery);
-        position.top += parseInt(chat_text_jquery.css('font-size')) - rect.top + 2;
+        position.top -= rect.top;
         position.left -= rect.left;
         if (rect.width - position.left < 236) {
             position.left -= 236;
+        }
+        if (rect.height - position.top < 90) {
+            if (position.top < 108) {
+                $("#_chatTextArea").css({'overflow-y': 'visible', 'z-index': 2});
+            }
+            position.top -= 118;
+        } else {
+            position.top += parseInt(chat_text_jquery.css('font-size'))  + 2
         }
         $("#suggestion-container").parent().css({position: 'relative'});
         $("#suggestion-container").css({top: position.top, left: position.left, position:'absolute'});
@@ -122,6 +130,7 @@ $(window).ready(function(){
         insert_mode = 'normal';
         insert_type = 'one';
         $("#suggestion-container").html('');
+        $("#_chatTextArea").css({'overflow-y': 'scroll', 'z-index': 0});
         // restore setting to correct value
         if (cached_enter_action != ST.data.enter_action && cached_enter_action == 'send') {
             ST.data.enter_action = cached_enter_action;
