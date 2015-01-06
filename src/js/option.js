@@ -11,7 +11,7 @@ var emo_info = {};
 var urls = {};
 var init = false;
 
-var offical_emos = {
+var official_emos = {
     Default: {
         name: 'Default',
         link: 'https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1',
@@ -21,6 +21,11 @@ var offical_emos = {
         name: 'Japanese',
         link: 'https://dl.dropboxusercontent.com/s/59gwiqg9bipvz40/jp-emo.json?dl=1',
         description: 'Yet another data for people who want to use Japanese Emoticons'
+    },
+    Skype: {
+        name: 'Skype',
+        link: 'https://www.dropbox.com/s/6wjwy1x9l7bs9xh/skype.json?dl=1',
+        description: 'Skype Original Emoticons'
     }
 };
 
@@ -190,18 +195,18 @@ function getPriority(data_name) {
 
 function showOfficialData() {
     var official = $('#official-data');
-    for (var data_name in offical_emos) {
+    for (var data_name in official_emos) {
         if (emo_info[data_name] === undefined) {
-            var new_button = '<div class="col-md-12"><button class="btn btn-info btn-sm btn-official-data" data-name="' + data_name + '">Add ' + data_name + '</button>'
-                + '<span class="text-primary" style="padding-left: 20px"><strong>' + offical_emos[data_name].description + '</strong></span>'
-                + '</div>';
+            var new_button = '<div class="col-md-12 official-data"><button class="btn btn-info btn-sm btn-official-data" data-name="' + data_name + '">Add ' + data_name + '</button>'
+                + '<span class="text-primary" style="padding-left: 20px"><strong>' + official_emos[data_name].description + '</strong></span>'
+                + '</div><br>';
             official.append(new_button);
         }
     }
 
     $('.btn-official-data').click(function() {
         var data_name = $(this).data('name');
-        var url = offical_emos[data_name].link;
+        var url = official_emos[data_name].link;
         if (validateUrl(url)) {
             urls[data_name] = url;
             console.log(urls);
