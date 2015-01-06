@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 1.0.3
+* Add Skype data to official list
+* Fix bug with mention popup
 
 ## 1.0.2
 * Add official emoticons data list in option page
