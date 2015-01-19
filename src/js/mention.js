@@ -10,7 +10,7 @@ $(window).ready(function(){
     var current_RM = null;
     var member_objects = [];
     var insert_mode = 'normal'; // normal, to, picon
-    var insert_type = 'one'; // one, me, all
+    var insert_type = 'one'; // one, me, all, contact
     var fuse = null;
     var DISPLAY_NUMS = 3;
     var cached_enter_action = ST.data.enter_action;
@@ -185,6 +185,22 @@ $(window).ready(function(){
       };
     }
 
+    // http://codegolf.stackexchange.com/a/17129
+    function merge() {
+       var args = arguments;
+       var hash = {};
+       var arr = [];
+       for (var i = 0; i < args.length; i++) {
+          for (var j = 0; j < args[i].length; j++) {
+            if (hash[args[i][j]] !== true) {
+              arr[arr.length] = args[i][j];
+              hash[args[i][j]] = true;
+            }
+          }
+        }
+       return arr;
+    }
+
     function filterDisplayResults(results){
         is_outbound_of_list = false;
         if (!is_navigated) return results.slice(0, DISPLAY_NUMS);
@@ -204,15 +220,17 @@ $(window).ready(function(){
     }
 
     function getRawResultsAndSetType(typed_text){
-        if (typed_text == 'me') {
-            insert_type = 'me';
-            return [getMemberObject(AC.myid)];
+        if (insert_type != 'contact') {
+            if (typed_text == 'me') {
+                insert_type = 'me';
+                return [getMemberObject(AC.myid)];
+            }
+            if (typed_text == 'all') {
+                insert_type = 'all';
+                return [];
+            }
+            insert_type = 'one';
         }
-        if (typed_text == 'all') {
-            insert_type = 'all';
-            return [];
-        }
-        insert_type = 'one';
         return typed_text ? fuse.search(typed_text) : member_objects;
     }
 
@@ -290,7 +308,7 @@ $(window).ready(function(){
         }
 
         if (current_RM != RM.id) {
-            member_objects = buildMemberListData();
+            member_objects = buildMemberListData(false);
             fuse = new Fuse(member_objects, options);
             current_RM = RM.id;
         }
@@ -307,6 +325,14 @@ $(window).ready(function(){
 
             typed_text = getTypedText();
             if (typed_text.length) {
+                if (typed_text.charAt(1) == '#') {
+                    if (insert_type != 'contact') {
+                        member_objects = buildMemberListData(true);
+                        fuse = new Fuse(member_objects, options);
+                        insert_type = 'contact';
+                    }
+                    typed_text = typed_text.substring(1);
+                }
                 raw_results = getRawResultsAndSetMode(typed_text.substring(1));
 
                 if (e.which == 38) current_index -= 1;
@@ -362,6 +388,7 @@ $(window).ready(function(){
         switch (insert_type){
             case 'me':
             case 'one':
+            case 'contact':
                 replace_text = format_string.format(cwid, target_name);
                 break;
             case 'all':
@@ -402,6 +429,7 @@ $(window).ready(function(){
         switch (insert_type){
             case 'me':
             case 'one':
+            case 'contact':
                 if (members.length) {
                     txt = '<ul>';
                     for (var i = 0; i < members.length; i++) {
@@ -423,10 +451,13 @@ $(window).ready(function(){
 
     }
 
-    function buildMemberListData() {
+    function buildMemberListData(with_contact) {
         if (!RM) return [];
         sorted_member_list = RM.getSortedMemberList(),
-        b = [],
+        b = [];
+        if (with_contact) {
+            sorted_member_list = merge(sorted_member_list, AC.contact_list);
+        }
         sorted_members_length = sorted_member_list.length;
         for (var index = 0; index < sorted_members_length; index++) {
             var member = sorted_member_list[index];
