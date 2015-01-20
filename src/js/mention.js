@@ -128,6 +128,10 @@ $(window).ready(function(){
         current_index = 0;
         selected_index = 0;
         insert_mode = 'normal';
+        if (insert_type == 'contact') {
+            member_objects = buildMemberListData(false);
+            fuse = new Fuse(member_objects, options);
+        }
         insert_type = 'one';
         $("#suggestion-container").html('');
         $("#_chatTextArea").css({'overflow-y': 'scroll', 'z-index': 0});
