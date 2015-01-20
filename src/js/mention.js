@@ -9,7 +9,7 @@ $(window).ready(function(){
     var selected_index = 0;
     var current_RM = null;
     var member_objects = [];
-    var insert_mode = 'normal'; // normal, to, picon
+    var insert_mode = 'normal'; // normal, to, picon, name
     var insert_type = 'one'; // one, me, all, contact
     var fuse = null;
     var DISPLAY_NUMS = 3;
@@ -239,9 +239,13 @@ $(window).ready(function(){
     }
 
     function getRawResultsAndSetMode(typed_text){
-        if (typed_text.slice(0, 2) == '__') {
+        if (typed_text.slice(0, 2) == '._') {
             insert_mode = 'picon';
             return getRawResultsAndSetType(typed_text.substring(2));
+        }
+        if (typed_text.slice(0, 1) == '.') {
+            insert_mode = 'name';
+            return getRawResultsAndSetType(typed_text.substring(1));
         }
         if (typed_text.slice(0, 1) == '_') {
             insert_mode = 'to';
@@ -419,6 +423,9 @@ $(window).ready(function(){
                 break;
             case 'picon':
                 replace_text = getReplaceText("[picon:{0}]", target_name, cwid, member_objects);
+                break;
+            case 'name':
+                replace_text = getReplaceText("[picon:{0}] {1}", target_name, cwid, member_objects);
                 break;
             default:
                 break;
