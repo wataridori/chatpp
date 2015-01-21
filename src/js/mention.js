@@ -10,7 +10,8 @@ $(window).ready(function(){
     var current_RM = null;
     var member_objects = [];
     var insert_mode = 'normal'; // normal, to, picon, name
-    var insert_type = 'one'; // one, me, all, contact
+    var insert_type = 'one'; // one, me, all, contact, group
+    var selected_group_name = '';
     var fuse = null;
     var DISPLAY_NUMS = 3;
     var cached_enter_action = ST.data.enter_action;
@@ -21,7 +22,8 @@ $(window).ready(function(){
     var chat_text_element = document.getElementById('_chatText');
     var suggestion_messages = {
         one: {ja: '\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093', en: 'No Matching Results'},
-        all: {ja: '\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059', en: 'Select All Members'}
+        all: {ja: '\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059', en: 'Select All Members'},
+        group: {ja: '\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7', en: 'Empty Group'}
     };
     var group_mention = JSON.parse(localStorage['CHATPP_GROUP_MENTION']);
 
@@ -133,6 +135,9 @@ $(window).ready(function(){
             member_objects = buildMemberListData(false);
             fuse = new Fuse(member_objects, options);
         }
+        if (insert_type == 'group') {
+            selected_group_name = '';
+        }
         insert_type = 'one';
         $("#suggestion-container").html('');
         $("#_chatTextArea").css({'overflow-y': 'scroll', 'z-index': 0});
@@ -226,6 +231,14 @@ $(window).ready(function(){
 
     function getRawResultsAndSetType(typed_text){
         if (insert_type != 'contact') {
+            for (var i = 0; i < group_mention.length; i++) {
+                if (typed_text == group_mention[i]['group_name']) {
+                    insert_type = 'group';
+                    selected_group_name = group_mention[i]['group_name'];
+                    return [];
+                }
+            };
+
             if (typed_text == 'me') {
                 insert_type = 'me';
                 return [getMemberObject(AC.myid)];
@@ -288,7 +301,7 @@ $(window).ready(function(){
             return;
         }
         if (e.which == 9 || e.which == 13) {
-            if (insert_type == 'all' && is_displayed) {
+            if ((insert_type == 'all' || insert_type == 'group') && is_displayed) {
                 setSuggestedChatText(getTypedText(), null, null);
                 // dirty hack to prevent message to be sent
                 if (cached_enter_action == 'send') ST.data.enter_action = 'br';
@@ -392,7 +405,7 @@ $(window).ready(function(){
         }
     });
 
-    function getReplaceText(format_string, target_name, cwid, member_objects){
+    function getReplaceText(format_string, target_name, cwid, members){
         replace_text = '';
         switch (insert_type){
             case 'me':
@@ -400,9 +413,10 @@ $(window).ready(function(){
             case 'contact':
                 replace_text = format_string.format(cwid, target_name);
                 break;
+            case 'group':
             case 'all':
-                for (var i = 0; i < member_objects.length; i++) {
-                    replace_text += format_string.format(member_objects[i].value, member_objects[i].aid2name);
+                for (var i = 0; i < members.length; i++) {
+                    replace_text += format_string.format(members[i].value, members[i].aid2name);
                 };
                 break;
             default:
@@ -415,18 +429,22 @@ $(window).ready(function(){
         current_pos = doGetCaretPosition(chat_text_element);
         var old = chat_text_jquery.val();
         var replace_text = '';
+        var members = member_objects;
+        if (insert_type == 'group') {
+            members = buildGroupMemberListData(selected_group_name);
+        }
         switch (insert_mode){
             case 'to':
-                replace_text = getReplaceText("[To:{0}] ", target_name, cwid, member_objects);
+                replace_text = getReplaceText("[To:{0}] ", target_name, cwid, members);
                 break;
             case 'normal':
-                replace_text = getReplaceText("[To:{0}] {1}\n", target_name, cwid, member_objects);
+                replace_text = getReplaceText("[To:{0}] {1}\n", target_name, cwid, members);
                 break;
             case 'picon':
-                replace_text = getReplaceText("[picon:{0}] ", target_name, cwid, member_objects);
+                replace_text = getReplaceText("[picon:{0}] ", target_name, cwid, members);
                 break;
             case 'name':
-                replace_text = getReplaceText("[picon:{0}] {1}", target_name, cwid, member_objects);
+                replace_text = getReplaceText("[picon:{0}] {1}", target_name, cwid, members);
                 break;
             default:
                 break;
@@ -445,13 +463,29 @@ $(window).ready(function(){
                 if (members.length) {
                     txt = '<ul>';
                     for (var i = 0; i < members.length; i++) {
-                        txt += '<li class="suggested-name" role="listitem" data-cwui-lt-value="' + members[i].value + '">' + members[i].label + "</li>"
+                        txt += '<li class="suggested-name" role="listitem" data-cwui-lt-value="' + members[i].value + '">' + members[i].avatar + members[i].label + "</li>"
                     };
-                    txt + '</ul>';
+                    txt += '</ul>';
                     return txt;
                 } else {
-                    message = (LANGUAGE == 'ja') ? '\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093' : 'No Matching Results';
                     return '<ul><li>' + suggestion_messages['one'][LANGUAGE] + '</li></ul>';
+                }
+                break;
+            case 'group':
+                members = buildGroupMemberListData(selected_group_name);
+                if (members.length) {
+                    txt = '<ul><li>';
+                    for (var i = 0; i < members.length; i++) {
+                        if (i == 6){
+                            txt += '<span>+' + (members.length - 6) + '</span>';
+                            break;
+                        }
+                        txt += members[i].avatar;
+                    };
+                    txt += '</li></ul>';
+                    return txt;
+                } else {
+                    return '<ul><li>' + suggestion_messages[insert_type][LANGUAGE] + '</li></ul>';
                 }
                 break;
             case 'all':
@@ -484,11 +518,26 @@ $(window).ready(function(){
         var h = CW.is_business && ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(member) : AC.getNickName(member);
         return {
             value: member,
-            label: CW.getAvatarPanel(member, {
+            avatar: CW.getAvatarPanel(member, {
                 clicktip: !1,
                 size: "small"
-            }) + '<p class="autotrim">' + escape_html(h) + "</p>",
+            }),
+            label: '<p class="autotrim">' + escape_html(h) + "</p>",
             aid2name: escape_html(h)
         }
+    }
+
+    function buildGroupMemberListData(group_name){
+        for (var i = 0; i < group_mention.length; i++) {
+            if (group_mention[i]['group_name'] == group_name) {
+                members = group_mention[i]['group_members'].split(',');
+                results = [];
+                for (var j = 0; j < members.length; j++) {
+                    results.push(getMemberObject(members[j]));
+                }
+                return results;
+            }
+        }
+        return [];
     }
 });
