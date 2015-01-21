@@ -22,7 +22,8 @@ $(window).ready(function(){
     var suggestion_messages = {
         one: {ja: '\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093', en: 'No Matching Results'},
         all: {ja: '\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059', en: 'Select All Members'}
-    }
+    };
+    var group_mention = JSON.parse(localStorage['CHATPP_GROUP_MENTION']);
 
     $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");
     hideSuggestionBox();
@@ -416,13 +417,13 @@ $(window).ready(function(){
         var replace_text = '';
         switch (insert_mode){
             case 'to':
-                replace_text = getReplaceText("[To:{0}]", target_name, cwid, member_objects);
+                replace_text = getReplaceText("[To:{0}] ", target_name, cwid, member_objects);
                 break;
             case 'normal':
                 replace_text = getReplaceText("[To:{0}] {1}\n", target_name, cwid, member_objects);
                 break;
             case 'picon':
-                replace_text = getReplaceText("[picon:{0}]", target_name, cwid, member_objects);
+                replace_text = getReplaceText("[picon:{0}] ", target_name, cwid, member_objects);
                 break;
             case 'name':
                 replace_text = getReplaceText("[picon:{0}] {1}", target_name, cwid, member_objects);

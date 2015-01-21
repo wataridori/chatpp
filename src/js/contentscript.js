@@ -3,8 +3,11 @@ var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
 var LOCAL_STORAGE_INFO_KEY = "YACEP_EMO_INFO";
 var LOCAL_STORAGE_EMOTICON_STATUS = "CHATPP_EMOTICON_STATUS";
 var LOCAL_STORAGE_MENTION_STATUS = "CHATPP_MENTION_STATUS";
+var LOCAL_STORAGE_SHORTCUT_STATUS = "CHATPP_SHORTCUT_STATUS";
+var LOCAL_STORAGE_GROUP_MENTION = "CHATPP_GROUP_MENTION";
 
 var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
+var CHROME_SYNC_GROUP_KEY = "CHATPP_CHROME_SYNC_GROUP";
 var CHROME_LOCAL_KEY = "CHATPP_CHROME_LOCAL_DATA";
 
 var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
@@ -58,6 +61,14 @@ function init(inject_script) {
         } else {
             localStorage[LOCAL_STORAGE_EMOTICON_STATUS] = true;
             getData(info, inject_script);
+        }
+    });
+
+    localStorage[LOCAL_STORAGE_GROUP_MENTION] = [];
+    chrome.storage.sync.get(CHROME_SYNC_GROUP_KEY, function(data) {
+        if (!$.isEmptyObject(data) && !$.isEmptyObject(data[CHROME_SYNC_GROUP_KEY])) {
+            localStorage[LOCAL_STORAGE_GROUP_MENTION] = JSON.stringify(data[CHROME_SYNC_GROUP_KEY]);
+            console.log(localStorage[LOCAL_STORAGE_GROUP_MENTION]);
         }
     });
 }

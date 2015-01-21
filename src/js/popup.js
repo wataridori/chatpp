@@ -22,8 +22,16 @@ $(function() {
     setVersionType();
 
     $('#chatpp_version').html(version + ' ' + version_name);
-    $('#option_page').click(function () {
+    $('#emoticon_page').click(function () {
         chrome.tabs.create({url:chrome.extension.getURL(app_detail.options_page)});
+    });
+
+    $('#group_page').click(function () {
+        chrome.tabs.create({url:'group.html'});
+    });
+
+    $('#shortcut_page').click(function () {
+        chrome.tabs.create({url:'shortcut.html'});
     });
 
     $('#homepage').click(function(){
