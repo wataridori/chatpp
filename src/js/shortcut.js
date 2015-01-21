@@ -124,7 +124,9 @@ var shortcuts_default = {
     edit: DOM_VK_E,
     copy: DOM_VK_O,
     delete: DOM_VK_D,
-    task: DOM_VK_K
+    task: DOM_VK_K,
+    my_chat: DOM_VK_A,
+    scroll: DOM_VK_S
 };
 
 $(function(){
@@ -169,6 +171,14 @@ function registerShortcut() {
 
     CW.view.registerKeyboardShortcut(shortcuts_default.task, !1, !1, !1, !1, function() {
         triggerDefaultAction('task')
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.my_chat, !1, !1, !1, !1, function() {
+        RL.selectRoom(AC.getRoomId(AC.myid));
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.scroll, !1, !1, !1, !1, function() {
+        RM.load(RM.timeline.getLastChatId());
     });
 }
 
