@@ -1,0 +1,60 @@
+<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title id="title"></title>
+    <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/group.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/bootbox.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <style>
+        .official-data {
+            padding-bottom: 20px;
+        }
+    </style>
+</head><body>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="text-primary">
+                <img src="icon64.png" id="popup_page" alt="Angelic">
+                <strong>Chat++ <span id="chatpp_version"></span></strong><br>
+            </h1>
+            <h3 class="text-info">*** A Chatwork Enhancement Toolkit ***</h3>
+            <hr>
+            <br>
+        </div>
+    </div>
+
+    <div class="row">
+        <h3 class="text-primary col-lg-offset-1">Create Mention Group</h3>
+        <div class="col-sm-12" id="group-input-div">
+            <div class="col-sm-3">
+                <input class="form-control" id="data-group-name" placeholder="Enter group name here">
+            </div>
+            <div class="col-sm-7">
+                <input class="form-control col-sm-9" id="data-group-members" placeholder="Enter group users here">
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-success" id="button-group-add">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <h3 class="text-primary">Group Data</h3>
+        <div class="col-sm-12" id="group-data-div">
+            <table class="table table-bordered" id="table-data">
+                <thead>
+                <tr class="success text-center">
+                    <th class="text-center">Group Name</th>
+                    <th class="text-center">Group Member</th>
+                    <th class="text-center">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body></html>
