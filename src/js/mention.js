@@ -537,7 +537,7 @@ $(window).ready(function(){
                 members = group_mention[i]['group_members'].split(',');
                 results = [];
                 for (var j = 0; j < members.length; j++) {
-                    results.push(getMemberObject(members[j]));
+                    results.push(getMemberObject(members[j].trim()));
                 }
                 return results;
             }

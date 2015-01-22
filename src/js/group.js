@@ -16,7 +16,7 @@ $(function() {
     });
 
     var data_group_name = $("#data-group-name");
-    var data_group_member = $("#data-group-members")
+    var data_group_member = $("#data-group-members");
 
     $('#button-group-add').click(function() {
        var info = {};
