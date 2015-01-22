@@ -23,7 +23,7 @@ $(function() {
        info.group_name = data_group_name.val().trim();
        var group_members = getGroupMembers($('#data-group-members').val());
        if (validateGroupName(info.group_name) && group_members.length > 0) {
-           info.group_members = group_members.join(',');
+           info.group_members = group_members.join(', ');
            pushGroup(info);
            syncData();
            clearInput();
@@ -117,6 +117,12 @@ function getGroupMembers(data) {
                 valid_members.push(member);
             }
         }
+    }
+
+    var regex = /\[[a-zA-Z]+:([0-9]+)\]/g;
+    var match;
+    while ((match = regex.exec(data)) != null) {
+        valid_members.push(match[1]);
     }
     return valid_members;
 }

@@ -25,7 +25,11 @@ $(window).ready(function(){
         all: {ja: '\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059', en: 'Select All Members'},
         group: {ja: '\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7', en: 'Empty Group'}
     };
-    var group_mention = JSON.parse(localStorage['CHATPP_GROUP_MENTION']);
+
+    var group_mention = [];
+    if (localStorage['CHATPP_GROUP_MENTION'] !== undefined) {
+        group_mention = JSON.parse(localStorage['CHATPP_GROUP_MENTION']);
+    }
 
     $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");
     hideSuggestionBox();
