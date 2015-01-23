@@ -27,7 +27,7 @@ $(window).ready(function(){
     };
 
     var group_mention = [];
-    if (localStorage['CHATPP_GROUP_MENTION'] !== undefined) {
+    if (localStorage['CHATPP_GROUP_MENTION'] !== undefined && localStorage['CHATPP_GROUP_MENTION']) {
         group_mention = JSON.parse(localStorage['CHATPP_GROUP_MENTION']);
     }
 
