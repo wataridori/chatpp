@@ -6,7 +6,7 @@ var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
 var LOCAL_STORAGE_EMOTICON_STATUS = "CHATPP_EMOTICON_STATUS";
 var LOCAL_STORAGE_MENTION_STATUS = "CHATPP_MENTION_STATUS";
 
-var yacep_status = false;
+var emoticon_status = false;
 var cw_timer;
 
 var mention_status = false;
@@ -20,7 +20,7 @@ $(function(){
                 window.clearInterval(cw_timer);
                 addStyle();
                 if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
-                    addYacepText();
+                    addEmoticonText();
                 }
                 if (localStorage[LOCAL_STORAGE_MENTION_STATUS] === 'true') {
                     mention_status = true;
@@ -28,7 +28,7 @@ $(function(){
                 }
                 addAdvertistment();
                 if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
-                    var code_type = localStorage['yacep_code_type'];
+                    var code_type = localStorage['emoticon_code_type'];
                     if (code_type === CODE_TYPE_OFFENSIVE) {
                         CW.prepareRegExp();
                     }
@@ -85,9 +85,9 @@ function removeExternalEmo() {
             break;
         }
     }
-    yacep_status = false;
-    updateYacepText();
-    console.log('Yacep emo removed!');
+    emoticon_status = false;
+    updateEmoticonText();
+    console.log('Emoticons removed!');
 }
 
 function addExternalEmo() {
@@ -98,70 +98,66 @@ function addExternalEmo() {
         var secret_emos = getSecretEmos();
         addEmo(secret_emos);
     }
-    yacep_status = true;
-    updateYacepText();
-    console.log('Yacep emo added!');
+    emoticon_status = true;
+    updateEmoticonText();
+    console.log('Emoticon added!');
 }
 
 function addStyle() {
-    $("<style type='text/css'> .yacepTextEnable{font-weight: bold;} </style>").appendTo("head");
+    $("<style type='text/css'> .emoticonTextEnable{font-weight: bold;} </style>").appendTo("head");
 }
 
-function addYacepText() {
-    if ($('#yacepText').length > 0) {
+function addEmoticonText() {
+    if ($('#emoticonText').length > 0) {
         return;
     }
-    var yacep_text = 'Emoticons ' + (yacep_status ? 'ON' : 'OFF');
+    var emoticon_text = 'E ' + (emoticon_status ? 'ON' : 'OFF');
     $('#_chatSendTool').append(
-        '<li id="_yacep" role="button" class=" _showDescription">' +
-            '<span id="yacepText" class="yacepText icoSizeSmall">' + yacep_text + '</span>' +
+        '<li id="_emoticons" role="button" class=" _showDescription">' +
+            '<span id="emoticonText" class="emoticonText icoSizeSmall">' + emoticon_text + '</span>' +
         '</li>'
     );
-    setYacepTextLabel();
-    $('#yacepText').click(function() {
-        if (yacep_status) {
-            removeExternalEmo();
-        } else {
-            addExternalEmo();
-        }
+    setEmoticonTextLabel();
+    $('#emoticonText').click(function() {
+        toggleEmoticonsStatus();
     })
 }
 
-function setYacepTextLabel() {
-    $('#_yacep').attr('aria-label', 'Data: ' + localStorage['yacep_data_version']);
+function setEmoticonTextLabel() {
+    $('#_emoticons').attr('aria-label', 'Data: ' + localStorage['emoticon_data_version']);
 }
 
-function removeYacepText() {
-    if ($('#yacepText').length > 0) {
-        $('#yacepText').remove();
+function removeEmoticonText() {
+    if ($('#emoticonText').length > 0) {
+        $('#emoticonText').remove();
     }
 }
 
-function updateYacepText() {
-    var yacep_text = 'Emoticons ' + (yacep_status ? 'ON' : 'OFF');
-    var div = $('#yacepText');
-    div.html(yacep_text);
-    if (yacep_status) {
-        div.addClass('yacepTextEnable');
+function updateEmoticonText() {
+    var emoticon_text = 'E: ' + (emoticon_status ? 'ON' : 'OFF');
+    var div = $('#emoticonText');
+    div.html(emoticon_text);
+    if (emoticon_status) {
+        div.addClass('emoticonTextEnable');
     } else {
-        div.removeClass('yacepTextEnable');
+        div.removeClass('emoticonTextEnable');
     }
 }
 
 function addAdvertistment() {
-    if ($('#yacepAdvertisment').length > 0) {
+    if ($('#chatppAdvertisment').length > 0) {
         return;
     }
     $('#_chatSendTool').append(
-        '<li id="_yacepSponsored" role="button" class=" _showDescription" aria-label="Advertising Corner. Contact us if you want to advertise everything here.">' +
-            '<span id="yacepAdvertisment" class="icoSizeSmall">Sponsored by <a href="https://hkt.thangtd.com" target="_blank">Framgia Hyakkaten</a></span>' +
+        '<li id="_chatppSponsored" role="button" class=" _showDescription" aria-label="Advertising Corner. Contact us if you want to advertise everything here.">' +
+            '<span id="chatppAdvertisment" class="icoSizeSmall">Sponsored by <a href="https://hkt.thangtd.com" target="_blank">Framgia Hyakkaten</a></span>' +
         '</li>'
     );
 }
 
 function removeAdvertistment() {
-    if ($('#yacepAdvertisment').length > 0) {
-        $('#yacepAdvertisment').remove();
+    if ($('#chatppAdvertisment').length > 0) {
+        $('#chatppAdvertisment').remove();
     }
 }
 
@@ -171,13 +167,12 @@ function addMentionText() {
     }
     $('#_chatSendTool').append(
         '<li id="_chatppMentionText" role="button" class=" _showDescription">' +
-        '<span id="chatppMentionText" class="yacepText icoSizeSmall"></span>' +
+        '<span id="chatppMentionText" class="emoticonText icoSizeSmall"></span>' +
         '</li>'
     );
     updateMentionText();
     $('#chatppMentionText').click(function() {
-        mention_status = mention_status !== true;
-        updateMentionText();
+        toggleMentionStatus();
     })
 }
 
@@ -188,15 +183,15 @@ function removeMentionText() {
 }
 
 function updateMentionText() {
-    var mention_text = 'Mention ' + (mention_status ? 'ON' : 'OFF');
+    var mention_text = 'M: ' + (mention_status ? 'ON' : 'OFF');
     var div = $('#chatppMentionText');
     div.html(mention_text);
     if (mention_status) {
         $('#_chatppMentionText').attr('aria-label', 'Click to disable Mention Feature');
-        div.addClass('yacepTextEnable');
+        div.addClass('emoticonTextEnable');
     } else {
         $('#_chatppMentionText').attr('aria-label', 'Click to enable Mention Feature');
-        div.removeClass('yacepTextEnable');
+        div.removeClass('emoticonTextEnable');
     }
 }
 
@@ -207,15 +202,28 @@ function getSecretEmos() {
     ];
 }
 
-function disableYacep() {
-    removeYacepText();
+function toggleEmoticonsStatus() {
+    if (emoticon_status) {
+        removeExternalEmo();
+    } else {
+        addExternalEmo();
+    }
+}
+
+function toggleMentionStatus() {
+    mention_status = mention_status !== true;
+    updateMentionText();
+}
+
+function disableChatpp() {
+    removeEmoticonText();
     removeMentionText();
     removeAdvertistment();
     removeExternalEmo();
 }
 
-function enableYacep() {
-    addYacepText();
+function enableChatpp() {
+    addEmoticonText();
     addMentionText();
     addAdvertistment();
     addExternalEmo();
@@ -226,5 +234,5 @@ function reloadEmoticions() {
     console.log('old emoticons removed');
     addExternalEmo();
     console.log('new emoticons removed');
-    setYacepTextLabel();
+    setEmoticonTextLabel();
 }

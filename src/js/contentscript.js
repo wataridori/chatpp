@@ -103,9 +103,9 @@ function getData(info, inject_script) {
                             var current_time = (new Date).toLocaleString();
                             console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name +  ". Code Type: " + code_type);
                             localStorage[LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
-                            localStorage['yacep_code_type'] = code_type;
+                            localStorage['emoticon_code_type'] = code_type;
                             localStorage['chatpp_version_name'] = version_name;
-                            localStorage['yacep_data_version'] = parseDataName(emo_info);
+                            localStorage['emoticon_data_version'] = parseDataName(emo_info);
                             if (inject_script !== undefined && inject_script) {
                                 addInjectedScript();
                             } else {

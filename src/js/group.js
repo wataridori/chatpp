@@ -99,7 +99,7 @@ function removeGroup(name) {
 }
 
 function validateGroupName(data) {
-    if (data.length > 15 || data.length < 3) {
+    if (data.length > 15 || data.length < 2) {
         return false;
     }
 

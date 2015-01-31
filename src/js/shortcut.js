@@ -126,7 +126,9 @@ var shortcuts_default = {
     delete: DOM_VK_D,
     task: DOM_VK_K,
     my_chat: DOM_VK_A,
-    scroll: DOM_VK_S
+    scroll: DOM_VK_S,
+    toggle_mention: DOM_VK_X,
+    toggle_emoticon: DOM_VK_Z
 };
 
 $(function(){
@@ -146,31 +148,31 @@ $(function(){
 function registerShortcut() {
     console.log('Registering ShortCut');
     CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function() {
-        triggerDefaultAction('reply')
+        triggerDefaultAction('reply');
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, function() {
-        triggerDefaultAction('quote')
+        triggerDefaultAction('quote');
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.link, !1, !1, !1, !1, function() {
-        triggerDefaultAction('link')
+        triggerDefaultAction('link');
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.edit, !1, !1, !1, !1, function() {
-        triggerDefaultAction('edit')
+        triggerDefaultAction('edit');
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.copy, !1, !1, !1, !1, function() {
-        triggerDefaultAction('copy')
+        triggerMoreAction('copy');
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.delete, !1, !1, !1, !1, function() {
-        triggerDefaultAction('delete')
+        triggerMoreAction('delete');
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.task, !1, !1, !1, !1, function() {
-        triggerDefaultAction('task')
+        triggerDefaultAction('task');
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.my_chat, !1, !1, !1, !1, function() {
@@ -180,6 +182,14 @@ function registerShortcut() {
     CW.view.registerKeyboardShortcut(shortcuts_default.scroll, !1, !1, !1, !1, function() {
         RM.load(RM.timeline.getLastChatId());
     });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.toggle_emoticon, !1, !1, !1, !1, function() {
+        toggleEmoticonsStatus();
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.toggle_mention, !1, !1, !1, !1, function() {
+        toggleMentionStatus();
+    });
 }
 
 function triggerDefaultAction(action) {
@@ -187,6 +197,17 @@ function triggerDefaultAction(action) {
     var reply = me.find("[data-cwui-ab-type='" + action + "']");
     if (isDomExists(reply)) {
         reply.trigger('click');
+    }
+}
+
+function triggerMoreAction(action) {
+    var more_action = $('._message:hover').find('._cwABMoreTip');
+    if (isDomExists(more_action)) {
+        more_action.trigger('click');
+        var delete_button = $('._cwABMoreListBox').find('[data-cwui-ab-type="action"]');
+        if (isDomExists(delete_button)) {
+            delete_button.trigger('click');
+        }
     }
 }
 
