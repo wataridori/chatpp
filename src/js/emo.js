@@ -12,6 +12,8 @@ var cw_timer;
 var mention_status = false;
 var VERSION_NAME_DEV = 'dev';
 
+var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
+
 $(function(){
 
     cw_timer = setInterval(
@@ -26,7 +28,7 @@ $(function(){
                     mention_status = true;
                     addMentionText();
                 }
-                addAdvertistment();
+                addAdvertisement();
                 if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
                     var code_type = localStorage['emoticon_code_type'];
                     if (code_type === CODE_TYPE_OFFENSIVE) {
@@ -144,20 +146,36 @@ function updateEmoticonText() {
     }
 }
 
-function addAdvertistment() {
-    if ($('#chatppAdvertisment').length > 0) {
+function addAdvertisement() {
+    if ($('#chatppAdvertisement').length > 0) {
         return;
     }
-    $('#_chatSendTool').append(
-        '<li id="_chatppSponsored" role="button" class=" _showDescription" aria-label="Advertising Corner. Contact us if you want to advertise everything here.">' +
-            '<span id="chatppAdvertisment" class="icoSizeSmall">Sponsored by <a href="https://hkt.thangtd.com" target="_blank">Framgia Hyakkaten</a></span>' +
-        '</li>'
-    );
+    var text = '<li id="_chatppSponsored" role="button" class=" _showDescription" aria-label="Advertising Corner. Contact us if you want to advertise everything here.">' +
+        '<span id="chatppAdvertisement" class="icoSizeSmall">' + getAdvertisementText() + '</span>' +
+    '</li>';
+
+    $('#_chatSendTool').append(text);
+    setInterval(changeRandomAdvertisement, ADVERTISEMENT_CHANGE_TIME);
 }
 
-function removeAdvertistment() {
-    if ($('#chatppAdvertisment').length > 0) {
-        $('#chatppAdvertisment').remove();
+function changeRandomAdvertisement() {
+    var text = getAdvertisementText();
+    $('#chatppAdvertisement').html(text);
+}
+
+function getAdvertisementText() {
+    if (localStorage['chatpp_advertisement'] !== undefined && localStorage['chatpp_advertisement']) {
+        var ads = JSON.parse(localStorage['chatpp_advertisement']);
+        if (ads.length > 0) {
+            return ads[Math.floor(Math.random() * ads.length)];
+        }
+    }
+    return 'Advertisement Here!';
+}
+
+function removeAdvertisement() {
+    if ($('#chatppAdvertisement').length > 0) {
+        $('#chatppAdvertisement').remove();
     }
 }
 
@@ -218,14 +236,14 @@ function toggleMentionStatus() {
 function disableChatpp() {
     removeEmoticonText();
     removeMentionText();
-    removeAdvertistment();
+    removeAdvertisement();
     removeExternalEmo();
 }
 
 function enableChatpp() {
     addEmoticonText();
     addMentionText();
-    addAdvertistment();
+    addAdvertisement();
     addExternalEmo();
 }
 

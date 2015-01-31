@@ -15,6 +15,9 @@ var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
 
 var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
 
+var ADVERTISEMENT_URL = "https://www.dropbox.com/s/flbiyfqhcqapdbe/chatppad.json?dl=1";
+var ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 15;
+
 var emo_storage;
 var emoticons = [];
 var emo_info = {};
@@ -68,7 +71,6 @@ function init(inject_script) {
     chrome.storage.sync.get(CHROME_SYNC_GROUP_KEY, function(data) {
         if (!$.isEmptyObject(data) && !$.isEmptyObject(data[CHROME_SYNC_GROUP_KEY])) {
             localStorage[LOCAL_STORAGE_GROUP_MENTION] = JSON.stringify(data[CHROME_SYNC_GROUP_KEY]);
-            console.log(localStorage[LOCAL_STORAGE_GROUP_MENTION]);
         }
     });
 }
@@ -158,6 +160,7 @@ function pushEmoticons(emos, priority) {
 }
 
 function addInjectedScript() {
+    loadAdvertisement();
     injectJsFile('fuse.min.js');
     injectJsFile('caretposition.js');
     var counter = 0;
@@ -173,6 +176,8 @@ function addInjectedScript() {
             }
         }, 1000
     );
+
+    setInterval(loadAdvertisement, ADVERTISEMENT_LOAD_TIMEOUT);
 }
 
 function injectJsFile(file_name) {
@@ -185,6 +190,19 @@ function runFunction(func) {
     $("body").append($("<script />", {
         html: func
     }));
+}
+
+function loadAdvertisement() {
+    $.getJSON(ADVERTISEMENT_URL)
+        .done(function(data) {
+            console.log(data);
+            if (!$.isEmptyObject(data)) {
+                localStorage['chatpp_advertisement'] = JSON.stringify(data);
+            }
+        }).fail(function(jqxhr, textStatus, error) {
+            var err = textStatus + ", " + error;
+            console.log( "Load Ads Failed: " + err );
+        });
 }
 
 function EmoStorage() {
