@@ -46,6 +46,10 @@ $(function() {
         switchMentionStatus();
     });
 
+    $('#btn-shortcut-status').click(function() {
+        switchShortcutStatus();
+    });
+
     $('#btn-code-type').click(function() {
         switchCodeType();
     });
@@ -81,6 +85,16 @@ function loadMentionStatus(status) {
     }
 }
 
+function loadShortcutStatus(status) {
+    if (status !== undefined && status == false) {
+        $('#shortcut-status').removeClass().addClass('text-danger').html('DISABLED');
+        $('#btn-shortcut-status').html('Enable');
+    } else {
+        $('#shortcut-status').removeClass().addClass('text-primary').html('ENABLED');
+        $('#btn-shortcut-status').html('Disable');
+    }
+}
+
 function loadCodeType(type) {
     if (type === CODE_TYPE_OFFENSIVE) {
         $('#code-type').removeClass().addClass('text-danger').html('OFFENSIVE');
@@ -112,12 +126,14 @@ function loadChatppEmoData() {
 }
 
 function updateViewData(data) {
+    console.log(data);
     var name = parseDataName(data);
     var date_sync = parseDateSynce(data);
     $('#current-data-info').html(name);
     $('#date-sync-info').html(date_sync);
     loadEmoticonStatus(data.emoticon_status);
     loadMentionStatus(data.mention_status);
+    loadShortcutStatus(data.shortcut_status);
 }
 
 function parseDataName(data) {
@@ -170,6 +186,19 @@ function switchMentionStatus() {
     stored_data[CHROME_SYNC_KEY]['mention_status'] = status;
     chrome.storage.sync.set(stored_data, function() {
         loadMentionStatus(status);
+    });
+}
+
+function switchShortcutStatus() {
+    var status = true;
+    if ($('#shortcut-status').html() == 'ENABLED') {
+        status = false;
+    } else {
+
+    }
+    stored_data[CHROME_SYNC_KEY]['shortcut_status'] = status;
+    chrome.storage.sync.set(stored_data, function() {
+        loadShortcutStatus(status);
     });
 }
 

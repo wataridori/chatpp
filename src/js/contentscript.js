@@ -57,6 +57,14 @@ function init(inject_script) {
         } else {
             localStorage[LOCAL_STORAGE_MENTION_STATUS] = true;
         }
+
+        if (info.shortcut_status == false) {
+            console.log("Shortcut Feature is disabled!");
+            localStorage[LOCAL_STORAGE_SHORTCUT_STATUS] = false;
+        } else {
+            localStorage[LOCAL_STORAGE_SHORTCUT_STATUS] = true;
+        }
+
         if (info.emoticon_status == false) {
             console.log("Emoticon Feature is disabled!");
             localStorage[LOCAL_STORAGE_EMOTICON_STATUS] = false;
@@ -195,7 +203,6 @@ function runFunction(func) {
 function loadAdvertisement() {
     $.getJSON(ADVERTISEMENT_URL)
         .done(function(data) {
-            console.log(data);
             if (!$.isEmptyObject(data)) {
                 localStorage['chatpp_advertisement'] = JSON.stringify(data);
             }
@@ -219,6 +226,8 @@ EmoStorage.prototype.pushData = function(inputted_data, inputted_priority) {
         data_version: inputted_data.data_version,
         date_sync: (new Date()).toLocaleString()
     };
+    this.data.mention_status = localStorage[LOCAL_STORAGE_MENTION_STATUS] === 'true';
+    this.data.shortcut_status = localStorage[LOCAL_STORAGE_SHORTCUT_STATUS] === 'true';
 };
 
 EmoStorage.prototype.removeData = function(data_name) {

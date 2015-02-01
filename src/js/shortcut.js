@@ -1,4 +1,3 @@
-var shortcut_status = true;
 var shortcut_timer;
 
 var DOM_VK_CANCEL = 3,
@@ -128,7 +127,8 @@ var shortcuts_default = {
     my_chat: DOM_VK_A,
     scroll: DOM_VK_S,
     toggle_mention: DOM_VK_X,
-    toggle_emoticon: DOM_VK_Z
+    toggle_emoticon: DOM_VK_Z,
+    toggle_shortcut: DOM_VK_V
 };
 
 $(function(){
@@ -146,7 +146,7 @@ $(function(){
 });
 
 function registerShortcut() {
-    console.log('Registering ShortCut');
+    console.log('Registering ShortCuts');
     CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function() {
         triggerDefaultAction('reply');
     });
@@ -190,6 +190,18 @@ function registerShortcut() {
     CW.view.registerKeyboardShortcut(shortcuts_default.toggle_mention, !1, !1, !1, !1, function() {
         toggleMentionStatus();
     });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.toggle_shortcut, !1, !1, !1, !1, function() {
+        toggleShortcutStatus();
+    });
+}
+
+function removeRegisteredKeyboardShortcut() {
+    for (keyboard in shortcuts_default) {
+        CW.view.registerKeyboardShortcut(shortcuts_default[keyboard], !1, !1, !1, !1, function() {
+            return false;
+        });
+    }
 }
 
 function triggerDefaultAction(action) {

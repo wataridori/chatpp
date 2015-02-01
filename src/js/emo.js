@@ -5,11 +5,13 @@ var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
 var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
 var LOCAL_STORAGE_EMOTICON_STATUS = "CHATPP_EMOTICON_STATUS";
 var LOCAL_STORAGE_MENTION_STATUS = "CHATPP_MENTION_STATUS";
+var LOCAL_STORAGE_SHORTCUT_STATUS = "CHATPP_SHORTCUT_STATUS";
 
 var emoticon_status = false;
 var cw_timer;
 
 var mention_status = false;
+var shortcut_status = false;
 var VERSION_NAME_DEV = 'dev';
 
 var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
@@ -28,6 +30,11 @@ $(function(){
                     mention_status = true;
                     addMentionText();
                 }
+                if (localStorage[LOCAL_STORAGE_SHORTCUT_STATUS] === 'true') {
+                    shortcut_status = true;
+                    addShortcutText();
+                }
+
                 addAdvertisement();
                 if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
                     var code_type = localStorage['emoticon_code_type'];
@@ -194,9 +201,30 @@ function addMentionText() {
     })
 }
 
+function addShortcutText() {
+    if ($('#_chatppShortcutText').length > 0) {
+        return;
+    }
+    $('#_chatSendTool').append(
+        '<li id="_chatppShortcutText" role="button" class=" _showDescription">' +
+        '<span id="chatppShortcutText" class="emoticonText icoSizeSmall"></span>' +
+        '</li>'
+    );
+    updateShortcutText();
+    $('#chatppShortcutText').click(function() {
+        toggleShortcutStatus();
+    })
+}
+
 function removeMentionText() {
     if ($('#_chatppMentionText').length > 0) {
         $('#_chatppMentionText').remove();
+    }
+}
+
+function removeShortcutText() {
+    if ($('#_chatppShortcutText').length > 0) {
+        $('#_chatppShortcutText').remove();
     }
 }
 
@@ -209,6 +237,19 @@ function updateMentionText() {
         div.addClass('emoticonTextEnable');
     } else {
         $('#_chatppMentionText').attr('aria-label', 'Click to enable Mention Feature');
+        div.removeClass('emoticonTextEnable');
+    }
+}
+
+function updateShortcutText() {
+    var shortcut_text = 'S: ' + (shortcut_status ? 'ON' : 'OFF');
+    var div = $('#chatppShortcutText');
+    div.html(shortcut_text);
+    if (shortcut_status) {
+        $('#_chatppShortcutText').attr('aria-label', 'Click to disable Shortcut Feature');
+        div.addClass('emoticonTextEnable');
+    } else {
+        $('#_chatppShortcutText').attr('aria-label', 'Click to enable Shortcut Feature');
         div.removeClass('emoticonTextEnable');
     }
 }
@@ -233,9 +274,20 @@ function toggleMentionStatus() {
     updateMentionText();
 }
 
+function toggleShortcutStatus() {
+    shortcut_status = shortcut_status !== true;
+    if (shortcut_status) {
+        registerShortcut()
+    } else {
+        removeRegisteredKeyboardShortcut();
+    }
+    updateShortcutText();
+}
+
 function disableChatpp() {
     removeEmoticonText();
     removeMentionText();
+    removeShortcutText();
     removeAdvertisement();
     removeExternalEmo();
 }
@@ -243,14 +295,15 @@ function disableChatpp() {
 function enableChatpp() {
     addEmoticonText();
     addMentionText();
+    addShortcutText();
     addAdvertisement();
     addExternalEmo();
 }
 
 function reloadEmoticions() {
     removeExternalEmo();
-    console.log('old emoticons removed');
+    console.log('Old emoticons removed');
     addExternalEmo();
-    console.log('new emoticons removed');
+    console.log('New emoticons removed');
     setEmoticonTextLabel();
 }
