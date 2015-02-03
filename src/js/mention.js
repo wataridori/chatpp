@@ -5,6 +5,7 @@ $(window).ready(function(){
     var is_inserted = false;
     var is_navigated = false;
     var is_outbound_of_list = false;
+    var actived_atmark_index = 0;
     var current_index = 0;
     var selected_index = 0;
     var current_RM = null;
@@ -14,9 +15,11 @@ $(window).ready(function(){
     var selected_group_name = '';
     var fuse = null;
     var DISPLAY_NUMS = 3;
+    var MAX_PATTERN_LENGTH = 20;
     var cached_enter_action = ST.data.enter_action;
     var options = {
-        keys: ['aid2name']
+        keys: ['aid2name'],
+        maxPatternLength: MAX_PATTERN_LENGTH,
     };
     var chat_text_jquery = $('#_chatText');
     var chat_text_element = document.getElementById('_chatText');
@@ -34,15 +37,40 @@ $(window).ready(function(){
     $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");
     hideSuggestionBox();
 
+    function getNearestAtmarkIndex(){
+        var content = chat_text_jquery.val();
+        var atmarks = content.match(start);
+
+        if (!atmarks) {
+            return -1;
+        }
+
+        var caret_index = doGetCaretPosition(chat_text_element);
+        var atmark_index = content.indexOf("@");
+        var pre_atmark_index = -1;
+        do {
+            if (atmark_index >= caret_index) {
+                break;
+            }
+            pre_atmark_index = atmark_index;
+            atmark_index = content.indexOf("@", atmark_index + 1);
+        } while (atmark_index != -1);
+
+        return pre_atmark_index;
+    }
+
     function findAtmark(){
-        content = chat_text_jquery.val();
-        atmarks = content.match(start);
+        var content = chat_text_jquery.val();
         // we only interested in @ symbol that: at the start of line or has a space before it
-        last_atmark_index = content.lastIndexOf("@");
-        if (last_atmark_index != 0 && (content.charAt(last_atmark_index - 1) != " " && content.charAt(last_atmark_index - 1) != "\n")) {
+        atmark_index = getNearestAtmarkIndex();
+        if (atmark_index != 0 && (content.charAt(atmark_index - 1) != " " && content.charAt(atmark_index - 1) != "\n")) {
             return false;
         }
-        if (atmarks) {
+
+        if (getTypedText().length >= MAX_PATTERN_LENGTH || getTypedText().length == 0) {
+            return false;
+        }
+        if (atmark_index != -1) {
             spaces = getTypedText().match(/ /ig);
             // text from last @ to current caret position have more than 2 spaces
             if (spaces && spaces.length > 2) {
@@ -53,7 +81,7 @@ $(window).ready(function(){
                 return false;
             }
             return true;
-        } else{
+        } else {
             // There is no @ symbol
             return false;
         }
@@ -61,7 +89,7 @@ $(window).ready(function(){
 
     function getTypedText(){
         content = chat_text_jquery.val();
-        start_pos = content.lastIndexOf("@");
+        start_pos = getNearestAtmarkIndex();
         if (start_pos == -1) return '';
         end_pos = doGetCaretPosition(chat_text_element);
         txt = content.substr(start_pos, end_pos - start_pos);
@@ -75,7 +103,7 @@ $(window).ready(function(){
     function setSuggestionBoxPosition() {
         var rect = chat_text_element.getBoundingClientRect();
         var current_pos = doGetCaretPosition(chat_text_element);
-        setCaretPosition(chat_text_element, chat_text_jquery.val().lastIndexOf('@') + 1)
+        setCaretPosition(chat_text_element, actived_atmark_index + 1);
         position = Measurement.caretPos(chat_text_jquery);
         position.top -= rect.top;
         position.left -= rect.left;
@@ -134,6 +162,7 @@ $(window).ready(function(){
         is_navigated = false;
         current_index = 0;
         selected_index = 0;
+        actived_atmark_index = -1;
         insert_mode = 'normal';
         if (insert_type == 'contact') {
             member_objects = buildMemberListData(false);
@@ -333,6 +362,10 @@ $(window).ready(function(){
             return;
         }
 
+        if (e.which == 9 || e.which == 13) {
+            return;
+        }
+
         if (current_RM != RM.id) {
             member_objects = buildMemberListData(false);
             fuse = new Fuse(member_objects, options);
@@ -340,9 +373,16 @@ $(window).ready(function(){
         }
 
         if (findAtmark()) {
+            if (is_displayed && getNearestAtmarkIndex() != -1 && getNearestAtmarkIndex() != actived_atmark_index) {
+                hideSuggestionBox();
+            }
+
             if (!is_displayed) {
                 if (!isTriggerKeyCode(e.which)) {
                     return;
+                }
+                if (getNearestAtmarkIndex() != -1) {
+                    actived_atmark_index = getNearestAtmarkIndex();
                 }
                 setSuggestionBoxPosition();
                 showSuggestionBox(buildList(filterDisplayResults(member_objects)));
@@ -430,8 +470,8 @@ $(window).ready(function(){
     }
 
     function setSuggestedChatText(entered_text, target_name, cwid){
-        current_pos = doGetCaretPosition(chat_text_element);
         var old = chat_text_jquery.val();
+        var start_pos = doGetCaretPosition(chat_text_element) - entered_text.length;
         var replace_text = '';
         var members = member_objects;
         if (insert_type == 'group') {
@@ -453,9 +493,9 @@ $(window).ready(function(){
             default:
                 break;
         }
-        var content = old.replace(entered_text, replace_text);
+        var content = old.substring(0, start_pos) + replace_text + old.substring(start_pos + entered_text.length);
         chat_text_jquery.val(content);
-        setCaretPosition(chat_text_element, current_pos + replace_text.length);
+        setCaretPosition(chat_text_element, start_pos + replace_text.length);
         hideSuggestionBox();
     }
 
