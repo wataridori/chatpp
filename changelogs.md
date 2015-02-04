@@ -1,5 +1,14 @@
 Chat++ Change Logs
 =================
+
+## 2.0.0 - A Big Update
+* View list issues at [Happy Lunar New Year Release Milestone](../../milestones/Happy%20Lunar%20New%20Year%20Release)
+* Mention syntax changed. (use `_` for omitting username, use `.` for picon)
+* Mention users that are in friend list, but not present in Chat box (using `@#`)
+* Register Groups name and members. Mention Group.
+* Shortcut Feature Added.
+* Several Bug Fixes. 
+
 ## 1.0.3
 * Add Skype data to official list
 * Fix bug with mention popup

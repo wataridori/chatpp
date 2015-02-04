@@ -1,4 +1,4 @@
-![chatpp](./src/icon32.png) Chat++
+![chatpp](./src/icon32.png) Chat++ 2
 =================
 
 Chat++ is an all-in-one Chatwork Enhancement Toolkit.
@@ -19,9 +19,15 @@ Main Features
 
 * Mention your self by typing `@me` (originally not supported by Chatwork).
 
-* Mention a person or all people __without name__ by typing `@_`, `@_me` or `@_all` (originally not supported by Chatwork).
+* Mention people in your friend list even if they are not present in current chat box. (originally not supported by Chatwork).
 
-* Just display user picon __(without mentioning)__ by typing `@__`, `@__me` or `@__all` (originally not supported by Chatwork).
+* Mention a person or all people __without name__ by adding `_` (originally not supported by Chatwork).
+
+* Just display user picon __(without mentioning)__ by adding `.` (originally not supported by Chatwork).
+
+* Register and Mention Group of people by typing only Group name.
+
+* Many useful shortcuts.
 
 * And more awesome features coming soon ...
 
