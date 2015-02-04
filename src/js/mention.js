@@ -491,7 +491,7 @@ $(window).ready(function(){
                 replace_text = getReplaceText("[picon:{0}] ", target_name, cwid, members);
                 break;
             case 'name':
-                replace_text = getReplaceText("[picon:{0}] {1}", target_name, cwid, members);
+                replace_text = getReplaceText("[picon:{0}] {1}\n", target_name, cwid, members);
                 break;
             default:
                 break;
