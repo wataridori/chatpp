@@ -333,6 +333,14 @@ $(window).ready(function(){
         if (!mention_status) {
             return;
         }
+
+        if (e.which == 38 || e.which == 40 && is_displayed) {
+            is_navigated = true;
+            holdCaretPosition(e);
+        } else {
+            is_navigated = false;
+        }
+
         if (e.which == 9 || e.which == 13) {
             if ((insert_type == 'all' || insert_type == 'group') && is_displayed) {
                 setSuggestedChatText(getTypedText(), null, null);
@@ -366,11 +374,19 @@ $(window).ready(function(){
             return;
         }
 
+        if (e.which == 38 || e.which == 40 && is_displayed) {
+            is_navigated = true;
+            holdCaretPosition(e);
+        } else {
+            is_navigated = false;
+        }
+
         if (current_RM != RM.id) {
             member_objects = buildMemberListData(false);
             fuse = new Fuse(member_objects, options);
             current_RM = RM.id;
         }
+
 
         if (findAtmark()) {
             if (is_displayed && getNearestAtmarkIndex() != -1 && getNearestAtmarkIndex() != actived_atmark_index) {
@@ -403,7 +419,6 @@ $(window).ready(function(){
 
                 if (e.which == 38) current_index -= 1;
                 if (e.which == 40) current_index += 1;
-
                 filtered_results = filterDisplayResults(raw_results);
 
                 if (e.which == 38 && is_outbound_of_list) {
@@ -436,18 +451,6 @@ $(window).ready(function(){
         current_pos = doGetCaretPosition(chat_text_element);
         setCaretPosition(chat_text_element, current_pos);
     }
-
-    chat_text_jquery.keydown(function (e) {
-        if (!mention_status) {
-            return;
-        }
-        if ((e.which == 9 || e.which == 13 || e.which == 38 || e.which == 40) && is_displayed) {
-            is_navigated = true;
-            holdCaretPosition(e);
-        } else {
-            is_navigated = false;
-        }
-    });
 
     function getReplaceText(format_string, target_name, cwid, members){
         replace_text = '';
