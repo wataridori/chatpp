@@ -334,7 +334,7 @@ $(window).ready(function(){
             return;
         }
 
-        if (e.which == 38 || e.which == 40 && is_displayed) {
+        if ((e.which == 38 || e.which == 40) && is_displayed) {
             is_navigated = true;
             holdCaretPosition(e);
         } else {
@@ -374,7 +374,7 @@ $(window).ready(function(){
             return;
         }
 
-        if (e.which == 38 || e.which == 40 && is_displayed) {
+        if ((e.which == 38 || e.which == 40) && is_displayed) {
             is_navigated = true;
             holdCaretPosition(e);
         } else {
