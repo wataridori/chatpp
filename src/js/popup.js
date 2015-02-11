@@ -1,7 +1,5 @@
 var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
 var CHROME_LOCAL_KEY = "CHATPP_CHROME_LOCAL_DATA";
-var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
-var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
 var VERSION_NAME_DEV = 'dev';
 var VERSION_NAME_RELEASE = 'final';
 var version_name;
@@ -50,10 +48,6 @@ $(function() {
         switchShortcutStatus();
     });
 
-    $('#btn-code-type').click(function() {
-        switchCodeType();
-    });
-
     chrome.storage.onChanged.addListener(function(changes, namespace) {
         var data = changes[CHROME_SYNC_KEY];
         if (!$.isEmptyObject(data) && !$.isEmptyObject(data.newValue)) {
@@ -95,14 +89,6 @@ function loadShortcutStatus(status) {
     }
 }
 
-function loadCodeType(type) {
-    if (type === CODE_TYPE_OFFENSIVE) {
-        $('#code-type').removeClass().addClass('text-danger').html('OFFENSIVE');
-    } else {
-        $('#code-type').removeClass().addClass('text-primary').html('DEFENSIVE');
-    }
-}
-
 function loadChatppEmoData() {
     chrome.storage.sync.get(CHROME_SYNC_KEY, function(data) {
         stored_data = data;
@@ -121,7 +107,6 @@ function loadChatppEmoData() {
         if (!$.isEmptyObject(data) && data.code_type !== undefined) {
             type = data.code_type;
         }
-        loadCodeType(type);
     });
 }
 
@@ -200,25 +185,6 @@ function switchShortcutStatus() {
     chrome.storage.sync.set(stored_data, function() {
         loadShortcutStatus(status);
     });
-}
-
-function switchCodeType() {
-    var code_type = CODE_TYPE_DEFENSIVE;
-    if ($('#code-type').html() === 'DEFENSIVE') {
-        code_type = CODE_TYPE_OFFENSIVE;
-    }
-
-    chrome.storage.local.get(CHROME_LOCAL_KEY, function(data) {
-        local_stored_data = data;
-        if (local_stored_data[CHROME_LOCAL_KEY] === undefined) {
-            local_stored_data[CHROME_LOCAL_KEY] = {};
-        }
-        local_stored_data[CHROME_LOCAL_KEY]['code_type'] = code_type;
-        chrome.storage.local.set(local_stored_data, function() {
-            loadCodeType(code_type);
-        });
-    });
-
 }
 
 function setVersionType() {

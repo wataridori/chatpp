@@ -10,9 +10,6 @@ var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
 var CHROME_SYNC_GROUP_KEY = "CHATPP_CHROME_SYNC_GROUP";
 var CHROME_LOCAL_KEY = "CHATPP_CHROME_LOCAL_DATA";
 
-var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
-var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
-
 var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
 
 var ADVERTISEMENT_URL = "https://www.dropbox.com/s/flbiyfqhcqapdbe/chatppad.json?dl=1";
@@ -101,19 +98,13 @@ function getData(info, inject_script) {
                     if (last) {
                         emo_storage.syncData();
                         chrome.storage.local.get(CHROME_LOCAL_KEY, function(local_data) {
-                            var code_type = '';
                             var version_name = '';
                             if (!$.isEmptyObject(local_data[CHROME_LOCAL_KEY])) {
-                                code_type = local_data[CHROME_LOCAL_KEY]['code_type'];
                                 version_name = local_data[CHROME_LOCAL_KEY]['version_name'];
                             }
-                            if (code_type === undefined || code_type === '') {
-                                code_type = CODE_TYPE_DEFENSIVE;
-                            }
                             var current_time = (new Date).toLocaleString();
-                            console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name +  ". Code Type: " + code_type);
+                            console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
                             localStorage[LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
-                            localStorage['emoticon_code_type'] = code_type;
                             localStorage['chatpp_version_name'] = version_name;
                             localStorage['emoticon_data_version'] = parseDataName(emo_info);
                             if (inject_script !== undefined && inject_script) {

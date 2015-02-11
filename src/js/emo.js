@@ -1,8 +1,6 @@
 // Const
 var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
 var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
-var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
-var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
 var LOCAL_STORAGE_EMOTICON_STATUS = "CHATPP_EMOTICON_STATUS";
 var LOCAL_STORAGE_MENTION_STATUS = "CHATPP_MENTION_STATUS";
 var LOCAL_STORAGE_SHORTCUT_STATUS = "CHATPP_SHORTCUT_STATUS";
@@ -37,10 +35,6 @@ $(function(){
 
                 addAdvertisement();
                 if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
-                    var code_type = localStorage['emoticon_code_type'];
-                    if (code_type === CODE_TYPE_OFFENSIVE) {
-                        CW.prepareRegExp();
-                    }
                     addExternalEmo();
                 }
             }
@@ -81,7 +75,7 @@ function getEmoUrl(img) {
 }
 
 function isSpecialEmo(emo) {
-    var special_emo = [':-ss', ':-??', '~:>'];
+    var special_emo = [':-ss', ':-??', '~:>', ':@)', '~X('];
     return special_emo.indexOf(emo) > -1;
 }
 
