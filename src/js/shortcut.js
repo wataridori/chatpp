@@ -128,7 +128,9 @@ var shortcuts_default = {
     scroll: DOM_VK_S,
     toggle_mention: DOM_VK_X,
     toggle_emoticon: DOM_VK_Z,
-    toggle_shortcut: DOM_VK_V
+    toggle_shortcut: DOM_VK_V,
+    previous_mention: DOM_VK_K,
+    next_mention: DOM_VK_J
 };
 
 $(function(){
@@ -194,6 +196,16 @@ function registerShortcut() {
     CW.view.registerKeyboardShortcut(shortcuts_default.toggle_shortcut, !1, !1, !1, !1, function() {
         toggleShortcutStatus();
     });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.previous_mention, !1, !1, !1, !1, function() {
+        var message_id = getHoverMessageId();
+        goToPreviousMention(message_id);
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, function() {
+        var message_id = getHoverMessageId();
+        goToNexMention(message_id);
+    });
 }
 
 function removeRegisteredKeyboardShortcut() {
@@ -225,4 +237,59 @@ function triggerMoreAction(action) {
 
 function isDomExists(dom) {
     return dom.length > 0;
+}
+
+function getHoverMessageId() {
+    return $('._message:hover').data('mid');
+}
+
+function getMessagePosition(id) {
+    var messages = RM.timeline.chat_list;
+    for (var i = messages.length -1; i >= 0; i--) {
+        if (messages[i].id == id) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+function goToPreviousMention(current) {
+    var position = getMessagePosition(current);
+    var messages = RM.timeline.chat_list;
+    for (var i = position - 1; i >= 0; i--) {
+        if (isMentionMessage(messages[i])) {
+            RM.load(messages[i].id);
+            return true;
+        }
+    }
+
+    if (!RM.timeline.has_old && messages.length == 0) {
+        return false;
+    }
+
+    RM.timeline.loadOld();
+}
+
+function goToNexMention(current) {
+    var position = getMessagePosition(current);
+    var messages = RM.timeline.chat_list;
+    for (var i = position + 1; i > 0 && i < messages.length; i++) {
+        if (isMentionMessage(messages[i])) {
+            RM.load(messages[i].id);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function isMentionMessage(message) {
+    var regex_reply = new RegExp('\\[.* aid=' + myid + ' .*\\]');
+    if (regex_reply.test(message.msg)) {
+        return true;
+    }
+
+    var regex_to = new RegExp('\\[To:' + myid + '\\]');
+    return regex_to.test(message.msg);
 }
