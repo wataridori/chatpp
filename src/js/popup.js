@@ -32,6 +32,10 @@ $(function() {
         chrome.tabs.create({url:'shortcut.html'});
     });
 
+    $('#room_page').click(function () {
+        chrome.tabs.create({url:'room.html'});
+    });
+
     $('#homepage').click(function(){
         chrome.tabs.create({url: $(this).attr('href')});
     });

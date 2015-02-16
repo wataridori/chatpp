@@ -1,4 +1,5 @@
 var shortcut_timer;
+var LOCAL_STORAGE_ROOM_SHORTCUT = "CHATPP_ROOM_SHORTCUT";
 
 var DOM_VK_CANCEL = 3,
     DOM_VK_HELP = 6,
@@ -133,6 +134,8 @@ var shortcuts_default = {
     next_mention: DOM_VK_J
 };
 
+var room_shortcuts = [];
+
 $(function(){
     shortcut_timer = setInterval(
         function(){
@@ -206,7 +209,24 @@ function registerShortcut() {
         var message_id = getHoverMessageId();
         goToNexMention(message_id);
     });
+
+    if (localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[LOCAL_STORAGE_ROOM_SHORTCUT]) {
+        room_shortcuts = JSON.parse(localStorage[LOCAL_STORAGE_ROOM_SHORTCUT]);
+    }
+
+    for (i in room_shortcuts) {
+        if (room_shortcuts[i]) {
+            var room = room_shortcuts[i];
+            CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, selectRoom(room));
+        }
+    }
 }
+
+var selectRoom = function (room) {
+    return function() {
+        RL.selectRoom(room);
+    }
+};
 
 function removeRegisteredKeyboardShortcut() {
     for (keyboard in shortcuts_default) {
