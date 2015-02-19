@@ -103,15 +103,6 @@ function loadChatppEmoData() {
             updateViewData(data);
         }
     });
-
-    chrome.storage.local.get(CHROME_LOCAL_KEY, function(data) {
-        local_stored_data = data;
-        data = data[CHROME_LOCAL_KEY];
-        var type = CODE_TYPE_DEFENSIVE;
-        if (!$.isEmptyObject(data) && data.code_type !== undefined) {
-            type = data.code_type;
-        }
-    });
 }
 
 function updateViewData(data) {

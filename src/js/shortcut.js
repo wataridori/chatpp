@@ -153,7 +153,8 @@ $(function(){
 function registerShortcut() {
     console.log('Registering ShortCuts');
     CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function() {
-        triggerDefaultAction('reply');
+        var message_id = getHoverMessageId();
+        replyMessage(message_id);
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, function() {
@@ -312,4 +313,13 @@ function isMentionMessage(message) {
 
     var regex_to = new RegExp('\\[To:' + myid + '\\]');
     return regex_to.test(message.msg);
+}
+
+function replyMessage(message) {
+    var data = RM.timeline.chat_id2chat_dat[message];
+    if (data) {
+        $C("#_chatText").focus();
+        var name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
+        CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
+    }
 }
