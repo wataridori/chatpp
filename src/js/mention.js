@@ -334,10 +334,11 @@ $(window).ready(function(){
             return;
         }
 
-        if ((e.which == 38 || e.which == 40) && is_displayed) {
+        if ((e.which == 38 || e.which == 40 || e.which == 9 || e.which == 13) && is_displayed) {
             is_navigated = true;
             holdCaretPosition(e);
         } else {
+            current_index = 0;
             is_navigated = false;
         }
 
