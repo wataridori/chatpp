@@ -16,7 +16,7 @@ $(window).ready(function(){
     var fuse = null;
     var DISPLAY_NUMS = 3;
     var MAX_PATTERN_LENGTH = 20;
-    var SPECIAL_CHARS = ["\n", '!', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '[', ']', '{', '}', ';', ':', ',', '/', '`', '\'', '"'];
+    var SPECIAL_CHARS = ["\n", '!', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '[', ']', '{', '}', ';', ':', ',', '/', '`', '\'', '"'];
     var cached_enter_action = ST.data.enter_action;
     var options = {
         keys: ['aid2name'],
