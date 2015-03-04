@@ -1,12 +1,9 @@
-![chatpp](./src/icon32.png) Chat++ 2
+![chatpp](./src/icon32.png) Chat++ 3
 =================
 
 Chat++ is an all-in-one Chatwork Enhancement Toolkit.
 It is a free Chrome Extension which provides more funny emoticons as well as many other features for Chatwork. 
 It is made by Framgia's Members, and for Framgia's Members.
-
-Chat++ is a big innovation of the well known extension [YACEP](https://github.com/wataridori/yacep)!
-
 
 Main Features
 --------------
@@ -29,7 +26,9 @@ Main Features
 
 * Many useful shortcuts.
 
-* And more awesome features coming soon ...
+* Easily check Room Information.
+
+* And more awesome features ...
 
 
 Change Logs
