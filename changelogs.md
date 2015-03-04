@@ -1,13 +1,22 @@
 Chat++ Change Logs
 =================
 
+## 3.0.0 - A Big Update
+* View list issues at [Happy Birthday Release Milestone](../../milestones/Happy%20Birthday%20Release)
+* Room Shortcut Feature Added.
+* Mention Jump Feature Added.
+* Drop OFFENSIVE mode.
+* Allow users to reply their own message.
+* Add room info button.
+* Several Bug Fixes. 
+
 ## 2.0.0 - A Big Update
 * View list issues at [Happy Lunar New Year Release Milestone](../../milestones/Happy%20Lunar%20New%20Year%20Release)
 * Mention syntax changed. (use `_` for omitting username, use `.` for picon)
 * Mention users that are in friend list, but not present in Chat box (using `@#`)
 * Register Groups name and members. Mention Group.
 * Shortcut Feature Added.
-* Several Bug Fixes. 
+* Several Bug Fixes.
 
 ## 1.0.3
 * Add Skype data to official list
@@ -24,6 +33,7 @@ Chat++ Change Logs
 
 ## 1.0.0
 * Change version for release purpose.
+* View list issues at [Happy New Year Release Milestone](../../milestones/Happy%20New%20Year%20Release)
 
 ## 0.1.3
 * [issue #13](../../issues/13): Fix bug with arrows inputted

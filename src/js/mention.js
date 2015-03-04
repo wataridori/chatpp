@@ -16,6 +16,7 @@ $(window).ready(function(){
     var fuse = null;
     var DISPLAY_NUMS = 3;
     var MAX_PATTERN_LENGTH = 20;
+    var SPECIAL_CHARS = ["\n", '!', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '[', ']', '{', '}', ';', ':', ',', '/', '`', '\'', '"'];
     var cached_enter_action = ST.data.enter_action;
     var options = {
         keys: ['aid2name'],
@@ -76,10 +77,14 @@ $(window).ready(function(){
             if (spaces && spaces.length > 2) {
                 return false;
             }
-            // text contain new line character
-            if (getTypedText().indexOf("\n") != -1){
-                return false;
-            }
+
+            // text contains special characters ?
+            for (var i = 0; i < SPECIAL_CHARS.length; i++) {
+                if (getTypedText().indexOf(SPECIAL_CHARS[i]) != -1) {
+                    return false;
+                }
+            };
+
             return true;
         } else {
             // There is no @ symbol
@@ -334,10 +339,11 @@ $(window).ready(function(){
             return;
         }
 
-        if ((e.which == 38 || e.which == 40) && is_displayed) {
+        if ((e.which == 38 || e.which == 40 || e.which == 9 || e.which == 13) && is_displayed) {
             is_navigated = true;
             holdCaretPosition(e);
         } else {
+            current_index = 0;
             is_navigated = false;
         }
 

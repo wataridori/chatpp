@@ -5,13 +5,12 @@ var LOCAL_STORAGE_EMOTICON_STATUS = "CHATPP_EMOTICON_STATUS";
 var LOCAL_STORAGE_MENTION_STATUS = "CHATPP_MENTION_STATUS";
 var LOCAL_STORAGE_SHORTCUT_STATUS = "CHATPP_SHORTCUT_STATUS";
 var LOCAL_STORAGE_GROUP_MENTION = "CHATPP_GROUP_MENTION";
+var LOCAL_STORAGE_ROOM_SHORTCUT = "CHATPP_ROOM_SHORTCUT";
 
 var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
 var CHROME_SYNC_GROUP_KEY = "CHATPP_CHROME_SYNC_GROUP";
 var CHROME_LOCAL_KEY = "CHATPP_CHROME_LOCAL_DATA";
-
-var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
-var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
+var CHROME_SYNC_ROOM_KEY = "CHATPP_CHROME_SYNC_ROOM";
 
 var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
 
@@ -81,6 +80,13 @@ function init(inject_script) {
             localStorage[LOCAL_STORAGE_GROUP_MENTION] = JSON.stringify(data[CHROME_SYNC_GROUP_KEY]);
         }
     });
+
+    localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] = [];
+    chrome.storage.sync.get(CHROME_SYNC_ROOM_KEY, function(data) {
+        if (!$.isEmptyObject(data) && !$.isEmptyObject(data[CHROME_SYNC_ROOM_KEY])) {
+            localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] = JSON.stringify(data[CHROME_SYNC_ROOM_KEY]);
+        }
+    });
 }
 
 function getData(info, inject_script) {
@@ -101,19 +107,13 @@ function getData(info, inject_script) {
                     if (last) {
                         emo_storage.syncData();
                         chrome.storage.local.get(CHROME_LOCAL_KEY, function(local_data) {
-                            var code_type = '';
                             var version_name = '';
                             if (!$.isEmptyObject(local_data[CHROME_LOCAL_KEY])) {
-                                code_type = local_data[CHROME_LOCAL_KEY]['code_type'];
                                 version_name = local_data[CHROME_LOCAL_KEY]['version_name'];
                             }
-                            if (code_type === undefined || code_type === '') {
-                                code_type = CODE_TYPE_DEFENSIVE;
-                            }
                             var current_time = (new Date).toLocaleString();
-                            console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name +  ". Code Type: " + code_type);
+                            console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
                             localStorage[LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
-                            localStorage['emoticon_code_type'] = code_type;
                             localStorage['chatpp_version_name'] = version_name;
                             localStorage['emoticon_data_version'] = parseDataName(emo_info);
                             if (inject_script !== undefined && inject_script) {

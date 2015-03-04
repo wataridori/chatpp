@@ -1,4 +1,4 @@
-![chatpp](./src/icon32.png) Chat++ 2
+![chatpp](./src/icon32.png) Chat++ 3
 =================
 
 Chat++ is an all-in-one Chatwork Enhancement Toolkit.
@@ -27,7 +27,9 @@ Main Features
 
 * Many useful shortcuts
 
-* And more awesome features coming soon ...
+* Easily check Room Information.
+
+* And more awesome features ...
 
 
 Change Logs

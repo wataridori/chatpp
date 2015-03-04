@@ -1,4 +1,5 @@
 var shortcut_timer;
+var LOCAL_STORAGE_ROOM_SHORTCUT = "CHATPP_ROOM_SHORTCUT";
 
 var DOM_VK_CANCEL = 3,
     DOM_VK_HELP = 6,
@@ -128,8 +129,12 @@ var shortcuts_default = {
     scroll: DOM_VK_S,
     toggle_mention: DOM_VK_X,
     toggle_emoticon: DOM_VK_Z,
-    toggle_shortcut: DOM_VK_V
+    toggle_shortcut: DOM_VK_V,
+    previous_mention: DOM_VK_K,
+    next_mention: DOM_VK_J
 };
+
+var room_shortcuts = [];
 
 $(function(){
     shortcut_timer = setInterval(
@@ -148,7 +153,8 @@ $(function(){
 function registerShortcut() {
     console.log('Registering ShortCuts');
     CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function() {
-        triggerDefaultAction('reply');
+        var message_id = getHoverMessageId();
+        replyMessage(message_id);
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, function() {
@@ -194,7 +200,34 @@ function registerShortcut() {
     CW.view.registerKeyboardShortcut(shortcuts_default.toggle_shortcut, !1, !1, !1, !1, function() {
         toggleShortcutStatus();
     });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.previous_mention, !1, !1, !1, !1, function() {
+        var message_id = getHoverMessageId();
+        goToPreviousMention(message_id);
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, function() {
+        var message_id = getHoverMessageId();
+        goToNexMention(message_id);
+    });
+
+    if (localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[LOCAL_STORAGE_ROOM_SHORTCUT]) {
+        room_shortcuts = JSON.parse(localStorage[LOCAL_STORAGE_ROOM_SHORTCUT]);
+    }
+
+    for (i in room_shortcuts) {
+        if (room_shortcuts[i]) {
+            var room = room_shortcuts[i];
+            CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, selectRoom(room));
+        }
+    }
 }
+
+var selectRoom = function (room) {
+    return function() {
+        RL.selectRoom(room);
+    }
+};
 
 function removeRegisteredKeyboardShortcut() {
     for (keyboard in shortcuts_default) {
@@ -225,4 +258,68 @@ function triggerMoreAction(action) {
 
 function isDomExists(dom) {
     return dom.length > 0;
+}
+
+function getHoverMessageId() {
+    return $('._message:hover').data('mid');
+}
+
+function getMessagePosition(id) {
+    var messages = RM.timeline.chat_list;
+    for (var i = messages.length -1; i >= 0; i--) {
+        if (messages[i].id == id) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+function goToPreviousMention(current) {
+    var position = getMessagePosition(current);
+    var messages = RM.timeline.chat_list;
+    for (var i = position - 1; i >= 0; i--) {
+        if (isMentionMessage(messages[i])) {
+            RM.load(messages[i].id);
+            return true;
+        }
+    }
+
+    if (!RM.timeline.has_old && messages.length == 0) {
+        return false;
+    }
+
+    RM.timeline.loadOld();
+}
+
+function goToNexMention(current) {
+    var position = getMessagePosition(current);
+    var messages = RM.timeline.chat_list;
+    for (var i = position + 1; i > 0 && i < messages.length; i++) {
+        if (isMentionMessage(messages[i])) {
+            RM.load(messages[i].id);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function isMentionMessage(message) {
+    var regex_reply = new RegExp('\\[.* aid=' + myid + ' .*\\]');
+    if (regex_reply.test(message.msg)) {
+        return true;
+    }
+
+    var regex_to = new RegExp('\\[To:' + myid + '\\]');
+    return regex_to.test(message.msg);
+}
+
+function replyMessage(message) {
+    var data = RM.timeline.chat_id2chat_dat[message];
+    if (data) {
+        $C("#_chatText").focus();
+        var name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
+        CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
+    }
 }

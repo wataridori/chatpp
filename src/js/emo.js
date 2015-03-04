@@ -1,8 +1,6 @@
 // Const
 var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
 var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
-var CODE_TYPE_OFFENSIVE = "OFFENSIVE";
-var CODE_TYPE_DEFENSIVE = "DEFENSIVE";
 var LOCAL_STORAGE_EMOTICON_STATUS = "CHATPP_EMOTICON_STATUS";
 var LOCAL_STORAGE_MENTION_STATUS = "CHATPP_MENTION_STATUS";
 var LOCAL_STORAGE_SHORTCUT_STATUS = "CHATPP_SHORTCUT_STATUS";
@@ -23,6 +21,7 @@ $(function(){
             if (typeof CW != 'undefined' && typeof CW.reg_cmp != 'undefined') {
                 window.clearInterval(cw_timer);
                 addStyle();
+                addInfoIcon();
                 if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
                     addEmoticonText();
                 }
@@ -37,10 +36,6 @@ $(function(){
 
                 addAdvertisement();
                 if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
-                    var code_type = localStorage['emoticon_code_type'];
-                    if (code_type === CODE_TYPE_OFFENSIVE) {
-                        CW.prepareRegExp();
-                    }
                     addExternalEmo();
                 }
             }
@@ -81,7 +76,7 @@ function getEmoUrl(img) {
 }
 
 function isSpecialEmo(emo) {
-    var special_emo = [':-ss', ':-??', '~:>'];
+    var special_emo = [':-ss', ':-??', '~:>', ':@)', '~X('];
     return special_emo.indexOf(emo) > -1;
 }
 
@@ -113,7 +108,49 @@ function addExternalEmo() {
 }
 
 function addStyle() {
-    $("<style type='text/css'> .emoticonTextEnable{font-weight: bold;} </style>").appendTo("head");
+    $("<style type='text/css'> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
+}
+
+function addInfoIcon() {
+    if ($('#roomInfoIcon').length > 0) {
+        return;
+    }
+    var roomInfo = '<li id="_roomInfo" role="button" class="_showDescription" aria-label="Show room Information" style="display: inline-block;"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></li>';
+    $('#_chatSendTool').append(roomInfo);
+    var roomInfoList = '<div id="_roomInfoList" class="roomInfo toolTip toolTipWhite mainContetTooltip" role="tooltip">' +
+        '<div class="_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom"></div>' +
+        '<span id="_roomInfoText">' +
+        '<div id="_roomInfoTextTotalMembers" class="tooltipFooter"></div>' +
+        '<div id="_roomInfoTextTotalMessages" class="tooltipFooter"></div>' +
+        '<div id="_roomInfoTextTotalFiles" class="tooltipFooter"></div>' +
+        '<div id="_roomInfoTextTotalTasks" class="tooltipFooter"></div>' +
+        '<div id="_roomInfoTextMyTasks" class="tooltipFooter"></div>' +
+        '</span>' +
+        '</div>';
+    $('body').append(roomInfoList);
+    $('#_roomInfo').click(function() {
+        prepareRoomInfo();
+        var roomName = RM.getIcon() + ' ' + RM.getName();
+        var tip = $('#_roomInfoList').cwListTip({
+            selectOptionArea: '<b>' + roomName + '</b>' + ' Information',
+            fixHeight: !1,
+            search: !1
+        });
+        tip.open($(this));
+    });
+}
+
+function prepareRoomInfo() {
+    var total_members = '<b>Total Members</b>: ' + RM.getSortedMemberList().length;
+    $('#_roomInfoTextTotalMembers').html(total_members);
+    var total_messages = '<b>Total Messages</b>: ' + RM.chat_num;
+    $('#_roomInfoTextTotalMessages').html(total_messages);
+    var total_tasks = '<b>Total Tasks</b>: ' + RM.task_num;
+    $('#_roomInfoTextTotalTasks').html(total_tasks);
+    var my_tasks = '<b>My Tasks</b>: ' + RM.mytask_num;
+    $('#_roomInfoTextMyTasks').html(my_tasks);
+    var total_files = '<b>Total Files</b>: ' + RM.file_num;
+    $('#_roomInfoTextTotalFiles').html(total_files);
 }
 
 function addEmoticonText() {
