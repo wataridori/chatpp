@@ -1,6 +1,9 @@
 Chat++ Change Logs
 =================
 
+## 3.0.1
+* Add Vietnamese Emoticon Data
+
 ## 3.0.0 - A Big Update
 * View list issues at [Happy Birthday Release Milestone](../../milestones/Happy%20Birthday%20Release)
 * Room Shortcut Feature Added.

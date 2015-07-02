@@ -1,9 +1,9 @@
 {
     "name": "Chat++",
     "short_name": "ChatPP",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "manifest_version": 2,
-    "description": "A Chatwork Enhancement Toolkit",
+    "description": "An all-in-one Chatwork Enhancement Toolkit which provides many useful features!",
     "content_scripts": [
         {
             "matches": [

@@ -17,6 +17,11 @@ var official_emos = {
         link: 'https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1',
         description: 'The default Emoticons data of Chat++'
     },
+    Vietnamese: {
+        name: 'Vietnamese',
+        link: 'https://www.dropbox.com/s/1zq7oqg11pkye6m/vn-emo.json?dl=1',
+        description: 'Yet another data for people who want to use Vietnamese Emoticons'
+    },
     Japanese: {
         name: 'Japanese',
         link: 'https://dl.dropboxusercontent.com/s/59gwiqg9bipvz40/jp-emo.json?dl=1',

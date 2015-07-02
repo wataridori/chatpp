@@ -36,7 +36,7 @@ $(function() {
         chrome.tabs.create({url:'room.html'});
     });
 
-    $('#homepage').click(function(){
+    $('.ext-url').click(function(){
         chrome.tabs.create({url: $(this).attr('href')});
     });
 
