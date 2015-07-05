@@ -130,7 +130,7 @@ function addInfoIcon() {
     $('body').append(roomInfoList);
     $('#_roomInfo').click(function() {
         prepareRoomInfo();
-        var roomName = RM.getIcon() + ' ' + RM.getName();
+        var roomName = RM.getIcon() + ' ' + htmlEncode(RM.getName());
         var tip = $('#_roomInfoList').cwListTip({
             selectOptionArea: '<b>' + roomName + '</b>' + ' Information',
             fixHeight: !1,
