@@ -3,8 +3,6 @@
 
 Chat++ is an all-in-one Chatwork Enhancement Toolkit.
 It is a free Chrome Extension which provides more funny emoticons as well as many other features for Chatwork. 
-It is made by Framgia's Members, and for Framgia's Members.
-
 
 Main Features
 --------------
