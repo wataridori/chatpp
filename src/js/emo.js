@@ -10,12 +10,10 @@ var cw_timer;
 
 var mention_status = false;
 var shortcut_status = false;
-var VERSION_NAME_DEV = 'dev';
 
 var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
 
 $(function(){
-
     cw_timer = setInterval(
         function(){
             if (typeof CW != 'undefined' && typeof CW.reg_cmp != 'undefined') {
@@ -97,11 +95,6 @@ function removeExternalEmo() {
 function addExternalEmo() {
     var emodata = JSON.parse(localStorage[LOCAL_STORAGE_DATA_KEY]);
     addEmo(emodata);
-    var version_name = localStorage['chatpp_version_name'];
-    if (version_name === VERSION_NAME_DEV) {
-        var secret_emos = getSecretEmos();
-        addEmo(secret_emos);
-    }
     emoticon_status = true;
     updateEmoticonText();
     console.log('Emoticon added!');
@@ -115,9 +108,9 @@ function addInfoIcon() {
     if ($('#roomInfoIcon').length > 0) {
         return;
     }
-    var roomInfo = '<li id="_roomInfo" role="button" class="_showDescription" aria-label="Show room Information" style="display: inline-block;"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></li>';
-    $('#_chatSendTool').append(roomInfo);
-    var roomInfoList = '<div id="_roomInfoList" class="roomInfo toolTip toolTipWhite mainContetTooltip" role="tooltip">' +
+    var room_info = '<li id="_roomInfo" role="button" class="_showDescription" aria-label="Show room Information" style="display: inline-block;"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></li>';
+    $('#_chatSendTool').append(room_info);
+    var room_info_list = '<div id="_roomInfoList" class="roomInfo toolTip toolTipWhite mainContetTooltip" role="tooltip">' +
         '<div class="_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom"></div>' +
         '<span id="_roomInfoText">' +
         '<div id="_roomInfoTextTotalMembers" class="tooltipFooter"></div>' +
@@ -127,12 +120,12 @@ function addInfoIcon() {
         '<div id="_roomInfoTextMyTasks" class="tooltipFooter"></div>' +
         '</span>' +
         '</div>';
-    $('body').append(roomInfoList);
+    $('body').append(room_info_list);
     $('#_roomInfo').click(function() {
         prepareRoomInfo();
-        var roomName = RM.getIcon() + ' ' + htmlEncode(RM.getName());
+        var room_name = RM.getIcon() + ' ' + htmlEncode(RM.getName());
         var tip = $('#_roomInfoList').cwListTip({
-            selectOptionArea: '<b>' + roomName + '</b>' + ' Information',
+            selectOptionArea: '<b>' + room_name + '</b>' + ' Information',
             fixHeight: !1,
             search: !1
         });
@@ -289,13 +282,6 @@ function updateShortcutText() {
         $('#_chatppShortcutText').attr('aria-label', 'Click to enable Shortcut Feature');
         div.removeClass('emoticonTextEnable');
     }
-}
-
-function getSecretEmos() {
-    return [
-        {"key": "(ngotlong)", "regex": "\\(ngotlong\\)", "src": "ngotlong.png"},
-        {"key": "(chatpp)", "regex": "\\(chatpp\\)", "src": "chatpp.png"}
-    ];
 }
 
 function toggleEmoticonsStatus() {
