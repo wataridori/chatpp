@@ -176,7 +176,7 @@ function addInjectedScript() {
         function() {
             if (counter === DELAY_TIME) {
                 window.clearInterval(inject_script_timer);
-                injectJsFile('emo.js');
+                injectJsFile('main.js');
                 injectJsFile('mention.js');
                 injectJsFile('shortcut.js');
             } else {

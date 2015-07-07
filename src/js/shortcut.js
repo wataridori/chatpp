@@ -139,7 +139,7 @@ var room_shortcuts = [];
 $(function(){
     shortcut_timer = setInterval(
         function(){
-            if (typeof CW != 'undefined' && typeof CW.view != 'undefined') {
+            if (typeof CW !== 'undefined' && typeof CW.view !== 'undefined') {
                 window.clearInterval(shortcut_timer);
                 if (shortcut_status) {
                     registerShortcut();

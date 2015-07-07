@@ -11,12 +11,14 @@ var cw_timer;
 var mention_status = false;
 var shortcut_status = false;
 
+var thumbnail_status = true;
+
 var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
 
 $(function(){
     cw_timer = setInterval(
         function(){
-            if (typeof CW != 'undefined' && typeof CW.reg_cmp != 'undefined') {
+            if (typeof CW !== 'undefined' && typeof CW.reg_cmp !== 'undefined') {
                 window.clearInterval(cw_timer);
                 addStyle();
                 addInfoIcon();
@@ -31,7 +33,9 @@ $(function(){
                     shortcut_status = true;
                     addShortcutText();
                 }
-
+                if (thumbnail_status) {
+                    prepareThumbnails();
+                }
                 addAdvertisement();
                 if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
                     addExternalEmo();
@@ -329,4 +333,36 @@ function reloadEmoticions() {
     addExternalEmo();
     console.log('New emoticons removed');
     setEmoticonTextLabel();
+}
+
+function prepareThumbnails() {
+    TimeLineView.prototype.getTimeLineOld = TimeLineView.prototype.getTimeLine;
+    TimeLineView.prototype.getTimeLine = function(a, b) {
+        var timeLine = this.getTimeLineOld(a, b);
+        var temp = $("<div></div>");
+        $(temp).html(timeLine);
+        $(".ui_sp_favicon_parent", temp).each(function(index, link) {
+            var dom = $(link);
+            var imageLink = getThumbnailLink(dom.attr("href"));
+            if (imageLink) {
+                var img = '<div><img src="' + imageLink + '" alt="' + imageLink +'" style="max-width: 500px; max-height: 150px"></div>';
+                dom.after(img);
+            }
+        });
+
+        return $(temp).html();
+    };
+}
+
+function getThumbnailLink(link) {
+    var imgRegex = /\.(png|jpg|gif|jpeg)$/;
+    if (link.match(imgRegex)) {
+        return link;
+    };
+
+    if (link.indexOf('http://gyazo.com/') === 0) {
+        return link + '.png';
+    }
+
+    return false;
 }
