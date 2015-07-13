@@ -14,35 +14,39 @@
     </head>
     <body>
         <div class="container">
-            <div class="media" style="min-width: 360px; margin-top: 20px">
-                <div class="media-left pull-left" href="#">
-                    <img src="icon64.png" id="popup_page" alt="Angelic">
+            <div class="media row" style="min-width: 360px; padding: 10px 0 10px 30px">
+                <div class="row">
+                    <div class="media-left pull-left" href="#">
+                        <img src="icon64.png" id="popup_page" alt="Angelic">
+                    </div>
+                    <div class="media-body pull-left" style="padding-top: 10px">
+                        <h4 class="media-heading text-warning"><strong>Chat++ <span id="chatpp_version"></span></strong></h4>
+                        <h5 class="media-heading text-success"><strong>A Chatwork Enhancement Toolkit</strong></h5>
+                    </div>
                 </div>
-                <div class="media-body pull-left">
-                    <h4 class="media-heading text-warning"><strong>Chat++ <span id="chatpp_version"></span></strong></h4>
-                    <h5 class="media-heading text-success"><strong>A Chatwork Enhancement Toolkit</strong></h5>
+                <div class="row media-body pull-left" style="padding-top: 10px">
+                    <button type="button" class="btn btn-primary btn-xs" id="setting_page" style="margin-bottom: 10px">Setting</button>
                     <button type="button" class="btn btn-primary btn-xs" id="emoticon_page" style="margin-bottom: 10px">Emoticons</button>
                     <button type="button" class="btn btn-primary btn-xs" id="group_page" style="margin-bottom: 10px">Groups</button>
                     <button type="button" class="btn btn-primary btn-xs" id="shortcut_page" style="margin-bottom: 10px">Shortcuts</button>
                     <button type="button" class="btn btn-primary btn-xs" id="room_page" style="margin-bottom: 10px">Rooms</button>
                 </div>
             </div>
-            <br>
-            <br>
-            <br>
-            <p class="text-warning" style="margin-top: 20px">Homepage: <a id="homepage" class="ext-url" href="http://chatpp.thangtd.com">http://chatpp.thangtd.com</a></p>
-            <p class="text-warning">Author: <span class="text-danger"><strong>Tran Duc Thang</strong> - <strong>Nguyen Anh Tien</strong></span></p>
-            <hr>
-            <p class="text-warning">Current Emoticon Data: <span class="text-danger" id="current-data-info"></span></p>
-            <p class="text-warning">Date Sync: <span class="text-danger" id="date-sync-info"></span></p>
-            <p class="text-warning">Emoticons Status: <span class="text-danger" id="emo-status"></span><button type="button" class="btn btn-info btn-xs" style="margin-left: 10px" id="btn-emo-status">Disable</button></p>
-            <hr>
-            <p class="text-warning">Mention Status: <span class="text-danger" id="mention-status"></span><button type="button" class="btn btn-info btn-xs" style="margin-left: 10px" id="btn-mention-status">Disable</button></p>
-            <hr>
-            <p class="text-warning">Shortcut Status: <span class="text-danger" id="shortcut-status"></span><button type="button" class="btn btn-info btn-xs" style="margin-left: 10px" id="btn-shortcut-status">Disable</button></p>
-            <hr>
-            <p class="text-black">ChatPP icon designed by <span class="text-danger">Tran Ba Trong</span>.</p>
-            <p class="text-danger">If you like Chat++, please <a class="ext-url" href="https://chrome.google.com/webstore/detail/chat%2B%2B/amhfnpimdfcdcpnchjionbddjjbmofnl/reviews">rate it</a> :)</p>
+            <div class="row" style="padding-left: 20px">
+                <p class="text-warning">Homepage: <a id="homepage" class="ext-url" href="http://chatpp.thangtd.com">http://chatpp.thangtd.com</a></p>
+                <p class="text-warning">Author: <span class="text-danger"><strong>Tran Duc Thang</strong> - <strong>Nguyen Anh Tien</strong></span></p>
+                <p class="text-warning">Current Emoticon Data: <span class="text-danger" id="current-data-info"></span></p>
+                <p class="text-warning">Date Sync: <span class="text-danger" id="date-sync-info"></span></p>
+                <hr>
+                <p class="text-warning">Emoticon: <span class="text-danger" id="emoticon-status"></span></p>
+                <p class="text-warning">Mention: <span class="text-danger" id="mention-status"></span></p>
+                <p class="text-warning">Shortcut: <span class="text-danger" id="shortcut-status"></span></p>
+                <p class="text-warning">Thumbnail: <span class="text-danger" id="thumbnail-status"></span></p>
+                <p class="text-warning">Highlight Code: <span class="text-danger" id="highlight-status"></span></p>
+                <hr>
+                <p class="text-black">ChatPP icon designed by <span class="text-danger">Tran Ba Trong</span>.</p>
+                <p class="text-danger">If you like Chat++, please <a class="ext-url" href="https://chrome.google.com/webstore/detail/chat%2B%2B/amhfnpimdfcdcpnchjionbddjjbmofnl/reviews">rate it</a> :)</p>
+            </div>
         </div>
     </body>
 </html>

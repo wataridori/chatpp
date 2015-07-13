@@ -1,9 +1,7 @@
 // Const
 var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
 var LOCAL_STORAGE_INFO_KEY = "YACEP_EMO_INFO";
-var LOCAL_STORAGE_EMOTICON_STATUS = "CHATPP_EMOTICON_STATUS";
-var LOCAL_STORAGE_MENTION_STATUS = "CHATPP_MENTION_STATUS";
-var LOCAL_STORAGE_SHORTCUT_STATUS = "CHATPP_SHORTCUT_STATUS";
+
 var LOCAL_STORAGE_GROUP_MENTION = "CHATPP_GROUP_MENTION";
 var LOCAL_STORAGE_ROOM_SHORTCUT = "CHATPP_ROOM_SHORTCUT";
 
@@ -34,7 +32,7 @@ function init(inject_script) {
         if (!$.isEmptyObject(info)) {
             for (key in info) {
                 var emo_data = info[key];
-                if (emo_data.data_name === 'Default' && emo_data.data_url !== DEFAULT_DATA_URL) {
+                if (emo_data.data_name === "Default" && emo_data.data_url !== DEFAULT_DATA_URL) {
                     url = DEFAULT_DATA_URL;
                 } else {
                     url = emo_data.data_url;
@@ -45,31 +43,28 @@ function init(inject_script) {
             }
         }
         if ($.isEmptyObject(urls)) {
-            urls['Default'] = DEFAULT_DATA_URL;
+            urls["Default"] = DEFAULT_DATA_URL;
         }
         if (info === undefined) {
             info = {};
         }
-        if (info.mention_status == false) {
-            console.log("Mention Feature is disabled!");
-            localStorage[LOCAL_STORAGE_MENTION_STATUS] = false;
-        } else {
-            localStorage[LOCAL_STORAGE_MENTION_STATUS] = true;
-        }
 
-        if (info.shortcut_status == false) {
-            console.log("Shortcut Feature is disabled!");
-            localStorage[LOCAL_STORAGE_SHORTCUT_STATUS] = false;
-        } else {
-            localStorage[LOCAL_STORAGE_SHORTCUT_STATUS] = true;
-        }
+        var features = ["mention", "shortcut", "thumbnail", "highlight"];
+        features.forEach(function(feature) {
+            if (info[feature + "_status"] == false) {
+                console.log(feature + " feature is disabled!");
+                localStorage[feature + "_status"] = false;
+            } else {
+                localStorage[feature + "_status"] = true;
+            }
+        });
 
         if (info.emoticon_status == false) {
-            console.log("Emoticon Feature is disabled!");
-            localStorage[LOCAL_STORAGE_EMOTICON_STATUS] = false;
+            console.log("emoticon feature is disabled!");
+            localStorage.emoticon_status = false;
             addInjectedScript();
         } else {
-            localStorage[LOCAL_STORAGE_EMOTICON_STATUS] = true;
+            localStorage.emoticon_status = true;
             getData(info, inject_script);
         }
     });
@@ -99,7 +94,7 @@ function getData(info, inject_script) {
             .done(function(data) {
                 loaded_count++;
                 var last = loaded_count === emo_count;
-                if (typeof(data.data_version) !== 'undefined' && typeof(data.emoticons) !== 'undefined') {
+                if (typeof(data.data_version) !== "undefined" && typeof(data.emoticons) !== "undefined") {
                     data.data_url = urls[data.data_name];
                     var priority = (emo_info[data.data_name] && emo_info[data.data_name].priority) ? emo_info[data.data_name].priority : 0;
                     emo_storage.pushData(data, priority);
@@ -107,19 +102,19 @@ function getData(info, inject_script) {
                     if (last) {
                         emo_storage.syncData();
                         chrome.storage.local.get(CHROME_LOCAL_KEY, function(local_data) {
-                            var version_name = '';
+                            var version_name = "";
                             if (!$.isEmptyObject(local_data[CHROME_LOCAL_KEY])) {
-                                version_name = local_data[CHROME_LOCAL_KEY]['version_name'];
+                                version_name = local_data[CHROME_LOCAL_KEY]["version_name"];
                             }
                             var current_time = (new Date).toLocaleString();
                             console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
                             localStorage[LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
-                            localStorage['chatpp_version_name'] = version_name;
-                            localStorage['emoticon_data_version'] = parseDataName(emo_info);
+                            localStorage["chatpp_version_name"] = version_name;
+                            localStorage["emoticon_data_version"] = parseDataName(emo_info);
                             if (inject_script !== undefined && inject_script) {
                                 addInjectedScript();
                             } else {
-                                // runFunction('reloadEmoticions()');
+                                // runFunction("reloadEmoticions()");
                             }
                         });
                     }
@@ -135,10 +130,10 @@ function parseDataName(data) {
     if (data.data_name !== undefined && data.data_version !== undefined) {
         return data.data_name + "_" + data.data_version;
     }
-    var data_name = '';
+    var data_name = "";
     for (key in data) {
         if (data[key].data_name !== undefined) {
-            data_name += data[key].data_name + '_' + data[key].data_version + '  ';
+            data_name += data[key].data_name + "_" + data[key].data_version + "  ";
         }
     }
     return data_name;
@@ -169,16 +164,18 @@ function pushEmoticons(emos, priority) {
 
 function addInjectedScript() {
     loadAdvertisement();
-    injectJsFile('fuse.min.js');
-    injectJsFile('caretposition.js');
+    injectJsFile("fuse.min.js");
+    injectJsFile("caretposition.js");
+    injectCssFile("highlight.min.css");
     var counter = 0;
     inject_script_timer = setInterval(
         function() {
             if (counter === DELAY_TIME) {
                 window.clearInterval(inject_script_timer);
-                injectJsFile('main.js');
-                injectJsFile('mention.js');
-                injectJsFile('shortcut.js');
+                injectJsFile("highlight.min.js");
+                injectJsFile("main.js");
+                injectJsFile("mention.js");
+                injectJsFile("shortcut.js");
             } else {
                 counter++;
             }
@@ -189,9 +186,18 @@ function addInjectedScript() {
 }
 
 function injectJsFile(file_name) {
-    var script = document.createElement('script');
-    script.src = chrome.extension.getURL('js/' + file_name);
+    var script = document.createElement("script");
+    script.src = chrome.extension.getURL("js/" + file_name);
     (document.documentElement).appendChild(script);
+}
+
+function injectCssFile(file_name) {
+    var css_link = $("<link>", {
+        rel: "stylesheet",
+        type: "text/css",
+        href: chrome.extension.getURL("css/" + file_name)
+    });
+    css_link.appendTo("head");
 }
 
 function runFunction(func) {
@@ -204,7 +210,7 @@ function loadAdvertisement() {
     $.getJSON(ADVERTISEMENT_URL)
         .done(function(data) {
             if (!$.isEmptyObject(data)) {
-                localStorage['chatpp_advertisement'] = JSON.stringify(data);
+                localStorage["chatpp_advertisement"] = JSON.stringify(data);
             }
         }).fail(function(jqxhr, textStatus, error) {
             var err = textStatus + ", " + error;
@@ -226,8 +232,11 @@ EmoStorage.prototype.pushData = function(inputted_data, inputted_priority) {
         data_version: inputted_data.data_version,
         date_sync: (new Date()).toLocaleString()
     };
-    this.data.mention_status = localStorage[LOCAL_STORAGE_MENTION_STATUS] === 'true';
-    this.data.shortcut_status = localStorage[LOCAL_STORAGE_SHORTCUT_STATUS] === 'true';
+    var features = ["mention", "shortcut", "thumbnail", "highlight"];
+    for (var i in features) {
+        var status_name = features[i] + "_status";
+        this.data[status_name] = localStorage[status_name] === 'true';
+    }
 };
 
 EmoStorage.prototype.removeData = function(data_name) {
@@ -241,7 +250,7 @@ EmoStorage.prototype.syncData = function(callback) {
     var sync = {};
     sync[CHROME_SYNC_KEY] = this.data;
     chrome.storage.sync.set(sync, function() {
-        if (typeof callback != 'undefined') {
+        if (typeof callback != "undefined") {
             callback();
         }
     });

@@ -1,9 +1,6 @@
 // Const
 var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
 var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
-var LOCAL_STORAGE_EMOTICON_STATUS = "CHATPP_EMOTICON_STATUS";
-var LOCAL_STORAGE_MENTION_STATUS = "CHATPP_MENTION_STATUS";
-var LOCAL_STORAGE_SHORTCUT_STATUS = "CHATPP_SHORTCUT_STATUS";
 
 var emoticon_status = false;
 var cw_timer;
@@ -11,7 +8,8 @@ var cw_timer;
 var mention_status = false;
 var shortcut_status = false;
 
-var thumbnail_status = true;
+var thumbnail_status = false;
+var highlight_status = false;
 
 var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
 
@@ -22,22 +20,24 @@ $(function(){
                 window.clearInterval(cw_timer);
                 addStyle();
                 addInfoIcon();
-                if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
+                if (localStorage.emoticon_status === 'true') {
                     addEmoticonText();
                 }
-                if (localStorage[LOCAL_STORAGE_MENTION_STATUS] === 'true') {
+                if (localStorage.mention_status === 'true') {
                     mention_status = true;
                     addMentionText();
                 }
-                if (localStorage[LOCAL_STORAGE_SHORTCUT_STATUS] === 'true') {
+                if (localStorage.shortcut_status === 'true') {
                     shortcut_status = true;
                     addShortcutText();
                 }
-                if (thumbnail_status) {
-                    prepareThumbnails();
+                if (localStorage.thumbnail_status === 'true' || localStorage.highlight_status === 'true') {
+                    updateTimeLine();
+                    thumbnail_status = localStorage.thumbnail_status === 'true';
+                    highlight_status = localStorage.highlight_status === 'true';
                 }
                 addAdvertisement();
-                if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
+                if (localStorage.emoticon_status === 'true') {
                     addExternalEmo();
                 }
             }
@@ -335,27 +335,33 @@ function reloadEmoticions() {
     setEmoticonTextLabel();
 }
 
-function prepareThumbnails() {
+function updateTimeLine() {
     TimeLineView.prototype.getTimeLineOld = TimeLineView.prototype.getTimeLine;
     TimeLineView.prototype.getTimeLine = function(a, b) {
         var timeLine = this.getTimeLineOld(a, b);
         var temp = $("<div></div>");
         $(temp).html(timeLine);
-        $(".ui_sp_favicon_parent", temp).each(function(index, link) {
-            var dom = $(link);
-            var imageLink = getThumbnailLink(dom.attr("href"));
-            if (imageLink) {
-                var img = '<div><img src="' + imageLink + '" alt="' + imageLink +'" style="max-width: 500px; max-height: 150px"></div>';
-                dom.after(img);
-            }
-        });
-
+        if (thumbnail_status) {
+            $(".ui_sp_favicon_parent", temp).each(function(index, link) {
+                var dom = $(link);
+                var imageLink = getThumbnailLink(dom.attr("href"));
+                if (imageLink) {
+                    var img = '<div><img src="' + imageLink + '" alt="' + imageLink +'" style="max-width: 500px; max-height: 150px"></div>';
+                    dom.after(img);
+                }
+            });
+        }
+        if (highlight_status) {
+            $("pre code", temp).each(function(i, block) {
+                hljs.highlightBlock(block);
+            });
+        }
         return $(temp).html();
     };
 }
 
 function getThumbnailLink(link) {
-    var imgRegex = /\.(png|jpg|gif|jpeg)$/;
+    var imgRegex = /\.(png|jpg|gif|jpeg)$/i;
     if (link.match(imgRegex)) {
         return link;
     };

@@ -20,20 +20,13 @@ $(function() {
     setVersionType();
 
     $('#chatpp_version').html(version + ' ' + version_name);
-    $('#emoticon_page').click(function () {
-        chrome.tabs.create({url:chrome.extension.getURL(app_detail.options_page)});
-    });
 
-    $('#group_page').click(function () {
-        chrome.tabs.create({url:'group.html'});
-    });
-
-    $('#shortcut_page').click(function () {
-        chrome.tabs.create({url:'shortcut.html'});
-    });
-
-    $('#room_page').click(function () {
-        chrome.tabs.create({url:'room.html'});
+    var pages = ['setting', 'emoticon', 'room', 'group', 'shortcut'];
+    pages.forEach(function(page_name) {
+        var url = page_name === 'emoticon' ? 'option.html' : page_name + '.html';
+        $('#' + page_name + '_page').click(function() {
+            chrome.tabs.create({url: url});
+        });
     });
 
     $('.ext-url').click(function(){
@@ -63,33 +56,11 @@ $(function() {
     loadChatppEmoData();
 });
 
-function loadEmoticonStatus(status) {
-    if (status !== undefined && status == false) {
-        $('#emo-status').removeClass().addClass('text-danger').html('DISABLED');
-        $('#btn-emo-status').html('Enable');
+function loadStatus(name, value) {
+    if (value !== undefined && value === false) {
+        $('#' + name + '-status').removeClass().addClass('text-danger').html('DISABLED');
     } else {
-        $('#emo-status').removeClass().addClass('text-primary').html('ENABLED');
-        $('#btn-emo-status').html('Disable');
-    }
-}
-
-function loadMentionStatus(status) {
-    if (status !== undefined && status == false) {
-        $('#mention-status').removeClass().addClass('text-danger').html('DISABLED');
-        $('#btn-mention-status').html('Enable');
-    } else {
-        $('#mention-status').removeClass().addClass('text-primary').html('ENABLED');
-        $('#btn-mention-status').html('Disable');
-    }
-}
-
-function loadShortcutStatus(status) {
-    if (status !== undefined && status == false) {
-        $('#shortcut-status').removeClass().addClass('text-danger').html('DISABLED');
-        $('#btn-shortcut-status').html('Enable');
-    } else {
-        $('#shortcut-status').removeClass().addClass('text-primary').html('ENABLED');
-        $('#btn-shortcut-status').html('Disable');
+        $('#' + name + '-status').removeClass().addClass('text-primary').html('ENABLED');
     }
 }
 
@@ -111,9 +82,11 @@ function updateViewData(data) {
     var date_sync = parseDateSynce(data);
     $('#current-data-info').html(name);
     $('#date-sync-info').html(date_sync);
-    loadEmoticonStatus(data.emoticon_status);
-    loadMentionStatus(data.mention_status);
-    loadShortcutStatus(data.shortcut_status);
+
+    var features = ['emoticon', 'mention', 'shortcut', 'thumbnail', 'highlight'];
+    for (var i in features) {
+        loadStatus(features[i], data[features[i] + '_status']);
+    }
 }
 
 function parseDataName(data) {
@@ -140,46 +113,6 @@ function parseDateSynce(data) {
         }
     }
     return date_sync;
-}
-
-function switchEmoticonStatus() {
-    var status = true;
-    if ($('#emo-status').html() == 'ENABLED') {
-        chrome.tabs.executeScript({code: 'runFunction("disableYacep")'});
-        status = false;
-    } else {
-        chrome.tabs.executeScript({code: 'runFunction("enableYacep")'});
-    }
-    stored_data[CHROME_SYNC_KEY]['emoticon_status'] = status;
-    chrome.storage.sync.set(stored_data, function() {
-        loadEmoticonStatus(status);
-    });
-}
-
-function switchMentionStatus() {
-    var status = true;
-    if ($('#mention-status').html() == 'ENABLED') {
-        status = false;
-    } else {
-
-    }
-    stored_data[CHROME_SYNC_KEY]['mention_status'] = status;
-    chrome.storage.sync.set(stored_data, function() {
-        loadMentionStatus(status);
-    });
-}
-
-function switchShortcutStatus() {
-    var status = true;
-    if ($('#shortcut-status').html() == 'ENABLED') {
-        status = false;
-    } else {
-
-    }
-    stored_data[CHROME_SYNC_KEY]['shortcut_status'] = status;
-    chrome.storage.sync.set(stored_data, function() {
-        loadShortcutStatus(status);
-    });
 }
 
 function setVersionType() {
