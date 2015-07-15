@@ -366,6 +366,11 @@ function getThumbnailLink(link) {
         return link;
     };
 
+    var fbImgRegex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
+    if (link.match(fbImgRegex)) {
+        return link;
+    };
+
     if (link.indexOf('http://gyazo.com/') === 0) {
         return link + '.png';
     }

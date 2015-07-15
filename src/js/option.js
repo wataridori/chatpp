@@ -56,7 +56,7 @@ $(function() {
             init = true;
             urls['Default'] = DEFAULT_DATA_URL;
         }
-        fillDataTable(info);
+        fillDataTable();
 
         if (init) {
             getData(urls, reload);
@@ -137,13 +137,11 @@ function getData(urls, callback) {
         $.getJSON(url)
             .done(function(data) {
                 if (typeof(data.data_version) !== 'undefined' && typeof(data.emoticons) !== 'undefined') {
-                    var index = getObjectLength(emo_storage.data);
-                    var last = index === getObjectLength(urls) - 1;
                     data.data_url = urls[data.data_name] ? urls[data.data_name] : urls['added'];
                     var priority = getPriority(data.data_name);
                     emo_storage.pushData(data, priority);
                     pushEmoticons(data.emoticons, priority, data.data_name);
-                    if (last) {
+                    if (emo_storage.data_count === getObjectLength(urls)) {
                         emo_storage.syncData(callback);
                     }
                 } else {
@@ -166,7 +164,7 @@ function getObjectLength(object) {
 
 function getPriority(data_name) {
     var max = 0;
-    for (key in emo_info) {
+    for (var key in emo_info) {
         var val = emo_info[key];
         if (val.data_name === data_name) {
             return val.priority;
@@ -190,7 +188,7 @@ function showOfficialData() {
         }
     }
 
-    $('.btn-official-data').click(function() {
+    $(".btn-official-data").click(function() {
         var data_name = $(this).data('name');
         var url = official_emos[data_name].link;
         if (validateUrl(url)) {
@@ -198,10 +196,6 @@ function showOfficialData() {
             getData(urls, reload);
         }
     });
-}
-
-function validateEmoData(data) {
-    return !$.isEmptyObject(data) && $.isArray(data.data) && data.date_sync !== undefined;
 }
 
 function pushEmoticons(emos, priority, data_name) {
@@ -293,38 +287,92 @@ function createEmoticonsTable(name) {
 function createTableTd(data) {
     var src = getEmoUrl(data.emo.src);
     var row = "";
-    var class_name = data.status ? 'danger' : 'info';
+    var class_name = data.status ? "danger" : "info";
     row += "<td class='" + class_name + " text-center'>" + data.emo.key + "</td>";
     row += "<td class='text-center'><img src='" + src + "'/> </td>";
     return row;
 }
 
-function fillDataTable(info) {
+function createDataTableText(emo_data) {
+    $("#table-data > tbody").html("");
     var table_text = '';
-    $.each(info, function(key, data) {
+    var first = true;
+    $.each(emo_data, function(key, data) {
         if (data.data_name !== undefined && data.data_url !== undefined) {
+            var disabled = first ? "disabled" : "";
+            first = false;
             table_text += "<tr>";
-            table_text += "<td class='text-center'>" + data.priority + "</td>";
             table_text += "<td class='text-center'>" + data.data_name + "</td>";
             table_text += "<td class='text-center'>" + data.data_version + "</td>";
             table_text += "<td class='text-center'>" + createATag(data.data_url) + "</td>";
             table_text += "<td class='text-center'>" +
-                //" <button class='btn btn-primary btn-sm btn-data-move-up' data-name='" + data.data_name + "' id='btn-move-up" + data.data_name + "'> Move Up </button>" +
+                " <button class='btn btn-primary btn-sm btn-data-move-up " + disabled + "' data-priority='" + data.priority + "' id='btn-move-up" + data.data_name + "'> Move Up </button>" +
                 " <button class='btn btn-warning btn-sm btn-data-remove' data-name='" + data.data_name + "' id='btn-" + data.data_name + "'> Remove </button></td>";
             table_text += "</tr>";
+        }
+    });
+    $("#table-data").find("tbody").append(table_text);
+}
 
+function fillDataTable() {
+    var emo_info_array = emoDataObjectToArray(emo_info);
+    createDataTableText(emo_info_array);
+    $.each(emo_info_array, function(key, data) {
+        if (data.data_name !== undefined && data.data_url !== undefined) {
             createEmoticonsTable(data.data_name);
         }
     });
-    $('#table-data').find('tbody').append(table_text);
-    $('.btn-data-remove').click(function() {
-        var name = $(this).data('name');
-        emo_storage.removeData(name);
-        emo_storage.syncData(reload);
+    $("#btn-save").click(function() {
+        var new_emo_storage = new EmoStorage();
+        for (var i in emo_info_array) {
+            new_emo_storage.pushData(emo_info_array[i], emo_info_array[i].priority);
+        }
+        new_emo_storage.syncData(reload);
     });
-    $('.btn-data-move-up').click(function() {
+    $("#table-data").on( "click", "button", function() {
+        var button = $(this);
+        if (button.hasClass("btn-data-move-up")) {
+            var priority = button.data("priority");
+            var temp;
+            var up = priority - 1;
+            if (up >= 0) {
+                temp = emo_info_array[up];
+                emo_info_array[up] = emo_info_array[priority];
+                emo_info_array[priority] = temp;
+                emo_info_array[up].priority = up;
+                emo_info_array[priority].priority = priority;
+            }
+            createDataTableText(emo_info_array);
+        }
 
+        if (button.hasClass("btn-data-remove")) {
+            var name = button.data('name');
+            emo_storage.removeData(name);
+            emo_storage.syncData(reload);
+        }
     });
+}
+
+function rearrangePriority(data) {
+    var i = 0;
+    var new_data = [];
+    for (var j in data) {
+        data[j].priority = i;
+        new_data[i++] = data[j];
+    }
+
+    return new_data;
+}
+
+function emoDataObjectToArray(data) {
+    var data_array = [];
+    $.each(data, function(key, emo) {
+        if (emo.priority !== undefined) {
+            data_array[emo.priority] = emo;
+        }
+    });
+
+    return rearrangePriority(data_array);
 }
 
 function createATag(url) {
@@ -347,6 +395,12 @@ function getEmoUrl(img) {
 
 function EmoStorage() {
     this.data = {};
+    this.data_count = 0;
+    var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
+    for (var i in features) {
+        var feature_name = features[i] + "_status";
+        this.data[feature_name] = emo_info[feature_name] === undefined ? true : emo_info[feature_name];
+    }
 }
 
 EmoStorage.prototype.pushData = function(inputed_data, priority) {
@@ -354,10 +408,10 @@ EmoStorage.prototype.pushData = function(inputed_data, priority) {
         priority: priority,
         data_name: inputed_data.data_name,
         data_url: inputed_data.data_url,
-        data_changelog: inputed_data.data_changelog,
         data_version: inputed_data.data_version,
         date_sync: (new Date()).toLocaleString()
     };
+    this.data_count++;
 };
 
 EmoStorage.prototype.removeData = function(data_name) {

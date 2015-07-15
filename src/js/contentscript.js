@@ -232,11 +232,6 @@ EmoStorage.prototype.pushData = function(inputted_data, inputted_priority) {
         data_version: inputted_data.data_version,
         date_sync: (new Date()).toLocaleString()
     };
-    var features = ["mention", "shortcut", "thumbnail", "highlight"];
-    for (var i in features) {
-        var status_name = features[i] + "_status";
-        this.data[status_name] = localStorage[status_name] === 'true';
-    }
 };
 
 EmoStorage.prototype.removeData = function(data_name) {
@@ -247,6 +242,11 @@ EmoStorage.prototype.removeData = function(data_name) {
 
 EmoStorage.prototype.syncData = function(callback) {
     localStorage[LOCAL_STORAGE_INFO_KEY] = JSON.stringify(this.data);
+    var features = ["mention", "shortcut", "thumbnail", "highlight"];
+    for (var i in features) {
+        var status_name = features[i] + "_status";
+        this.data[status_name] = localStorage[status_name] === 'true';
+    }
     var sync = {};
     sync[CHROME_SYNC_KEY] = this.data;
     chrome.storage.sync.set(sync, function() {
