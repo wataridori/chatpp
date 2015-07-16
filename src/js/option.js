@@ -297,7 +297,7 @@ function createDataTableText(emo_data) {
     $("#table-data > tbody").html("");
     var table_text = '';
     var first = true;
-    $.each(emo_data, function(key, data) {
+    $.each(emo_data.slice().reverse(), function(key, data) {
         if (data.data_name !== undefined && data.data_url !== undefined) {
             var disabled = first ? "disabled" : "";
             first = false;
@@ -317,7 +317,7 @@ function createDataTableText(emo_data) {
 function fillDataTable() {
     var emo_info_array = emoDataObjectToArray(emo_info);
     createDataTableText(emo_info_array);
-    $.each(emo_info_array, function(key, data) {
+    $.each(emo_info_array.slice().reverse(), function(key, data) {
         if (data.data_name !== undefined && data.data_url !== undefined) {
             createEmoticonsTable(data.data_name);
         }
@@ -334,8 +334,8 @@ function fillDataTable() {
         if (button.hasClass("btn-data-move-up")) {
             var priority = button.data("priority");
             var temp;
-            var up = priority - 1;
-            if (up >= 0) {
+            var up = priority + 1;
+            if (emo_info_array[up]) {
                 temp = emo_info_array[up];
                 emo_info_array[up] = emo_info_array[priority];
                 emo_info_array[priority] = temp;

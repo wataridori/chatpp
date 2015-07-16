@@ -13,13 +13,11 @@ var CHROME_SYNC_ROOM_KEY = "CHATPP_CHROME_SYNC_ROOM";
 var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
 
 var ADVERTISEMENT_URL = "https://www.dropbox.com/s/flbiyfqhcqapdbe/chatppad.json?dl=1";
-var ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 15;
+var ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 
-var emo_storage;
 var emoticons = [];
 var emo_info = {};
-var inject_script_timer;
-var DELAY_TIME = 5;
+var DELAY_TIME = 6000;
 var urls = {};
 
 init(true);
@@ -167,19 +165,13 @@ function addInjectedScript() {
     injectJsFile("fuse.min.js");
     injectJsFile("caretposition.js");
     injectCssFile("highlight.min.css");
-    var counter = 0;
-    inject_script_timer = setInterval(
+    setTimeout(
         function() {
-            if (counter === DELAY_TIME) {
-                window.clearInterval(inject_script_timer);
-                injectJsFile("highlight.min.js");
-                injectJsFile("main.js");
-                injectJsFile("mention.js");
-                injectJsFile("shortcut.js");
-            } else {
-                counter++;
-            }
-        }, 1000
+            injectJsFile("highlight.min.js");
+            injectJsFile("main.js");
+            injectJsFile("mention.js");
+            injectJsFile("shortcut.js");
+        }, DELAY_TIME
     );
 
     setInterval(loadAdvertisement, ADVERTISEMENT_LOAD_TIMEOUT);
