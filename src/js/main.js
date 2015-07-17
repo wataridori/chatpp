@@ -336,9 +336,9 @@ function reloadEmoticions() {
 }
 
 function updateTimeLine() {
-    TimeLineView.prototype.getTimeLineOld = TimeLineView.prototype.getTimeLine;
-    TimeLineView.prototype.getTimeLine = function(a, b) {
-        var timeLine = this.getTimeLineOld(a, b);
+    TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
+    TimeLineView.prototype.getMessagePanel = function(a, b) {
+        var timeLine = this.getMessagePanelOld(a, b);
         var temp = $("<div></div>");
         $(temp).html(timeLine);
         if (thumbnail_status) {

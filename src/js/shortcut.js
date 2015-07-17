@@ -122,8 +122,6 @@ var shortcuts_default = {
     quote: DOM_VK_Q,
     link: DOM_VK_L,
     edit: DOM_VK_E,
-    copy: DOM_VK_O,
-    delete: DOM_VK_D,
     task: DOM_VK_K,
     my_chat: DOM_VK_A,
     scroll: DOM_VK_S,
@@ -131,7 +129,9 @@ var shortcuts_default = {
     toggle_emoticon: DOM_VK_Z,
     toggle_shortcut: DOM_VK_V,
     previous_mention: DOM_VK_K,
-    next_mention: DOM_VK_J
+    next_mention: DOM_VK_J,
+    next_mention_room: DOM_VK_N,
+    next_new_message_room: DOM_VK_M
 };
 
 var room_shortcuts = [];
@@ -169,14 +169,6 @@ function registerShortcut() {
         triggerDefaultAction('edit');
     });
 
-    CW.view.registerKeyboardShortcut(shortcuts_default.copy, !1, !1, !1, !1, function() {
-        triggerMoreAction('copy');
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.delete, !1, !1, !1, !1, function() {
-        triggerMoreAction('delete');
-    });
-
     CW.view.registerKeyboardShortcut(shortcuts_default.task, !1, !1, !1, !1, function() {
         triggerDefaultAction('task');
     });
@@ -209,6 +201,14 @@ function registerShortcut() {
     CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, function() {
         var message_id = getHoverMessageId();
         goToNexMention(message_id);
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.next_mention_room, !1, !1, !1, !1, function() {
+        nextUnreadRoom(true);
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.next_new_message_room, !1, !1, !1, !1, function() {
+        nextUnreadRoom();
     });
 
     if (localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[LOCAL_STORAGE_ROOM_SHORTCUT]) {
@@ -321,5 +321,20 @@ function replyMessage(message) {
         $C("#_chatText").focus();
         var name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
         CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
+    }
+}
+
+function nextUnreadRoom(check_mention) {
+    var current_room = RM.id;
+    var sortedRooms = RL.getSortedRoomList();
+    var rooms = RL.rooms;
+    for (var i = 0; i < sortedRooms.length; i++) {
+        if (sortedRooms[i] && sortedRooms[i] !== current_room) {
+            var room = rooms[sortedRooms[i]];
+            var check = check_mention ? room.getMentionNum() : room.getUnreadNum();
+            if (check) {
+                return RL.selectRoom(room.id);
+            }
+        }
     }
 }
