@@ -21,7 +21,7 @@ $(function() {
 
     $('#chatpp_version').html(version + ' ' + version_name);
 
-    var pages = ['setting', 'emoticon', 'room', 'group', 'shortcut', 'change_logs'];
+    var pages = ['setting', 'emoticon', 'room', 'group', 'shortcut', 'change_logs', 'features'];
     pages.forEach(function(page_name) {
         var url = page_name === 'emoticon' ? 'option.html' : page_name + '.html';
         $('#' + page_name + '_page').click(function() {

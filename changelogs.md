@@ -2,13 +2,21 @@ Chat++ Change Logs
 =================
 
 ## 4.0.0 - Big Update
-* View list issues at [Happy Birthday Release Milestone](../../milestones/Version%20Four)
+* View list issues at [Version Four Milestone](../../milestones/Version%20Four)
 * Highlight Code
 * Display image thumbnail. Support direct image link, gyazo link, Facebook image link ...
+* Many new Shortcuts that help users to quickly switch Chat room.
+    *  Go to the first Room in the list
+    *  Go to the first nonstick Room in the list
+    *  Go to the Room below in the list
+    *  Go to the Room above in the list
+    *  Go to the first Room that has new unread Message(s)
+    *  Go to the first Room that has new unread Mention Message(s)
 * New setting page
 * New change logs page
+* New feature list page
 * Update Emoticons page. It is now easier to arrange data priority
-* Several Bug Fixes.
+* Bug Fixes.
 
 ## 3.0.2
 * Fix bug with room title
