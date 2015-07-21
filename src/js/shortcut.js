@@ -288,7 +288,7 @@ function getHoverMessageId() {
 
 function getMessagePosition(id) {
     var messages = RM.timeline.chat_list;
-    for (var i = messages.length -1; i >= 0; i--) {
+    for (var i = messages.length - 1; i >= 0; i--) {
         if (messages[i].id == id) {
             return i;
         }

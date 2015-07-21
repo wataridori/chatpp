@@ -329,7 +329,7 @@ function fillDataTable() {
         }
         new_emo_storage.syncData(reload);
     });
-    $("#table-data").on( "click", "button", function() {
+    $("#table-data").on("click", "button", function() {
         var button = $(this);
         if (button.hasClass("btn-data-move-up")) {
             var priority = button.data("priority");
