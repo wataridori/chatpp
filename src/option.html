@@ -38,17 +38,30 @@
                 </div>
             </div>
             <br>
+            <br>
             <div class="row">
                 <div id="official-data"></div>
             </div>
 
             <div class="row">
                 <h3 class="text-primary">Emoticons Data</h3>
+                <div class="row">
+                    <h4 class="text-primary">Notices</h4>
+                    <p class="text-danger">
+                        ■　If there are two or more emoticons in different data but have the same name, only one is used.
+                        It is the emoticon belongs to the data that have the highest priority.<br>
+                        ■　Use the "Move Up" button to arrange your data priority. The data in upper place will have higher priority<br>
+                        ■　You can create your own Emoticons data file and then share it with your friends.
+                        Of course if you and your friends have the same data, you will see the same emoticons on Chatwork!<br>
+                        ■　You can easily create a Emoticons Data file for Chat++ by referring the below data files,
+                        or using the <a target="_blank" href="http://chatpp-emo.thangtd.com/">Chat++ Emoticon Set Editor</a>, a great site made by <a target="_blank" href="https://github.com/nguyenductung">Nguyen Duc Tung</a>.
+                        Great thanks to him for his hard work<br>
+                    </p>
+                </div>
                 <div class="col-sm-12" id="emo-data-div">
                     <table class="table table-bordered" id="table-data">
                         <thead>
                         <tr class="success text-center">
-                            <th class="text-center">Priority</th>
                             <th class="text-center">Data Name</th>
                             <th class="text-center">Data Version</th>
                             <th class="text-center">Data URL</th>
@@ -60,40 +73,16 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="col-sm-12">
+                    <button class="btn btn-primary btn-sm" id="btn-save">Save</button>
+                </div>
             </div>
             <hr>
-            <!--<div class="row">-->
-                <!--<button class="btn btn-success btn-sm" id="btn-show-changelog" hidden>Show Changelog</button>-->
-                <!--<br>-->
-                <!--<br>-->
-                <!--<div class="jumbotron" style="background-color: rgb(34, 34, 34);" id="changelog" hidden>-->
-                    <!--<h3>Change log</h3>-->
-                <!--</div>-->
-            <!--</div>-->
             <br>
             <br>
         </div>
     </div>
-    <div id="emoticions-table">
-        <div class="panel panel-warning">
-            <div class="panel-heading">
-                All Emoticons <span class="text-danger" id="data-version"></span>
-            </div>
-
-            <table class="table table-bordered" id="table-emo">
-                <thead>
-                    <tr class="success text-center">
-                        <th colspan="2" class="text-center">Emo</th>
-                        <th colspan="2" class="text-center">Emo</th>
-                        <th colspan="2" class="text-center">Emo</th>
-                        <th colspan="2" class="text-center">Emo</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-            </table>
-        </div>
+    <div id="emoticons-table">
     </div>
 </div>
 </body></html>

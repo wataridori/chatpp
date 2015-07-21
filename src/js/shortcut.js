@@ -122,16 +122,19 @@ var shortcuts_default = {
     quote: DOM_VK_Q,
     link: DOM_VK_L,
     edit: DOM_VK_E,
-    copy: DOM_VK_O,
-    delete: DOM_VK_D,
     task: DOM_VK_K,
     my_chat: DOM_VK_A,
     scroll: DOM_VK_S,
-    toggle_mention: DOM_VK_X,
-    toggle_emoticon: DOM_VK_Z,
-    toggle_shortcut: DOM_VK_V,
     previous_mention: DOM_VK_K,
-    next_mention: DOM_VK_J
+    next_mention: DOM_VK_J,
+    next_mention_room: DOM_VK_M,
+    next_new_message_room: DOM_VK_N,
+    down_room: DOM_VK_V,
+    up_room: DOM_VK_B,
+    first_room: DOM_VK_Z,
+    first_nonstick_room: DOM_VK_X,
+    focus_chatbox: DOM_VK_SPACE,
+    edit_image_upload: DOM_VK_E
 };
 
 var room_shortcuts = [];
@@ -139,7 +142,7 @@ var room_shortcuts = [];
 $(function(){
     shortcut_timer = setInterval(
         function(){
-            if (typeof CW != 'undefined' && typeof CW.view != 'undefined') {
+            if (typeof CW !== 'undefined' && typeof CW.view !== 'undefined') {
                 window.clearInterval(shortcut_timer);
                 if (shortcut_status) {
                     registerShortcut();
@@ -169,14 +172,6 @@ function registerShortcut() {
         triggerDefaultAction('edit');
     });
 
-    CW.view.registerKeyboardShortcut(shortcuts_default.copy, !1, !1, !1, !1, function() {
-        triggerMoreAction('copy');
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.delete, !1, !1, !1, !1, function() {
-        triggerMoreAction('delete');
-    });
-
     CW.view.registerKeyboardShortcut(shortcuts_default.task, !1, !1, !1, !1, function() {
         triggerDefaultAction('task');
     });
@@ -189,18 +184,6 @@ function registerShortcut() {
         RM.load(RM.timeline.getLastChatId());
     });
 
-    CW.view.registerKeyboardShortcut(shortcuts_default.toggle_emoticon, !1, !1, !1, !1, function() {
-        toggleEmoticonsStatus();
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.toggle_mention, !1, !1, !1, !1, function() {
-        toggleMentionStatus();
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.toggle_shortcut, !1, !1, !1, !1, function() {
-        toggleShortcutStatus();
-    });
-
     CW.view.registerKeyboardShortcut(shortcuts_default.previous_mention, !1, !1, !1, !1, function() {
         var message_id = getHoverMessageId();
         goToPreviousMention(message_id);
@@ -209,6 +192,45 @@ function registerShortcut() {
     CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, function() {
         var message_id = getHoverMessageId();
         goToNexMention(message_id);
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.next_mention_room, !1, !1, !1, !1, function() {
+        nextUnreadRoom(true);
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.next_new_message_room, !1, !1, !1, !1, function() {
+        nextUnreadRoom();
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.up_room, !1, !1, !1, !1, function() {
+        nextRoom(true)
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.down_room, !1, !1, !1, !1, function() {
+        nextRoom();
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.first_room, !1, !1, !1, !1, function() {
+        firstRoom();
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.first_nonstick_room, !1, !1, !1, !1, function() {
+        firstRoom(true);
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.focus_chatbox, !1, !1, !1, !1, function() {
+        $("#_chatText").focus();
+    });
+
+    CW.view.registerKeyboardShortcut(shortcuts_default.edit_image_upload, !1, !0, !1, !1, function() {
+        triggerDefaultAction('edit');
+        var chat_text = $("#_chatText");
+        var text = chat_text.val();
+        var img = text.match(/(\[preview id=[0-9]* ht=[0-9]*\])/);
+        if (img && img[0]) {
+            text = text.replace(/\[info\].*\[\/info\]/, img[0]);
+            chat_text.val(text);
+        }
     });
 
     if (localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[LOCAL_STORAGE_ROOM_SHORTCUT]) {
@@ -266,7 +288,7 @@ function getHoverMessageId() {
 
 function getMessagePosition(id) {
     var messages = RM.timeline.chat_list;
-    for (var i = messages.length -1; i >= 0; i--) {
+    for (var i = messages.length - 1; i >= 0; i--) {
         if (messages[i].id == id) {
             return i;
         }
@@ -322,4 +344,45 @@ function replyMessage(message) {
         var name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
         CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
     }
+}
+
+function nextUnreadRoom(check_mention) {
+    var current_room = RM.id;
+    var sortedRooms = RL.getSortedRoomList();
+    var rooms = RL.rooms;
+    for (var i = 0; i < sortedRooms.length; i++) {
+        if (sortedRooms[i] && sortedRooms[i] !== current_room) {
+            var room = rooms[sortedRooms[i]];
+            var check = check_mention ? room.getMentionNum() : room.getUnreadNum();
+            if (check) {
+                return RL.selectRoom(room.id);
+            }
+        }
+    }
+}
+
+function nextRoom(back) {
+    var previous;
+    var current_room = RM.id;
+    var sortedRooms = RL.getSortedRoomList();
+    for (var i = 0; i < sortedRooms.length; i++) {
+        if (sortedRooms[i] === current_room) {
+            if (back) {
+                if (previous) {
+                    return RL.selectRoom(previous);
+                }
+            } else {
+                if (sortedRooms[i+1]) {
+                    return RL.selectRoom(sortedRooms[i+1]);
+                }
+            }
+        }
+        previous = sortedRooms[i];
+    }
+}
+
+function firstRoom(nonstick) {
+    var sortedRooms = RL.getSortedRoomList();
+    var room_index = nonstick ? RL.getStickyRoomNum() : 0;
+    return RL.selectRoom(sortedRooms[room_index]);
 }

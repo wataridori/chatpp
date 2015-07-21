@@ -1,7 +1,7 @@
 {
     "name": "Chat++ for Chatwork",
     "short_name": "ChatPP",
-    "version": "3.0.2",
+    "version": "4.0.0",
     "manifest_version": 2,
     "description": "An all-in-one Chatwork Enhancement Toolkit which provides many useful features!",
     "content_scripts": [
@@ -13,12 +13,12 @@
             "js": [
                 "js/jquery-2.1.1.min.js",
                 "js/contentscript.js",
-                "js/emo.js"
+                "js/main.js"
             ],
             "run_at": "document_end"
         }
     ],
-    "web_accessible_resources": ["js/emo.js", "js/mention.js", "js/shortcut.js", "js/fuse.min.js", "js/caretposition.js"],
+    "web_accessible_resources": ["js/main.js", "js/mention.js", "js/shortcut.js", "js/fuse.min.js", "js/caretposition.js", "js/highlight.min.js", "css/highlight.min.css"],
     "browser_action": {
         "default_icon": "icon64.png",
         "default_popup": "popup.html"

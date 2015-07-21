@@ -1,41 +1,43 @@
 // Const
 var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
 var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
-var LOCAL_STORAGE_EMOTICON_STATUS = "CHATPP_EMOTICON_STATUS";
-var LOCAL_STORAGE_MENTION_STATUS = "CHATPP_MENTION_STATUS";
-var LOCAL_STORAGE_SHORTCUT_STATUS = "CHATPP_SHORTCUT_STATUS";
 
 var emoticon_status = false;
 var cw_timer;
 
 var mention_status = false;
 var shortcut_status = false;
-var VERSION_NAME_DEV = 'dev';
+
+var thumbnail_status = false;
+var highlight_status = false;
 
 var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
 
 $(function(){
-
     cw_timer = setInterval(
         function(){
-            if (typeof CW != 'undefined' && typeof CW.reg_cmp != 'undefined') {
+            if (typeof CW !== 'undefined' && typeof CW.reg_cmp !== 'undefined') {
                 window.clearInterval(cw_timer);
                 addStyle();
                 addInfoIcon();
-                if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
+                if (localStorage.emoticon_status === 'true') {
                     addEmoticonText();
                 }
-                if (localStorage[LOCAL_STORAGE_MENTION_STATUS] === 'true') {
+                if (localStorage.mention_status === 'true') {
                     mention_status = true;
                     addMentionText();
                 }
-                if (localStorage[LOCAL_STORAGE_SHORTCUT_STATUS] === 'true') {
+                if (localStorage.shortcut_status === 'true') {
                     shortcut_status = true;
                     addShortcutText();
                 }
-
+                if (localStorage.thumbnail_status === 'true' || localStorage.highlight_status === 'true') {
+                    updateTimeLine();
+                    thumbnail_status = localStorage.thumbnail_status === 'true';
+                    highlight_status = localStorage.highlight_status === 'true';
+                }
                 addAdvertisement();
-                if (localStorage[LOCAL_STORAGE_EMOTICON_STATUS] === 'true') {
+                if (localStorage.emoticon_status === 'true') {
                     addExternalEmo();
                 }
             }
@@ -97,11 +99,6 @@ function removeExternalEmo() {
 function addExternalEmo() {
     var emodata = JSON.parse(localStorage[LOCAL_STORAGE_DATA_KEY]);
     addEmo(emodata);
-    var version_name = localStorage['chatpp_version_name'];
-    if (version_name === VERSION_NAME_DEV) {
-        var secret_emos = getSecretEmos();
-        addEmo(secret_emos);
-    }
     emoticon_status = true;
     updateEmoticonText();
     console.log('Emoticon added!');
@@ -115,9 +112,9 @@ function addInfoIcon() {
     if ($('#roomInfoIcon').length > 0) {
         return;
     }
-    var roomInfo = '<li id="_roomInfo" role="button" class="_showDescription" aria-label="Show room Information" style="display: inline-block;"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></li>';
-    $('#_chatSendTool').append(roomInfo);
-    var roomInfoList = '<div id="_roomInfoList" class="roomInfo toolTip toolTipWhite mainContetTooltip" role="tooltip">' +
+    var room_info = '<li id="_roomInfo" role="button" class="_showDescription" aria-label="Show room Information" style="display: inline-block;"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></li>';
+    $('#_chatSendTool').append(room_info);
+    var room_info_list = '<div id="_roomInfoList" class="roomInfo toolTip toolTipWhite mainContetTooltip" role="tooltip">' +
         '<div class="_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom"></div>' +
         '<span id="_roomInfoText">' +
         '<div id="_roomInfoTextTotalMembers" class="tooltipFooter"></div>' +
@@ -127,12 +124,12 @@ function addInfoIcon() {
         '<div id="_roomInfoTextMyTasks" class="tooltipFooter"></div>' +
         '</span>' +
         '</div>';
-    $('body').append(roomInfoList);
+    $('body').append(room_info_list);
     $('#_roomInfo').click(function() {
         prepareRoomInfo();
-        var roomName = RM.getIcon() + ' ' + htmlEncode(RM.getName());
+        var room_name = RM.getIcon() + ' ' + htmlEncode(RM.getName());
         var tip = $('#_roomInfoList').cwListTip({
-            selectOptionArea: '<b>' + roomName + '</b>' + ' Information',
+            selectOptionArea: '<b>' + room_name + '</b>' + ' Information',
             fixHeight: !1,
             search: !1
         });
@@ -291,13 +288,6 @@ function updateShortcutText() {
     }
 }
 
-function getSecretEmos() {
-    return [
-        {"key": "(ngotlong)", "regex": "\\(ngotlong\\)", "src": "ngotlong.png"},
-        {"key": "(chatpp)", "regex": "\\(chatpp\\)", "src": "chatpp.png"}
-    ];
-}
-
 function toggleEmoticonsStatus() {
     if (emoticon_status) {
         removeExternalEmo();
@@ -343,4 +333,47 @@ function reloadEmoticions() {
     addExternalEmo();
     console.log('New emoticons removed');
     setEmoticonTextLabel();
+}
+
+function updateTimeLine() {
+    TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
+    TimeLineView.prototype.getMessagePanel = function(a, b) {
+        var timeLine = this.getMessagePanelOld(a, b);
+        var temp = $("<div></div>");
+        $(temp).html(timeLine);
+        if (thumbnail_status) {
+            $(".ui_sp_favicon_parent", temp).each(function(index, link) {
+                var dom = $(link);
+                var imageLink = getThumbnailLink(dom.attr("href"));
+                if (imageLink) {
+                    var img = '<div><img src="' + imageLink + '" alt="' + imageLink +'" style="max-width: 500px; max-height: 150px"></div>';
+                    dom.after(img);
+                }
+            });
+        }
+        if (highlight_status) {
+            $("pre code", temp).each(function(i, block) {
+                hljs.highlightBlock(block);
+            });
+        }
+        return $(temp).html();
+    };
+}
+
+function getThumbnailLink(link) {
+    var imgRegex = /\.(png|jpg|gif|jpeg)$/i;
+    if (link.match(imgRegex)) {
+        return link;
+    };
+
+    var fbImgRegex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
+    if (link.match(fbImgRegex)) {
+        return link;
+    };
+
+    if (link.indexOf('http://gyazo.com/') === 0) {
+        return link + '.png';
+    }
+
+    return false;
 }

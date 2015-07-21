@@ -1,10 +1,30 @@
 Chat++ Change Logs
 =================
 
+## 4.0.0 - Big Update
+* View list issues at [Version Four Milestone](../../milestones/Version%20Four)
+* Highlight Code
+* Display image thumbnail. Support direct image link, gyazo link, Facebook image link ...
+* Many new Shortcuts that help users to quickly switch Chat room.
+    *  Go to the first Room in the list
+    *  Go to the first nonstick Room in the list
+    *  Go to the Room below in the list
+    *  Go to the Room above in the list
+    *  Go to the first Room that has new unread Message(s)
+    *  Go to the first Room that has new unread Mention Message(s)
+* New setting page
+* New change logs page
+* New feature list page
+* Update Emoticons page. It is now easier to arrange data priority
+* Bug Fixes.
+
+## 3.0.2
+* Fix bug with room title
+
 ## 3.0.1
 * Add Vietnamese Emoticon Data
 
-## 3.0.0 - A Big Update
+## 3.0.0 - Big Update
 * View list issues at [Happy Birthday Release Milestone](../../milestones/Happy%20Birthday%20Release)
 * Room Shortcut Feature Added.
 * Mention Jump Feature Added.
@@ -13,7 +33,7 @@ Chat++ Change Logs
 * Add room info button.
 * Several Bug Fixes. 
 
-## 2.0.0 - A Big Update
+## 2.0.0 - Big Update
 * View list issues at [Happy Lunar New Year Release Milestone](../../milestones/Happy%20Lunar%20New%20Year%20Release)
 * Mention syntax changed. (use `_` for omitting username, use `.` for picon)
 * Mention users that are in friend list, but not present in Chat box (using `@#`)
@@ -39,29 +59,29 @@ Chat++ Change Logs
 * View list issues at [Happy New Year Release Milestone](../../milestones/Happy%20New%20Year%20Release)
 
 ## 0.1.3
-* [issue #13](../../issues/13): Fix bug with arrows inputted
-* [issue #9](../../issues/9): Apply multiple emoticons data
+* Fix bug with arrows inputted
+* Apply multiple emoticons data
 
 ## 0.1.2
-* [issue #15](../../issues/15): Fix bug with `version_type` in Manifest
+* Fix bug with `version_type` in Manifest
 
 ## 0.1.0
-* [issue #14](../../issues/14): Add secret emoticons
+* Add secret emoticons
 
 ## 0.0.9
-* [issue #11](../../issues/11): Add `@_all` and `@__all` feature
-* [issue #12](../../issues/12): Add `@_me` and `@__me` feature
+* Add `@_all` and `@__all` feature
+* Add `@_me` and `@__me` feature
 
 ## 0.0.8
-* [issue #1](../../issues/1): add `@me` feature
-* [issue #2](../../issues/2): add `@all` feature
-* [issue #3](../../issues/3): add show picon only when type `@__`
-* [issue #4](../../issues/4): add show TO and picon only when type `@_`
-* [issue #6](../../issues/6): move popup to left when is hidden
+* Add `@me` feature
+* Add `@all` feature
+* Add show picon only when type `@__`
+* Add show TO and picon only when type `@_`
+* Move popup to left when is hidden
 
 ## 0.0.7
-* [issue #5](../../issues/5): Press ESC don't hide the pop up
-* [issue #7](../../issues/7): Send message when choose press Enter to send setting
+* Press ESC don't hide the pop up
+* Send message when choose press Enter to send setting
 
 ## 0.0.6
 * Now It is possible to change Mention Status from popup page. The status is sync via google account like Emoticon Status.
