@@ -4,10 +4,11 @@
 Chat++ is an all-in-one Chatwork Enhancement Toolkit.
 It is a free Chrome Extension which provides more funny emoticons as well as many other features for Chatwork. 
 
-![thumb1](http://chatpp.thangtd.com/img/1.png)
-![thumb2](http://chatpp.thangtd.com/img/2.png)
-![thumb3](http://chatpp.thangtd.com/img/3.png)
-![thumb4](http://chatpp.thangtd.com/img/4.png)
+![thumb1](./images/1.png)
+![thumb2](./images/2.png)
+![thumb3](./images/3.png)
+![thumb4](./images/4.png)
+![thumb5](./images/5.png)
 
 Main Features
 --------------
