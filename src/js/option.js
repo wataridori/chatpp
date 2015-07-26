@@ -13,24 +13,24 @@ var init = false;
 
 var official_emos = {
     Default: {
-        name: 'Default',
-        link: 'https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1',
-        description: 'The default Emoticons data of Chat++'
+        name: "Default",
+        link: "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1",
+        description: "The default Emoticons data of Chat++"
     },
     Vietnamese: {
-        name: 'Vietnamese',
-        link: 'https://www.dropbox.com/s/1zq7oqg11pkye6m/vn-emo.json?dl=1',
-        description: 'Yet another data for people who want to use Vietnamese Emoticons'
+        name: "Vietnamese",
+        link: "https://www.dropbox.com/s/1zq7oqg11pkye6m/vn-emo.json?dl=1",
+        description: "Yet another data for people who want to use Vietnamese Emoticons"
     },
     Japanese: {
-        name: 'Japanese',
-        link: 'https://dl.dropboxusercontent.com/s/59gwiqg9bipvz40/jp-emo.json?dl=1',
-        description: 'Yet another data for people who want to use Japanese Emoticons'
+        name: "Japanese",
+        link: "https://dl.dropboxusercontent.com/s/59gwiqg9bipvz40/jp-emo.json?dl=1",
+        description: "Yet another data for people who want to use Japanese Emoticons"
     },
     Skype: {
-        name: 'Skype',
-        link: 'https://www.dropbox.com/s/6wjwy1x9l7bs9xh/skype.json?dl=1',
-        description: 'Skype Original Emoticons'
+        name: "Skype",
+        link: "https://www.dropbox.com/s/6wjwy1x9l7bs9xh/skype.json?dl=1",
+        description: "Skype Original Emoticons"
     }
 };
 
@@ -42,7 +42,7 @@ $(function() {
             console.log(info);
             for (var key in info) {
                 var emo_data = info[key];
-                if (emo_data.data_name == 'Default' && emo_data.data_url != DEFAULT_DATA_URL) {
+                if (emo_data.data_name == "Default" && emo_data.data_url != DEFAULT_DATA_URL) {
                     var url = DEFAULT_DATA_URL;
                 } else {
                     var url = emo_data.data_url;
@@ -54,7 +54,7 @@ $(function() {
         }
         if ($.isEmptyObject(urls)) {
             init = true;
-            urls['Default'] = DEFAULT_DATA_URL;
+            urls["Default"] = DEFAULT_DATA_URL;
         }
         fillDataTable();
 
@@ -68,16 +68,16 @@ $(function() {
 
     var app_detail = chrome.app.getDetails();
     var version = app_detail.version;
-    $('#chatpp_version').html(version);
-    $('#btn-reset').click(function() {
+    $("#chatpp_version").html(version);
+    $("#btn-reset").click(function() {
         emo_info = {};
         getData({}, reload);
     });
-    $('#btn-load').click(function() {
-        if ($('#data-select').val() == 'default') {
+    $("#btn-load").click(function() {
+        if ($("#data-select").val() == "default") {
             getData(DEFAULT_DATA_URL, reload);
         } else {
-            var url = $('#data-url').val();
+            var url = $("#data-url").val();
             if (!validateUrl(url)) {
                 bootbox.alert("Invalid URL! Make sure your inputted URL is correct, and start with https!");
             } else {
@@ -89,7 +89,7 @@ $(function() {
                             label: "OK!",
                             className: "btn-success",
                             callback: function() {
-                                urls['added'] = url;
+                                urls["added"] = url;
                                 getData(urls, reload);
                             }
                         },
@@ -106,12 +106,12 @@ $(function() {
         }
     });
 
-    $('#data-select').change(function (){
+    $("#data-select").change(function (){
         var val = $(this).val();
-        if (val == 'default') {
-            $('#url-input-div').hide("slow");
+        if (val == "default") {
+            $("#url-input-div").hide("slow");
         } else {
-            $('#url-input-div').show("slow");
+            $("#url-input-div").show("slow");
         }
     });
 });
@@ -123,7 +123,7 @@ function validateUrl(url) {
 
 function getData(urls, callback) {
     if ($.isEmptyObject(urls)) {
-        urls['Default'] = DEFAULT_DATA_URL;
+        urls["Default"] = DEFAULT_DATA_URL;
     }
     emo_storage = new EmoStorage();
     var loaded_urls = [];
@@ -136,8 +136,8 @@ function getData(urls, callback) {
         }
         $.getJSON(url)
             .done(function(data) {
-                if (typeof(data.data_version) !== 'undefined' && typeof(data.emoticons) !== 'undefined') {
-                    data.data_url = urls[data.data_name] ? urls[data.data_name] : urls['added'];
+                if (typeof(data.data_version) !== "undefined" && typeof(data.emoticons) !== "undefined") {
+                    data.data_url = urls[data.data_name] ? urls[data.data_name] : urls["added"];
                     var priority = getPriority(data.data_name);
                     emo_storage.pushData(data, priority);
                     pushEmoticons(data.emoticons, priority, data.data_name);
@@ -178,7 +178,7 @@ function getPriority(data_name) {
 }
 
 function showOfficialData() {
-    var official = $('#official-data');
+    var official = $("#official-data");
     for (var data_name in official_emos) {
         if (emo_info[data_name] === undefined) {
             var new_button = '<div class="col-md-12 official-data"><button class="btn btn-info btn-sm btn-official-data" data-name="' + data_name + '">Add ' + data_name + '</button>'
@@ -189,7 +189,7 @@ function showOfficialData() {
     }
 
     $(".btn-official-data").click(function() {
-        var data_name = $(this).data('name');
+        var data_name = $(this).data("name");
         var url = official_emos[data_name].link;
         if (validateUrl(url)) {
             urls[data_name] = url;
@@ -228,10 +228,10 @@ function fillTable() {
     clearTable();
     var info = JSON.parse(localStorage[LOCAL_STORAGE_INFO_KEY]);
     if (info.data_name != "Default" && info.data_url) {
-        $('#data-select').val('custom');
-        $('#data-url').val(info.data_url);
-        $('#url-input-div').show("slow");
-        $('#btn-show-changelog').show("slow");
+        $("#data-select").val("custom");
+        $("#data-url").val(info.data_url);
+        $("#url-input-div").show("slow");
+        $("#btn-show-changelog").show("slow");
     }
 
     var table_text = "";
@@ -241,7 +241,7 @@ function fillTable() {
     $.each(emoticons, function(key, data) {
         if (!current_data || current_data !== data.data_name) {
             if (table_text) {
-                $("#table-emo-" + last_data_name).find('tbody').append(table_text);
+                $("#table-emo-" + last_data_name).find("tbody").append(table_text);
             }
             current_data = data.data_name;
             table_text = "";
@@ -256,7 +256,7 @@ function fillTable() {
             table_text += "</tr>";
         }
     });
-    $("#table-emo-" + last_data_name).find('tbody').append(table_text);
+    $("#table-emo-" + last_data_name).find("tbody").append(table_text);
 }
 
 function createEmoticonsTable(name) {
@@ -281,7 +281,7 @@ function createEmoticonsTable(name) {
             '</div>'
         '</div>';
 
-    $('#emoticons-table').append(table);
+    $("#emoticons-table").append(table);
 }
 
 function createTableTd(data) {
@@ -295,7 +295,7 @@ function createTableTd(data) {
 
 function createDataTableText(emo_data) {
     $("#table-data > tbody").html("");
-    var table_text = '';
+    var table_text = "";
     var first = true;
     $.each(emo_data.slice().reverse(), function(key, data) {
         if (data.data_name !== undefined && data.data_url !== undefined) {
@@ -346,7 +346,7 @@ function fillDataTable() {
         }
 
         if (button.hasClass("btn-data-remove")) {
-            var name = button.data('name');
+            var name = button.data("name");
             emo_storage.removeData(name);
             emo_storage.syncData(reload);
         }
@@ -377,17 +377,17 @@ function emoDataObjectToArray(data) {
 
 function createATag(url) {
     if (!url) {
-        return '';
+        return "";
     }
-    return $('<a>', {
+    return $("<a>", {
         href: url,
         text: url,
-        target: '_blank'
-    }).prop('outerHTML');;
+        target: "_blank"
+    }).prop("outerHTML");;
 }
 
 function getEmoUrl(img) {
-    if (img.indexOf('https://') == 0 || img.indexOf('http://') == 0) {
+    if (img.indexOf("https://") == 0 || img.indexOf("http://") == 0) {
         return img;
     }
     return DEFAULT_IMG_HOST + "img/emoticons/" + img;
@@ -425,7 +425,7 @@ EmoStorage.prototype.syncData = function(callback) {
     var sync = {};
     sync[CHROME_SYNC_KEY] = this.data;
     chrome.storage.sync.set(sync, function() {
-        if (typeof callback != 'undefined') {
+        if (typeof callback !== "undefined") {
             callback();
         }
     });

@@ -13,31 +13,164 @@ var highlight_status = false;
 
 var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
 
+var support_languages = [
+    "1c",
+    "actionscript",
+    "apache",
+    "applescript",
+    "armasm",
+    "asciidoc",
+    "aspectj",
+    "autohotkey",
+    "autoit",
+    "avrasm",
+    "axapta",
+    "bash",
+    "brainfuck",
+    "cal",
+    "capnproto",
+    "ceylon",
+    "clojure-repl",
+    "clojure",
+    "cmake",
+    "coffeescript",
+    "cpp",
+    "cs",
+    "css",
+    "d",
+    "dart",
+    "delphi",
+    "diff",
+    "django",
+    "dns",
+    "dockerfile",
+    "dos",
+    "dust",
+    "elixir",
+    "elm",
+    "erb",
+    "erlang-repl",
+    "erlang",
+    "fix",
+    "fortran",
+    "fsharp",
+    "gcode",
+    "gherkin",
+    "glsl",
+    "go",
+    "gradle",
+    "groovy",
+    "haml",
+    "handlebars",
+    "haskell",
+    "haxe",
+    "http",
+    "inform7",
+    "ini",
+    "java",
+    "javascript",
+    "json",
+    "julia",
+    "kotlin",
+    "lasso",
+    "less",
+    "lisp",
+    "livecodeserver",
+    "livescript",
+    "lua",
+    "makefile",
+    "markdown",
+    "mathematica",
+    "matlab",
+    "mel",
+    "mercury",
+    "mizar",
+    "mojolicious",
+    "monkey",
+    "nginx",
+    "nimrod",
+    "nix",
+    "nsis",
+    "objectivec",
+    "ocaml",
+    "openscad",
+    "oxygene",
+    "parser3",
+    "perl",
+    "pf",
+    "php",
+    "powershell",
+    "processing",
+    "profile",
+    "prolog",
+    "protobuf",
+    "puppet",
+    "python",
+    "q",
+    "r",
+    "rib",
+    "roboconf",
+    "rsl",
+    "ruby",
+    "ruleslanguage",
+    "rust",
+    "scala",
+    "scheme",
+    "scilab",
+    "scss",
+    "smali",
+    "smalltalk",
+    "sml",
+    "sql",
+    "stata",
+    "step21",
+    "stylus",
+    "swift",
+    "tcl",
+    "tex",
+    "thrift",
+    "tp",
+    "twig",
+    "typescript",
+    "vala",
+    "vbnet",
+    "vbscript-html",
+    "vbscript",
+    "verilog",
+    "vhdl",
+    "vim",
+    "x86asm",
+    "xl",
+    "xml",
+    "xquery",
+    "zephir",
+];
+
 $(function(){
     cw_timer = setInterval(
         function(){
-            if (typeof CW !== 'undefined' && typeof CW.reg_cmp !== 'undefined') {
+            if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
                 window.clearInterval(cw_timer);
                 addStyle();
                 addInfoIcon();
-                if (localStorage.emoticon_status === 'true') {
+                if (localStorage.emoticon_status === "true") {
                     addEmoticonText();
                 }
-                if (localStorage.mention_status === 'true') {
+                if (localStorage.mention_status === "true") {
                     mention_status = true;
                     addMentionText();
                 }
-                if (localStorage.shortcut_status === 'true') {
+                if (localStorage.shortcut_status === "true") {
                     shortcut_status = true;
                     addShortcutText();
                 }
-                if (localStorage.thumbnail_status === 'true' || localStorage.highlight_status === 'true') {
+                if (localStorage.thumbnail_status === "true" || localStorage.highlight_status === "true") {
                     updateTimeLine();
-                    thumbnail_status = localStorage.thumbnail_status === 'true';
-                    highlight_status = localStorage.highlight_status === 'true';
+                    thumbnail_status = localStorage.thumbnail_status === "true";
+                    highlight_status = localStorage.highlight_status === "true";
                 }
                 addAdvertisement();
-                if (localStorage.emoticon_status === 'true') {
+                if (localStorage.emoticon_status === "true") {
                     addExternalEmo();
                 }
             }
@@ -47,7 +180,7 @@ $(function(){
 });
 
 function htmlEncode(value){
-    return $('<div/>').text(value).html();
+    return $("<div/>").text(value).html();
 }
 
 function addEmo(emo) {
@@ -62,7 +195,7 @@ function addEmo(emo) {
             encoded_text + '" class="ui_emoticon"/>';
         }
         CW.reg_cmp.push({
-            key: new RegExp(emo[index].regex, 'g'),
+            key: new RegExp(emo[index].regex, "g"),
             rep: rep,
             reptxt: emo[index].key,
             external: true
@@ -71,14 +204,14 @@ function addEmo(emo) {
 }
 
 function getEmoUrl(img) {
-    if (img.indexOf('https://') == 0 || img.indexOf('http://') == 0) {
+    if (img.indexOf("https://") == 0 || img.indexOf("http://") == 0) {
         return img;
     }
     return DEFAULT_IMG_HOST + "img/emoticons/" + img;
 }
 
 function isSpecialEmo(emo) {
-    var special_emo = [':-ss', ':-??', '~:>', ':@)', '~X('];
+    var special_emo = [":-ss", ":-??", "~:>", ":@)", "~X("];
     return special_emo.indexOf(emo) > -1;
 }
 
@@ -93,7 +226,7 @@ function removeExternalEmo() {
     }
     emoticon_status = false;
     updateEmoticonText();
-    console.log('Emoticons removed!');
+    console.log("Emoticons removed!");
 }
 
 function addExternalEmo() {
@@ -101,15 +234,15 @@ function addExternalEmo() {
     addEmo(emodata);
     emoticon_status = true;
     updateEmoticonText();
-    console.log('Emoticon added!');
+    console.log("Emoticon added!");
 }
 
 function addStyle() {
-    $("<style type='text/css'> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
+    $('<style type="text/css"> .emoticonTextEnable{font-weight: bold;};</style>').appendTo("head");
 }
 
 function addInfoIcon() {
-    if ($('#roomInfoIcon').length > 0) {
+    if ($("#roomInfoIcon").length > 0) {
         return;
     }
     var room_info = '<li id="_roomInfo" role="button" class="_showDescription" aria-label="Show room Information" style="display: inline-block;"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></li>';
@@ -124,12 +257,12 @@ function addInfoIcon() {
         '<div id="_roomInfoTextMyTasks" class="tooltipFooter"></div>' +
         '</span>' +
         '</div>';
-    $('body').append(room_info_list);
-    $('#_roomInfo').click(function() {
+    $("body").append(room_info_list);
+    $("#_roomInfo").click(function() {
         prepareRoomInfo();
-        var room_name = RM.getIcon() + ' ' + htmlEncode(RM.getName());
-        var tip = $('#_roomInfoList').cwListTip({
-            selectOptionArea: '<b>' + room_name + '</b>' + ' Information',
+        var room_name = RM.getIcon() + " " + htmlEncode(RM.getName());
+        var tip = $("#_roomInfoList").cwListTip({
+            selectOptionArea: "<b>" + room_name + "</b>" + " Information",
             fixHeight: !1,
             search: !1
         });
@@ -138,153 +271,153 @@ function addInfoIcon() {
 }
 
 function prepareRoomInfo() {
-    var total_members = '<b>Total Members</b>: ' + RM.getSortedMemberList().length;
-    $('#_roomInfoTextTotalMembers').html(total_members);
-    var total_messages = '<b>Total Messages</b>: ' + RM.chat_num;
-    $('#_roomInfoTextTotalMessages').html(total_messages);
-    var total_tasks = '<b>Total Tasks</b>: ' + RM.task_num;
-    $('#_roomInfoTextTotalTasks').html(total_tasks);
-    var my_tasks = '<b>My Tasks</b>: ' + RM.mytask_num;
-    $('#_roomInfoTextMyTasks').html(my_tasks);
-    var total_files = '<b>Total Files</b>: ' + RM.file_num;
-    $('#_roomInfoTextTotalFiles').html(total_files);
+    var total_members = "<b>Total Members</b>: " + RM.getSortedMemberList().length;
+    $("#_roomInfoTextTotalMembers").html(total_members);
+    var total_messages = "<b>Total Messages</b>: " + RM.chat_num;
+    $("#_roomInfoTextTotalMessages").html(total_messages);
+    var total_tasks = "<b>Total Tasks</b>: " + RM.task_num;
+    $("#_roomInfoTextTotalTasks").html(total_tasks);
+    var my_tasks = "<b>My Tasks</b>: " + RM.mytask_num;
+    $("#_roomInfoTextMyTasks").html(my_tasks);
+    var total_files = "<b>Total Files</b>: " + RM.file_num;
+    $("#_roomInfoTextTotalFiles").html(total_files);
 }
 
 function addEmoticonText() {
-    if ($('#emoticonText').length > 0) {
+    if ($("#emoticonText").length > 0) {
         return;
     }
-    var emoticon_text = 'E ' + (emoticon_status ? 'ON' : 'OFF');
-    $('#_chatSendTool').append(
+    var emoticon_text = "E " + (emoticon_status ? "ON" : "OFF");
+    $("#_chatSendTool").append(
         '<li id="_emoticons" role="button" class=" _showDescription">' +
             '<span id="emoticonText" class="emoticonText icoSizeSmall">' + emoticon_text + '</span>' +
         '</li>'
     );
     setEmoticonTextLabel();
-    $('#emoticonText').click(function() {
+    $("#emoticonText").click(function() {
         toggleEmoticonsStatus();
     })
 }
 
 function setEmoticonTextLabel() {
-    $('#_emoticons').attr('aria-label', 'Data: ' + localStorage['emoticon_data_version']);
+    $("#_emoticons").attr("aria-label", "Data: " + localStorage["emoticon_data_version"]);
 }
 
 function removeEmoticonText() {
-    if ($('#emoticonText').length > 0) {
-        $('#emoticonText').remove();
+    if ($("#emoticonText").length > 0) {
+        $("#emoticonText").remove();
     }
 }
 
 function updateEmoticonText() {
-    var emoticon_text = 'E: ' + (emoticon_status ? 'ON' : 'OFF');
-    var div = $('#emoticonText');
+    var emoticon_text = "E: " + (emoticon_status ? "ON" : "OFF");
+    var div = $("#emoticonText");
     div.html(emoticon_text);
     if (emoticon_status) {
-        div.addClass('emoticonTextEnable');
+        div.addClass("emoticonTextEnable");
     } else {
-        div.removeClass('emoticonTextEnable');
+        div.removeClass("emoticonTextEnable");
     }
 }
 
 function addAdvertisement() {
-    if ($('#chatppAdvertisement').length > 0) {
+    if ($("#chatppAdvertisement").length > 0) {
         return;
     }
     var text = '<li id="_chatppSponsored" role="button" class=" _showDescription" aria-label="Advertising Corner. Contact us if you want to advertise everything here.">' +
         '<span id="chatppAdvertisement" class="icoSizeSmall">' + getAdvertisementText() + '</span>' +
     '</li>';
 
-    $('#_chatSendTool').append(text);
+    $("#_chatSendTool").append(text);
     setInterval(changeRandomAdvertisement, ADVERTISEMENT_CHANGE_TIME);
 }
 
 function changeRandomAdvertisement() {
     var text = getAdvertisementText();
-    $('#chatppAdvertisement').html(text);
+    $("#chatppAdvertisement").html(text);
 }
 
 function getAdvertisementText() {
-    if (localStorage['chatpp_advertisement'] !== undefined && localStorage['chatpp_advertisement']) {
-        var ads = JSON.parse(localStorage['chatpp_advertisement']);
+    if (localStorage["chatpp_advertisement"] !== undefined && localStorage["chatpp_advertisement"]) {
+        var ads = JSON.parse(localStorage["chatpp_advertisement"]);
         if (ads.length > 0) {
             return ads[Math.floor(Math.random() * ads.length)];
         }
     }
-    return 'Advertisement Here!';
+    return "Advertisement Here!";
 }
 
 function removeAdvertisement() {
-    if ($('#chatppAdvertisement').length > 0) {
-        $('#chatppAdvertisement').remove();
+    if ($("#chatppAdvertisement").length > 0) {
+        $("#chatppAdvertisement").remove();
     }
 }
 
 function addMentionText() {
-    if ($('#_chatppMentionText').length > 0) {
+    if ($("#_chatppMentionText").length > 0) {
         return;
     }
-    $('#_chatSendTool').append(
+    $("#_chatSendTool").append(
         '<li id="_chatppMentionText" role="button" class=" _showDescription">' +
         '<span id="chatppMentionText" class="emoticonText icoSizeSmall"></span>' +
         '</li>'
     );
     updateMentionText();
-    $('#chatppMentionText').click(function() {
+    $("#chatppMentionText").click(function() {
         toggleMentionStatus();
     })
 }
 
 function addShortcutText() {
-    if ($('#_chatppShortcutText').length > 0) {
+    if ($("#_chatppShortcutText").length > 0) {
         return;
     }
-    $('#_chatSendTool').append(
+    $("#_chatSendTool").append(
         '<li id="_chatppShortcutText" role="button" class=" _showDescription">' +
         '<span id="chatppShortcutText" class="emoticonText icoSizeSmall"></span>' +
         '</li>'
     );
     updateShortcutText();
-    $('#chatppShortcutText').click(function() {
+    $("#chatppShortcutText").click(function() {
         toggleShortcutStatus();
     })
 }
 
 function removeMentionText() {
-    if ($('#_chatppMentionText').length > 0) {
-        $('#_chatppMentionText').remove();
+    if ($("#_chatppMentionText").length > 0) {
+        $("#_chatppMentionText").remove();
     }
 }
 
 function removeShortcutText() {
-    if ($('#_chatppShortcutText').length > 0) {
-        $('#_chatppShortcutText').remove();
+    if ($("#_chatppShortcutText").length > 0) {
+        $("#_chatppShortcutText").remove();
     }
 }
 
 function updateMentionText() {
-    var mention_text = 'M: ' + (mention_status ? 'ON' : 'OFF');
-    var div = $('#chatppMentionText');
+    var mention_text = "M: " + (mention_status ? "ON" : "OFF");
+    var div = $("#chatppMentionText");
     div.html(mention_text);
     if (mention_status) {
-        $('#_chatppMentionText').attr('aria-label', 'Click to disable Mention Feature');
-        div.addClass('emoticonTextEnable');
+        $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
+        div.addClass("emoticonTextEnable");
     } else {
-        $('#_chatppMentionText').attr('aria-label', 'Click to enable Mention Feature');
-        div.removeClass('emoticonTextEnable');
+        $("#_chatppMentionText").attr("aria-label", "Click to enable Mention Feature");
+        div.removeClass("emoticonTextEnable");
     }
 }
 
 function updateShortcutText() {
-    var shortcut_text = 'S: ' + (shortcut_status ? 'ON' : 'OFF');
-    var div = $('#chatppShortcutText');
+    var shortcut_text = "S: " + (shortcut_status ? "ON" : "OFF");
+    var div = $("#chatppShortcutText");
     div.html(shortcut_text);
     if (shortcut_status) {
-        $('#_chatppShortcutText').attr('aria-label', 'Click to disable Shortcut Feature');
-        div.addClass('emoticonTextEnable');
+        $("#_chatppShortcutText").attr("aria-label", "Click to disable Shortcut Feature");
+        div.addClass("emoticonTextEnable");
     } else {
-        $('#_chatppShortcutText').attr('aria-label', 'Click to enable Shortcut Feature');
-        div.removeClass('emoticonTextEnable');
+        $("#_chatppShortcutText").attr("aria-label", "Click to enable Shortcut Feature");
+        div.removeClass("emoticonTextEnable");
     }
 }
 
@@ -329,9 +462,9 @@ function enableChatpp() {
 
 function reloadEmoticions() {
     removeExternalEmo();
-    console.log('Old emoticons removed');
+    console.log("Old emoticons removed");
     addExternalEmo();
-    console.log('New emoticons removed');
+    console.log("New emoticons removed");
     setEmoticonTextLabel();
 }
 
@@ -353,6 +486,14 @@ function updateTimeLine() {
         }
         if (highlight_status) {
             $("pre code", temp).each(function(i, block) {
+                var block_text = $(block).html();
+                console.log(block_text);
+                var language = getHighLightLanguage(block_text);
+                if (language) {
+                    block_text = block_text.replace(language + "\n", "");
+                    $(block).html(block_text);
+                    $(block).addClass(language);
+                }
                 hljs.highlightBlock(block);
             });
         }
@@ -371,9 +512,23 @@ function getThumbnailLink(link) {
         return link;
     };
 
-    if (link.indexOf('http://gyazo.com/') === 0) {
-        return link + '.png';
+    if (link.indexOf("http://gyazo.com/") === 0) {
+        return link + ".png";
     }
 
     return false;
+}
+
+function getHighLightLanguage(text) {
+    var language = text.split("\n", 1)[0];
+    if (!language) {
+        return null;
+    }
+    for (var i in support_languages) {
+        if (support_languages[i] === language.toLowerCase()) {
+            return language;
+        }
+    }
+
+    return null;
 }
