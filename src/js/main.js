@@ -165,9 +165,9 @@ $(function(){
                     addShortcutText();
                 }
                 if (localStorage.thumbnail_status === "true" || localStorage.highlight_status === "true") {
-                    updateTimeLine();
                     thumbnail_status = localStorage.thumbnail_status === "true";
                     highlight_status = localStorage.highlight_status === "true";
+                    updateTimeLine();
                 }
                 addAdvertisement();
                 if (localStorage.emoticon_status === "true") {
@@ -471,34 +471,56 @@ function reloadEmoticions() {
 function updateTimeLine() {
     TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
     TimeLineView.prototype.getMessagePanel = function(a, b) {
-        var timeLine = this.getMessagePanelOld(a, b);
+        var message_panel = this.getMessagePanelOld(a, b);
         var temp = $("<div></div>");
-        $(temp).html(timeLine);
+        $(temp).html(message_panel);
         if (thumbnail_status) {
-            $(".ui_sp_favicon_parent", temp).each(function(index, link) {
-                var dom = $(link);
-                var imageLink = getThumbnailLink(dom.attr("href"));
-                if (imageLink) {
-                    var img = '<div><img src="' + imageLink + '" alt="' + imageLink +'" style="max-width: 500px; max-height: 150px"></div>';
-                    dom.after(img);
-                }
-            });
+            temp = insertThumbnail(temp);
         }
         if (highlight_status) {
             $("pre code", temp).each(function(i, block) {
                 var block_text = $(block).html();
-                console.log(block_text);
-                var language = getHighLightLanguage(block_text);
-                if (language) {
-                    block_text = block_text.replace(language + "\n", "");
+                var options = getHighlightOption(block_text);
+                console.log(options);
+                if (options.has_valid_options) {
+                    var first_line = block_text.split("\n", 1)[0];
+                    block_text = block_text.replace(first_line + "\n", "");
                     $(block).html(block_text);
-                    $(block).addClass(language);
+                }
+                if (options.language) {
+                    $(block).addClass(options.language);
+                }
+                if (options.wrap) {
+                    $(block).css({"word-wrap": "break-word"});;
                 }
                 hljs.highlightBlock(block);
             });
         }
         return $(temp).html();
     };
+
+    TK.view.getTaskPanelOld = TK.view.getTaskPanel;
+    TK.view.getTaskPanel = function(b, d) {
+        var task_panel = TK.view.getTaskPanelOld(b, d);
+        var temp = $("<div></div>");
+        $(temp).html(task_panel);
+        if (thumbnail_status) {
+            temp = insertThumbnail(temp);
+        }
+        return $(temp).html();
+    }
+}
+
+function insertThumbnail(dom) {
+    $(".ui_sp_favicon_parent", dom).each(function(index, link) {
+        var dom = $(link);
+        var imageLink = getThumbnailLink(dom.attr("href"));
+        if (imageLink) {
+            var img = '<div><img src="' + imageLink + '" alt="' + imageLink +'" style="max-width: 500px; max-height: 120px"></div>';
+            dom.after(img);
+        }
+    });
+    return dom;
 }
 
 function getThumbnailLink(link) {
@@ -519,16 +541,48 @@ function getThumbnailLink(link) {
     return false;
 }
 
-function getHighLightLanguage(text) {
-    var language = text.split("\n", 1)[0];
-    if (!language) {
-        return null;
-    }
+function getHighLightLanguage(language) {
     for (var i in support_languages) {
         if (support_languages[i] === language.toLowerCase()) {
-            return language;
+            return support_languages[i];
         }
     }
 
     return null;
+}
+
+function getHighlightOption(text) {
+    var highlight_options = {
+        language: null,
+        wrap: false,
+        has_valid_options: false
+    }
+    var valid_options = ["wrap"];
+    var options = text.split("\n", 1)[0];
+    if (!options) {
+        return highlight_options;
+    }
+
+    options = options.split(" ");
+    for (var i in options) {
+        if (!options[i]) {
+            continue;
+        }
+        if (valid_options.indexOf(options[i]) > -1) {
+            highlight_options[options[i]] = true;
+            continue
+        }
+        var language = getHighLightLanguage(options[i]);
+        if (language) {
+            highlight_options.language = language;
+            continue;
+        }
+        return {
+            language: null,
+            wrap: false,
+            has_valid_options: false
+        }
+    }
+    highlight_options.has_valid_options = true;
+    return highlight_options;
 }
