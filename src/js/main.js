@@ -147,6 +147,7 @@ var support_languages = [
 ];
 
 $(function(){
+    var rebuild = false;
     cw_timer = setInterval(
         function(){
             if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
@@ -154,6 +155,7 @@ $(function(){
                 addStyle();
                 addInfoIcon();
                 if (localStorage.emoticon_status === "true") {
+                    rebuild = true;
                     addEmoticonText();
                 }
                 if (localStorage.mention_status === "true") {
@@ -165,13 +167,18 @@ $(function(){
                     addShortcutText();
                 }
                 if (localStorage.thumbnail_status === "true" || localStorage.highlight_status === "true") {
+                    rebuild = true;
                     thumbnail_status = localStorage.thumbnail_status === "true";
                     highlight_status = localStorage.highlight_status === "true";
-                    updateTimeLine();
+                    updateChatworkView();
                 }
                 addAdvertisement();
                 if (localStorage.emoticon_status === "true") {
                     addExternalEmo();
+                }
+
+                if (rebuild) {
+                    RL.rooms[RM.id].build();
                 }
             }
         },
@@ -468,7 +475,7 @@ function reloadEmoticions() {
     setEmoticonTextLabel();
 }
 
-function updateTimeLine() {
+function updateChatworkView() {
     TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
     TimeLineView.prototype.getMessagePanel = function(a, b) {
         var message_panel = this.getMessagePanelOld(a, b);
@@ -490,7 +497,7 @@ function updateTimeLine() {
                 if (options.language) {
                     $(block).addClass(options.language);
                 }
-                if (options.wrap) {
+                if (!options.nowrap) {
                     $(block).css({"word-wrap": "break-word"});;
                 }
                 hljs.highlightBlock(block);
@@ -508,6 +515,14 @@ function updateTimeLine() {
             temp = insertThumbnail(temp);
         }
         return $(temp).html();
+    };
+
+    RoomView.prototype.buildOld = RoomView.prototype.build;
+    RoomView.prototype.build = function(a) {
+        this.buildOld(a);
+        if (thumbnail_status) {
+            insertThumbnail($("#_subRoomDescription"));
+        }
     }
 }
 
@@ -516,7 +531,7 @@ function insertThumbnail(dom) {
         var dom = $(link);
         var imageLink = getThumbnailLink(dom.attr("href"));
         if (imageLink) {
-            var img = '<div><img src="' + imageLink + '" alt="' + imageLink +'" style="max-width: 500px; max-height: 120px"></div>';
+            var img = '<div><img src="' + imageLink + '" alt="' + imageLink +'" style="max-width: 500px; max-height: 125px"></div>';
             dom.after(img);
         }
     });
@@ -554,10 +569,10 @@ function getHighLightLanguage(language) {
 function getHighlightOption(text) {
     var highlight_options = {
         language: null,
-        wrap: false,
+        nowrap: false,
         has_valid_options: false
     }
-    var valid_options = ["wrap"];
+    var valid_options = ["nowrap"];
     var options = text.split("\n", 1)[0];
     if (!options) {
         return highlight_options;
@@ -579,7 +594,7 @@ function getHighlightOption(text) {
         }
         return {
             language: null,
-            wrap: false,
+            nowrap: false,
             has_valid_options: false
         }
     }

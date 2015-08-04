@@ -1,6 +1,28 @@
 Chat++ Change Logs
 =================
 
+## 4.1.0
+* Code Highlight: Support more languages
+* Support specifying the language of the code
+* Code block will be applied word wrap by default. Support "nowrap" option
+Example
+```
+ruby
+#ruby code, long text is wrapped by default
+puts "This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text"
+```
+
+```
+ruby nowrap
+#ruby code, do not wrap long text
+puts "This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text"
+```
+* Use dark theme for code highlight
+* Thumbnail size (height) is rescaled from 150px to 125px
+* Show thumbnail in Task view, as well as in Chat room description
+* Now, many Chat++ features such as external emoticons, code highlight, thumbnail display ... will be automatically applied after loading Chatwork
+(In previous versions, you must switch room to make everything become effective)
+
 ## 4.0.0 - Big Update
 * View list issues at [Version Four Milestone](../../milestones/Version%20Four)
 * Highlight Code
