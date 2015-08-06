@@ -488,7 +488,6 @@ function updateChatworkView() {
             $("pre code", temp).each(function(i, block) {
                 var block_text = $(block).html();
                 var options = getHighlightOption(block_text);
-                console.log(options);
                 if (options.has_valid_options) {
                     var first_line = block_text.split("\n", 1)[0];
                     block_text = block_text.replace(first_line + "\n", "");
@@ -506,21 +505,22 @@ function updateChatworkView() {
         return $(temp).html();
     };
 
-    TK.view.getTaskPanelOld = TK.view.getTaskPanel;
-    TK.view.getTaskPanel = function(b, d) {
-        var task_panel = TK.view.getTaskPanelOld(b, d);
-        var temp = $("<div></div>");
-        $(temp).html(task_panel);
-        if (thumbnail_status) {
+    if (thumbnail_status) {
+        TK.view.getTaskPanelOld = TK.view.getTaskPanel;
+        TK.view.getTaskPanel = function(b, d) {
+            var task_panel = TK.view.getTaskPanelOld(b, d);
+            if ($(task_panel).is("div")) {
+                return task_panel;
+            }
+            var temp = $("<span></span>");
+            temp.html(task_panel);
             temp = insertThumbnail(temp);
-        }
-        return $(temp).html();
-    };
+            return temp.html();
+        };
 
-    RoomView.prototype.buildOld = RoomView.prototype.build;
-    RoomView.prototype.build = function(a) {
-        this.buildOld(a);
-        if (thumbnail_status) {
+        RoomView.prototype.buildOld = RoomView.prototype.build;
+        RoomView.prototype.build = function(a) {
+            this.buildOld(a);
             insertThumbnail($("#_subRoomDescription"));
         }
     }
@@ -539,17 +539,18 @@ function insertThumbnail(dom) {
 }
 
 function getThumbnailLink(link) {
-    var imgRegex = /\.(png|jpg|gif|jpeg)$/i;
-    if (link.match(imgRegex)) {
+    var img_regex = /\.(png|jpg|gif|jpeg)$/i;
+    if (link.match(img_regex)) {
         return link;
     };
 
-    var fbImgRegex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
-    if (link.match(fbImgRegex)) {
+    var fb_img_regex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
+    if (link.match(fb_img_regex)) {
         return link;
     };
 
-    if (link.indexOf("http://gyazo.com/") === 0) {
+    var gyazo_regex = /^https?:\/\/gyazo.com\//i;
+    if (link.match(gyazo_regex)) {
         return link + ".png";
     }
 
