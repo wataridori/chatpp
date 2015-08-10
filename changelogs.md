@@ -19,6 +19,7 @@ puts "This is a super long text. This is a super long text. This is a super long
 ```
 * Use dark theme for code highlight
 * Thumbnail size (height) is rescaled from 150px to 125px
+* Display gyazo's https image thumbnail
 * Show thumbnail in Task view, as well as in Chat room description
 * Now, many Chat++ features such as external emoticons, code highlight, thumbnail display ... will be automatically applied after loading Chatwork
 (In previous versions, you must switch room to make everything become effective)
