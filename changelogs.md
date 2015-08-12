@@ -18,6 +18,7 @@ ruby nowrap
 puts "This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text. This is a super long text"
 ```
 * Use dark theme for code highlight
+* Thumbnail feature is OFF by default. Please turn it on if you want to use it.
 * Thumbnail size (height) is rescaled from 150px to 125px
 * Display gyazo's https image thumbnail
 * Show thumbnail in Task view, as well as in Chat room description

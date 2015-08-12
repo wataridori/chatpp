@@ -15,6 +15,8 @@ var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AAC
 var ADVERTISEMENT_URL = "https://www.dropbox.com/s/flbiyfqhcqapdbe/chatppad.json?dl=1";
 var ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 
+var FORCE_TURN_OFF_THUMBNAIL = 1;
+
 var emoticons = [];
 var emo_info = {};
 var DELAY_TIME = 6000;
@@ -46,7 +48,12 @@ function init(inject_script) {
         if (info === undefined) {
             info = {};
         }
-
+        if (!info.force_update_version || info.force_update_version < FORCE_TURN_OFF_THUMBNAIL) {
+            info.force_update_version = FORCE_TURN_OFF_THUMBNAIL;
+            info.thumbnail_status = false;
+            info.emoticon_status = true;
+        }
+        localStorage.force_update_version = info.force_update_version;
         var features = ["mention", "shortcut", "thumbnail", "highlight"];
         features.forEach(function(feature) {
             if (info[feature + "_status"] == false) {
@@ -56,7 +63,6 @@ function init(inject_script) {
                 localStorage[feature + "_status"] = true;
             }
         });
-
         if (info.emoticon_status == false) {
             console.log("emoticon feature is disabled!");
             localStorage.emoticon_status = false;
@@ -239,6 +245,7 @@ EmoStorage.prototype.syncData = function(callback) {
         var status_name = features[i] + "_status";
         this.data[status_name] = localStorage[status_name] === 'true';
     }
+    this.data.force_update_version = localStorage.force_update_version;
     var sync = {};
     sync[CHROME_SYNC_KEY] = this.data;
     chrome.storage.sync.set(sync, function() {

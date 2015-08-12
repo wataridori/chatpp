@@ -401,6 +401,7 @@ function EmoStorage() {
         var feature_name = features[i] + "_status";
         this.data[feature_name] = emo_info[feature_name] === undefined ? true : emo_info[feature_name];
     }
+    this.data.force_update_version = emo_info.force_update_version;
 }
 
 EmoStorage.prototype.pushData = function(inputed_data, priority) {
