@@ -92,40 +92,45 @@ function getData(info, inject_script) {
     var loaded_count = 0;
     var emo_count = getObjectLength(urls);
     var emo_storage = new EmoStorage();
+    var failed = false;
     for (data_name in urls) {
         var url = urls[data_name];
         $.getJSON(url)
             .done(function(data) {
-                loaded_count++;
-                var last = loaded_count === emo_count;
                 if (typeof(data.data_version) !== "undefined" && typeof(data.emoticons) !== "undefined") {
                     data.data_url = urls[data.data_name];
                     var priority = (emo_info[data.data_name] && emo_info[data.data_name].priority) ? emo_info[data.data_name].priority : 0;
                     emo_storage.pushData(data, priority);
                     pushEmoticons(data.emoticons, priority);
-                    if (last) {
-                        emo_storage.syncData();
-                        chrome.storage.local.get(CHROME_LOCAL_KEY, function(local_data) {
-                            var version_name = "";
-                            if (!$.isEmptyObject(local_data[CHROME_LOCAL_KEY])) {
-                                version_name = local_data[CHROME_LOCAL_KEY]["version_name"];
-                            }
-                            var current_time = (new Date).toLocaleString();
-                            console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
-                            localStorage[LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
-                            localStorage["chatpp_version_name"] = version_name;
-                            localStorage["emoticon_data_version"] = parseDataName(emo_info);
-                            if (inject_script !== undefined && inject_script) {
-                                addInjectedScript();
-                            } else {
-                                // runFunction("reloadEmoticions()");
-                            }
-                        });
-                    }
                 }
             }).fail(function(jqxhr, textStatus, error) {
-                var err = textStatus + ", " + error;
-                console.log( "Request Failed: " + err );
+                failed = true;
+                var message = "Chat++ Error\n\nThere is an error occurred when loading or parsing the data named '" + data_name + "' (" + url + "). \n\n" +
+                    "It may be because of the failure in downloading file or invalid file format.\n\n" +
+                    "Check your file data carefully and try to reload again."
+                alert(message);
+            }).always(function() {
+                if (++loaded_count === emo_count) {
+                    if (!failed) {
+                        emo_storage.syncData();
+                    }
+                    chrome.storage.local.get(CHROME_LOCAL_KEY, function(local_data) {
+                        var version_name = "";
+                        if (!$.isEmptyObject(local_data[CHROME_LOCAL_KEY])) {
+                            version_name = local_data[CHROME_LOCAL_KEY]["version_name"];
+                        }
+                        var current_time = (new Date).toLocaleString();
+                        console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
+                        localStorage[LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
+                        localStorage["chatpp_version_name"] = version_name;
+                        localStorage["emoticon_data_version"] = parseDataName(emo_info);
+                        if (inject_script !== undefined && inject_script) {
+                            addInjectedScript();
+                        } else {
+                            // runFunction("reloadEmoticions()");
+                        }
+                    });
+                }
             });
     }
 }
@@ -168,6 +173,7 @@ function pushEmoticons(emos, priority) {
 
 function addInjectedScript() {
     loadAdvertisement();
+    preLoad();
     injectJsFile("fuse.min.js");
     injectJsFile("caretposition.js");
     injectCssFile("highlight.min.css");
@@ -181,6 +187,21 @@ function addInjectedScript() {
     );
 
     setInterval(loadAdvertisement, ADVERTISEMENT_LOAD_TIMEOUT);
+}
+
+function preLoad() {
+    var text = '<li id="_chatppPreLoad"><span id="chatppPreLoad" class="icoSizeSmall"></span></li>';
+    $("#_chatSendTool").append(text);
+    var chatpp_pre_load = $("#chatppPreLoad");
+    var delay_time = DELAY_TIME / 1000;
+    var pre_load_interval = setInterval(function() {
+        if (--delay_time <= 0) {
+            $("#_chatppPreLoad").remove();
+            window.clearInterval(pre_load_interval);
+        }
+        var text = "Chat++ will be loaded in about " + delay_time + " second" + (delay_time > 1 ? "s" : "");
+        chatpp_pre_load.html(text);
+    }, 1000);
 }
 
 function injectJsFile(file_name) {

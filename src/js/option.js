@@ -70,9 +70,27 @@ $(function() {
     var version = app_detail.version;
     $("#chatpp_version").html(version);
     $("#btn-reset").click(function() {
-        emo_info = {};
-        getData({}, reload);
-    });
+        bootbox.dialog({
+            title: "<span class='text-primary'>Reset Emoticon Data",
+            message: "<span class='text-danger'>Your are trying to reset emoticon data, which will clear your current data information.<br>" +
+                "This action cannot be undone. Are you sure ?</span>",
+            buttons: {
+                success: {
+                    label: "OK!",
+                    className: "btn-success",
+                    callback: function() {
+                        emo_info = {};
+                        getData({}, reload);
+                    }
+                },
+                danger: {
+                    label: "Cancel!",
+                    className: "btn-danger"
+                }
+            }
+        });
+    })
+
     $("#btn-load").click(function() {
         if ($("#data-select").val() == "default") {
             getData(DEFAULT_DATA_URL, reload);
@@ -147,9 +165,12 @@ function getData(urls, callback) {
                 } else {
                     bootbox.alert("Invalid data structure!");
                 }
-            }).fail(function( jqxhr, textStatus, error ) {
-                var err = textStatus + ", " + error;
-                bootbox.alert("Request Failed: " + err);
+            }).fail(function(jqxhr, textStatus, error) {
+                var message = "<span class='text-danger'>There is an error occurred when loading or parsing the following url: <br>" +
+                    "<a href='" + url + "'>" + url + "</a>" +
+                    "<br>It may be because of the failure in downloading file or invalid file format.<br>" +
+                    "Check your file data carefully and try to reload again.</span>"
+                bootbox.alert(message);
             });
     }
 }
@@ -285,11 +306,11 @@ function createEmoticonsTable(name) {
 }
 
 function createTableTd(data) {
-    var src = getEmoUrl(data.emo.src);
+    var src = htmlEncode(getEmoUrl(data.emo.src));
     var row = "";
     var class_name = data.status ? "danger" : "info";
     row += "<td class='" + class_name + " text-center'>" + data.emo.key + "</td>";
-    row += "<td class='text-center'><img src='" + src + "'/> </td>";
+    row += "<td class='text-center'><img class='emoticon' src='" + src + "'/> </td>";
     return row;
 }
 
@@ -384,6 +405,10 @@ function createATag(url) {
         text: url,
         target: "_blank"
     }).prop("outerHTML");;
+}
+
+function htmlEncode(value){
+    return $("<div/>").text(value).html();
 }
 
 function getEmoUrl(img) {

@@ -77,42 +77,10 @@ function loadChatppEmoData() {
 }
 
 function updateViewData(data) {
-    console.log(data);
-    var name = parseDataName(data);
-    var date_sync = parseDateSynce(data);
-    $('#current-data-info').html(name);
-    $('#date-sync-info').html(date_sync);
-
     var features = ['emoticon', 'mention', 'shortcut', 'thumbnail', 'highlight'];
     for (var i in features) {
         loadStatus(features[i], data[features[i] + '_status']);
     }
-}
-
-function parseDataName(data) {
-    if (data.data_name !== undefined && data.data_version !== undefined) {
-        return data.data_name + "_" + data.data_version;
-    }
-    var data_name = '';
-    for (key in data) {
-        if (data[key].data_name !== undefined) {
-            data_name += data[key].data_name + '_' + data[key].data_version + '  ';
-        }
-    }
-    return data_name;
-}
-
-function parseDateSynce(data) {
-    if (data.date_sync !== undefined) {
-        return data.date_sync;
-    }
-    var date_sync;
-    for (key in data) {
-        if (data[key].date_sync !== undefined) {
-            date_sync = data[key].date_sync;
-        }
-    }
-    return date_sync;
 }
 
 function setVersionType() {
