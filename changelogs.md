@@ -1,6 +1,14 @@
 Chat++ Change Logs
 =================
 
+## 4.2.0
+* Display detailed error when can not load or parse Emoticons data in both Emoticons page and Chatwork
+* Rewrite Emoticons data loading flow. Now if there are errors with Emoticons data files, only that data will be disabled. Chat++'s features, including emoticon, will still work
+(In previous versions, failing in loading or parsing Emoticons data file will cause Chat++ become unable to work)
+* Display confirmation alert when clicking at "Reset" button in Emoticons page
+* Display countdown message before Chat++ is loaded
+* Bug fix
+
 ## 4.1.0
 * Code Highlight: Support more languages
 * Support specifying the language of the code

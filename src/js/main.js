@@ -152,6 +152,7 @@ $(function(){
         function(){
             if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
                 window.clearInterval(cw_timer);
+                $("#_chatppPreLoad").remove();
                 addStyle();
                 addInfoIcon();
                 if (localStorage.emoticon_status === "true") {
@@ -194,7 +195,7 @@ function addEmo(emo) {
     for (var index = 0; index < emo.length; index++) {
         var rep = "";
         var encoded_text = htmlEncode(emo[index].key);
-        var img_src = getEmoUrl(emo[index].src);
+        var img_src = htmlEncode(getEmoUrl(emo[index].src));
         if (isSpecialEmo(emo[index].key)) {
             rep = '<img src="' + img_src + '" class="ui_emoticon"/>';
         } else {
@@ -331,7 +332,7 @@ function addAdvertisement() {
     if ($("#chatppAdvertisement").length > 0) {
         return;
     }
-    var text = '<li id="_chatppSponsored" role="button" class=" _showDescription" aria-label="Advertising Corner. Contact us if you want to advertise everything here.">' +
+    var text = '<li id="_chatppSponsored" role="button" class=" _showDescription" aria-label="Chat Plus Plus Information">' +
         '<span id="chatppAdvertisement" class="icoSizeSmall">' + getAdvertisementText() + '</span>' +
     '</li>';
 
