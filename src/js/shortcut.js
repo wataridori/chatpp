@@ -233,7 +233,7 @@ function registerShortcut() {
         }
     });
 
-    if (localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[LOCAL_STORAGE_ROOM_SHORTCUT]) {
+    if (localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] !== "undefined" && localStorage[LOCAL_STORAGE_ROOM_SHORTCUT]) {
         room_shortcuts = JSON.parse(localStorage[LOCAL_STORAGE_ROOM_SHORTCUT]);
     }
 

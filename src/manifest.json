@@ -1,9 +1,13 @@
 {
     "name": "Chat++ for Chatwork",
-    "short_name": "ChatPP",
     "version": "4.2.0",
     "manifest_version": 2,
     "description": "An all-in-one Chatwork Enhancement Toolkit which provides many useful features!",
+    "applications": {
+        "gecko": {
+            "id": "chatplusplus@thangtd.com"
+        }
+    },
     "content_scripts": [
         {
             "matches": [
@@ -18,19 +22,20 @@
             "run_at": "document_end"
         }
     ],
+    "background": {
+        "scripts": [
+            "js/background.js"
+        ]
+    },
     "web_accessible_resources": ["js/main.js", "js/mention.js", "js/shortcut.js", "js/fuse.min.js", "js/caretposition.js", "js/highlight.min.js", "css/highlight.min.css"],
     "browser_action": {
         "default_icon": "icon64.png",
+        "default_title": "Chat++",
         "default_popup": "popup.html"
     },
     "permissions": [
         "storage",
         "tabs",
         "<all_urls>"
-    ],
-    "options_page": "option.html",
-    "icons": {
-        "64": "icon64.png"
-    },
-    "homepage_url": "http://chatpp.thangtd.com"
+    ]
 }

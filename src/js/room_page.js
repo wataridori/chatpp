@@ -3,14 +3,19 @@ var CHROME_SYNC_ROOM_KEY = "CHATPP_CHROME_SYNC_ROOM";
 var rooms = [];
 
 $(function() {
-    var app_detail = chrome.app.getDetails();
+    var app_detail = {
+        "name": "Chat++ for Chatwork",
+        "version": "4.2.0"
+    };
     var version = app_detail.version;
     $('#chatpp_version').html(version);
 
-    chrome.storage.sync.get(CHROME_SYNC_ROOM_KEY, function(data) {
+    chrome.storage.local.get(CHROME_SYNC_ROOM_KEY, function(data) {
         if (!$.isEmptyObject(data)) {
             data = data[CHROME_SYNC_ROOM_KEY];
-            rooms = data;
+            if (data) {
+                rooms = JSON.parse(data);
+            }
             loadData();
         }
     });
@@ -53,8 +58,8 @@ function checkRoomId(room) {
 
 function syncData(callback) {
     var sync = {};
-    sync[CHROME_SYNC_ROOM_KEY] = rooms;
-    chrome.storage.sync.set(sync, function() {
+    sync[CHROME_SYNC_ROOM_KEY] = JSON.stringify(rooms);
+    chrome.storage.local.set(sync, function() {
         location.reload();
     });
 }

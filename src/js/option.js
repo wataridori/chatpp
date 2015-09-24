@@ -35,13 +35,18 @@ var official_emos = {
 };
 
 $(function() {
-    chrome.storage.sync.get(CHROME_SYNC_KEY, function(info) {
+    chrome.storage.local.get(CHROME_SYNC_KEY, function(info) {
         if (!$.isEmptyObject(info)) {
             info = info[CHROME_SYNC_KEY];
+            if (info) {
+                info = JSON.parse(info);
+            }
             emo_info = info;
-            console.log(info);
             for (var key in info) {
                 var emo_data = info[key];
+                if ($.isEmptyObject(emo_data)) {
+                    continue;
+                }
                 if (emo_data.data_name == "Default" && emo_data.data_url != DEFAULT_DATA_URL) {
                     var url = DEFAULT_DATA_URL;
                 } else {
@@ -66,7 +71,10 @@ $(function() {
         }
     });
 
-    var app_detail = chrome.app.getDetails();
+    var app_detail = {
+        "name": "Chat++ for Chatwork",
+        "version": "4.2.0"
+    };
     var version = app_detail.version;
     $("#chatpp_version").html(version);
     $("#btn-reset").click(function() {
@@ -107,7 +115,7 @@ $(function() {
                             label: "OK!",
                             className: "btn-success",
                             callback: function() {
-                                urls["added"] = url;
+                                urls["added"] = replaceDropboxLink(url);
                                 getData(urls, reload);
                             }
                         },
@@ -179,6 +187,10 @@ function reload() {
     location.reload();
 }
 
+function replaceDropboxLink(link) {
+    return link.replace("https://www.dropbox.com/", "https://dl.dropboxusercontent.com/");
+}
+
 function getObjectLength(object) {
     return Object.keys(object).length;
 }
@@ -187,6 +199,9 @@ function getPriority(data_name) {
     var max = 0;
     for (var key in emo_info) {
         var val = emo_info[key];
+        if ($.isEmptyObject(val)) {
+            continue;
+        }
         if (val.data_name === data_name) {
             return val.priority;
         }
@@ -213,7 +228,7 @@ function showOfficialData() {
         var data_name = $(this).data("name");
         var url = official_emos[data_name].link;
         if (validateUrl(url)) {
-            urls[data_name] = url;
+            urls[data_name] = replaceDropboxLink(url);
             getData(urls, reload);
         }
     });
@@ -247,7 +262,7 @@ function clearTable() {
 
 function fillTable() {
     clearTable();
-    var info = JSON.parse(localStorage[LOCAL_STORAGE_INFO_KEY]);
+    var info = emo_storage.data;
     if (info.data_name != "Default" && info.data_url) {
         $("#data-select").val("custom");
         $("#data-url").val(info.data_url);
@@ -388,7 +403,7 @@ function rearrangePriority(data) {
 function emoDataObjectToArray(data) {
     var data_array = [];
     $.each(data, function(key, emo) {
-        if (emo.priority !== undefined) {
+        if (emo && emo.priority !== undefined) {
             data_array[emo.priority] = emo;
         }
     });
@@ -447,10 +462,9 @@ EmoStorage.prototype.removeData = function(data_name) {
 };
 
 EmoStorage.prototype.syncData = function(callback) {
-    localStorage[LOCAL_STORAGE_INFO_KEY] = JSON.stringify(this.data);
     var sync = {};
-    sync[CHROME_SYNC_KEY] = this.data;
-    chrome.storage.sync.set(sync, function() {
+    sync[CHROME_SYNC_KEY] = JSON.stringify(this.data);
+    chrome.storage.local.set(sync, function() {
         if (typeof callback !== "undefined") {
             callback();
         }

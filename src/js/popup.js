@@ -8,7 +8,10 @@ var local_stored_data = {};
 var app_detail;
 
 $(function() {
-    app_detail = chrome.app.getDetails();
+    app_detail = {
+        "name": "Chat++ for Chatwork",
+        "version": "4.2.0"
+    };
     var version = app_detail.version;
     var app_name = app_detail.name;
     if (isDevVersion(app_name)) {
@@ -65,12 +68,13 @@ function loadStatus(name, value) {
 }
 
 function loadChatppEmoData() {
-    chrome.storage.sync.get(CHROME_SYNC_KEY, function(data) {
+    chrome.storage.local.get(CHROME_SYNC_KEY, function(data) {
         stored_data = data;
         data = data[CHROME_SYNC_KEY];
         if ($.isEmptyObject(data)) {
-            chrome.tabs.create({url:chrome.extension.getURL(app_detail.options_page)});
+            chrome.tabs.create({url: chrome.extension.getURL() + 'option.html'});
         } else {
+            data = JSON.parse(data);
             updateViewData(data);
         }
     });
@@ -85,7 +89,11 @@ function updateViewData(data) {
 
 function setVersionType() {
     chrome.storage.local.get(CHROME_LOCAL_KEY, function(data) {
-        local_stored_data = data;
+        if ($.isEmptyObject(data)) {
+            local_stored_data = {};
+        } else {
+            local_stored_data = data;
+        }
         if (local_stored_data[CHROME_LOCAL_KEY] === undefined) {
             local_stored_data[CHROME_LOCAL_KEY] = {};
         }

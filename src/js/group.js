@@ -3,15 +3,20 @@ var CHROME_SYNC_GROUP_KEY = "CHATPP_CHROME_SYNC_GROUP";
 var groups = [];
 
 $(function() {
-    var app_detail = chrome.app.getDetails();
+    var app_detail = {
+        "name": "Chat++ for Chatwork",
+        "version": "4.2.0"
+    };
     var version = app_detail.version;
     $('#chatpp_version').html(version);
 
-    chrome.storage.sync.get(CHROME_SYNC_GROUP_KEY, function(data) {
+    chrome.storage.local.get(CHROME_SYNC_GROUP_KEY, function(data) {
         if (!$.isEmptyObject(data)) {
             data = data[CHROME_SYNC_GROUP_KEY];
-            groups = data;
-            syncData();
+            if (data) {
+                groups = JSON.parse(data);
+            }
+            fillDataTable();
         }
     });
 
@@ -132,8 +137,8 @@ function syncData(callback) {
         callback = fillDataTable;
     }
     var sync = {};
-    sync[CHROME_SYNC_GROUP_KEY] = groups;
-    chrome.storage.sync.set(sync, function() {
+    sync[CHROME_SYNC_GROUP_KEY] = JSON.stringify(groups);
+    chrome.storage.local.set(sync, function() {
         if (typeof callback != 'undefined') {
             callback();
         }

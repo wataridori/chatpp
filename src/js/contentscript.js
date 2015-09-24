@@ -12,7 +12,7 @@ var CHROME_SYNC_ROOM_KEY = "CHATPP_CHROME_SYNC_ROOM";
 
 var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
 
-var ADVERTISEMENT_URL = "https://www.dropbox.com/s/flbiyfqhcqapdbe/chatppad.json?dl=1";
+var ADVERTISEMENT_URL = "https://dl.dropboxusercontent.com/s/flbiyfqhcqapdbe/chatppad.json?dl=1";
 var ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 
 var FORCE_TURN_OFF_THUMBNAIL = 1;
@@ -22,70 +22,84 @@ var emo_info = {};
 var DELAY_TIME = 6000;
 var urls = {};
 
-init(true);
+var keys = [CHROME_SYNC_KEY, CHROME_SYNC_GROUP_KEY, CHROME_SYNC_ROOM_KEY, CHROME_LOCAL_KEY];
+
+for (var i in keys) {
+    chrome.runtime.sendMessage({action: "init", data: keys[i]}, function(response) {});
+}
+
+setTimeout(function() {
+    $.each(keys, function(index, key) {
+        chrome.runtime.sendMessage({action: "getLocalStorage", data: key}, function(response) {
+            localStorage[key] = response;
+        });
+    })
+}, 500);
+
+setTimeout(function() {
+    init(true);
+}, 1000);
+
 
 function init(inject_script) {
-    chrome.storage.sync.get(CHROME_SYNC_KEY, function(info) {
-        info = info[CHROME_SYNC_KEY];
-        emo_info = info;
-        var url = "";
-        if (!$.isEmptyObject(info)) {
-            for (key in info) {
-                var emo_data = info[key];
-                if (emo_data.data_name === "Default" && emo_data.data_url !== DEFAULT_DATA_URL) {
-                    url = DEFAULT_DATA_URL;
-                } else {
-                    url = emo_data.data_url;
-                }
-                if (url) {
-                    urls[emo_data.data_name] = url;
-                }
-            }
-        }
-        if ($.isEmptyObject(urls)) {
-            urls["Default"] = DEFAULT_DATA_URL;
-        }
-        if (info === undefined) {
-            info = {};
-        }
-        if (!info.force_update_version || info.force_update_version < FORCE_TURN_OFF_THUMBNAIL) {
-            info.force_update_version = FORCE_TURN_OFF_THUMBNAIL;
-            info.thumbnail_status = false;
-            info.emoticon_status = true;
-        }
-        localStorage.force_update_version = info.force_update_version;
-        var features = ["mention", "shortcut", "thumbnail", "highlight"];
-        features.forEach(function(feature) {
-            if (info[feature + "_status"] == false) {
-                console.log(feature + " feature is disabled!");
-                localStorage[feature + "_status"] = false;
+    var info = localStorage[CHROME_SYNC_KEY];
+    emo_info = info = (info && info !== "undefined") ? JSON.parse(info) : {};
+    var url = "";
+    if (!$.isEmptyObject(info)) {
+        for (var key in info) {
+            var emo_data = info[key];
+            if (emo_data.data_name === "Default" && emo_data.data_url !== DEFAULT_DATA_URL) {
+                url = DEFAULT_DATA_URL;
             } else {
-                localStorage[feature + "_status"] = true;
+                url = emo_data.data_url;
             }
-        });
-        if (info.emoticon_status == false) {
-            console.log("emoticon feature is disabled!");
-            localStorage.emoticon_status = false;
-            addInjectedScript();
+            if (url) {
+                urls[emo_data.data_name] = url;
+            }
+        }
+    }
+    if ($.isEmptyObject(urls)) {
+        urls["Default"] = DEFAULT_DATA_URL;
+    }
+    if (info === undefined) {
+        info = {};
+    }
+    if (!info.force_update_version || info.force_update_version < FORCE_TURN_OFF_THUMBNAIL) {
+        info.force_update_version = FORCE_TURN_OFF_THUMBNAIL;
+        info.thumbnail_status = false;
+        info.emoticon_status = true;
+    }
+    localStorage.force_update_version = info.force_update_version;
+    var features = ["mention", "shortcut", "thumbnail", "highlight"];
+    features.forEach(function(feature) {
+        if (info[feature + "_status"] == false) {
+            console.log(feature + " feature is disabled!");
+            localStorage[feature + "_status"] = false;
         } else {
-            localStorage.emoticon_status = true;
-            getData(info, inject_script);
+            localStorage[feature + "_status"] = true;
         }
     });
+    if (info.emoticon_status == false) {
+        console.log("emoticon feature is disabled!");
+        localStorage.emoticon_status = false;
+        addInjectedScript();
+    } else {
+        localStorage.emoticon_status = true;
+        getData(info, inject_script);
+    }
 
     localStorage[LOCAL_STORAGE_GROUP_MENTION] = [];
-    chrome.storage.sync.get(CHROME_SYNC_GROUP_KEY, function(data) {
-        if (!$.isEmptyObject(data) && !$.isEmptyObject(data[CHROME_SYNC_GROUP_KEY])) {
-            localStorage[LOCAL_STORAGE_GROUP_MENTION] = JSON.stringify(data[CHROME_SYNC_GROUP_KEY]);
-        }
-    });
+    var data = localStorage[CHROME_SYNC_GROUP_KEY];
+    if (!$.isEmptyObject(data)) {
+        localStorage[LOCAL_STORAGE_GROUP_MENTION] = data;
+    }
+
 
     localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] = [];
-    chrome.storage.sync.get(CHROME_SYNC_ROOM_KEY, function(data) {
-        if (!$.isEmptyObject(data) && !$.isEmptyObject(data[CHROME_SYNC_ROOM_KEY])) {
-            localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] = JSON.stringify(data[CHROME_SYNC_ROOM_KEY]);
-        }
-    });
+    data = localStorage[CHROME_SYNC_ROOM_KEY];
+    if (!$.isEmptyObject(data)) {
+        localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] = data;
+    }
 }
 
 function getData(info, inject_script) {
@@ -114,22 +128,26 @@ function getData(info, inject_script) {
                     if (!failed) {
                         emo_storage.syncData();
                     }
-                    chrome.storage.local.get(CHROME_LOCAL_KEY, function(local_data) {
-                        var version_name = "";
-                        if (!$.isEmptyObject(local_data[CHROME_LOCAL_KEY])) {
-                            version_name = local_data[CHROME_LOCAL_KEY]["version_name"];
-                        }
-                        var current_time = (new Date).toLocaleString();
-                        console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
-                        localStorage[LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
-                        localStorage["chatpp_version_name"] = version_name;
-                        localStorage["emoticon_data_version"] = parseDataName(emo_info);
-                        if (inject_script !== undefined && inject_script) {
-                            addInjectedScript();
-                        } else {
-                            // runFunction("reloadEmoticions()");
-                        }
-                    });
+                    var data = localStorage[CHROME_LOCAL_KEY];
+                    var version_name = "";
+                    if ($.isEmptyObject(data)) {
+                        local_stored_data = {};
+                    } else {
+                        local_stored_data = data;
+                    }
+                    if (!$.isEmptyObject(local_stored_data[CHROME_LOCAL_KEY])) {
+                        version_name = local_stored_data[CHROME_LOCAL_KEY]["version_name"];
+                    }
+                    var current_time = (new Date).toLocaleString();
+                    console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
+                    localStorage[LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
+                    localStorage["chatpp_version_name"] = version_name;
+                    localStorage["emoticon_data_version"] = parseDataName(emo_info);
+                    if (inject_script !== undefined && inject_script) {
+                        addInjectedScript();
+                    } else {
+                        // runFunction("reloadEmoticions()");
+                    }
                 }
             });
     }
@@ -268,8 +286,8 @@ EmoStorage.prototype.syncData = function(callback) {
     }
     this.data.force_update_version = localStorage.force_update_version;
     var sync = {};
-    sync[CHROME_SYNC_KEY] = this.data;
-    chrome.storage.sync.set(sync, function() {
+    sync[CHROME_SYNC_KEY] = JSON.stringify(this.data);
+    chrome.runtime.sendMessage({action: "setLocalStorage", data: sync}, function(response) {
         if (typeof callback != "undefined") {
             callback();
         }
