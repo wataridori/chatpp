@@ -1,7 +1,8 @@
 var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
 var CHROME_LOCAL_KEY = "CHATPP_CHROME_LOCAL_DATA";
-var VERSION_NAME_DEV = 'dev';
+var VERSION_NAME_DEV = "dev";
 var VERSION_NAME_RELEASE = "final";
+var VERSION_NAME_BETA = "beta";
 var version_name;
 var stored_data = {};
 var local_stored_data = {};
@@ -19,7 +20,7 @@ $(function() {
     } else {
         version_name = VERSION_NAME_RELEASE;
     }
-
+    version_name = VERSION_NAME_BETA;
     setVersionType();
 
     $("#chatpp_version").html(version + " " + version_name);

@@ -3,6 +3,9 @@ var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
 var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
 
 var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
+var SKYPE_DATA_URL = "https://dl.dropboxusercontent.com/s/6wjwy1x9l7bs9xh/skype.json?dl=1";
+var VN_DATA_URL = "https://dl.dropboxusercontent.com/s/1zq7oqg11pkye6m/vn-emo.json?dl=1";
+var JP_DATA_URL = "https://dl.dropboxusercontent.com/s/59gwiqg9bipvz40/jp-emo.json?dl=1";
 var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
 
 var emo_storage;
@@ -14,22 +17,22 @@ var init = false;
 var official_emos = {
     Default: {
         name: "Default",
-        link: "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1",
+        link: DEFAULT_DATA_URL,
         description: "The default Emoticons data of Chat++"
     },
     Vietnamese: {
         name: "Vietnamese",
-        link: "https://www.dropbox.com/s/1zq7oqg11pkye6m/vn-emo.json?dl=1",
+        link: VN_DATA_URL,
         description: "Yet another data for people who want to use Vietnamese Emoticons"
     },
     Japanese: {
         name: "Japanese",
-        link: "https://dl.dropboxusercontent.com/s/59gwiqg9bipvz40/jp-emo.json?dl=1",
+        link: JP_DATA_URL,
         description: "Yet another data for people who want to use Japanese Emoticons"
     },
     Skype: {
         name: "Skype",
-        link: "https://www.dropbox.com/s/6wjwy1x9l7bs9xh/skype.json?dl=1",
+        link: SKYPE_DATA_URL,
         description: "Skype Original Emoticons"
     }
 };
@@ -59,7 +62,12 @@ $(function() {
         }
         if ($.isEmptyObject(urls)) {
             init = true;
-            urls["Default"] = DEFAULT_DATA_URL;
+            urls = {
+                "Default": DEFAULT_DATA_URL,
+                "Skype": SKYPE_DATA_URL,
+                "Vietnamese": VN_DATA_URL,
+                "Japanese": JP_DATA_URL
+            };
         }
         fillDataTable();
 
@@ -149,10 +157,16 @@ function validateUrl(url) {
 
 function getData(urls, callback) {
     if ($.isEmptyObject(urls)) {
-        urls["Default"] = DEFAULT_DATA_URL;
+        urls = {
+            "Default": DEFAULT_DATA_URL,
+            "Skype": SKYPE_DATA_URL,
+            "Vietnamese": VN_DATA_URL,
+            "Japanese": JP_DATA_URL
+        };
     }
     emo_storage = new EmoStorage();
     var loaded_urls = [];
+    var count = 0;
     $.each(urls, function(i, url) {
         if (loaded_urls.indexOf(url) === -1) {
             loaded_urls.push(url);
@@ -163,7 +177,11 @@ function getData(urls, callback) {
             .done(function(data) {
                 if (typeof(data.data_version) !== "undefined" && typeof(data.emoticons) !== "undefined") {
                     data.data_url = urls[data.data_name] ? urls[data.data_name] : urls["added"];
-                    var priority = getPriority(data.data_name);
+                    if (!$.isEmptyObject(emo_info)) {
+                        var priority = getPriority(data.data_name);
+                    } else {
+                        var priority = ++count;
+                    }
                     emo_storage.pushData(data, priority);
                     pushEmoticons(data.emoticons, priority, data.data_name);
                     if (emo_storage.data_count === getObjectLength(urls)) {

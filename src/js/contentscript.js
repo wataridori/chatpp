@@ -11,6 +11,9 @@ var CHROME_LOCAL_KEY = "CHATPP_CHROME_LOCAL_DATA";
 var CHROME_SYNC_ROOM_KEY = "CHATPP_CHROME_SYNC_ROOM";
 
 var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
+var SKYPE_DATA_URL = "https://dl.dropboxusercontent.com/s/6wjwy1x9l7bs9xh/skype.json?dl=1";
+var VN_DATA_URL = "https://dl.dropboxusercontent.com/s/1zq7oqg11pkye6m/vn-emo.json?dl=1";
+var JP_DATA_URL = "https://dl.dropboxusercontent.com/s/59gwiqg9bipvz40/jp-emo.json?dl=1";
 
 var ADVERTISEMENT_URL = "https://dl.dropboxusercontent.com/s/flbiyfqhcqapdbe/chatppad.json?dl=1";
 var ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
@@ -59,7 +62,12 @@ function init(inject_script) {
         }
     }
     if ($.isEmptyObject(urls)) {
-        urls["Default"] = DEFAULT_DATA_URL;
+        urls = {
+            "Default": DEFAULT_DATA_URL,
+            "Skype": SKYPE_DATA_URL,
+            "Vietnamese": VN_DATA_URL,
+            "Japanese": JP_DATA_URL
+        };
     }
     if (info === undefined) {
         info = {};
@@ -103,6 +111,7 @@ function init(inject_script) {
 }
 
 function getData(info, inject_script) {
+    var priority_count = 1;
     var loaded_count = 0;
     var emo_count = getObjectLength(urls);
     var emo_storage = new EmoStorage();
@@ -112,7 +121,7 @@ function getData(info, inject_script) {
             .done(function(data) {
                 if (typeof(data.data_version) !== "undefined" && typeof(data.emoticons) !== "undefined") {
                     data.data_url = urls[data.data_name];
-                    var priority = (emo_info[data.data_name] && emo_info[data.data_name].priority) ? emo_info[data.data_name].priority : 0;
+                    var priority = (emo_info[data.data_name] && emo_info[data.data_name].priority) ? emo_info[data.data_name].priority : (priority_count++);
                     emo_storage.pushData(data, priority);
                     pushEmoticons(data.emoticons, priority);
                 }
