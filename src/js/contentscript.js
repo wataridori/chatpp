@@ -93,8 +93,7 @@ function getData(info, inject_script) {
     var emo_count = getObjectLength(urls);
     var emo_storage = new EmoStorage();
     var failed = false;
-    for (data_name in urls) {
-        var url = urls[data_name];
+    $.each(urls, function(data_name, url) {
         $.getJSON(url)
             .done(function(data) {
                 if (typeof(data.data_version) !== "undefined" && typeof(data.emoticons) !== "undefined") {
@@ -105,6 +104,7 @@ function getData(info, inject_script) {
                 }
             }).fail(function(jqxhr, textStatus, error) {
                 failed = true;
+                delete emo_info[data_name];
                 var message = "Chat++ Error\n\nThere is an error occurred when loading or parsing the data named '" + data_name + "' (" + url + "). \n\n" +
                     "It may be because of the failure in downloading file or invalid file format.\n\n" +
                     "Check your file data carefully and try to reload again."
@@ -132,7 +132,7 @@ function getData(info, inject_script) {
                     });
                 }
             });
-    }
+    });
 }
 
 function parseDataName(data) {
