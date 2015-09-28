@@ -8,7 +8,7 @@ $(function() {
         "version": "4.2.0"
     };
     var version = app_detail.version;
-    $('#chatpp_version').html(version);
+    $("#chatpp_version").html(version);
 
     chrome.storage.local.get(CHROME_SYNC_GROUP_KEY, function(data) {
         if (!$.isEmptyObject(data)) {
@@ -23,12 +23,12 @@ $(function() {
     var data_group_name = $("#data-group-name");
     var data_group_member = $("#data-group-members");
 
-    $('#button-group-add').click(function() {
+    $("#button-group-add").click(function() {
        var info = {};
        info.group_name = data_group_name.val().trim();
-       var group_members = getGroupMembers($('#data-group-members').val());
+       var group_members = getGroupMembers($("#data-group-members").val());
        if (validateGroupName(info.group_name) && group_members.length > 0) {
-           info.group_members = group_members.join(', ');
+           info.group_members = group_members.join(", ");
            pushGroup(info);
            syncData();
            clearInput();
@@ -44,20 +44,20 @@ $(function() {
 
     data_group_member.keyup(function (e) {
         if (e.keyCode == 13) {
-            $('#button-group-add').trigger('click');
+            $("#button-group-add").trigger("click");
         }
     });
 });
 
 function clearInput() {
-    $('#data-group-name').val('');
-    $('#data-group-members').val('');
+    $("#data-group-name").val("");
+    $("#data-group-members").val("");
 }
 
 function fillDataTable() {
-    var table_text = '';
-    var table_body = $('#table-data').find('tbody');
-    table_body.html('');
+    var table_text = "";
+    var table_body = $("#table-data").find("tbody");
+    table_body.html("");
     $.each(groups, function(key, data) {
         if (data.group_name !== undefined && data.group_members !== undefined) {
             table_text += "<tr id='row-" + key + "'>";
@@ -69,8 +69,8 @@ function fillDataTable() {
         }
     });
     table_body.append(table_text);
-    $('.btn-data-remove').click(function() {
-        var name = $(this).data('name');
+    $(".btn-data-remove").click(function() {
+        var name = $(this).data("name");
         removeGroup(name);
         syncData();
     });
@@ -108,11 +108,11 @@ function validateGroupName(data) {
         return false;
     }
 
-    return data.split(' ').length - 1 <= 2;
+    return data.split(" ").length - 1 <= 2;
 }
 
 function getGroupMembers(data) {
-    var members = data.split(',');
+    var members = data.split(",");
     var valid_members = [];
     for (var i = 0; i < members.length; i++) {
         var member = members[i];
@@ -139,7 +139,8 @@ function syncData(callback) {
     var sync = {};
     sync[CHROME_SYNC_GROUP_KEY] = JSON.stringify(groups);
     chrome.storage.local.set(sync, function() {
-        if (typeof callback != 'undefined') {
+        if (typeof callback != "undefined") {
+
             callback();
         }
     });

@@ -142,7 +142,7 @@ var room_shortcuts = [];
 $(function(){
     shortcut_timer = setInterval(
         function(){
-            if (typeof CW !== 'undefined' && typeof CW.view !== 'undefined') {
+            if (typeof CW !== "undefined" && typeof CW.view !== "undefined") {
                 window.clearInterval(shortcut_timer);
                 if (shortcut_status) {
                     registerShortcut();
@@ -154,26 +154,26 @@ $(function(){
 });
 
 function registerShortcut() {
-    console.log('Registering ShortCuts');
+    console.log("Registering ShortCuts");
     CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function() {
         var message_id = getHoverMessageId();
         replyMessage(message_id);
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, function() {
-        triggerDefaultAction('quote');
+        triggerDefaultAction("quote");
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.link, !1, !1, !1, !1, function() {
-        triggerDefaultAction('link');
+        triggerDefaultAction("link");
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.edit, !1, !1, !1, !1, function() {
-        triggerDefaultAction('edit');
+        triggerDefaultAction("edit");
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.task, !1, !1, !1, !1, function() {
-        triggerDefaultAction('task');
+        triggerDefaultAction("task");
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.my_chat, !1, !1, !1, !1, function() {
@@ -223,7 +223,7 @@ function registerShortcut() {
     });
 
     CW.view.registerKeyboardShortcut(shortcuts_default.edit_image_upload, !1, !0, !1, !1, function() {
-        triggerDefaultAction('edit');
+        triggerDefaultAction("edit");
         var chat_text = $("#_chatText");
         var text = chat_text.val();
         var img = text.match(/(\[preview id=[0-9]* ht=[0-9]*\])/);
@@ -260,20 +260,20 @@ function removeRegisteredKeyboardShortcut() {
 }
 
 function triggerDefaultAction(action) {
-    var me = $('._message:hover');
+    var me = $("._message:hover");
     var reply = me.find("[data-cwui-ab-type='" + action + "']");
     if (isDomExists(reply)) {
-        reply.trigger('click');
+        reply.trigger("click");
     }
 }
 
 function triggerMoreAction(action) {
-    var more_action = $('._message:hover').find('._cwABMoreTip');
+    var more_action = $("._message:hover").find("._cwABMoreTip");
     if (isDomExists(more_action)) {
-        more_action.trigger('click');
-        var delete_button = $('._cwABMoreListBox').find('[data-cwui-ab-type="action"]');
+        more_action.trigger("click");
+        var delete_button = $("._cwABMoreListBox").find('[data-cwui-ab-type="action"]');
         if (isDomExists(delete_button)) {
-            delete_button.trigger('click');
+            delete_button.trigger("click");
         }
     }
 }
@@ -283,7 +283,7 @@ function isDomExists(dom) {
 }
 
 function getHoverMessageId() {
-    return $('._message:hover').data('mid');
+    return $("._message:hover").data("mid");
 }
 
 function getMessagePosition(id) {
@@ -328,12 +328,12 @@ function goToNexMention(current) {
 }
 
 function isMentionMessage(message) {
-    var regex_reply = new RegExp('\\[.* aid=' + myid + ' .*\\]');
+    var regex_reply = new RegExp("\\[.* aid=" + myid + " .*\\]");
     if (regex_reply.test(message.msg)) {
         return true;
     }
 
-    var regex_to = new RegExp('\\[To:' + myid + '\\]');
+    var regex_to = new RegExp("\\[To:" + myid + "\\]");
     return regex_to.test(message.msg);
 }
 

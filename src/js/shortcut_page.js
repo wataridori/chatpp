@@ -4,5 +4,5 @@ $(function() {
         "version": "4.2.0"
     };
     var version = app_detail.version;
-    $('#chatpp_version').html(version);
+    $("#chatpp_version").html(version);
 });

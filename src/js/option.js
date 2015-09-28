@@ -153,12 +153,11 @@ function getData(urls, callback) {
     }
     emo_storage = new EmoStorage();
     var loaded_urls = [];
-    for (var i in urls) {
-        var url = urls[i];
+    $.each(urls, function(i, url) {
         if (loaded_urls.indexOf(url) === -1) {
             loaded_urls.push(url);
         } else {
-            continue;
+            return;
         }
         $.getJSON(url)
             .done(function(data) {
@@ -180,7 +179,7 @@ function getData(urls, callback) {
                     "Check your file data carefully and try to reload again.</span>"
                 bootbox.alert(message);
             });
-    }
+    });
 }
 
 function reload() {
