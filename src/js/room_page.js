@@ -5,7 +5,7 @@ var rooms = [];
 $(function() {
     var app_detail = chrome.app.getDetails();
     var version = app_detail.version;
-    $('#chatpp_version').html(version);
+    $("#chatpp_version").html(version);
 
     chrome.storage.sync.get(CHROME_SYNC_ROOM_KEY, function(data) {
         if (!$.isEmptyObject(data)) {
@@ -15,9 +15,9 @@ $(function() {
         }
     });
 
-    $('#save-btn').click(function() {
-        $('input').each(function (){
-            var number = $(this).data('btn');
+    $("#save-btn").click(function() {
+        $("input").each(function (){
+            var number = $(this).data("btn");
             var value = $(this).val();
             value = parseRoomId(value);
             if (value && value.length > 0) {
@@ -26,7 +26,7 @@ $(function() {
             if (checkRoomId(value)) {
                 rooms[number] = value;
             } else {
-                rooms[number] = '';
+                rooms[number] = "";
             }
         });
         syncData();

@@ -145,12 +145,11 @@ function getData(urls, callback) {
     }
     emo_storage = new EmoStorage();
     var loaded_urls = [];
-    for (var i in urls) {
-        var url = urls[i];
+    $.each(urls, function(i, url) {
         if (loaded_urls.indexOf(url) === -1) {
             loaded_urls.push(url);
         } else {
-            continue;
+            return;
         }
         $.getJSON(url)
             .done(function(data) {
@@ -172,7 +171,7 @@ function getData(urls, callback) {
                     "Check your file data carefully and try to reload again.</span>"
                 bootbox.alert(message);
             });
-    }
+    });
 }
 
 function reload() {
@@ -247,7 +246,7 @@ function clearTable() {
 
 function fillTable() {
     clearTable();
-    var info = JSON.parse(localStorage[LOCAL_STORAGE_INFO_KEY]);
+    var info = emo_storage.data;
     if (info.data_name != "Default" && info.data_url) {
         $("#data-select").val("custom");
         $("#data-url").val(info.data_url);
@@ -446,7 +445,6 @@ EmoStorage.prototype.removeData = function(data_name) {
 };
 
 EmoStorage.prototype.syncData = function(callback) {
-    localStorage[LOCAL_STORAGE_INFO_KEY] = JSON.stringify(this.data);
     var sync = {};
     sync[CHROME_SYNC_KEY] = this.data;
     chrome.storage.sync.set(sync, function() {
