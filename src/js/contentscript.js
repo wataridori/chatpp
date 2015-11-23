@@ -4,11 +4,13 @@ var LOCAL_STORAGE_INFO_KEY = "YACEP_EMO_INFO";
 
 var LOCAL_STORAGE_GROUP_MENTION = "CHATPP_GROUP_MENTION";
 var LOCAL_STORAGE_ROOM_SHORTCUT = "CHATPP_ROOM_SHORTCUT";
+var LOCAL_STORAGE_DISABLE_NOTIFY_ROOM = "CHATPP_DISABLE_NOTIFY_ROOM";
 
 var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
 var CHROME_SYNC_GROUP_KEY = "CHATPP_CHROME_SYNC_GROUP";
 var CHROME_LOCAL_KEY = "CHATPP_CHROME_LOCAL_DATA";
 var CHROME_SYNC_ROOM_KEY = "CHATPP_CHROME_SYNC_ROOM";
+var CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY = "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM";
 
 var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
 
@@ -84,6 +86,13 @@ function init(inject_script) {
     chrome.storage.sync.get(CHROME_SYNC_ROOM_KEY, function(data) {
         if (!$.isEmptyObject(data) && !$.isEmptyObject(data[CHROME_SYNC_ROOM_KEY])) {
             localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] = JSON.stringify(data[CHROME_SYNC_ROOM_KEY]);
+        }
+    });
+
+    localStorage[LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = [];
+    chrome.storage.sync.get(CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, function(data) {
+        if (!$.isEmptyObject(data) && !$.isEmptyObject(data[CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY])) {
+            localStorage[LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = JSON.stringify(data[CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY]);
         }
     });
 }
@@ -183,6 +192,7 @@ function addInjectedScript() {
             injectJsFile("main.js");
             injectJsFile("mention.js");
             injectJsFile("shortcut.js");
+            injectJsFile("notification.js");
         }, DELAY_TIME
     );
 
