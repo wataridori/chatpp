@@ -197,11 +197,12 @@ function addEmo(emo) {
     for (var index = 0; index < emo.length; index++) {
         var rep = "";
         var encoded_text = htmlEncode(emo[index].key);
+        var title = encoded_text + " - " + emo[index].data_name;
         var img_src = htmlEncode(getEmoUrl(emo[index].src));
         if (isSpecialEmo(emo[index].key)) {
             rep = '<img src="' + img_src + '" class="ui_emoticon"/>';
         } else {
-            rep = '<img src="' + img_src + '" title="' + encoded_text + '" alt="' +
+            rep = '<img src="' + img_src + '" title="' + title + '" alt="' +
             encoded_text + '" class="ui_emoticon"/>';
         }
         CW.reg_cmp.push({
@@ -497,10 +498,10 @@ function updateChatSendView() {
                     b = d.prop("selectionStart"),
                     e = d.prop("selectionEnd");
                 b === e && (
-                    e = a.substr(0, b), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)```\r?\n([\s\S]+?)\r?\n```$/, "$1[code]\n$2\n[/code]") : e.replace(/(^|\n)```\r?\n([\s\S]+?)\r?\n```\n$/, "$1[code]\n$2\n[/code]\n"),
+                    e = a.substr(0, b), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```$/, "$1[code]\n$2\n[/code]") : e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[code]\n$2\n[/code]\n"),
                         // Added by Chatpp
-                        e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``t\r?\n([\s\S]+?)\r?\n```$/, "$1[title]$2[/title]") : e.replace(/(^|\n)``t\r?\n([\s\S]+?)\r?\n```\n$/, "$1[title]$2[/title]"),
-                        e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``i\r?\n([\s\S]+?)\r?\n```$/, "$1[info]$2[/info]") : e.replace(/(^|\n)``i\r?\n([\s\S]+?)\r?\n```\n$/, "$1[info]$2[/info]\n"),
+                        e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```$/, "$1[title]$2[/title]") : e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[title]$2[/title]"),
+                        e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```$/, "$1[info]$2[/info]") : e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[info]$2[/info]\n"),
                         a = a.substr(b), d.val(e + a), d.prop("selectionStart", e.length), d.prop("selectionEnd", e.length)
                 )
             }

@@ -109,7 +109,7 @@ function getData(info, inject_script) {
                     data.data_url = urls[data.data_name];
                     var priority = (emo_info[data.data_name] && emo_info[data.data_name].priority) ? emo_info[data.data_name].priority : 0;
                     emo_storage.pushData(data, priority);
-                    pushEmoticons(data.emoticons, priority);
+                    pushEmoticons(data.emoticons, priority, data.data_name);
                 }
             }).fail(function(jqxhr, textStatus, error) {
                 failed = true;
@@ -161,10 +161,11 @@ function getObjectLength(object) {
     return Object.keys(object).length;
 }
 
-function pushEmoticons(emos, priority) {
+function pushEmoticons(emos, priority, data_name) {
     for (var i = 0; i < emos.length; i++) {
         var repeated = false;
         emos[i].priority = priority;
+        emos[i].data_name = data_name;
         for (var j = 0; j < emoticons.length; j++) {
             if (emoticons[j].regex === emos[i].regex) {
                 if (emoticons[j].src !== emos[i].src && emoticons[j].priority < emos[i].priority) {
