@@ -17,7 +17,7 @@ $(function() {
         version_name = VERSION_NAME_RELEASE;
     }
 
-    setVersionType();
+    setVersionType(version);
 
     $("#chatpp_version").html(version + " " + version_name);
 
@@ -83,7 +83,7 @@ function updateViewData(data) {
     }
 }
 
-function setVersionType() {
+function setVersionType(version) {
     chrome.storage.local.get(CHROME_LOCAL_KEY, function(data) {
         if ($.isEmptyObject(data)) {
             local_stored_data = {};
@@ -92,6 +92,11 @@ function setVersionType() {
         }
         if (local_stored_data[CHROME_LOCAL_KEY] === undefined) {
             local_stored_data[CHROME_LOCAL_KEY] = {};
+        }
+        if (local_stored_data[CHROME_LOCAL_KEY]["version"] != version) {
+            local_stored_data[CHROME_LOCAL_KEY]["version"] = version;
+            chrome.browserAction.setBadgeText({text: ""});
+            chrome.tabs.create({url: "change_logs.html"});
         }
         local_stored_data[CHROME_LOCAL_KEY]["version_name"] = version_name;
         chrome.storage.local.set(local_stored_data);

@@ -19,15 +19,7 @@ $(function() {
         $("input").each(function (){
             var number = $(this).data("btn");
             var value = $(this).val();
-            value = parseRoomId(value);
-            if (value && value.length > 0) {
-                value = value[0];
-            }
-            if (checkRoomId(value)) {
-                rooms[number] = value;
-            } else {
-                rooms[number] = "";
-            }
+            rooms[number] = parseRoomId(value);
         });
         syncData();
     });
@@ -41,14 +33,17 @@ function loadData() {
     }
 }
 
-function parseRoomId(room) {
-    var number_regex = /\d+/g;
-    return room.match(number_regex);
-}
-
-function checkRoomId(room) {
+function parseRoomId(text) {
+    var room = text.match(/\d+/g);
+    if (!room || room.length == 0) {
+        return null;
+    }
+    room = room[0];
     var regex = /^[0-9]{6,10}$/g;
-    return regex.test(room);
+    if (regex.test(room)) {
+        return room;
+    }
+    return null;
 }
 
 function syncData(callback) {
