@@ -64,6 +64,10 @@ Display only picon of people in group, without name @._group name
 ### Other
 * Easily check Room Information.
 
+* Disabled Desktop Notification Feature (base on registered rooms)
+
+* Quick Info tag, quick Title tag
+
 * If for some reasons, you do not like a Chat++'s feature, you can easily turn it off. It will not effect other features. 
 
 * And more awesome features ...
@@ -126,6 +130,10 @@ Hiện picon của tất cả mọi người ở trong một group đã đăng k
 
 ### Other
 * Dễ dàng check thông tim về một room
+
+* Tắt Desktop Notification dựa trên những room đăng ký
+
+* Tạo nhanh Info tag, Title tag
 
 * Nếu vì lý do nào đó mà bạn không thích một tính năng của Chat++, thì bạn có thể tắt tính năng đó đi.
 Việc làm đó sẽ không ảnh hưởng đến các tính năng khác.

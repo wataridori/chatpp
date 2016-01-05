@@ -1,4 +1,4 @@
-![chatpp](./src/icon32.png) Chat++ 4.2.0
+![chatpp](./src/icon32.png) Chat++ 4.3.0
 =================
 
 Chat++ is an all-in-one Chatwork Enhancement Toolkit.

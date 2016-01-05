@@ -1,5 +1,21 @@
 Chat++ Change Logs
 =================
+## 4.3.0
+* Disabled Desktop Notification Feature (base on registered rooms)
+* Quick Title Tag, Quick Info Tag
+~~~
+    ```
+    ``` => tag [code][/code] (default)
+
+    ``i
+    ``` => tag [info][/info]
+
+    ``t
+    ``` => tag [title][/title]
+~~~
+* Change emoticon alt attribute value (From only emoticon text to emoticon text plus emoticon data name)
+From now, you can check the emoticon data that an emoticon belongs to by hovering the mouse over the emoticon
+* Display a notification text (**new**) inside the Chat++ icon when Chat++ is updated
 
 ## 4.2.0
 * Display detailed error when can not load or parse Emoticons data in both Emoticons page and Chatwork
