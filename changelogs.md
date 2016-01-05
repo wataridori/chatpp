@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 4.3.1
+* Fix bug with sending message by Shift + Enter
+
 ## 4.3.0
 * Disabled Desktop Notification Feature (base on registered rooms)
 * Quick Title Tag, Quick Info Tag

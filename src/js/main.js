@@ -480,18 +480,10 @@ function reloadEmoticions() {
 }
 
 function updateChatSendView() {
+    var chatTextKeyUpOld = CS.view.chatTextKeyUp;
     CS.view.chatTextKeyUp = function(b) {
-        // Original code from chatwork.js
         up_key = b.keyCode;
-        k = typeof b.modifiers == "undefined" ? b.ctrlKey : b.modifiers & Event.CONTROL_MASK;
-        g = typeof b.modifiers ==
-        "undefined" ? b.shiftKey : b.modifiers & Event.SHIFT_MASK;
-        l = typeof b.modifiers == "undefined" ? b.altKey : b.modifiers & Event.ALT_MASK;
-        m = typeof b.modifiers == "undefined" ? b.metaKey : b.modifiers & Event.META_MASK;
         d = $C("#_chatText");
-        if (up_key == 13 && press_key == 13)
-            if (ST.data.enter_action == "send") !g && !k && !l && !m ? CS.view.sendMessage() : (k || l || m) && d.insertAtCaretForMessage("\n");
-            else if (k || g || l || m) return CS.view.sendMessage(), !1;
         (function() {
             if (!(up_key !== 13 || press_key !== 13)) {
                 var a = d.val(),
@@ -499,15 +491,13 @@ function updateChatSendView() {
                     e = d.prop("selectionEnd");
                 b === e && (
                     e = a.substr(0, b), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```$/, "$1[code]\n$2\n[/code]") : e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[code]\n$2\n[/code]\n"),
-                        // Added by Chatpp
                         e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```$/, "$1[title]$2[/title]") : e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[title]$2[/title]"),
                         e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```$/, "$1[info]$2[/info]") : e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[info]$2[/info]\n"),
                         a = a.substr(b), d.val(e + a), d.prop("selectionStart", e.length), d.prop("selectionEnd", e.length)
                 )
             }
         })();
-        d.val() == "" && CS.clearChatEdit();
-        press_key == 27 && up_key == 27 && d.blur();
+        return chatTextKeyUpOld(b);
     };
 }
 
