@@ -93,11 +93,13 @@ function setVersionType(version) {
         if (local_stored_data[CHROME_LOCAL_KEY] === undefined) {
             local_stored_data[CHROME_LOCAL_KEY] = {};
         }
-        if (local_stored_data[CHROME_LOCAL_KEY]["version"] != version) {
-            local_stored_data[CHROME_LOCAL_KEY]["version"] = version;
-            chrome.browserAction.setBadgeText({text: ""});
-            chrome.tabs.create({url: "change_logs.html"});
-        }
+        local_stored_data[CHROME_LOCAL_KEY]["version"] = version;
+        chrome.browserAction.getBadgeText({}, function(result) {
+            if (result === "new") {
+                chrome.browserAction.setBadgeText({text: ""});
+                chrome.tabs.create({url: "change_logs.html"});
+            }
+        });
         local_stored_data[CHROME_LOCAL_KEY]["version_name"] = version_name;
         chrome.storage.local.set(local_stored_data);
     });

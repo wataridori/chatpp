@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 4.3.2
+* Fix bug with "new" text in Chat++ icon
+
 ## 4.3.1
 * Fix bug with sending message by Shift + Enter
 
