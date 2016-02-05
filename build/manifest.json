@@ -1,7 +1,7 @@
 {
     "name": "Chat++ for Chatwork",
-    "short_name": "ChatPP",
-    "version": "4.3.2",
+    "short_name": "Chat++",
+    "version": "5.0.0",
     "manifest_version": 2,
     "description": "An all-in-one Chatwork Enhancement Toolkit which provides many useful features!",
     "content_scripts": [
@@ -11,29 +11,27 @@
                 "https://kcw.kddi.ne.jp/*"
             ],
             "js": [
-                "js/jquery-2.1.1.min.js",
-                "js/contentscript.js",
-                "js/main.js"
+                "js/jquery.min.js"
             ],
             "run_at": "document_end"
         }
     ],
     "background": {
-        "scripts": ["js/background.js"]
+        "scripts": []
     },
-    "web_accessible_resources": ["js/main.js", "js/mention.js", "js/shortcut.js", "js/fuse.min.js", "js/caretposition.js", "js/notification.js", "js/highlight.min.js", "css/highlight.min.css"],
+    "web_accessible_resources": [],
     "browser_action": {
-        "default_icon": "icon64.png",
-        "default_popup": "popup.html"
+        "default_icon": "img/icon64.png",
+        "default_popup": "html/popup.html"
     },
     "permissions": [
         "storage",
         "tabs",
         "<all_urls>"
     ],
-    "options_page": "option.html",
+    "options_page": "html/emoticon.html",
     "icons": {
-        "64": "icon64.png"
+        "64": "img/icon64.png"
     },
     "homepage_url": "http://chatpp.thangtd.com"
 }

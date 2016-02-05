@@ -1,13 +1,21 @@
-var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
+let Const = require("../helpers/Const.js");
+let common = require("../helpers/Common.js");
+let Storage = require("../helpers/Storage.js");
+
+let storage = new Storage();
+let stored_data = {};
 
 $(function() {
-    app_detail = chrome.app.getDetails();
+    if (!common.isPage("setting")) {
+        return;
+    }
+    common.setPageTitle();
 
-    chrome.storage.sync.get(CHROME_SYNC_KEY, function(data) {
+    storage.get(Const.CHROME_SYNC_KEY, function(data) {
         stored_data = data;
-        data = data[CHROME_SYNC_KEY];
+        data = data[Const.CHROME_SYNC_KEY];
         if ($.isEmptyObject(data)) {
-            chrome.tabs.create({url: chrome.extension.getURL(app_detail.options_page)});
+            common.openNewExtensionPageUrl(common.app_detail.options_page)
         } else {
             updateViewData(data);
             $("[id$=-status-btn]").click(function() {
@@ -18,8 +26,8 @@ $(function() {
                 if ($(this).html() === "Disable") {
                     status = false;
                 }
-                stored_data[CHROME_SYNC_KEY][feature_name + "_status"] = status;
-                chrome.storage.sync.set(stored_data, function() {
+                stored_data[Const.CHROME_SYNC_KEY][feature_name + "_status"] = status;
+                storage.setData(stored_data, function() {
                     loadStatus(feature_name, status);
                 });
             })

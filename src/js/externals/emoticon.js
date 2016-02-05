@@ -1,15 +1,11 @@
-var LOCAL_STORAGE_INFO_KEY = "YACEP_EMO_INFO";
-var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
-var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
-
-var DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
-var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
-
-var emo_storage;
-var emoticons = [];
-var emo_info = {};
-var urls = {};
-var init = false;
+let common = require("../helpers/Common.js");
+let Const = require("../helpers/Const.js");
+let EmoStorage = require("../helpers/EmoStorage.js");
+let emo_storage = new EmoStorage();
+let emoticons = [];
+let emo_info = {};
+let urls = {};
+let init = false;
 
 var official_emos = {
     Default: {
@@ -35,15 +31,20 @@ var official_emos = {
 };
 
 $(function() {
-    chrome.storage.sync.get(CHROME_SYNC_KEY, function(info) {
+    if (!common.isPage("emoticon")) {
+        return;
+    }
+    common.setPageTitle();
+    emo_storage.get(Const.CHROME_SYNC_KEY, function(info) {
         if (!$.isEmptyObject(info)) {
-            info = info[CHROME_SYNC_KEY];
+            info = info[Const.CHROME_SYNC_KEY];
             emo_info = info;
+            emo_storage.setFeatureStatus(emo_info);
             console.log(info);
             for (var key in info) {
                 var emo_data = info[key];
-                if (emo_data.data_name == "Default" && emo_data.data_url != DEFAULT_DATA_URL) {
-                    var url = DEFAULT_DATA_URL;
+                if (emo_data.data_name == "Default" && emo_data.data_url != Const.DEFAULT_DATA_URL) {
+                    var url = Const.DEFAULT_DATA_URL;
                 } else {
                     var url = emo_data.data_url;
                 }
@@ -54,7 +55,7 @@ $(function() {
         }
         if ($.isEmptyObject(urls)) {
             init = true;
-            urls["Default"] = DEFAULT_DATA_URL;
+            urls["Default"] = Const.DEFAULT_DATA_URL;
         }
         fillDataTable();
 
@@ -66,9 +67,6 @@ $(function() {
         }
     });
 
-    var app_detail = chrome.app.getDetails();
-    var version = app_detail.version;
-    $("#chatpp_version").html(version);
     $("#btn-reset").click(function() {
         bootbox.dialog({
             title: "<span class='text-primary'>Reset Emoticon Data",
@@ -93,10 +91,10 @@ $(function() {
 
     $("#btn-load").click(function() {
         if ($("#data-select").val() == "default") {
-            getData(DEFAULT_DATA_URL, reload);
+            getData(Const.DEFAULT_DATA_URL, reload);
         } else {
             var url = $("#data-url").val();
-            if (!validateUrl(url)) {
+            if (!common.validateUrl(url)) {
                 bootbox.alert("Invalid URL! Make sure your inputted URL is correct, and start with https!");
             } else {
                 bootbox.dialog({
@@ -134,16 +132,10 @@ $(function() {
     });
 });
 
-function validateUrl(url) {
-    var regexp = /(https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-    return regexp.test(url);
-}
-
 function getData(urls, callback) {
     if ($.isEmptyObject(urls)) {
-        urls["Default"] = DEFAULT_DATA_URL;
+        urls["Default"] = Const.DEFAULT_DATA_URL;
     }
-    emo_storage = new EmoStorage();
     var loaded_urls = [];
     $.each(urls, function(i, url) {
         if (loaded_urls.indexOf(url) === -1) {
@@ -158,7 +150,7 @@ function getData(urls, callback) {
                     var priority = getPriority(data.data_name);
                     emo_storage.pushData(data, priority);
                     pushEmoticons(data.emoticons, priority, data.data_name);
-                    if (emo_storage.data_count === getObjectLength(urls)) {
+                    if (emo_storage.data_count === common.getObjectLength(urls)) {
                         emo_storage.syncData(callback);
                     }
                 } else {
@@ -176,10 +168,6 @@ function getData(urls, callback) {
 
 function reload() {
     location.reload();
-}
-
-function getObjectLength(object) {
-    return Object.keys(object).length;
 }
 
 function getPriority(data_name) {
@@ -211,7 +199,7 @@ function showOfficialData() {
     $(".btn-official-data").click(function() {
         var data_name = $(this).data("name");
         var url = official_emos[data_name].link;
-        if (validateUrl(url)) {
+        if (common.validateUrl(url)) {
             urls[data_name] = url;
             getData(urls, reload);
         }
@@ -305,7 +293,7 @@ function createEmoticonsTable(name) {
 }
 
 function createTableTd(data) {
-    var src = htmlEncode(getEmoUrl(data.emo.src));
+    var src = common.htmlEncode(common.getEmoUrl(data.emo.src));
     var row = "";
     var class_name = data.status ? "danger" : "info";
     row += "<td class='" + class_name + " text-center'>" + data.emo.key + "</td>";
@@ -405,53 +393,4 @@ function createATag(url) {
         target: "_blank"
     }).prop("outerHTML");;
 }
-
-function htmlEncode(value){
-    return $("<div/>").text(value).html();
-}
-
-function getEmoUrl(img) {
-    if (img.indexOf("https://") == 0 || img.indexOf("http://") == 0) {
-        return img;
-    }
-    return DEFAULT_IMG_HOST + "img/emoticons/" + img;
-}
-
-function EmoStorage() {
-    this.data = {};
-    this.data_count = 0;
-    var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
-    for (var i in features) {
-        var feature_name = features[i] + "_status";
-        this.data[feature_name] = emo_info[feature_name] === undefined ? true : emo_info[feature_name];
-    }
-    this.data.force_update_version = emo_info.force_update_version;
-}
-
-EmoStorage.prototype.pushData = function(inputed_data, priority) {
-    this.data[inputed_data.data_name] = {
-        priority: priority,
-        data_name: inputed_data.data_name,
-        data_url: inputed_data.data_url,
-        data_version: inputed_data.data_version,
-        date_sync: (new Date()).toLocaleString()
-    };
-    this.data_count++;
-};
-
-EmoStorage.prototype.removeData = function(data_name) {
-    if (this.data[data_name] !== undefined) {
-        delete this.data[data_name];
-    }
-};
-
-EmoStorage.prototype.syncData = function(callback) {
-    var sync = {};
-    sync[CHROME_SYNC_KEY] = this.data;
-    chrome.storage.sync.set(sync, function() {
-        if (typeof callback !== "undefined") {
-            callback();
-        }
-    });
-};
 

@@ -1,15 +1,20 @@
-var CHROME_SYNC_GROUP_KEY = "CHATPP_CHROME_SYNC_GROUP";
+let Const = require("../helpers/Const.js");
+let common = require("../helpers/Common.js");
+let Storage = require("../helpers/Storage.js");
 
-var groups = [];
+let storage = new Storage();
+
+let groups = [];
 
 $(function() {
-    var app_detail = chrome.app.getDetails();
-    var version = app_detail.version;
-    $("#chatpp_version").html(version);
+    if (!common.isPage("group")) {
+        return;
+    }
+    common.setPageTitle();
 
-    chrome.storage.sync.get(CHROME_SYNC_GROUP_KEY, function(data) {
+    storage.get(Const.CHROME_SYNC_GROUP_KEY, function(data) {
         if (!$.isEmptyObject(data)) {
-            data = data[CHROME_SYNC_GROUP_KEY];
+            data = data[Const.CHROME_SYNC_GROUP_KEY];
             groups = data;
             syncData();
         }
@@ -131,12 +136,6 @@ function syncData(callback) {
     if (callback === undefined) {
         callback = fillDataTable;
     }
-    var sync = {};
-    sync[CHROME_SYNC_GROUP_KEY] = groups;
-    chrome.storage.sync.set(sync, function() {
-        if (typeof callback != "undefined") {
-            callback();
-        }
-    });
+    storage.set(Const.CHROME_SYNC_GROUP_KEY, groups, callback);
 }
 

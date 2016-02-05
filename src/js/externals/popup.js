@@ -1,36 +1,27 @@
-var CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
-var CHROME_LOCAL_KEY = "CHATPP_CHROME_LOCAL_DATA";
-var VERSION_NAME_DEV = 'dev';
-var VERSION_NAME_RELEASE = "final";
-var version_name;
-var stored_data = {};
-var local_stored_data = {};
-var app_detail;
+let common = require("../helpers/Common.js");
+let Storage = require("../helpers/Storage.js");
+let Const = require("../helpers/Const.js");
+
+let stored_data = {};
+let local_stored_data = {};
 
 $(function() {
-    app_detail = chrome.app.getDetails();
+    var app_detail = common.getAppDetail();
     var version = app_detail.version;
-    var app_name = app_detail.name;
-    if (isDevVersion(app_name)) {
-        version_name = VERSION_NAME_DEV;
-    } else {
-        version_name = VERSION_NAME_RELEASE;
-    }
-
     setVersionType(version);
 
-    $("#chatpp_version").html(version + " " + version_name);
+    $("#chatpp_version").html(common.getAppFullName());
 
     var pages = ["setting", "emoticon", "room", "group", "shortcut", "change_logs", "features", "notification"];
     pages.forEach(function(page_name) {
-        var url = page_name === "emoticon" ? "option.html" : page_name + ".html";
+        var url = `html/${page_name}.html`;
         $("#" + page_name + "_page").click(function() {
-            chrome.tabs.create({url: url});
+            common.openNewUrl(url);
         });
     });
 
     $(".ext-url").click(function(){
-        chrome.tabs.create({url: $(this).attr("href")});
+        common.openNewUrl($(this).attr("href"));
     });
 
     $("#btn-emo-status").click(function() {
@@ -46,7 +37,7 @@ $(function() {
     });
 
     chrome.storage.onChanged.addListener(function(changes, namespace) {
-        var data = changes[CHROME_SYNC_KEY];
+        var data = changes[Const.CHROME_SYNC_KEY];
         if (!$.isEmptyObject(data) && !$.isEmptyObject(data.newValue)) {
             data = data.newValue;
             updateViewData(data);
@@ -65,11 +56,12 @@ function loadStatus(name, value) {
 }
 
 function loadChatppEmoData() {
-    chrome.storage.sync.get(CHROME_SYNC_KEY, function(data) {
+    var storage = new Storage;
+    storage.get(Const.CHROME_SYNC_KEY, function(data) {
         stored_data = data;
-        data = data[CHROME_SYNC_KEY];
+        data = data[Const.CHROME_SYNC_KEY];
         if ($.isEmptyObject(data)) {
-            chrome.tabs.create({url:chrome.extension.getURL(app_detail.options_page)});
+            common.openNewExtensionPageUrl(common.app_detail.options_page);
         } else {
             updateViewData(data);
         }
@@ -84,27 +76,22 @@ function updateViewData(data) {
 }
 
 function setVersionType(version) {
-    chrome.storage.local.get(CHROME_LOCAL_KEY, function(data) {
+    chrome.storage.local.get(Const.CHROME_LOCAL_KEY, function(data) {
         if ($.isEmptyObject(data)) {
             local_stored_data = {};
         } else {
             local_stored_data = data;
         }
-        if (local_stored_data[CHROME_LOCAL_KEY] === undefined) {
-            local_stored_data[CHROME_LOCAL_KEY] = {};
+        if (local_stored_data[Const.CHROME_LOCAL_KEY] === undefined) {
+            local_stored_data[Const.CHROME_LOCAL_KEY] = {};
         }
-        local_stored_data[CHROME_LOCAL_KEY]["version"] = version;
+        local_stored_data[Const.CHROME_LOCAL_KEY]["version"] = version;
         chrome.browserAction.getBadgeText({}, function(result) {
             if (result === "new") {
                 chrome.browserAction.setBadgeText({text: ""});
-                chrome.tabs.create({url: "change_logs.html"});
+                //chrome.tabs.create({url: "change_logs.html"});
             }
         });
-        local_stored_data[CHROME_LOCAL_KEY]["version_name"] = version_name;
         chrome.storage.local.set(local_stored_data);
     });
-}
-
-function isDevVersion(app_name) {
-    return app_name.indexOf(VERSION_NAME_DEV, app_name.length - VERSION_NAME_DEV.length) !== -1;
 }
