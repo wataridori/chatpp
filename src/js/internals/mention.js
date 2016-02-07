@@ -1,5 +1,8 @@
-$(window).ready(function(){
+let common = require("../helpers/Common.js");
+let Const = require("../helpers/Const.js");
+let mention_status = common.getStatus("mention");
 
+$(function(){
     var start = /@/ig;
     var is_displayed = false;
     var is_inserted = false;
@@ -31,8 +34,8 @@ $(window).ready(function(){
     };
 
     var group_mention = [];
-    if (localStorage['CHATPP_GROUP_MENTION'] !== undefined && localStorage['CHATPP_GROUP_MENTION']) {
-        group_mention = JSON.parse(localStorage['CHATPP_GROUP_MENTION']);
+    if (localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]) {
+        group_mention = JSON.parse(localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]);
     }
 
     $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");

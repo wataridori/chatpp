@@ -1,19 +1,16 @@
-// Const
-var LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
-var DEFAULT_IMG_HOST = "http://chatpp.thangtd.com/";
+let common = require("../helpers/Common.js");
+let Const = require("../helpers/Const.js");
 
-var emoticon_status = false;
-var cw_timer;
+let emoticon_status = false;
+let mention_status = false;
+let shortcut_status = false;
+let thumbnail_status = false;
+let highlight_status = false;
+let cw_timer;
 
-var mention_status = false;
-var shortcut_status = false;
+let ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
 
-var thumbnail_status = false;
-var highlight_status = false;
-
-var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
-
-var support_languages = [
+let support_languages = [
     "1c",
     "actionscript",
     "apache",
@@ -155,26 +152,29 @@ $(function(){
                 $("#_chatppPreLoad").remove();
                 addStyle();
                 addInfoIcon();
-                if (localStorage.emoticon_status === "true") {
+                if (common.getStatus("emoticon")) {
                     rebuild = true;
                     addEmoticonText();
                 }
-                if (localStorage.mention_status === "true") {
+                console.log("mention", common.getStatus("mention"));
+                if (common.getStatus("mention")) {
                     mention_status = true;
                     addMentionText();
                 }
-                if (localStorage.shortcut_status === "true") {
+                console.log("shortcut", common.getStatus("shortcut"));
+                if (common.getStatus("shortcut")) {
                     shortcut_status = true;
                     addShortcutText();
                 }
-                if (localStorage.thumbnail_status === "true" || localStorage.highlight_status === "true") {
+                console.log("highlight", common.getStatus("highlight"));
+                if (common.getStatus("thumbnail") || common.getStatus("highlight")) {
                     rebuild = true;
-                    thumbnail_status = localStorage.thumbnail_status === "true";
-                    highlight_status = localStorage.highlight_status === "true";
+                    thumbnail_status = common.getStatus("thumbnail");
+                    highlight_status = common.getStatus("highlight");
                     updateChatworkView();
                 }
                 addAdvertisement();
-                if (localStorage.emoticon_status === "true") {
+                if (common.getStatus("emoticon")) {
                     addExternalEmo();
                 }
 
@@ -189,16 +189,12 @@ $(function(){
     );
 });
 
-function htmlEncode(value){
-    return $("<div/>").text(value).html();
-}
-
 function addEmo(emo) {
     for (var index = 0; index < emo.length; index++) {
         var rep = "";
-        var encoded_text = htmlEncode(emo[index].key);
+        var encoded_text = common.htmlEncode(emo[index].key);
         var title = encoded_text + " - " + emo[index].data_name;
-        var img_src = htmlEncode(getEmoUrl(emo[index].src));
+        var img_src = common.htmlEncode(common.getEmoUrl(emo[index].src));
         if (isSpecialEmo(emo[index].key)) {
             rep = '<img src="' + img_src + '" class="ui_emoticon"/>';
         } else {
@@ -212,13 +208,6 @@ function addEmo(emo) {
             external: true
         });
     }
-}
-
-function getEmoUrl(img) {
-    if (img.indexOf("https://") == 0 || img.indexOf("http://") == 0) {
-        return img;
-    }
-    return DEFAULT_IMG_HOST + "img/emoticons/" + img;
 }
 
 function isSpecialEmo(emo) {
@@ -241,8 +230,8 @@ function removeExternalEmo() {
 }
 
 function addExternalEmo() {
-    var emodata = JSON.parse(localStorage[LOCAL_STORAGE_DATA_KEY]);
-    addEmo(emodata);
+    var emo_data = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
+    addEmo(emo_data);
     emoticon_status = true;
     updateEmoticonText();
     console.log("Emoticon added!");
@@ -271,7 +260,7 @@ function addInfoIcon() {
     $("body").append(room_info_list);
     $("#_roomInfo").click(function() {
         prepareRoomInfo();
-        var room_name = RM.getIcon() + " " + htmlEncode(RM.getName());
+        var room_name = RM.getIcon() + " " + common.htmlEncode(RM.getName());
         var tip = $("#_roomInfoList").cwListTip({
             selectOptionArea: "<b>" + room_name + "</b>" + " Information",
             fixHeight: !1,

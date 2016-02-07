@@ -10,7 +10,15 @@ elixir.config.js.browserify.transformers
     ];
 
 elixir(function(mix) {
-    mix.scripts(["libs/bootstrap.min.js", "libs/bootbox.min.js"], "build/js/externals/external-libs.js")
+    mix.scripts([
+            "libs/bootstrap.min.js",
+            "libs/bootbox.min.js"
+        ], "build/js/externals/libs.js")
+        .scripts([
+            "libs/caretposition.js",
+            "libs/fuse.min.js",
+            "libs/highlight.min.js"
+        ], "build/js/internals/libs.js")
         .browserify(["externals/popup.js"], "build/js/externals/popup.js")
         .browserify([
             "externals/emoticon.js",
@@ -19,5 +27,14 @@ elixir(function(mix) {
             "externals/room.js",
             "externals/setting.js",
             "externals/group.js",
-        ], "build/js/externals/external-page.js");
+        ], "build/js/externals/pages.js")
+        .browserify([
+            "extensions/contentscript.js"
+        ], "build/js/extensions/contentscript.js")
+        .browserify([
+            "internals/main.js",
+            "internals/mention.js",
+            "internals/notification.js",
+            "internals/shortcut.js"
+        ], "build/js/internals/all.js");
 });

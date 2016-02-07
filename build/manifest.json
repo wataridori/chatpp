@@ -11,7 +11,8 @@
                 "https://kcw.kddi.ne.jp/*"
             ],
             "js": [
-                "js/jquery.min.js"
+                "js/jquery.min.js",
+                "js/extensions/contentscript.js"
             ],
             "run_at": "document_end"
         }
@@ -19,7 +20,7 @@
     "background": {
         "scripts": []
     },
-    "web_accessible_resources": [],
+    "web_accessible_resources": ["js/internals/libs.js", "js/internals/all.js"],
     "browser_action": {
         "default_icon": "img/icon64.png",
         "default_popup": "html/popup.html"

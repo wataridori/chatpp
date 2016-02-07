@@ -1,5 +1,6 @@
-var shortcut_timer;
-var LOCAL_STORAGE_ROOM_SHORTCUT = "CHATPP_ROOM_SHORTCUT";
+let Const = require("../helpers/Const.js");
+let common = require("../helpers/Common.js");
+let shortcut_timer;
 
 var DOM_VK_CANCEL = 3,
     DOM_VK_HELP = 6,
@@ -144,7 +145,7 @@ $(function(){
         function(){
             if (typeof CW !== "undefined" && typeof CW.view !== "undefined") {
                 window.clearInterval(shortcut_timer);
-                if (shortcut_status) {
+                if (common.getStatus("shortcut")) {
                     registerShortcut();
                 }
             }
@@ -233,11 +234,11 @@ function registerShortcut() {
         }
     });
 
-    if (localStorage[LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[LOCAL_STORAGE_ROOM_SHORTCUT]) {
-        room_shortcuts = JSON.parse(localStorage[LOCAL_STORAGE_ROOM_SHORTCUT]);
+    if (localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]) {
+        room_shortcuts = JSON.parse(localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]);
     }
 
-    for (i in room_shortcuts) {
+    for (var i in room_shortcuts) {
         if (room_shortcuts[i]) {
             var room = room_shortcuts[i];
             CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, selectRoom(room));
@@ -252,7 +253,7 @@ var selectRoom = function (room) {
 };
 
 function removeRegisteredKeyboardShortcut() {
-    for (keyboard in shortcuts_default) {
+    for (var keyboard in shortcuts_default) {
         CW.view.registerKeyboardShortcut(shortcuts_default[keyboard], !1, !1, !1, !1, function() {
             return false;
         });

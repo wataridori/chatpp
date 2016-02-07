@@ -87,12 +87,13 @@ class Common {
         chrome.tabs.create({url: url});
     }
 
-    getExtensionPageUrl(page_name) {
-        return chrome.extension.getURL(page_name);
+
+    getExtensionPageUrl(url) {
+        return chrome.extension.getURL(url);
     }
 
-    openNewExtensionPageUrl(page_name) {
-        this.openNewUrl(this.getExtensionPageUrl(page_name));
+    openNewExtensionPageUrl(url) {
+        this.openNewUrl(this.getExtensionPageUrl(url));
     }
 
     validateUrl(url) {
@@ -106,6 +107,20 @@ class Common {
 
     setPageTitle() {
         $("#chatpp_name").html(this.getAppFullName());
+    }
+
+    setStatus(key, value) {
+        if (key.indexOf("_status") === -1) {
+            key = `${key}_status`;
+        }
+        localStorage[key] = !!value;
+    }
+
+    getStatus(key) {
+        if (key.indexOf("_status") === -1) {
+            key = `${key}_status`;
+        }
+        return localStorage[key] === "true" || localStorage[key] === true;
     }
 }
 

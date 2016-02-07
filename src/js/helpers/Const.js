@@ -21,6 +21,10 @@ class Const {
     static VERSION_NAME_RELEASE = "final";
 
     static DEFAULT_IMG_HOST = "https://chatpp.thangtd.com/";
+
+    static DELAY_TIME = 6000;
+    static FORCE_TURN_OFF_THUMBNAIL = 1;
+    static ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 }
 
 module.exports = Const;

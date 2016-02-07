@@ -26,7 +26,7 @@ $(function() {
             var value = $(this).val();
             rooms[number] = common.parseRoomId(value);
         });
-        storage.set(Const.CHROME_SYNC_ROOM_KEY, rooms);
+        storage.set(Const.CHROME_SYNC_ROOM_KEY, rooms, common.reload);
     });
 });
 
