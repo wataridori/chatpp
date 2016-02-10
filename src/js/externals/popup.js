@@ -6,9 +6,7 @@ let stored_data = {};
 let local_stored_data = {};
 
 $(function() {
-    var app_detail = common.getAppDetail();
-    var version = app_detail.version;
-    setVersionType(version);
+    setVersionType();
 
     $("#chatpp_version").html(common.getAppFullName());
 
@@ -75,7 +73,7 @@ function updateViewData(data) {
     }
 }
 
-function setVersionType(version) {
+function setVersionType() {
     chrome.storage.local.get(Const.CHROME_LOCAL_KEY, function(data) {
         if ($.isEmptyObject(data)) {
             local_stored_data = {};
@@ -85,7 +83,8 @@ function setVersionType(version) {
         if (local_stored_data[Const.CHROME_LOCAL_KEY] === undefined) {
             local_stored_data[Const.CHROME_LOCAL_KEY] = {};
         }
-        local_stored_data[Const.CHROME_LOCAL_KEY]["version"] = version;
+        local_stored_data[Const.CHROME_LOCAL_KEY]["version"] = common.getAppVersion();
+        local_stored_data[Const.CHROME_LOCAL_KEY]["version_name"] = common.getAppVersionName();
         chrome.browserAction.getBadgeText({}, function(result) {
             if (result === "new") {
                 chrome.browserAction.setBadgeText({text: ""});

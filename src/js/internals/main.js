@@ -156,17 +156,14 @@ $(function(){
                     rebuild = true;
                     addEmoticonText();
                 }
-                console.log("mention", common.getStatus("mention"));
                 if (common.getStatus("mention")) {
                     mention_status = true;
                     addMentionText();
                 }
-                console.log("shortcut", common.getStatus("shortcut"));
                 if (common.getStatus("shortcut")) {
                     shortcut_status = true;
                     addShortcutText();
                 }
-                console.log("highlight", common.getStatus("highlight"));
                 if (common.getStatus("thumbnail") || common.getStatus("highlight")) {
                     rebuild = true;
                     thumbnail_status = common.getStatus("thumbnail");
@@ -201,8 +198,9 @@ function addEmo(emo) {
             rep = '<img src="' + img_src + '" title="' + title + '" alt="' +
             encoded_text + '" class="ui_emoticon"/>';
         }
+        var regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
         CW.reg_cmp.push({
-            key: new RegExp(emo[index].regex, "g"),
+            key: regex,
             rep: rep,
             reptxt: emo[index].key,
             external: true
@@ -211,7 +209,7 @@ function addEmo(emo) {
 }
 
 function isSpecialEmo(emo) {
-    var special_emo = [":-ss", ":-??", "~:>", ":@)", "~X("];
+    var special_emo = [":-ss", ":-??", "~:>", ":@)", "~X(", "3:-O"];
     return special_emo.indexOf(emo) > -1;
 }
 
@@ -471,8 +469,8 @@ function reloadEmoticions() {
 function updateChatSendView() {
     var chatTextKeyUpOld = CS.view.chatTextKeyUp;
     CS.view.chatTextKeyUp = function(b) {
-        up_key = b.keyCode;
-        d = $C("#_chatText");
+        var up_key = b.keyCode;
+        var d = $("#_chatText");
         (function() {
             if (!(up_key !== 13 || press_key !== 13)) {
                 var a = d.val(),

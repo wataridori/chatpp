@@ -13,6 +13,28 @@ var Common = function () {
 
         this.version = Const.VERSION_CHROME;
         this.app_detail = this.getAppDetail();
+        this.official_emoticons_data = {
+            Default: {
+                name: "Default",
+                link: "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1",
+                description: "The default Emoticons data of Chat++"
+            },
+            Vietnamese: {
+                name: "Vietnamese",
+                link: "https://dl.dropboxusercontent.com/s/2b085bilbno4ri1/vietnamese.json?dl=1",
+                description: "Yet another data for people who want to use Vietnamese Emoticons"
+            },
+            Japanese: {
+                name: "Japanese",
+                link: "https://dl.dropboxusercontent.com/s/fdq05pwwtsccrn6/japanese.json?dl=1",
+                description: "Yet another data for people who want to use Japanese Emoticons"
+            },
+            Skype: {
+                name: "Skype",
+                link: "https://dl.dropboxusercontent.com/s/8ew2mdh0v2vcad8/skype.json?dl=1",
+                description: "Skype Original Emoticons"
+            }
+        };
     }
 
     _createClass(Common, [{
@@ -51,6 +73,15 @@ var Common = function () {
                     callback();
                 }
             });
+        }
+    }, {
+        key: "getEmoticonDataUrl",
+        value: function getEmoticonDataUrl(data_name, default_url) {
+            if (data_name && this.official_emoticons_data[data_name]) {
+                return this.official_emoticons_data[data_name]["link"];
+            }
+
+            return default_url;
         }
     }, {
         key: "getObjectLength",
@@ -95,12 +126,23 @@ var Common = function () {
             return chrome.app.getDetails();
         }
     }, {
+        key: "getAppVersion",
+        value: function getAppVersion() {
+            return this.app_detail.version;
+        }
+    }, {
+        key: "getAppVersionName",
+        value: function getAppVersionName() {
+            if (this.isDevVersion()) {
+                return Const.VERSION_NAME_DEV;
+            }
+
+            return Const.VERSION_NAME_RELEASE;
+        }
+    }, {
         key: "getAppFullName",
         value: function getAppFullName() {
-            var version_name = Const.VERSION_NAME_RELEASE;
-            if (this.isDevVersion()) {
-                version_name = Const.VERSION_NAME_DEV;
-            }
+            var version_name = this.getAppVersionName();
 
             return this.app_detail.short_name + " " + this.app_detail.version + " " + version_name;
         }
@@ -151,6 +193,17 @@ var Common = function () {
             }
             return localStorage[key] === "true" || localStorage[key] === true;
         }
+    }, {
+        key: "regexEscape",
+        value: function regexEscape(string) {
+            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        }
+    }, {
+        key: "generateEmoticonRegex",
+        value: function generateEmoticonRegex(text, regex) {
+            regex = regex || this.htmlEncode(this.regexEscape(text));
+            return new RegExp(regex, "g");
+        }
     }]);
 
     return Common;
@@ -178,7 +231,7 @@ Const.CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
 Const.CHROME_SYNC_GROUP_KEY = "CHATPP_CHROME_SYNC_GROUP";
 Const.CHROME_SYNC_ROOM_KEY = "CHATPP_CHROME_SYNC_ROOM";
 Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY = "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM";
-Const.DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
+Const.DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1";
 Const.ADVERTISEMENT_URL = "https://www.dropbox.com/s/flbiyfqhcqapdbe/chatppad.json?dl=1";
 Const.VERSION_CHROME = "VERSION_CHROME";
 Const.VERSION_FIREFOX = "VERSION_FIREFOX";
@@ -220,17 +273,14 @@ $(function () {
                 rebuild = true;
                 addEmoticonText();
             }
-            console.log("mention", common.getStatus("mention"));
             if (common.getStatus("mention")) {
                 mention_status = true;
                 addMentionText();
             }
-            console.log("shortcut", common.getStatus("shortcut"));
             if (common.getStatus("shortcut")) {
                 shortcut_status = true;
                 addShortcutText();
             }
-            console.log("highlight", common.getStatus("highlight"));
             if (common.getStatus("thumbnail") || common.getStatus("highlight")) {
                 rebuild = true;
                 thumbnail_status = common.getStatus("thumbnail");
@@ -262,8 +312,9 @@ function addEmo(emo) {
         } else {
             rep = '<img src="' + img_src + '" title="' + title + '" alt="' + encoded_text + '" class="ui_emoticon"/>';
         }
+        var regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
         CW.reg_cmp.push({
-            key: new RegExp(emo[index].regex, "g"),
+            key: regex,
             rep: rep,
             reptxt: emo[index].key,
             external: true
@@ -272,7 +323,7 @@ function addEmo(emo) {
 }
 
 function isSpecialEmo(emo) {
-    var special_emo = [":-ss", ":-??", "~:>", ":@)", "~X("];
+    var special_emo = [":-ss", ":-??", "~:>", ":@)", "~X(", "3:-O"];
     return special_emo.indexOf(emo) > -1;
 }
 
@@ -509,8 +560,8 @@ function reloadEmoticions() {
 function updateChatSendView() {
     var chatTextKeyUpOld = CS.view.chatTextKeyUp;
     CS.view.chatTextKeyUp = function (b) {
-        up_key = b.keyCode;
-        d = $C("#_chatText");
+        var up_key = b.keyCode;
+        var d = $("#_chatText");
         (function () {
             if (!(up_key !== 13 || press_key !== 13)) {
                 var a = d.val(),
@@ -656,9 +707,9 @@ function getHighlightOption(text) {
 
 var common = require("../helpers/Common.js");
 var Const = require("../helpers/Const.js");
-var mention_status = common.getStatus("mention");
 
 $(function () {
+    var mention_status = common.getStatus("mention");
     var start = /@/ig;
     var is_displayed = false;
     var is_inserted = false;
@@ -722,7 +773,7 @@ $(function () {
     function findAtmark() {
         var content = chat_text_jquery.val();
         // we only interested in @ symbol that: at the start of line or has a space before it
-        atmark_index = getNearestAtmarkIndex();
+        var atmark_index = getNearestAtmarkIndex();
         if (atmark_index != 0 && content.charAt(atmark_index - 1) != " " && content.charAt(atmark_index - 1) != "\n") {
             return false;
         }
@@ -731,7 +782,7 @@ $(function () {
             return false;
         }
         if (atmark_index != -1) {
-            spaces = getTypedText().match(/ /ig);
+            var spaces = getTypedText().match(/ /ig);
             // text from last @ to current caret position have more than 2 spaces
             if (spaces && spaces.length > 2) {
                 return false;
@@ -752,11 +803,11 @@ $(function () {
     }
 
     function getTypedText() {
-        content = chat_text_jquery.val();
-        start_pos = getNearestAtmarkIndex();
+        var content = chat_text_jquery.val();
+        var start_pos = getNearestAtmarkIndex();
         if (start_pos == -1) return '';
-        end_pos = doGetCaretPosition(chat_text_element);
-        txt = content.substr(start_pos, end_pos - start_pos);
+        var end_pos = doGetCaretPosition(chat_text_element);
+        var txt = content.substr(start_pos, end_pos - start_pos);
         if (txt) {
             return txt;
         } else {
@@ -768,7 +819,7 @@ $(function () {
         var rect = chat_text_element.getBoundingClientRect();
         var current_pos = doGetCaretPosition(chat_text_element);
         setCaretPosition(chat_text_element, actived_atmark_index + 1);
-        position = Measurement.caretPos(chat_text_jquery);
+        var position = Measurement.caretPos(chat_text_jquery);
         position.top -= rect.top;
         position.left -= rect.left;
         if (rect.width - position.left < 236) {
@@ -1063,7 +1114,7 @@ $(function () {
                 is_displayed = true;
             }
 
-            typed_text = getTypedText();
+            var typed_text = getTypedText();
             if (typed_text.length) {
                 if (typed_text.charAt(1) == '#') {
                     if (insert_type != 'contact') {
@@ -1073,11 +1124,11 @@ $(function () {
                     }
                     typed_text = typed_text.substring(1);
                 }
-                raw_results = getRawResultsAndSetMode(typed_text.substring(1));
+                var raw_results = getRawResultsAndSetMode(typed_text.substring(1));
 
                 if (e.which == 38) current_index -= 1;
                 if (e.which == 40) current_index += 1;
-                filtered_results = filterDisplayResults(raw_results);
+                var filtered_results = filterDisplayResults(raw_results);
 
                 if (e.which == 38 && is_outbound_of_list) {
                     selected_index -= 1;
@@ -1106,12 +1157,12 @@ $(function () {
     function holdCaretPosition(event_object) {
         event_object.preventDefault();
         chat_text_jquery.focus();
-        current_pos = doGetCaretPosition(chat_text_element);
+        var current_pos = doGetCaretPosition(chat_text_element);
         setCaretPosition(chat_text_element, current_pos);
     }
 
     function getReplaceText(format_string, target_name, cwid, members) {
-        replace_text = '';
+        var replace_text = '';
         switch (insert_type) {
             case 'me':
             case 'one':
@@ -1166,7 +1217,7 @@ $(function () {
             case 'one':
             case 'contact':
                 if (members.length) {
-                    txt = '<ul>';
+                    var txt = '<ul>';
                     for (var i = 0; i < members.length; i++) {
                         txt += '<li class="suggested-name" role="listitem" data-cwui-lt-value="' + members[i].value + '">' + members[i].avatar + members[i].label + "</li>";
                     };
@@ -1203,11 +1254,12 @@ $(function () {
 
     function buildMemberListData(with_contact) {
         if (!RM) return [];
-        sorted_member_list = RM.getSortedMemberList(), b = [];
+        var sorted_member_list = RM.getSortedMemberList();
+        var b = [];
         if (with_contact) {
             sorted_member_list = merge(sorted_member_list, AC.contact_list);
         }
-        sorted_members_length = sorted_member_list.length;
+        var sorted_members_length = sorted_member_list.length;
         for (var index = 0; index < sorted_members_length; index++) {
             var member = sorted_member_list[index];
             if (member != AC.myid) {
@@ -1233,8 +1285,8 @@ $(function () {
     function buildGroupMemberListData(group_name) {
         for (var i = 0; i < group_mention.length; i++) {
             if (group_mention[i]['group_name'] == group_name) {
-                members = group_mention[i]['group_members'].split(',');
-                results = [];
+                var members = group_mention[i]['group_members'].split(',');
+                var results = [];
                 for (var j = 0; j < members.length; j++) {
                     results.push(getMemberObject(members[j].trim()));
                 }

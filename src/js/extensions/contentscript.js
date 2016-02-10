@@ -15,15 +15,10 @@ function init(inject_script) {
     storage.get(Const.CHROME_SYNC_KEY, function(info) {
         info = info[Const.CHROME_SYNC_KEY];
         emo_info = info;
-        var url = "";
         if (!$.isEmptyObject(info)) {
             for (let key in info) {
                 var emo_data = info[key];
-                if (emo_data.data_name === "Default" && emo_data.data_url !== Const.DEFAULT_DATA_URL) {
-                    url = Const.DEFAULT_DATA_URL;
-                } else {
-                    url = emo_data.data_url;
-                }
+                var url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
                 if (url) {
                     urls[emo_data.data_name] = url;
                 }
@@ -40,15 +35,15 @@ function init(inject_script) {
             info.thumbnail_status = false;
             info.emoticon_status = true;
         }
-        console.log(info);
         localStorage.force_update_version = info.force_update_version;
         var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
         features.forEach(function(feature) {
-            if (info[feature + "_status"] == false) {
+            var feature_name = `${feature}_status`;
+            if (info[feature_name] == false) {
                 console.log(feature + " feature is disabled!");
             }
-            info[feature + "_status"] = info[feature + "_status"] === undefined ? true : info[feature + "_status"];
-            common.setStatus(feature, info[feature + "_status"]);
+            info[feature_name] = info[feature_name] === undefined ? true : info[feature_name];
+            common.setStatus(feature, info[feature_name]);
         });
         emo_storage.setFeatureStatus(info);
         if (info.emoticon_status == false) {
@@ -145,7 +140,7 @@ function pushEmoticons(emos, priority, data_name) {
         emos[i].priority = priority;
         emos[i].data_name = data_name;
         for (var j = 0; j < emoticons.length; j++) {
-            if (emoticons[j].regex === emos[i].regex) {
+            if (emoticons[j].key === emos[i].key) {
                 if (emoticons[j].src !== emos[i].src && emoticons[j].priority < emos[i].priority) {
                     emoticons[j] = emos[i];
                 }
@@ -163,6 +158,7 @@ function addInjectedScript() {
     loadAdvertisement();
     preLoad();
     injectJsFile("internals/libs.js");
+    injectCssFile("highlight.min.css");
     setTimeout(
         function() {
             injectJsFile("internals/all.js");

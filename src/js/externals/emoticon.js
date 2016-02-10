@@ -7,28 +7,7 @@ let emo_info = {};
 let urls = {};
 let init = false;
 
-var official_emos = {
-    Default: {
-        name: "Default",
-        link: "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1",
-        description: "The default Emoticons data of Chat++"
-    },
-    Vietnamese: {
-        name: "Vietnamese",
-        link: "https://www.dropbox.com/s/1zq7oqg11pkye6m/vn-emo.json?dl=1",
-        description: "Yet another data for people who want to use Vietnamese Emoticons"
-    },
-    Japanese: {
-        name: "Japanese",
-        link: "https://dl.dropboxusercontent.com/s/59gwiqg9bipvz40/jp-emo.json?dl=1",
-        description: "Yet another data for people who want to use Japanese Emoticons"
-    },
-    Skype: {
-        name: "Skype",
-        link: "https://www.dropbox.com/s/6wjwy1x9l7bs9xh/skype.json?dl=1",
-        description: "Skype Original Emoticons"
-    }
-};
+var official_emoticons_data = common.official_emoticons_data;
 
 $(function() {
     if (!common.isPage("emoticon")) {
@@ -43,11 +22,7 @@ $(function() {
             console.log(info);
             for (var key in info) {
                 var emo_data = info[key];
-                if (emo_data.data_name == "Default" && emo_data.data_url != Const.DEFAULT_DATA_URL) {
-                    var url = Const.DEFAULT_DATA_URL;
-                } else {
-                    var url = emo_data.data_url;
-                }
+                var url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
                 if (url) {
                     urls[emo_data.data_name] = url;
                 }
@@ -55,7 +30,7 @@ $(function() {
         }
         if ($.isEmptyObject(urls)) {
             init = true;
-            urls["Default"] = Const.DEFAULT_DATA_URL;
+            urls["Default"] = common.getEmoticonDataUrl("Default");
         }
         fillDataTable();
 
@@ -187,10 +162,10 @@ function getPriority(data_name) {
 
 function showOfficialData() {
     var official = $("#official-data");
-    for (var data_name in official_emos) {
+    for (var data_name in official_emoticons_data) {
         if (emo_info[data_name] === undefined) {
             var new_button = '<div class="col-md-12 official-data"><button class="btn btn-info btn-sm btn-official-data" data-name="' + data_name + '">Add ' + data_name + '</button>'
-                + '<span class="text-primary" style="padding-left: 20px"><strong>' + official_emos[data_name].description + '</strong></span>'
+                + '<span class="text-primary" style="padding-left: 20px"><strong>' + official_emoticons_data[data_name].description + '</strong></span>'
                 + '</div><br>';
             official.append(new_button);
         }
@@ -198,7 +173,7 @@ function showOfficialData() {
 
     $(".btn-official-data").click(function() {
         var data_name = $(this).data("name");
-        var url = official_emos[data_name].link;
+        var url = official_emoticons_data[data_name].link;
         if (common.validateUrl(url)) {
             urls[data_name] = url;
             getData(urls, reload);
@@ -211,7 +186,7 @@ function pushEmoticons(emos, priority, data_name) {
         var disable = false;
         emos[i].priority = priority;
         for (var j = 0; j < emoticons.length; j++) {
-            if (emoticons[j].emo.regex === emos[i].regex) {
+            if (emoticons[j].emo.key === emos[i].key) {
                 if (emoticons[j].emo.priority < emos[i].priority) {
                     emoticons[j].status = true;
                 } else {

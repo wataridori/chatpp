@@ -9,9 +9,7 @@ var stored_data = {};
 var local_stored_data = {};
 
 $(function () {
-    var app_detail = common.getAppDetail();
-    var version = app_detail.version;
-    setVersionType(version);
+    setVersionType();
 
     $("#chatpp_version").html(common.getAppFullName());
 
@@ -78,7 +76,7 @@ function updateViewData(data) {
     }
 }
 
-function setVersionType(version) {
+function setVersionType() {
     chrome.storage.local.get(Const.CHROME_LOCAL_KEY, function (data) {
         if ($.isEmptyObject(data)) {
             local_stored_data = {};
@@ -88,7 +86,8 @@ function setVersionType(version) {
         if (local_stored_data[Const.CHROME_LOCAL_KEY] === undefined) {
             local_stored_data[Const.CHROME_LOCAL_KEY] = {};
         }
-        local_stored_data[Const.CHROME_LOCAL_KEY]["version"] = version;
+        local_stored_data[Const.CHROME_LOCAL_KEY]["version"] = common.getAppVersion();
+        local_stored_data[Const.CHROME_LOCAL_KEY]["version_name"] = common.getAppVersionName();
         chrome.browserAction.getBadgeText({}, function (result) {
             if (result === "new") {
                 chrome.browserAction.setBadgeText({ text: "" });
@@ -114,6 +113,28 @@ var Common = function () {
 
         this.version = Const.VERSION_CHROME;
         this.app_detail = this.getAppDetail();
+        this.official_emoticons_data = {
+            Default: {
+                name: "Default",
+                link: "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1",
+                description: "The default Emoticons data of Chat++"
+            },
+            Vietnamese: {
+                name: "Vietnamese",
+                link: "https://dl.dropboxusercontent.com/s/2b085bilbno4ri1/vietnamese.json?dl=1",
+                description: "Yet another data for people who want to use Vietnamese Emoticons"
+            },
+            Japanese: {
+                name: "Japanese",
+                link: "https://dl.dropboxusercontent.com/s/fdq05pwwtsccrn6/japanese.json?dl=1",
+                description: "Yet another data for people who want to use Japanese Emoticons"
+            },
+            Skype: {
+                name: "Skype",
+                link: "https://dl.dropboxusercontent.com/s/8ew2mdh0v2vcad8/skype.json?dl=1",
+                description: "Skype Original Emoticons"
+            }
+        };
     }
 
     _createClass(Common, [{
@@ -152,6 +173,15 @@ var Common = function () {
                     callback();
                 }
             });
+        }
+    }, {
+        key: "getEmoticonDataUrl",
+        value: function getEmoticonDataUrl(data_name, default_url) {
+            if (data_name && this.official_emoticons_data[data_name]) {
+                return this.official_emoticons_data[data_name]["link"];
+            }
+
+            return default_url;
         }
     }, {
         key: "getObjectLength",
@@ -196,12 +226,23 @@ var Common = function () {
             return chrome.app.getDetails();
         }
     }, {
+        key: "getAppVersion",
+        value: function getAppVersion() {
+            return this.app_detail.version;
+        }
+    }, {
+        key: "getAppVersionName",
+        value: function getAppVersionName() {
+            if (this.isDevVersion()) {
+                return Const.VERSION_NAME_DEV;
+            }
+
+            return Const.VERSION_NAME_RELEASE;
+        }
+    }, {
         key: "getAppFullName",
         value: function getAppFullName() {
-            var version_name = Const.VERSION_NAME_RELEASE;
-            if (this.isDevVersion()) {
-                version_name = Const.VERSION_NAME_DEV;
-            }
+            var version_name = this.getAppVersionName();
 
             return this.app_detail.short_name + " " + this.app_detail.version + " " + version_name;
         }
@@ -252,6 +293,17 @@ var Common = function () {
             }
             return localStorage[key] === "true" || localStorage[key] === true;
         }
+    }, {
+        key: "regexEscape",
+        value: function regexEscape(string) {
+            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        }
+    }, {
+        key: "generateEmoticonRegex",
+        value: function generateEmoticonRegex(text, regex) {
+            regex = regex || this.htmlEncode(this.regexEscape(text));
+            return new RegExp(regex, "g");
+        }
     }]);
 
     return Common;
@@ -279,7 +331,7 @@ Const.CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
 Const.CHROME_SYNC_GROUP_KEY = "CHATPP_CHROME_SYNC_GROUP";
 Const.CHROME_SYNC_ROOM_KEY = "CHATPP_CHROME_SYNC_ROOM";
 Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY = "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM";
-Const.DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/sh/rnyip87zzjyxaev/AACBVYHPxG88r-1BhYuBNkmHa/new.json?dl=1";
+Const.DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1";
 Const.ADVERTISEMENT_URL = "https://www.dropbox.com/s/flbiyfqhcqapdbe/chatppad.json?dl=1";
 Const.VERSION_CHROME = "VERSION_CHROME";
 Const.VERSION_FIREFOX = "VERSION_FIREFOX";

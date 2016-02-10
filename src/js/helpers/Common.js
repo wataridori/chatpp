@@ -4,6 +4,28 @@ class Common {
     constructor() {
         this.version = Const.VERSION_CHROME;
         this.app_detail = this.getAppDetail();
+        this.official_emoticons_data = {
+            Default: {
+                name: "Default",
+                link: "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1",
+                description: "The default Emoticons data of Chat++"
+            },
+            Vietnamese: {
+                name: "Vietnamese",
+                link: "https://dl.dropboxusercontent.com/s/2b085bilbno4ri1/vietnamese.json?dl=1",
+                description: "Yet another data for people who want to use Vietnamese Emoticons"
+            },
+            Japanese: {
+                name: "Japanese",
+                link: "https://dl.dropboxusercontent.com/s/fdq05pwwtsccrn6/japanese.json?dl=1",
+                description: "Yet another data for people who want to use Japanese Emoticons"
+            },
+            Skype: {
+                name: "Skype",
+                link: "https://dl.dropboxusercontent.com/s/8ew2mdh0v2vcad8/skype.json?dl=1",
+                description: "Skype Original Emoticons"
+            }
+        };
     }
 
     isChromeVersion() {
@@ -36,6 +58,14 @@ class Common {
                 callback();
             }
         });
+    }
+
+    getEmoticonDataUrl(data_name, default_url) {
+        if (data_name && this.official_emoticons_data[data_name]) {
+            return this.official_emoticons_data[data_name]["link"];
+        }
+
+        return default_url;
     }
 
     getObjectLength(object) {
@@ -74,11 +104,20 @@ class Common {
         return chrome.app.getDetails();
     }
 
-    getAppFullName() {
-        var version_name = Const.VERSION_NAME_RELEASE;
+    getAppVersion() {
+        return this.app_detail.version;
+    }
+
+    getAppVersionName() {
         if (this.isDevVersion()) {
-            version_name = Const.VERSION_NAME_DEV;
+            return Const.VERSION_NAME_DEV;
         }
+
+        return Const.VERSION_NAME_RELEASE
+    }
+
+    getAppFullName() {
+        var version_name = this.getAppVersionName();
 
         return `${this.app_detail.short_name} ${this.app_detail.version} ${version_name}`;
     }
@@ -121,6 +160,15 @@ class Common {
             key = `${key}_status`;
         }
         return localStorage[key] === "true" || localStorage[key] === true;
+    }
+
+    regexEscape(string) {
+        return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    }
+
+    generateEmoticonRegex(text, regex) {
+        regex = regex || this.htmlEncode(this.regexEscape(text));
+        return new RegExp(regex, "g");
     }
 }
 

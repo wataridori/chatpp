@@ -1,5 +1,5 @@
 {
-    "name": "Chat++ for Chatwork",
+    "name": "Chat++ for Chatwork dev",
     "short_name": "Chat++",
     "version": "5.0.0",
     "manifest_version": 2,
@@ -20,7 +20,7 @@
     "background": {
         "scripts": []
     },
-    "web_accessible_resources": ["js/internals/libs.js", "js/internals/all.js"],
+    "web_accessible_resources": ["js/internals/libs.js", "js/internals/all.js", "css/highlight.min.css"],
     "browser_action": {
         "default_icon": "img/icon64.png",
         "default_popup": "html/popup.html"
