@@ -232,7 +232,7 @@ Const.CHROME_SYNC_GROUP_KEY = "CHATPP_CHROME_SYNC_GROUP";
 Const.CHROME_SYNC_ROOM_KEY = "CHATPP_CHROME_SYNC_ROOM";
 Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY = "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM";
 Const.DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1";
-Const.ADVERTISEMENT_URL = "https://www.dropbox.com/s/flbiyfqhcqapdbe/chatppad.json?dl=1";
+Const.ADVERTISEMENT_URL = "https://dl.dropboxusercontent.com/s/jsmceot0pqi8lpk/chatppad.json?dl=1";
 Const.VERSION_CHROME = "VERSION_CHROME";
 Const.VERSION_FIREFOX = "VERSION_FIREFOX";
 Const.VERSION_NAME_DEV = "dev";
@@ -245,6 +245,60 @@ Const.ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 module.exports = Const;
 
 },{}],3:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
+
+var Advertisement = function () {
+    function Advertisement() {
+        _classCallCheck(this, Advertisement);
+    }
+
+    _createClass(Advertisement, [{
+        key: 'setUp',
+        value: function setUp() {
+            var _this = this;
+
+            if ($("#chatppAdvertisement").length > 0) {
+                return;
+            }
+            var text = '<li id="_chatppSponsored" role="button" class=" _showDescription" aria-label="Chat Plus Plus Information">' + '<span id="chatppAdvertisement" class="icoSizeSmall">' + this.getAdvertisementText() + '</span>' + '</li>';
+
+            $("#_chatSendTool").append(text);
+            setInterval(function () {
+                _this.changeRandomAdvertisement();
+            }, ADVERTISEMENT_CHANGE_TIME);
+        }
+    }, {
+        key: 'changeRandomAdvertisement',
+        value: function changeRandomAdvertisement() {
+            var text = this.getAdvertisementText();
+            $("#chatppAdvertisement").html(text);
+        }
+    }, {
+        key: 'getAdvertisementText',
+        value: function getAdvertisementText() {
+            if (localStorage["chatpp_advertisement"] !== undefined && localStorage["chatpp_advertisement"]) {
+                var ads = JSON.parse(localStorage["chatpp_advertisement"]);
+                if (ads.length > 0) {
+                    return ads[Math.floor(Math.random() * ads.length)];
+                }
+            }
+            return "Advertisement Here!";
+        }
+    }]);
+
+    return Advertisement;
+}();
+
+var advertisement = new Advertisement();
+module.exports = advertisement;
+
+},{}],4:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -373,9 +427,808 @@ var Emoticon = function () {
     return Emoticon;
 }();
 
-module.exports = Emoticon;
+var emoticon = new Emoticon();
+module.exports = emoticon;
 
-},{"../helpers/Common.js":1,"../helpers/Const.js":2}],4:[function(require,module,exports){
+},{"../helpers/Common.js":1,"../helpers/Const.js":2}],5:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var common = require("../helpers/Common.js");
+var Const = require("../helpers/Const.js");
+
+var DISPLAY_NUMS = 3;
+var MAX_PATTERN_LENGTH = 20;
+var SPECIAL_CHARS = ["\n", '!', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '[', ']', '{', '}', ';', ':', ',', '/', '`', '\'', '"'];
+
+var Mention = function () {
+    function Mention() {
+        _classCallCheck(this, Mention);
+
+        this.status = common.getStatus("mention");
+        this.start = /@/ig;
+        this.is_displayed = false;
+        this.is_inserted = false;
+        this.is_navigated = false;
+        this.is_outbound_of_list = false;
+        this.actived_atmark_index = 0;
+        this.current_index = 0;
+        this.selected_index = 0;
+        this.current_RM = null;
+        this.member_objects = [];
+        this.insert_mode = 'normal'; // normal, to, picon, name
+        this.insert_type = 'one'; // one, me, all, contact, group
+        this.selected_group_name = '';
+        this.fuse = null;
+        this.cached_enter_action = ST.data.enter_action;
+        this.options = {
+            keys: ['aid2name'],
+            maxPatternLength: MAX_PATTERN_LENGTH
+        };
+        this.chat_text_jquery = $('#_chatText');
+        this.chat_text_element = document.getElementById('_chatText');
+        this.suggestion_messages = {
+            one: { ja: "検索結果はありません", en: 'No Matching Results' },
+            all: { ja: "すべてを選択します", en: 'Select All Members' },
+            group: { ja: "空のグループ", en: 'Empty Group' }
+        };
+
+        this.group_mention = [];
+    }
+
+    _createClass(Mention, [{
+        key: "setUp",
+        value: function setUp() {
+            var _this = this;
+
+            if (localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]) {
+                this.group_mention = JSON.parse(localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]);
+            }
+
+            $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");
+            this.hideSuggestionBox();
+            $("#_sendEnterActionArea").click(function () {
+                _this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? 'send' : 'br';
+            });
+            // http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
+            // First, checks if it isn't implemented yet.
+            if (!String.prototype.format) {
+                String.prototype.format = function () {
+                    var args = arguments;
+                    return this.replace(/{(\d+)}/g, function (match, number) {
+                        return typeof args[number] != 'undefined' ? args[number] : match;
+                    });
+                };
+            }
+
+            // hide suggestion box when click in textarea or outside
+            this.chat_text_jquery.click(function () {
+                return _this.hideSuggestionBox();
+            });
+
+            $('#_roomListArea').click(function () {
+                return _this.hideSuggestionBox();
+            });
+
+            $('#_headerSearch').click(function () {
+                return _this.hideSuggestionBox();
+            });
+
+            // when user press ESC, we hide suggestion box
+            $(document).keyup(function (e) {
+                if (!_this.status) {
+                    return;
+                }
+                if (e.which == 27) {
+                    _this.hideSuggestionBox();
+                }
+            });
+
+            this.chat_text_jquery.keydown(function (e) {
+                if (!_this.status) {
+                    return;
+                }
+
+                if ((e.which == 38 || e.which == 40 || e.which == 9 || e.which == 13) && _this.is_displayed) {
+                    _this.is_navigated = true;
+                    _this.holdCaretPosition(e);
+                } else {
+                    _this.current_index = 0;
+                    _this.is_navigated = false;
+                }
+
+                if (e.which == 9 || e.which == 13) {
+                    if ((_this.insert_type == 'all' || _this.insert_type == 'group') && _this.is_displayed) {
+                        _this.setSuggestedChatText(_this.getTypedText(), null, null);
+                        // dirty hack to prevent message to be sent
+                        if (_this.cached_enter_action == 'send') {
+                            ST.data.enter_action = 'br';
+                        }
+                        e.preventDefault();
+                    } else {
+                        if ($(".suggested-name").first().length) {
+                            if (_this.is_navigated) {
+                                $(".suggested-name").eq(_this.selected_index).click();
+                            } else {
+                                $(".suggested-name").first().click();
+                            }
+                            // dirty hack to prevent message to be sent
+                            if (_this.cached_enter_action == 'send') {
+                                ST.data.enter_action = 'br';
+                            }
+                            e.preventDefault();
+                        } else {
+                            // there's no thing after @ symbol
+                            _this.hideSuggestionBox();
+                        }
+                    }
+                }
+            });
+
+            this.chat_text_jquery.keyup(function (e) {
+                if (!_this.status) {
+                    return;
+                }
+
+                if (e.which == 9 || e.which == 13) {
+                    return;
+                }
+
+                if ((e.which == 38 || e.which == 40) && _this.is_displayed) {
+                    _this.is_navigated = true;
+                    _this.holdCaretPosition(e);
+                } else {
+                    _this.is_navigated = false;
+                }
+
+                if (_this.current_RM != RM.id) {
+                    _this.member_objects = _this.buildMemberListData(false);
+                    _this.fuse = new Fuse(_this.member_objects, _this.options);
+                    _this.current_RM = RM.id;
+                }
+
+                if (_this.findAtmark()) {
+                    if (_this.is_displayed && _this.getNearestAtmarkIndex() != -1 && _this.getNearestAtmarkIndex() != _this.actived_atmark_index) {
+                        _this.hideSuggestionBox();
+                    }
+
+                    if (!_this.is_displayed) {
+                        if (!_this.isTriggerKeyCode(e.which)) {
+                            return;
+                        }
+                        if (_this.getNearestAtmarkIndex() != -1) {
+                            _this.actived_atmark_index = _this.getNearestAtmarkIndex();
+                        }
+                        _this.setSuggestionBoxPosition();
+                        _this.showSuggestionBox(_this.buildList(_this.filterDisplayResults(_this.member_objects)));
+                        _this.is_displayed = true;
+                    }
+
+                    var typed_text = _this.getTypedText();
+                    if (typed_text.length) {
+                        if (typed_text.charAt(1) == '#') {
+                            if (_this.insert_type != 'contact') {
+                                _this.member_objects = _this.buildMemberListData(true);
+                                _this.fuse = new Fuse(_this.member_objects, _this.options);
+                                _this.insert_type = 'contact';
+                            }
+                            typed_text = typed_text.substring(1);
+                        }
+                        var raw_results = _this.getRawResultsAndSetMode(typed_text.substring(1));
+
+                        if (e.which == 38) {
+                            _this.current_index -= 1;
+                        }
+                        if (e.which == 40) {
+                            _this.current_index += 1;
+                        }
+                        var filtered_results = _this.filterDisplayResults(raw_results);
+
+                        if (e.which == 38 && _this.is_outbound_of_list) {
+                            _this.selected_index -= 1;
+                            if (_this.selected_index < 0) {
+                                _this.selected_index = 0;
+                            }
+                        }
+                        if (e.which == 40 && _this.current_index > raw_results.length - filtered_results.length) {
+                            _this.selected_index += 1;
+                            if (_this.selected_index >= Math.min(DISPLAY_NUMS, filtered_results.length)) {
+                                _this.selected_index = Math.min(DISPLAY_NUMS, filtered_results.length) - 1;
+                            }
+                        }
+
+                        _this.showSuggestionBox(_this.buildList(filtered_results));
+                    }
+
+                    if (e.which == 27) {
+                        // when user press ESC, we hide suggestion box
+                        _this.hideSuggestionBox();
+                        _this.holdCaretPosition(e);
+                    }
+                } else {
+                    _this.hideSuggestionBox();
+                }
+
+                return false;
+            });
+
+            this.addMentionText();
+        }
+    }, {
+        key: "getNearestAtmarkIndex",
+        value: function getNearestAtmarkIndex() {
+            var content = this.chat_text_jquery.val();
+            var atmarks = content.match(this.start);
+
+            if (!atmarks) {
+                return -1;
+            }
+
+            var caret_index = this.doGetCaretPosition(this.chat_text_element);
+            var atmark_index = content.indexOf("@");
+            var pre_atmark_index = -1;
+            do {
+                if (atmark_index >= caret_index) {
+                    break;
+                }
+                pre_atmark_index = atmark_index;
+                atmark_index = content.indexOf("@", atmark_index + 1);
+            } while (atmark_index != -1);
+
+            return pre_atmark_index;
+        }
+    }, {
+        key: "findAtmark",
+        value: function findAtmark() {
+            var content = this.chat_text_jquery.val();
+            // we only interested in @ symbol that: at the start of line or has a space before it
+            var atmark_index = this.getNearestAtmarkIndex();
+            if (atmark_index != 0 && content.charAt(atmark_index - 1) != " " && content.charAt(atmark_index - 1) != "\n") {
+                return false;
+            }
+
+            if (this.getTypedText().length >= MAX_PATTERN_LENGTH || this.getTypedText().length == 0) {
+                return false;
+            }
+            if (atmark_index != -1) {
+                var spaces = this.getTypedText().match(/ /ig);
+                // text from last @ to current caret position have more than 2 spaces
+                if (spaces && spaces.length > 2) {
+                    return false;
+                }
+
+                // text contains special characters ?
+                for (var i = 0; i < SPECIAL_CHARS.length; i++) {
+                    if (this.getTypedText().indexOf(SPECIAL_CHARS[i]) != -1) {
+                        return false;
+                    }
+                }
+                ;
+
+                return true;
+            } else {
+                // There is no @ symbol
+                return false;
+            }
+        }
+    }, {
+        key: "getTypedText",
+        value: function getTypedText() {
+            var content = this.chat_text_jquery.val();
+            var start_pos = this.getNearestAtmarkIndex();
+            if (start_pos == -1) return '';
+            var end_pos = this.doGetCaretPosition(this.chat_text_element);
+            var txt = content.substr(start_pos, end_pos - start_pos);
+            if (txt) {
+                return txt;
+            } else {
+                return '';
+            }
+        }
+    }, {
+        key: "setSuggestionBoxPosition",
+        value: function setSuggestionBoxPosition() {
+            var rect = this.chat_text_element.getBoundingClientRect();
+            var current_pos = this.doGetCaretPosition(this.chat_text_element);
+            this.setCaretPosition(this.chat_text_element, this.actived_atmark_index + 1);
+            var position = Measurement.caretPos(this.chat_text_jquery);
+            position.top -= rect.top;
+            position.left -= rect.left;
+            if (rect.width - position.left < 236) {
+                position.left -= 236;
+            }
+            if (rect.height - position.top < 90) {
+                if (position.top < 108) {
+                    $("#_chatTextArea").css({ 'overflow-y': 'visible', 'z-index': 2 });
+                }
+                position.top -= 118;
+            } else {
+                position.top += parseInt(this.chat_text_jquery.css('font-size')) + 2;
+            }
+            $("#suggestion-container").parent().css({ position: 'relative' });
+            $("#suggestion-container").css({ top: position.top, left: position.left, position: 'absolute' });
+            this.setCaretPosition(this.chat_text_element, current_pos);
+        }
+    }, {
+        key: "showSuggestionBox",
+        value: function showSuggestionBox(content) {
+            var _this2 = this;
+
+            this.is_inserted = false;
+            $("#suggestion-container").html(content).show();
+            $("#suggestion-container").css('visibility', 'visible');
+            if (this.is_navigated) {
+                $(".suggested-name").eq(this.selected_index).css("background-color", "#D8F0F9");
+            } else {
+                $(".suggested-name").first().css("background-color", "#D8F0F9");
+            }
+
+            $(".suggested-name").click(function (e) {
+                if (_this2.is_inserted) {
+                    return;
+                }
+                _this2.is_inserted = true;
+                var target = $(e.target);
+                target.css("background-color", "#D8F0F9");
+                _this2.setSuggestedChatText(_this2.getTypedText(), target.text(), target.data('cwui-lt-value'));
+            });
+
+            $(".suggested-name").mouseover(function () {
+                $(this).siblings().css("background-color", "white");
+                $(this).css("background-color", "#D8F0F9");
+            });
+
+            $(".suggested-name").mouseout(function () {
+                $(this).siblings().first().css("background-color", "#D8F0F9");
+                $(this).css("background-color", "white");
+            });
+        }
+    }, {
+        key: "hideSuggestionBox",
+        value: function hideSuggestionBox(content) {
+            $("#suggestion-container").html(content).hide();
+            $("#suggestion-container").css('visibility', 'hidden');
+            this.cleanUp();
+        }
+    }, {
+        key: "cleanUp",
+        value: function cleanUp() {
+            this.is_displayed = false;
+            this.is_navigated = false;
+            this.current_index = 0;
+            this.selected_index = 0;
+            this.actived_atmark_index = -1;
+            this.insert_mode = 'normal';
+            if (this.insert_type == 'contact') {
+                this.member_objects = this.buildMemberListData(false);
+                this.fuse = new Fuse(this.member_objects, this.options);
+            }
+            if (this.insert_type == 'group') {
+                this.selected_group_name = '';
+            }
+            this.insert_type = 'one';
+            $("#suggestion-container").html('');
+            $("#_chatTextArea").css({ 'overflow-y': 'scroll', 'z-index': 0 });
+            // restore setting to correct value
+            if (this.cached_enter_action != ST.data.enter_action && this.cached_enter_action == 'send') {
+                ST.data.enter_action = this.cached_enter_action;
+            }
+        }
+
+        // http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
+
+    }, {
+        key: "doGetCaretPosition",
+        value: function doGetCaretPosition(ctrl) {
+            var CaretPos = 0; // IE Support
+            if (document.selection) {
+                ctrl.focus();
+                var Sel = document.selection.createRange();
+                Sel.moveStart('character', -ctrl.value.length);
+                CaretPos = Sel.text.length;
+            }
+            // Firefox support
+            else if (ctrl.selectionStart || ctrl.selectionStart == '0') CaretPos = ctrl.selectionStart;
+            return CaretPos;
+        }
+    }, {
+        key: "setCaretPosition",
+        value: function setCaretPosition(ctrl, pos) {
+            if (ctrl.setSelectionRange) {
+                ctrl.focus();
+                ctrl.setSelectionRange(pos, pos);
+            } else if (ctrl.createTextRange) {
+                var range = ctrl.createTextRange();
+                range.collapse(true);
+                range.moveEnd('character', pos);
+                range.moveStart('character', pos);
+                range.select();
+            }
+        }
+
+        // http://codegolf.stackexchange.com/a/17129
+
+    }, {
+        key: "merge",
+        value: function merge() {
+            var args = arguments;
+            var hash = {};
+            var arr = [];
+            for (var i = 0; i < args.length; i++) {
+                for (var j = 0; j < args[i].length; j++) {
+                    if (hash[args[i][j]] !== true) {
+                        arr[arr.length] = args[i][j];
+                        hash[args[i][j]] = true;
+                    }
+                }
+            }
+            return arr;
+        }
+    }, {
+        key: "filterDisplayResults",
+        value: function filterDisplayResults(results) {
+            this.is_outbound_of_list = false;
+            if (!this.is_navigated) return results.slice(0, DISPLAY_NUMS);
+            if (this.current_index < 0) this.current_index = 0;
+            if (this.current_index >= results.length) this.current_index = results.length - 1;
+
+            if (results.length <= DISPLAY_NUMS) {
+                this.is_outbound_of_list = true;
+                return results;
+            }
+            if (this.current_index >= results.length - DISPLAY_NUMS) {
+                this.is_outbound_of_list = true;
+                return results.slice(DISPLAY_NUMS * -1);
+            } else {
+                return results.slice(this.current_index, this.current_index + DISPLAY_NUMS);
+            }
+        }
+    }, {
+        key: "getRawResultsAndSetType",
+        value: function getRawResultsAndSetType(typed_text) {
+            if (this.insert_type != 'contact') {
+                for (var i = 0; i < this.group_mention.length; i++) {
+                    if (typed_text == this.group_mention[i]['group_name']) {
+                        this.insert_type = 'group';
+                        this.selected_group_name = this.group_mention[i]['group_name'];
+                        return [];
+                    }
+                }
+                ;
+
+                if (typed_text == 'me') {
+                    this.insert_type = 'me';
+                    return [this.getMemberObject(AC.myid)];
+                }
+                if (typed_text == 'all') {
+                    this.insert_type = 'all';
+                    return [];
+                }
+                this.insert_type = 'one';
+            }
+            return typed_text ? this.fuse.search(typed_text) : this.member_objects;
+        }
+    }, {
+        key: "getRawResultsAndSetMode",
+        value: function getRawResultsAndSetMode(typed_text) {
+            if (typed_text.slice(0, 2) == '._') {
+                this.insert_mode = 'picon';
+                return this.getRawResultsAndSetType(typed_text.substring(2));
+            }
+            if (typed_text.slice(0, 1) == '.') {
+                this.insert_mode = 'name';
+                return this.getRawResultsAndSetType(typed_text.substring(1));
+            }
+            if (typed_text.slice(0, 1) == '_') {
+                this.insert_mode = 'to';
+                return this.getRawResultsAndSetType(typed_text.substring(1));
+            }
+            this.insert_mode = 'normal';
+            return this.getRawResultsAndSetType(typed_text);
+        }
+    }, {
+        key: "isTriggerKeyCode",
+        value: function isTriggerKeyCode(keyCode) {
+            return [37, 38, 39, 40].indexOf(keyCode) == -1;
+        }
+    }, {
+        key: "holdCaretPosition",
+        value: function holdCaretPosition(event_object) {
+            event_object.preventDefault();
+            this.chat_text_jquery.focus();
+            var current_pos = this.doGetCaretPosition(this.chat_text_element);
+            this.setCaretPosition(this.chat_text_element, current_pos);
+        }
+    }, {
+        key: "getReplaceText",
+        value: function getReplaceText(format_string, target_name, cwid, members) {
+            var replace_text = '';
+            switch (this.insert_type) {
+                case 'me':
+                case 'one':
+                case 'contact':
+                    replace_text = format_string.format(cwid, target_name);
+                    break;
+                case 'group':
+                case 'all':
+                    for (var i = 0; i < members.length; i++) {
+                        replace_text += format_string.format(members[i].value, members[i].aid2name);
+                    }
+                    ;
+                    break;
+                default:
+                    break;
+            }
+            return replace_text;
+        }
+    }, {
+        key: "setSuggestedChatText",
+        value: function setSuggestedChatText(entered_text, target_name, cwid) {
+            var old = this.chat_text_jquery.val();
+            var start_pos = this.doGetCaretPosition(this.chat_text_element) - entered_text.length;
+            var replace_text = '';
+            var members = this.member_objects;
+            if (this.insert_type == 'group') {
+                members = this.buildGroupMemberListData(this.selected_group_name);
+            }
+            switch (this.insert_mode) {
+                case 'to':
+                    replace_text = this.getReplaceText("[To:{0}] ", target_name, cwid, members);
+                    break;
+                case 'normal':
+                    replace_text = this.getReplaceText("[To:{0}] {1}\n", target_name, cwid, members);
+                    break;
+                case 'picon':
+                    replace_text = this.getReplaceText("[picon:{0}] ", target_name, cwid, members);
+                    break;
+                case 'name':
+                    replace_text = this.getReplaceText("[picon:{0}] {1}\n", target_name, cwid, members);
+                    break;
+                default:
+                    break;
+            }
+            var content = old.substring(0, start_pos) + replace_text + old.substring(start_pos + entered_text.length);
+            this.chat_text_jquery.val(content);
+            this.setCaretPosition(this.chat_text_element, start_pos + replace_text.length);
+            this.hideSuggestionBox();
+        }
+    }, {
+        key: "buildList",
+        value: function buildList(members) {
+            switch (this.insert_type) {
+                case 'me':
+                case 'one':
+                case 'contact':
+                    if (members.length) {
+                        var txt = '<ul>';
+                        for (var i = 0; i < members.length; i++) {
+                            txt += '<li class="suggested-name" role="listitem" data-cwui-lt-value="' + members[i].value + '">' + members[i].avatar + members[i].label + "</li>";
+                        }
+                        ;
+                        txt += '</ul>';
+                        return txt;
+                    } else {
+                        return '<ul><li>' + this.suggestion_messages['one'][LANGUAGE] + '</li></ul>';
+                    }
+                    break;
+                case 'group':
+                    members = this.buildGroupMemberListData(this.selected_group_name);
+                    if (members.length) {
+                        txt = '<ul><li>';
+                        for (var i = 0; i < members.length; i++) {
+                            if (i == 6) {
+                                txt += '<span>+' + (members.length - 6) + '</span>';
+                                break;
+                            }
+                            txt += members[i].avatar;
+                        }
+                        ;
+                        txt += '</li></ul>';
+                        return txt;
+                    } else {
+                        return '<ul><li>' + this.suggestion_messages[this.insert_type][LANGUAGE] + '</li></ul>';
+                    }
+                    break;
+                case 'all':
+                    return '<ul><li>' + this.suggestion_messages[this.insert_type][LANGUAGE] + '</li></ul>';
+                    break;
+                default:
+                    break;
+            }
+        }
+    }, {
+        key: "buildMemberListData",
+        value: function buildMemberListData(with_contact) {
+            if (!RM) return [];
+            var sorted_member_list = RM.getSortedMemberList();
+            var b = [];
+            if (with_contact) {
+                sorted_member_list = this.merge(sorted_member_list, AC.contact_list);
+            }
+            var sorted_members_length = sorted_member_list.length;
+            for (var index = 0; index < sorted_members_length; index++) {
+                var member = sorted_member_list[index];
+                if (member != AC.myid) {
+                    b.push(this.getMemberObject(member));
+                }
+            }
+            return b;
+        }
+    }, {
+        key: "getMemberObject",
+        value: function getMemberObject(member) {
+            var h = CW.is_business && ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(member) : AC.getNickName(member);
+            return {
+                value: member,
+                avatar: CW.getAvatarPanel(member, {
+                    clicktip: !1,
+                    size: "small"
+                }),
+                label: '<p class="autotrim">' + escape_html(h) + "</p>",
+                aid2name: escape_html(h)
+            };
+        }
+    }, {
+        key: "buildGroupMemberListData",
+        value: function buildGroupMemberListData(group_name) {
+            for (var i = 0; i < this.group_mention.length; i++) {
+                if (this.group_mention[i]['group_name'] == group_name) {
+                    var members = this.group_mention[i]['group_members'].split(',');
+                    var results = [];
+                    for (var j = 0; j < members.length; j++) {
+                        results.push(this.getMemberObject(members[j].trim()));
+                    }
+                    return results;
+                }
+            }
+            return [];
+        }
+    }, {
+        key: "addMentionText",
+        value: function addMentionText() {
+            var _this3 = this;
+
+            if ($("#_chatppMentionText").length > 0) {
+                return;
+            }
+            $("#_chatSendTool").append('<li id="_chatppMentionText" role="button" class=" _showDescription">' + '<span id="chatppMentionText" class="emoticonText icoSizeSmall"></span>' + '</li>');
+            this.updateMentionText();
+            $("#chatppMentionText").click(function () {
+                return _this3.toggleMentionStatus();
+            });
+        }
+    }, {
+        key: "updateMentionText",
+        value: function updateMentionText() {
+            var mention_text = "M: " + (this.status ? "ON" : "OFF");
+            var div = $("#chatppMentionText");
+            div.html(mention_text);
+            if (this.status) {
+                $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
+                div.addClass("emoticonTextEnable");
+            } else {
+                $("#_chatppMentionText").attr("aria-label", "Click to enable Mention Feature");
+                div.removeClass("emoticonTextEnable");
+            }
+        }
+    }, {
+        key: "toggleMentionStatus",
+        value: function toggleMentionStatus() {
+            this.status = !this.status;
+            common.setStatus("mention", this.status);
+            this.updateMentionText();
+        }
+    }]);
+
+    return Mention;
+}();
+
+var mention = new Mention();
+module.exports = mention;
+
+},{"../helpers/Common.js":1,"../helpers/Const.js":2}],6:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var NotificationDisabler = function () {
+    function NotificationDisabler() {
+        _classCallCheck(this, NotificationDisabler);
+    }
+
+    _createClass(NotificationDisabler, null, [{
+        key: "setUp",
+        value: function setUp() {
+            var disabledNotifyRooms = [];
+
+            if (localStorage["CHATPP_DISABLE_NOTIFY_ROOM"] !== undefined && localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]) {
+                disabledNotifyRooms = JSON.parse(localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]);
+            }
+
+            if (disabledNotifyRooms) {
+                var chatworkPopup = CW.popup;
+                var b = null,
+                    d = null,
+                    e = window.navigator.userAgent.toLowerCase().indexOf("chrome") != -1;
+                CW.popup = function wrapper(a, f, j, h) {
+                    if (disabledNotifyRooms.indexOf(h.toString()) == -1) {
+                        chatworkPopup(a, f, j, h);
+                    }
+                };
+            }
+        }
+    }]);
+
+    return NotificationDisabler;
+}();
+
+module.exports = NotificationDisabler;
+
+},{}],7:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var common = require("../helpers/Common.js");
+
+var RoomInformation = function () {
+    function RoomInformation() {
+        _classCallCheck(this, RoomInformation);
+    }
+
+    _createClass(RoomInformation, [{
+        key: "setUp",
+        value: function setUp() {
+            var _this = this;
+
+            if ($("#roomInfoIcon").length > 0) {
+                return;
+            }
+            var room_info = '<li id="_roomInfo" role="button" class="_showDescription" aria-label="Show room Information" style="display: inline-block;"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></li>';
+            $('#_chatSendTool').append(room_info);
+            var room_info_list = '<div id="_roomInfoList" class="roomInfo toolTip toolTipWhite mainContetTooltip" role="tooltip">' + '<div class="_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom"></div>' + '<span id="_roomInfoText">' + '<div id="_roomInfoTextTotalMembers" class="tooltipFooter"></div>' + '<div id="_roomInfoTextTotalMessages" class="tooltipFooter"></div>' + '<div id="_roomInfoTextTotalFiles" class="tooltipFooter"></div>' + '<div id="_roomInfoTextTotalTasks" class="tooltipFooter"></div>' + '<div id="_roomInfoTextMyTasks" class="tooltipFooter"></div>' + '</span>' + '</div>';
+            $("body").append(room_info_list);
+            $("#_roomInfo").click(function (e) {
+                _this.prepareRoomInfo();
+                var room_name = RM.getIcon() + " " + common.htmlEncode(RM.getName());
+                var tip = $("#_roomInfoList").cwListTip({
+                    selectOptionArea: "<b>" + room_name + "</b>" + " Information",
+                    fixHeight: !1,
+                    search: !1
+                });
+                tip.open($(e.target));
+            });
+        }
+    }, {
+        key: "prepareRoomInfo",
+        value: function prepareRoomInfo() {
+            var total_members = "<b>Total Members</b>: " + RM.getSortedMemberList().length;
+            $("#_roomInfoTextTotalMembers").html(total_members);
+            var total_messages = "<b>Total Messages</b>: " + RM.chat_num;
+            $("#_roomInfoTextTotalMessages").html(total_messages);
+            var total_tasks = "<b>Total Tasks</b>: " + RM.task_num;
+            $("#_roomInfoTextTotalTasks").html(total_tasks);
+            var my_tasks = "<b>My Tasks</b>: " + RM.mytask_num;
+            $("#_roomInfoTextMyTasks").html(my_tasks);
+            var total_files = "<b>Total Files</b>: " + RM.file_num;
+            $("#_roomInfoTextTotalFiles").html(total_files);
+        }
+    }]);
+
+    return RoomInformation;
+}();
+
+var room_information = new RoomInformation();
+module.exports = room_information;
+
+},{"../helpers/Common.js":1}],8:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -827,233 +1680,19 @@ var Shortcut = function () {
     return Shortcut;
 }();
 
-module.exports = Shortcut;
+var shortcut = new Shortcut();
+module.exports = shortcut;
 
-},{"../helpers/Common.js":1,"../helpers/Const.js":2}],5:[function(require,module,exports){
+},{"../helpers/Common.js":1,"../helpers/Const.js":2}],9:[function(require,module,exports){
 "use strict";
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var common = require("../helpers/Common.js");
-var Const = require("../helpers/Const.js");
-var Emoticon = require("./Emoticon.js");
-var Shortcut = require("./Shortcut.js");
-
-var mention_status = false;
-var thumbnail_status = false;
-var highlight_status = false;
-var cw_timer = undefined;
-
-var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
 
 var support_languages = ["1c", "actionscript", "apache", "applescript", "armasm", "asciidoc", "aspectj", "autohotkey", "autoit", "avrasm", "axapta", "bash", "brainfuck", "cal", "capnproto", "ceylon", "clojure-repl", "clojure", "cmake", "coffeescript", "cpp", "cs", "css", "d", "dart", "delphi", "diff", "django", "dns", "dockerfile", "dos", "dust", "elixir", "elm", "erb", "erlang-repl", "erlang", "fix", "fortran", "fsharp", "gcode", "gherkin", "glsl", "go", "gradle", "groovy", "haml", "handlebars", "haskell", "haxe", "http", "inform7", "ini", "java", "javascript", "json", "julia", "kotlin", "lasso", "less", "lisp", "livecodeserver", "livescript", "lua", "makefile", "markdown", "mathematica", "matlab", "mel", "mercury", "mizar", "mojolicious", "monkey", "nginx", "nimrod", "nix", "nsis", "objectivec", "ocaml", "openscad", "oxygene", "parser3", "perl", "pf", "php", "powershell", "processing", "profile", "prolog", "protobuf", "puppet", "python", "q", "r", "rib", "roboconf", "rsl", "ruby", "ruleslanguage", "rust", "scala", "scheme", "scilab", "scss", "smali", "smalltalk", "sml", "sql", "stata", "step21", "stylus", "swift", "tcl", "tex", "thrift", "tp", "twig", "typescript", "vala", "vbnet", "vbscript-html", "vbscript", "verilog", "vhdl", "vim", "x86asm", "xl", "xml", "xquery", "zephir"];
-
-$(function () {
-    var rebuild = false;
-    cw_timer = setInterval(function () {
-        if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
-            window.clearInterval(cw_timer);
-            var emoticon_feature = new Emoticon();
-            var shortcut_feature = new Shortcut();
-            $("#_chatppPreLoad").remove();
-            addStyle();
-            addInfoIcon();
-            if (common.getStatus("emoticon")) {
-                rebuild = true;
-                emoticon_feature.addEmoticonText();
-            }
-            if (common.getStatus("mention")) {
-                mention_status = true;
-                addMentionText();
-            }
-            if (common.getStatus("shortcut")) {
-                shortcut_feature.addShortcutText();
-                shortcut_feature.registerShortcut();
-            }
-            if (common.getStatus("thumbnail") || common.getStatus("highlight")) {
-                rebuild = true;
-                thumbnail_status = common.getStatus("thumbnail");
-                highlight_status = common.getStatus("highlight");
-                updateChatworkView();
-            }
-            addAdvertisement();
-            if (common.getStatus("emoticon")) {
-                emoticon_feature.addExternalEmo();
-            }
-
-            if (rebuild) {
-                RL.rooms[RM.id].build();
-            }
-
-            updateChatSendView();
-        }
-    }, 100);
-});
-
-function addStyle() {
-    $('<style type="text/css"> .emoticonTextEnable{font-weight: bold;};</style>').appendTo("head");
-    $('<style type="text/css"> .chatppErrorsText{font-weight: bold; color: red;};</style>').appendTo("head");
-}
-
-function addInfoIcon() {
-    if ($("#roomInfoIcon").length > 0) {
-        return;
-    }
-    var room_info = '<li id="_roomInfo" role="button" class="_showDescription" aria-label="Show room Information" style="display: inline-block;"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></li>';
-    $('#_chatSendTool').append(room_info);
-    var room_info_list = '<div id="_roomInfoList" class="roomInfo toolTip toolTipWhite mainContetTooltip" role="tooltip">' + '<div class="_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom"></div>' + '<span id="_roomInfoText">' + '<div id="_roomInfoTextTotalMembers" class="tooltipFooter"></div>' + '<div id="_roomInfoTextTotalMessages" class="tooltipFooter"></div>' + '<div id="_roomInfoTextTotalFiles" class="tooltipFooter"></div>' + '<div id="_roomInfoTextTotalTasks" class="tooltipFooter"></div>' + '<div id="_roomInfoTextMyTasks" class="tooltipFooter"></div>' + '</span>' + '</div>';
-    $("body").append(room_info_list);
-    $("#_roomInfo").click(function () {
-        prepareRoomInfo();
-        var room_name = RM.getIcon() + " " + common.htmlEncode(RM.getName());
-        var tip = $("#_roomInfoList").cwListTip({
-            selectOptionArea: "<b>" + room_name + "</b>" + " Information",
-            fixHeight: !1,
-            search: !1
-        });
-        tip.open($(this));
-    });
-}
-
-function prepareRoomInfo() {
-    var total_members = "<b>Total Members</b>: " + RM.getSortedMemberList().length;
-    $("#_roomInfoTextTotalMembers").html(total_members);
-    var total_messages = "<b>Total Messages</b>: " + RM.chat_num;
-    $("#_roomInfoTextTotalMessages").html(total_messages);
-    var total_tasks = "<b>Total Tasks</b>: " + RM.task_num;
-    $("#_roomInfoTextTotalTasks").html(total_tasks);
-    var my_tasks = "<b>My Tasks</b>: " + RM.mytask_num;
-    $("#_roomInfoTextMyTasks").html(my_tasks);
-    var total_files = "<b>Total Files</b>: " + RM.file_num;
-    $("#_roomInfoTextTotalFiles").html(total_files);
-}
-
-function addAdvertisement() {
-    if ($("#chatppAdvertisement").length > 0) {
-        return;
-    }
-    var text = '<li id="_chatppSponsored" role="button" class=" _showDescription" aria-label="Chat Plus Plus Information">' + '<span id="chatppAdvertisement" class="icoSizeSmall">' + getAdvertisementText() + '</span>' + '</li>';
-
-    $("#_chatSendTool").append(text);
-    setInterval(changeRandomAdvertisement, ADVERTISEMENT_CHANGE_TIME);
-}
-
-function changeRandomAdvertisement() {
-    var text = getAdvertisementText();
-    $("#chatppAdvertisement").html(text);
-}
-
-function getAdvertisementText() {
-    if (localStorage["chatpp_advertisement"] !== undefined && localStorage["chatpp_advertisement"]) {
-        var ads = JSON.parse(localStorage["chatpp_advertisement"]);
-        if (ads.length > 0) {
-            return ads[Math.floor(Math.random() * ads.length)];
-        }
-    }
-    return "Advertisement Here!";
-}
-
-function removeAdvertisement() {
-    if ($("#chatppAdvertisement").length > 0) {
-        $("#chatppAdvertisement").remove();
-    }
-}
-
-function addMentionText() {
-    if ($("#_chatppMentionText").length > 0) {
-        return;
-    }
-    $("#_chatSendTool").append('<li id="_chatppMentionText" role="button" class=" _showDescription">' + '<span id="chatppMentionText" class="emoticonText icoSizeSmall"></span>' + '</li>');
-    updateMentionText();
-    $("#chatppMentionText").click(function () {
-        toggleMentionStatus();
-    });
-}
-
-function updateMentionText() {
-    var mention_text = "M: " + (mention_status ? "ON" : "OFF");
-    var div = $("#chatppMentionText");
-    div.html(mention_text);
-    if (mention_status) {
-        $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
-        div.addClass("emoticonTextEnable");
-    } else {
-        $("#_chatppMentionText").attr("aria-label", "Click to enable Mention Feature");
-        div.removeClass("emoticonTextEnable");
-    }
-}
-
-function toggleMentionStatus() {
-    mention_status = mention_status !== true;
-    common.setStatus("mention", mention_status);
-    updateMentionText();
-}
-
-function updateChatSendView() {
-    var chatTextKeyUpOld = CS.view.chatTextKeyUp;
-    CS.view.chatTextKeyUp = function (b) {
-        var up_key = b.keyCode;
-        var d = $("#_chatText");
-        (function () {
-            if (!(up_key !== 13 || press_key !== 13)) {
-                var a = d.val(),
-                    b = d.prop("selectionStart"),
-                    e = d.prop("selectionEnd");
-                b === e && (e = a.substr(0, b), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```$/, "$1[code]\n$2\n[/code]") : e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[code]\n$2\n[/code]\n"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```$/, "$1[title]$2[/title]") : e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[title]$2[/title]"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```$/, "$1[info]$2[/info]") : e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[info]$2[/info]\n"), a = a.substr(b), d.val(e + a), d.prop("selectionStart", e.length), d.prop("selectionEnd", e.length));
-            }
-        })();
-        return chatTextKeyUpOld(b);
-    };
-}
-
-function updateChatworkView() {
-    TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
-    TimeLineView.prototype.getMessagePanel = function (a, b) {
-        var message_panel = this.getMessagePanelOld(a, b);
-        var temp = $("<div></div>");
-        $(temp).html(message_panel);
-        if (thumbnail_status) {
-            temp = insertThumbnail(temp);
-        }
-        if (highlight_status) {
-            $("pre code", temp).each(function (i, block) {
-                var block_text = $(block).html();
-                var options = getHighlightOption(block_text);
-                if (options.has_valid_options) {
-                    var first_line = block_text.split("\n", 1)[0];
-                    block_text = block_text.replace(first_line + "\n", "");
-                    $(block).html(block_text);
-                }
-                if (options.language) {
-                    $(block).addClass(options.language);
-                }
-                if (!options.nowrap) {
-                    $(block).css({ "word-wrap": "break-word" });;
-                }
-                hljs.highlightBlock(block);
-            });
-        }
-        return $(temp).html();
-    };
-
-    if (thumbnail_status) {
-        TK.view.getTaskPanelOld = TK.view.getTaskPanel;
-        TK.view.getTaskPanel = function (b, d) {
-            var task_panel = TK.view.getTaskPanelOld(b, d);
-            if ($(task_panel).is("div")) {
-                return task_panel;
-            }
-            var temp = $("<span></span>");
-            temp.html(task_panel);
-            temp = insertThumbnail(temp);
-            return temp.html();
-        };
-
-        RoomView.prototype.buildOld = RoomView.prototype.build;
-        RoomView.prototype.build = function (a) {
-            this.buildOld(a);
-            insertThumbnail($("#_subRoomDescription"));
-        };
-    }
-}
 
 function insertThumbnail(dom) {
     $(".ui_sp_favicon_parent", dom).each(function (index, link) {
@@ -1132,624 +1771,160 @@ function getHighlightOption(text) {
     return highlight_options;
 }
 
-},{"../helpers/Common.js":1,"../helpers/Const.js":2,"./Emoticon.js":3,"./Shortcut.js":4}],6:[function(require,module,exports){
+var ViewEnhancer = function () {
+    function ViewEnhancer() {
+        _classCallCheck(this, ViewEnhancer);
+
+        this.thumbnail_status = common.getStatus("thumbnail");
+        this.highlight_status = common.getStatus("highlight");
+    }
+
+    _createClass(ViewEnhancer, [{
+        key: "isActive",
+        value: function isActive() {
+            return this.thumbnail_status || this.highlight_status;
+        }
+    }, {
+        key: "updateChatSendView",
+        value: function updateChatSendView() {
+            var chatTextKeyUpOld = CS.view.chatTextKeyUp;
+            CS.view.chatTextKeyUp = function (b) {
+                var up_key = b.keyCode;
+                var d = $("#_chatText");
+                (function () {
+                    if (!(up_key !== 13 || press_key !== 13)) {
+                        var a = d.val(),
+                            b = d.prop("selectionStart"),
+                            e = d.prop("selectionEnd");
+                        b === e && (e = a.substr(0, b), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```$/, "$1[code]\n$2\n[/code]") : e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[code]\n$2\n[/code]\n"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```$/, "$1[title]$2[/title]") : e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[title]$2[/title]"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```$/, "$1[info]$2[/info]") : e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[info]$2[/info]\n"), a = a.substr(b), d.val(e + a), d.prop("selectionStart", e.length), d.prop("selectionEnd", e.length));
+                    }
+                })();
+                return chatTextKeyUpOld(b);
+            };
+        }
+    }, {
+        key: "updateChatworkView",
+        value: function updateChatworkView() {
+            TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
+            TimeLineView.prototype.getMessagePanel = function (a, b) {
+                var message_panel = this.getMessagePanelOld(a, b);
+                var temp = $("<div></div>");
+                $(temp).html(message_panel);
+                if (common.getStatus("thumbnail")) {
+                    temp = insertThumbnail(temp);
+                }
+                if (common.getStatus("highlight")) {
+                    $("pre code", temp).each(function (i, block) {
+                        var block_text = $(block).html();
+                        var options = getHighlightOption(block_text);
+                        if (options.has_valid_options) {
+                            var first_line = block_text.split("\n", 1)[0];
+                            block_text = block_text.replace(first_line + "\n", "");
+                            $(block).html(block_text);
+                        }
+                        if (options.language) {
+                            $(block).addClass(options.language);
+                        }
+                        if (!options.nowrap) {
+                            $(block).css({ "word-wrap": "break-word" });;
+                        }
+                        hljs.highlightBlock(block);
+                    });
+                }
+                return $(temp).html();
+            };
+
+            if (common.getStatus("thumbnail_status")) {
+                TK.view.getTaskPanelOld = TK.view.getTaskPanel;
+                TK.view.getTaskPanel = function (b, d) {
+                    var task_panel = this.getTaskPanelOld(b, d);
+                    if ($(task_panel).is("div")) {
+                        return task_panel;
+                    }
+                    var temp = $("<span></span>");
+                    temp.html(task_panel);
+                    temp = insertThumbnail(temp);
+                    return temp.html();
+                };
+
+                RoomView.prototype.buildOld = RoomView.prototype.build;
+                RoomView.prototype.build = function (a) {
+                    this.buildOld(a);
+                    insertThumbnail($("#_subRoomDescription"));
+                };
+            }
+        }
+    }]);
+
+    return ViewEnhancer;
+}();
+
+var view_enhancer = new ViewEnhancer();
+module.exports = view_enhancer;
+
+},{"../helpers/Common.js":1}],10:[function(require,module,exports){
 "use strict";
 
-var common = require("../helpers/Common.js");
 var Const = require("../helpers/Const.js");
 
-$(function () {
-    var mention_status = common.getStatus("mention");
-    var start = /@/ig;
-    var is_displayed = false;
-    var is_inserted = false;
-    var is_navigated = false;
-    var is_outbound_of_list = false;
-    var actived_atmark_index = 0;
-    var current_index = 0;
-    var selected_index = 0;
-    var current_RM = null;
-    var member_objects = [];
-    var insert_mode = 'normal'; // normal, to, picon, name
-    var insert_type = 'one'; // one, me, all, contact, group
-    var selected_group_name = '';
-    var fuse = null;
-    var DISPLAY_NUMS = 3;
-    var MAX_PATTERN_LENGTH = 20;
-    var SPECIAL_CHARS = ["\n", '!', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '[', ']', '{', '}', ';', ':', ',', '/', '`', '\'', '"'];
-    var cached_enter_action = ST.data.enter_action;
-    var options = {
-        keys: ['aid2name'],
-        maxPatternLength: MAX_PATTERN_LENGTH
-    };
-    var chat_text_jquery = $('#_chatText');
-    var chat_text_element = document.getElementById('_chatText');
-    var suggestion_messages = {
-        one: { ja: "検索結果はありません", en: 'No Matching Results' },
-        all: { ja: "すべてを選択します", en: 'Select All Members' },
-        group: { ja: "空のグループ", en: 'Empty Group' }
-    };
+var emoticon = require("./Emoticon.js");
+var shortcut = require("./Shortcut.js");
+var mention = require("./Mention.js");
+var room_information = require("./RoomInformation.js");
+var view_enhancer = require("./ViewEnhancer.js");
+var advertisement = require("./Advertisement.js");
+var NotificationDisabler = require("./NotificationDisabler.js");
 
-    var group_mention = [];
-    if (localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]) {
-        group_mention = JSON.parse(localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]);
-    }
-
-    $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");
-    hideSuggestionBox();
-
-    function getNearestAtmarkIndex() {
-        var content = chat_text_jquery.val();
-        var atmarks = content.match(start);
-
-        if (!atmarks) {
-            return -1;
-        }
-
-        var caret_index = doGetCaretPosition(chat_text_element);
-        var atmark_index = content.indexOf("@");
-        var pre_atmark_index = -1;
-        do {
-            if (atmark_index >= caret_index) {
-                break;
-            }
-            pre_atmark_index = atmark_index;
-            atmark_index = content.indexOf("@", atmark_index + 1);
-        } while (atmark_index != -1);
-
-        return pre_atmark_index;
-    }
-
-    function findAtmark() {
-        var content = chat_text_jquery.val();
-        // we only interested in @ symbol that: at the start of line or has a space before it
-        var atmark_index = getNearestAtmarkIndex();
-        if (atmark_index != 0 && content.charAt(atmark_index - 1) != " " && content.charAt(atmark_index - 1) != "\n") {
-            return false;
-        }
-
-        if (getTypedText().length >= MAX_PATTERN_LENGTH || getTypedText().length == 0) {
-            return false;
-        }
-        if (atmark_index != -1) {
-            var spaces = getTypedText().match(/ /ig);
-            // text from last @ to current caret position have more than 2 spaces
-            if (spaces && spaces.length > 2) {
-                return false;
-            }
-
-            // text contains special characters ?
-            for (var i = 0; i < SPECIAL_CHARS.length; i++) {
-                if (getTypedText().indexOf(SPECIAL_CHARS[i]) != -1) {
-                    return false;
-                }
-            };
-
-            return true;
-        } else {
-            // There is no @ symbol
-            return false;
-        }
-    }
-
-    function getTypedText() {
-        var content = chat_text_jquery.val();
-        var start_pos = getNearestAtmarkIndex();
-        if (start_pos == -1) return '';
-        var end_pos = doGetCaretPosition(chat_text_element);
-        var txt = content.substr(start_pos, end_pos - start_pos);
-        if (txt) {
-            return txt;
-        } else {
-            return '';
-        }
-    }
-
-    function setSuggestionBoxPosition() {
-        var rect = chat_text_element.getBoundingClientRect();
-        var current_pos = doGetCaretPosition(chat_text_element);
-        setCaretPosition(chat_text_element, actived_atmark_index + 1);
-        var position = Measurement.caretPos(chat_text_jquery);
-        position.top -= rect.top;
-        position.left -= rect.left;
-        if (rect.width - position.left < 236) {
-            position.left -= 236;
-        }
-        if (rect.height - position.top < 90) {
-            if (position.top < 108) {
-                $("#_chatTextArea").css({ 'overflow-y': 'visible', 'z-index': 2 });
-            }
-            position.top -= 118;
-        } else {
-            position.top += parseInt(chat_text_jquery.css('font-size')) + 2;
-        }
-        $("#suggestion-container").parent().css({ position: 'relative' });
-        $("#suggestion-container").css({ top: position.top, left: position.left, position: 'absolute' });
-        setCaretPosition(chat_text_element, current_pos);
-    }
-
-    function showSuggestionBox(content) {
-        is_inserted = false;
-        $("#suggestion-container").html(content).show();
-        $("#suggestion-container").css('visibility', 'visible');
-        if (is_navigated) {
-            $(".suggested-name").eq(selected_index).css("background-color", "#D8F0F9");
-        } else {
-            $(".suggested-name").first().css("background-color", "#D8F0F9");
-        }
-
-        $(".suggested-name").click(function () {
-            if (is_inserted) return;
-            is_inserted = true;
-            $(this).css("background-color", "#D8F0F9");
-            setSuggestedChatText(getTypedText(), $(this).text(), $(this).data('cwui-lt-value'));
-        });
-
-        $(".suggested-name").mouseover(function () {
-            $(this).siblings().css("background-color", "white");
-            $(this).css("background-color", "#D8F0F9");
-        });
-
-        $(".suggested-name").mouseout(function () {
-            $(this).siblings().first().css("background-color", "#D8F0F9");
-            $(this).css("background-color", "white");
-        });
-    }
-
-    function hideSuggestionBox(content) {
-        $("#suggestion-container").html(content).hide();
-        $("#suggestion-container").css('visibility', 'hidden');
-        cleanUp();
-    }
-
-    function cleanUp() {
-        is_displayed = false;
-        is_navigated = false;
-        current_index = 0;
-        selected_index = 0;
-        actived_atmark_index = -1;
-        insert_mode = 'normal';
-        if (insert_type == 'contact') {
-            member_objects = buildMemberListData(false);
-            fuse = new Fuse(member_objects, options);
-        }
-        if (insert_type == 'group') {
-            selected_group_name = '';
-        }
-        insert_type = 'one';
-        $("#suggestion-container").html('');
-        $("#_chatTextArea").css({ 'overflow-y': 'scroll', 'z-index': 0 });
-        // restore setting to correct value
-        if (cached_enter_action != ST.data.enter_action && cached_enter_action == 'send') {
-            ST.data.enter_action = cached_enter_action;
-        }
-    }
-
-    $("#_sendEnterActionArea").click(function () {
-        cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? 'send' : 'br';
-    });
-
-    // http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
-    function doGetCaretPosition(ctrl) {
-        var CaretPos = 0; // IE Support
-        if (document.selection) {
-            ctrl.focus();
-            var Sel = document.selection.createRange();
-            Sel.moveStart('character', -ctrl.value.length);
-            CaretPos = Sel.text.length;
-        }
-        // Firefox support
-        else if (ctrl.selectionStart || ctrl.selectionStart == '0') CaretPos = ctrl.selectionStart;
-        return CaretPos;
-    }
-
-    function setCaretPosition(ctrl, pos) {
-        if (ctrl.setSelectionRange) {
-            ctrl.focus();
-            ctrl.setSelectionRange(pos, pos);
-        } else if (ctrl.createTextRange) {
-            var range = ctrl.createTextRange();
-            range.collapse(true);
-            range.moveEnd('character', pos);
-            range.moveStart('character', pos);
-            range.select();
-        }
-    }
-
-    // http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
-    // First, checks if it isn't implemented yet.
-    if (!String.prototype.format) {
-        String.prototype.format = function () {
-            var args = arguments;
-            return this.replace(/{(\d+)}/g, function (match, number) {
-                return typeof args[number] != 'undefined' ? args[number] : match;
-            });
-        };
-    }
-
-    // http://codegolf.stackexchange.com/a/17129
-    function merge() {
-        var args = arguments;
-        var hash = {};
-        var arr = [];
-        for (var i = 0; i < args.length; i++) {
-            for (var j = 0; j < args[i].length; j++) {
-                if (hash[args[i][j]] !== true) {
-                    arr[arr.length] = args[i][j];
-                    hash[args[i][j]] = true;
-                }
-            }
-        }
-        return arr;
-    }
-
-    function filterDisplayResults(results) {
-        is_outbound_of_list = false;
-        if (!is_navigated) return results.slice(0, DISPLAY_NUMS);
-        if (current_index < 0) current_index = 0;
-        if (current_index >= results.length) current_index = results.length - 1;
-
-        if (results.length <= DISPLAY_NUMS) {
-            is_outbound_of_list = true;
-            return results;
-        }
-        if (current_index >= results.length - DISPLAY_NUMS) {
-            is_outbound_of_list = true;
-            return results.slice(DISPLAY_NUMS * -1);
-        } else {
-            return results.slice(current_index, current_index + DISPLAY_NUMS);
-        }
-    }
-
-    function getRawResultsAndSetType(typed_text) {
-        if (insert_type != 'contact') {
-            for (var i = 0; i < group_mention.length; i++) {
-                if (typed_text == group_mention[i]['group_name']) {
-                    insert_type = 'group';
-                    selected_group_name = group_mention[i]['group_name'];
-                    return [];
-                }
-            };
-
-            if (typed_text == 'me') {
-                insert_type = 'me';
-                return [getMemberObject(AC.myid)];
-            }
-            if (typed_text == 'all') {
-                insert_type = 'all';
-                return [];
-            }
-            insert_type = 'one';
-        }
-        return typed_text ? fuse.search(typed_text) : member_objects;
-    }
-
-    function getRawResultsAndSetMode(typed_text) {
-        if (typed_text.slice(0, 2) == '._') {
-            insert_mode = 'picon';
-            return getRawResultsAndSetType(typed_text.substring(2));
-        }
-        if (typed_text.slice(0, 1) == '.') {
-            insert_mode = 'name';
-            return getRawResultsAndSetType(typed_text.substring(1));
-        }
-        if (typed_text.slice(0, 1) == '_') {
-            insert_mode = 'to';
-            return getRawResultsAndSetType(typed_text.substring(1));
-        }
-        insert_mode = 'normal';
-        return getRawResultsAndSetType(typed_text);
-    }
-
-    // hide suggestion box when click in textarea or outside
-    chat_text_jquery.click(function () {
-        hideSuggestionBox();
-    });
-
-    $('#_roomListArea').click(function () {
-        hideSuggestionBox();
-    });
-
-    $('#_headerSearch').click(function () {
-        hideSuggestionBox();
-    });
-
-    // when user press ESC, we hide suggestion box
-    $(document).keyup(function (e) {
-        if (!mention_status) {
-            return;
-        }
-        if (e.which == 27) {
-            hideSuggestionBox();
-        }
-    });
-
-    function isTriggerKeyCode(keyCode) {
-        return [37, 38, 39, 40].indexOf(keyCode) == -1;
-    }
-
-    chat_text_jquery.keydown(function (e) {
-        if (!mention_status) {
-            return;
-        }
-
-        if ((e.which == 38 || e.which == 40 || e.which == 9 || e.which == 13) && is_displayed) {
-            is_navigated = true;
-            holdCaretPosition(e);
-        } else {
-            current_index = 0;
-            is_navigated = false;
-        }
-
-        if (e.which == 9 || e.which == 13) {
-            if ((insert_type == 'all' || insert_type == 'group') && is_displayed) {
-                setSuggestedChatText(getTypedText(), null, null);
-                // dirty hack to prevent message to be sent
-                if (cached_enter_action == 'send') ST.data.enter_action = 'br';
-                e.preventDefault();
-            } else {
-                if ($(".suggested-name").first().length) {
-                    if (is_navigated) {
-                        $(".suggested-name").eq(selected_index).click();
-                    } else {
-                        $(".suggested-name").first().click();
-                    }
-                    // dirty hack to prevent message to be sent
-                    if (cached_enter_action == 'send') ST.data.enter_action = 'br';
-                    e.preventDefault();
-                } else {
-                    // there's no thing after @ symbol
-                    hideSuggestionBox();
-                }
-            }
-        }
-    });
-
-    chat_text_jquery.keyup(function (e) {
-        if (!mention_status) {
-            return;
-        }
-
-        if (e.which == 9 || e.which == 13) {
-            return;
-        }
-
-        if ((e.which == 38 || e.which == 40) && is_displayed) {
-            is_navigated = true;
-            holdCaretPosition(e);
-        } else {
-            is_navigated = false;
-        }
-
-        if (current_RM != RM.id) {
-            member_objects = buildMemberListData(false);
-            fuse = new Fuse(member_objects, options);
-            current_RM = RM.id;
-        }
-
-        if (findAtmark()) {
-            if (is_displayed && getNearestAtmarkIndex() != -1 && getNearestAtmarkIndex() != actived_atmark_index) {
-                hideSuggestionBox();
-            }
-
-            if (!is_displayed) {
-                if (!isTriggerKeyCode(e.which)) {
-                    return;
-                }
-                if (getNearestAtmarkIndex() != -1) {
-                    actived_atmark_index = getNearestAtmarkIndex();
-                }
-                setSuggestionBoxPosition();
-                showSuggestionBox(buildList(filterDisplayResults(member_objects)));
-                is_displayed = true;
-            }
-
-            var typed_text = getTypedText();
-            if (typed_text.length) {
-                if (typed_text.charAt(1) == '#') {
-                    if (insert_type != 'contact') {
-                        member_objects = buildMemberListData(true);
-                        fuse = new Fuse(member_objects, options);
-                        insert_type = 'contact';
-                    }
-                    typed_text = typed_text.substring(1);
-                }
-                var raw_results = getRawResultsAndSetMode(typed_text.substring(1));
-
-                if (e.which == 38) current_index -= 1;
-                if (e.which == 40) current_index += 1;
-                var filtered_results = filterDisplayResults(raw_results);
-
-                if (e.which == 38 && is_outbound_of_list) {
-                    selected_index -= 1;
-                    if (selected_index < 0) selected_index = 0;
-                }
-                if (e.which == 40 && current_index > raw_results.length - filtered_results.length) {
-                    selected_index += 1;
-                    if (selected_index >= Math.min(DISPLAY_NUMS, filtered_results.length)) selected_index = Math.min(DISPLAY_NUMS, filtered_results.length) - 1;
-                }
-
-                showSuggestionBox(buildList(filtered_results));
-            }
-
-            if (e.which == 27) {
-                // when user press ESC, we hide suggestion box
-                hideSuggestionBox();
-                holdCaretPosition(e);
-            }
-        } else {
-            hideSuggestionBox();
-        }
-
-        return false;
-    });
-
-    function holdCaretPosition(event_object) {
-        event_object.preventDefault();
-        chat_text_jquery.focus();
-        var current_pos = doGetCaretPosition(chat_text_element);
-        setCaretPosition(chat_text_element, current_pos);
-    }
-
-    function getReplaceText(format_string, target_name, cwid, members) {
-        var replace_text = '';
-        switch (insert_type) {
-            case 'me':
-            case 'one':
-            case 'contact':
-                replace_text = format_string.format(cwid, target_name);
-                break;
-            case 'group':
-            case 'all':
-                for (var i = 0; i < members.length; i++) {
-                    replace_text += format_string.format(members[i].value, members[i].aid2name);
-                };
-                break;
-            default:
-                break;
-        }
-        return replace_text;
-    }
-
-    function setSuggestedChatText(entered_text, target_name, cwid) {
-        var old = chat_text_jquery.val();
-        var start_pos = doGetCaretPosition(chat_text_element) - entered_text.length;
-        var replace_text = '';
-        var members = member_objects;
-        if (insert_type == 'group') {
-            members = buildGroupMemberListData(selected_group_name);
-        }
-        switch (insert_mode) {
-            case 'to':
-                replace_text = getReplaceText("[To:{0}] ", target_name, cwid, members);
-                break;
-            case 'normal':
-                replace_text = getReplaceText("[To:{0}] {1}\n", target_name, cwid, members);
-                break;
-            case 'picon':
-                replace_text = getReplaceText("[picon:{0}] ", target_name, cwid, members);
-                break;
-            case 'name':
-                replace_text = getReplaceText("[picon:{0}] {1}\n", target_name, cwid, members);
-                break;
-            default:
-                break;
-        }
-        var content = old.substring(0, start_pos) + replace_text + old.substring(start_pos + entered_text.length);
-        chat_text_jquery.val(content);
-        setCaretPosition(chat_text_element, start_pos + replace_text.length);
-        hideSuggestionBox();
-    }
-
-    function buildList(members) {
-        switch (insert_type) {
-            case 'me':
-            case 'one':
-            case 'contact':
-                if (members.length) {
-                    var txt = '<ul>';
-                    for (var i = 0; i < members.length; i++) {
-                        txt += '<li class="suggested-name" role="listitem" data-cwui-lt-value="' + members[i].value + '">' + members[i].avatar + members[i].label + "</li>";
-                    };
-                    txt += '</ul>';
-                    return txt;
-                } else {
-                    return '<ul><li>' + suggestion_messages['one'][LANGUAGE] + '</li></ul>';
-                }
-                break;
-            case 'group':
-                members = buildGroupMemberListData(selected_group_name);
-                if (members.length) {
-                    txt = '<ul><li>';
-                    for (var i = 0; i < members.length; i++) {
-                        if (i == 6) {
-                            txt += '<span>+' + (members.length - 6) + '</span>';
-                            break;
-                        }
-                        txt += members[i].avatar;
-                    };
-                    txt += '</li></ul>';
-                    return txt;
-                } else {
-                    return '<ul><li>' + suggestion_messages[insert_type][LANGUAGE] + '</li></ul>';
-                }
-                break;
-            case 'all':
-                return '<ul><li>' + suggestion_messages[insert_type][LANGUAGE] + '</li></ul>';
-                break;
-            default:
-                break;
-        }
-    }
-
-    function buildMemberListData(with_contact) {
-        if (!RM) return [];
-        var sorted_member_list = RM.getSortedMemberList();
-        var b = [];
-        if (with_contact) {
-            sorted_member_list = merge(sorted_member_list, AC.contact_list);
-        }
-        var sorted_members_length = sorted_member_list.length;
-        for (var index = 0; index < sorted_members_length; index++) {
-            var member = sorted_member_list[index];
-            if (member != AC.myid) {
-                b.push(getMemberObject(member));
-            }
-        }
-        return b;
-    }
-
-    function getMemberObject(member) {
-        var h = CW.is_business && ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(member) : AC.getNickName(member);
-        return {
-            value: member,
-            avatar: CW.getAvatarPanel(member, {
-                clicktip: !1,
-                size: "small"
-            }),
-            label: '<p class="autotrim">' + escape_html(h) + "</p>",
-            aid2name: escape_html(h)
-        };
-    }
-
-    function buildGroupMemberListData(group_name) {
-        for (var i = 0; i < group_mention.length; i++) {
-            if (group_mention[i]['group_name'] == group_name) {
-                var members = group_mention[i]['group_members'].split(',');
-                var results = [];
-                for (var j = 0; j < members.length; j++) {
-                    results.push(getMemberObject(members[j].trim()));
-                }
-                return results;
-            }
-        }
-        return [];
-    }
-});
-
-},{"../helpers/Common.js":1,"../helpers/Const.js":2}],7:[function(require,module,exports){
-"use strict";
+var cw_timer = undefined;
 
 $(function () {
-    (function () {
-        var disabledNotifyRooms = [];
+    var rebuild = false;
+    cw_timer = setInterval(function () {
+        if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
+            window.clearInterval(cw_timer);
+            $("#_chatppPreLoad").remove();
+            addStyle();
 
-        if (localStorage["CHATPP_DISABLE_NOTIFY_ROOM"] !== undefined && localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]) {
-            disabledNotifyRooms = JSON.parse(localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]);
-        }
+            room_information.setUp();
 
-        if (disabledNotifyRooms) {
-            var chatworkPopup = CW.popup;
-            var b = null,
-                d = null,
-                e = window.navigator.userAgent.toLowerCase().indexOf("chrome") != -1;
-            CW.popup = function wrapper(a, f, j, h) {
-                if (disabledNotifyRooms.indexOf(h.toString()) == -1) {
-                    chatworkPopup(a, f, j, h);
-                }
-            };
+            if (emoticon.status) {
+                rebuild = true;
+                emoticon.addEmoticonText();
+            }
+
+            if (mention.status) {
+                mention.setUp();
+            }
+
+            if (shortcut.status) {
+                shortcut.addShortcutText();
+                shortcut.registerShortcut();
+            }
+
+            if (view_enhancer.isActive()) {
+                rebuild = true;
+                view_enhancer.updateChatworkView();
+            }
+
+            advertisement.setUp();
+
+            if (emoticon.status) {
+                emoticon.addExternalEmo();
+            }
+
+            if (rebuild) {
+                RL.rooms[RM.id].build();
+            }
+
+            view_enhancer.updateChatSendView();
+            NotificationDisabler.setUp();
         }
-    })();
+    }, 100);
 });
 
-},{}]},{},[5,6,7]);
+function addStyle() {
+    $('<style type="text/css"> .emoticonTextEnable{font-weight: bold;};</style>').appendTo("head");
+    $('<style type="text/css"> .chatppErrorsText{font-weight: bold; color: red;};</style>').appendTo("head");
+}
+
+},{"../helpers/Const.js":2,"./Advertisement.js":3,"./Emoticon.js":4,"./Mention.js":5,"./NotificationDisabler.js":6,"./RoomInformation.js":7,"./Shortcut.js":8,"./ViewEnhancer.js":9}]},{},[10]);

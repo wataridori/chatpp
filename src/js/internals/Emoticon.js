@@ -110,4 +110,5 @@ class Emoticon {
     }
 }
 
-module.exports = Emoticon;
+let emoticon = new Emoticon();
+module.exports = emoticon;

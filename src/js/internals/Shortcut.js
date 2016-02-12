@@ -417,4 +417,5 @@ class Shortcut {
     }
 }
 
-module.exports = Shortcut;
+let shortcut = new Shortcut();
+module.exports = shortcut;

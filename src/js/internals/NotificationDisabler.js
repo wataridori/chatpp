@@ -1,5 +1,5 @@
-$(function(){
-    (function() {
+class NotificationDisabler {
+    static setUp() {
         var disabledNotifyRooms = [];
 
         if (localStorage["CHATPP_DISABLE_NOTIFY_ROOM"] !== undefined && localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]) {
@@ -17,5 +17,7 @@ $(function(){
                 }
             }
         }
-    })();
-});
+    }
+}
+
+module.exports = NotificationDisabler;

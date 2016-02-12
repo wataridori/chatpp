@@ -19,7 +19,7 @@ elixir(function(mix) {
             "libs/fuse.min.js",
             "libs/highlight.min.js"
         ], "build/js/internals/libs.js")
-        .browserify(["externals/popup.js"], "build/js/externals/popup.js")
+        .browserify("externals/popup.js", "build/js/externals/popup.js")
         .browserify([
             "externals/emoticon.js",
             "externals/shortcut.js",
@@ -28,12 +28,6 @@ elixir(function(mix) {
             "externals/setting.js",
             "externals/group.js",
         ], "build/js/externals/pages.js")
-        .browserify([
-            "extensions/contentscript.js"
-        ], "build/js/extensions/contentscript.js")
-        .browserify([
-            "internals/main.js",
-            "internals/mention.js",
-            "internals/notification.js",
-        ], "build/js/internals/all.js");
+        .browserify("extensions/contentscript.js", "build/js/extensions/contentscript.js")
+        .browserify("internals/main.js", "build/js/internals/all.js");
 });
