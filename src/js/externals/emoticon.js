@@ -16,7 +16,6 @@ $(function() {
     common.setPageTitle();
     emo_storage.get(Const.CHROME_SYNC_KEY, function(info) {
         if (!$.isEmptyObject(info)) {
-            info = info[Const.CHROME_SYNC_KEY];
             emo_info = info;
             emo_storage.setFeatureStatus(emo_info);
             console.log(info);

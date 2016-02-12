@@ -1,9 +1,9 @@
 let common = require("../helpers/Common.js");
 let Const = require("../helpers/Const.js");
+let Emoticon = require("./Emoticon.js");
+let Shortcut = require("./Shortcut.js");
 
-let emoticon_status = false;
 let mention_status = false;
-let shortcut_status = false;
 let thumbnail_status = false;
 let highlight_status = false;
 let cw_timer;
@@ -149,20 +149,22 @@ $(function(){
         function(){
             if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
                 window.clearInterval(cw_timer);
+                var emoticon_feature = new Emoticon();
+                var shortcut_feature = new Shortcut();
                 $("#_chatppPreLoad").remove();
                 addStyle();
                 addInfoIcon();
                 if (common.getStatus("emoticon")) {
                     rebuild = true;
-                    addEmoticonText();
+                    emoticon_feature.addEmoticonText();
                 }
                 if (common.getStatus("mention")) {
                     mention_status = true;
                     addMentionText();
                 }
                 if (common.getStatus("shortcut")) {
-                    shortcut_status = true;
-                    addShortcutText();
+                    shortcut_feature.addShortcutText();
+                    shortcut_feature.registerShortcut();
                 }
                 if (common.getStatus("thumbnail") || common.getStatus("highlight")) {
                     rebuild = true;
@@ -172,7 +174,7 @@ $(function(){
                 }
                 addAdvertisement();
                 if (common.getStatus("emoticon")) {
-                    addExternalEmo();
+                    emoticon_feature.addExternalEmo();
                 }
 
                 if (rebuild) {
@@ -186,57 +188,9 @@ $(function(){
     );
 });
 
-function addEmo(emo) {
-    for (var index = 0; index < emo.length; index++) {
-        var rep = "";
-        var encoded_text = common.htmlEncode(emo[index].key);
-        var title = encoded_text + " - " + emo[index].data_name;
-        var img_src = common.htmlEncode(common.getEmoUrl(emo[index].src));
-        if (isSpecialEmo(emo[index].key)) {
-            rep = '<img src="' + img_src + '" class="ui_emoticon"/>';
-        } else {
-            rep = '<img src="' + img_src + '" title="' + title + '" alt="' +
-            encoded_text + '" class="ui_emoticon"/>';
-        }
-        var regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
-        CW.reg_cmp.push({
-            key: regex,
-            rep: rep,
-            reptxt: emo[index].key,
-            external: true
-        });
-    }
-}
-
-function isSpecialEmo(emo) {
-    var special_emo = [":-ss", ":-??", "~:>", ":@)", "~X(", "3:-O"];
-    return special_emo.indexOf(emo) > -1;
-}
-
-function removeExternalEmo() {
-    for (var i = CW.reg_cmp.length -1; true; i--) {
-        var emo = CW.reg_cmp[i];
-        if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
-            CW.reg_cmp.splice(i, 1);
-        } else {
-            break;
-        }
-    }
-    emoticon_status = false;
-    updateEmoticonText();
-    console.log("Emoticons removed!");
-}
-
-function addExternalEmo() {
-    var emo_data = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
-    addEmo(emo_data);
-    emoticon_status = true;
-    updateEmoticonText();
-    console.log("Emoticon added!");
-}
-
 function addStyle() {
     $('<style type="text/css"> .emoticonTextEnable{font-weight: bold;};</style>').appendTo("head");
+    $('<style type="text/css"> .chatppErrorsText{font-weight: bold; color: red;};</style>').appendTo("head");
 }
 
 function addInfoIcon() {
@@ -279,43 +233,6 @@ function prepareRoomInfo() {
     $("#_roomInfoTextMyTasks").html(my_tasks);
     var total_files = "<b>Total Files</b>: " + RM.file_num;
     $("#_roomInfoTextTotalFiles").html(total_files);
-}
-
-function addEmoticonText() {
-    if ($("#emoticonText").length > 0) {
-        return;
-    }
-    var emoticon_text = "E " + (emoticon_status ? "ON" : "OFF");
-    $("#_chatSendTool").append(
-        '<li id="_emoticons" role="button" class=" _showDescription">' +
-            '<span id="emoticonText" class="emoticonText icoSizeSmall">' + emoticon_text + '</span>' +
-        '</li>'
-    );
-    setEmoticonTextLabel();
-    $("#emoticonText").click(function() {
-        toggleEmoticonsStatus();
-    })
-}
-
-function setEmoticonTextLabel() {
-    $("#_emoticons").attr("aria-label", "Data: " + localStorage["emoticon_data_version"]);
-}
-
-function removeEmoticonText() {
-    if ($("#emoticonText").length > 0) {
-        $("#emoticonText").remove();
-    }
-}
-
-function updateEmoticonText() {
-    var emoticon_text = "E: " + (emoticon_status ? "ON" : "OFF");
-    var div = $("#emoticonText");
-    div.html(emoticon_text);
-    if (emoticon_status) {
-        div.addClass("emoticonTextEnable");
-    } else {
-        div.removeClass("emoticonTextEnable");
-    }
 }
 
 function addAdvertisement() {
@@ -366,33 +283,6 @@ function addMentionText() {
     })
 }
 
-function addShortcutText() {
-    if ($("#_chatppShortcutText").length > 0) {
-        return;
-    }
-    $("#_chatSendTool").append(
-        '<li id="_chatppShortcutText" role="button" class=" _showDescription">' +
-        '<span id="chatppShortcutText" class="emoticonText icoSizeSmall"></span>' +
-        '</li>'
-    );
-    updateShortcutText();
-    $("#chatppShortcutText").click(function() {
-        toggleShortcutStatus();
-    })
-}
-
-function removeMentionText() {
-    if ($("#_chatppMentionText").length > 0) {
-        $("#_chatppMentionText").remove();
-    }
-}
-
-function removeShortcutText() {
-    if ($("#_chatppShortcutText").length > 0) {
-        $("#_chatppShortcutText").remove();
-    }
-}
-
 function updateMentionText() {
     var mention_text = "M: " + (mention_status ? "ON" : "OFF");
     var div = $("#chatppMentionText");
@@ -406,64 +296,10 @@ function updateMentionText() {
     }
 }
 
-function updateShortcutText() {
-    var shortcut_text = "S: " + (shortcut_status ? "ON" : "OFF");
-    var div = $("#chatppShortcutText");
-    div.html(shortcut_text);
-    if (shortcut_status) {
-        $("#_chatppShortcutText").attr("aria-label", "Click to disable Shortcut Feature");
-        div.addClass("emoticonTextEnable");
-    } else {
-        $("#_chatppShortcutText").attr("aria-label", "Click to enable Shortcut Feature");
-        div.removeClass("emoticonTextEnable");
-    }
-}
-
-function toggleEmoticonsStatus() {
-    if (emoticon_status) {
-        removeExternalEmo();
-    } else {
-        addExternalEmo();
-    }
-}
-
 function toggleMentionStatus() {
     mention_status = mention_status !== true;
+    common.setStatus("mention", mention_status);
     updateMentionText();
-}
-
-function toggleShortcutStatus() {
-    shortcut_status = shortcut_status !== true;
-    if (shortcut_status) {
-        registerShortcut()
-    } else {
-        removeRegisteredKeyboardShortcut();
-    }
-    updateShortcutText();
-}
-
-function disableChatpp() {
-    removeEmoticonText();
-    removeMentionText();
-    removeShortcutText();
-    removeAdvertisement();
-    removeExternalEmo();
-}
-
-function enableChatpp() {
-    addEmoticonText();
-    addMentionText();
-    addShortcutText();
-    addAdvertisement();
-    addExternalEmo();
-}
-
-function reloadEmoticions() {
-    removeExternalEmo();
-    console.log("Old emoticons removed");
-    addExternalEmo();
-    console.log("New emoticons removed");
-    setEmoticonTextLabel();
 }
 
 function updateChatSendView() {

@@ -1,8 +1,8 @@
 let common = require("../helpers/Common.js");
 let Storage = require("../helpers/Storage.js");
+let ChromeStorageLocal = require("../helpers/ChromeStorageLocal.js");
 let Const = require("../helpers/Const.js");
 
-let stored_data = {};
 let local_stored_data = {};
 
 $(function() {
@@ -56,8 +56,6 @@ function loadStatus(name, value) {
 function loadChatppEmoData() {
     var storage = new Storage;
     storage.get(Const.CHROME_SYNC_KEY, function(data) {
-        stored_data = data;
-        data = data[Const.CHROME_SYNC_KEY];
         if ($.isEmptyObject(data)) {
             common.openNewExtensionPageUrl(common.app_detail.options_page);
         } else {
@@ -74,7 +72,8 @@ function updateViewData(data) {
 }
 
 function setVersionType() {
-    chrome.storage.local.get(Const.CHROME_LOCAL_KEY, function(data) {
+    var chrome_storage_local = new ChromeStorageLocal();
+    chrome_storage_local.get(function(data) {
         if ($.isEmptyObject(data)) {
             local_stored_data = {};
         } else {
@@ -91,6 +90,6 @@ function setVersionType() {
                 //chrome.tabs.create({url: "change_logs.html"});
             }
         });
-        chrome.storage.local.set(local_stored_data);
+        chrome_storage_local.setData(local_stored_data);
     });
 }

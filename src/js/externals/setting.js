@@ -12,8 +12,7 @@ $(function() {
     common.setPageTitle();
 
     storage.get(Const.CHROME_SYNC_KEY, function(data) {
-        stored_data = data;
-        data = data[Const.CHROME_SYNC_KEY];
+        stored_data[Const.CHROME_SYNC_KEY] = data;
         if ($.isEmptyObject(data)) {
             common.openNewExtensionPageUrl(common.app_detail.options_page)
         } else {

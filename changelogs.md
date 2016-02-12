@@ -1,5 +1,26 @@
 Chat++ Change Logs
 =================
+## 5.0.0
+* Chat++ is rewritten in [**ECMAScript 6**](http://www.ecma-international.org/publications/standards/Ecma-262.htm),
+ transformed by [**babel**](https://babeljs.io/), built by [**gulp**](http://gulpjs.com/).
+* Emoticon Data File Structure changed. The `regex` field is not necessary anymore. (However, you can add it if you want)
+```
+// Before
+"emoticons": [
+    {"key": "(rofl2)", "regex": "\\(rofl2\\))", "src": "https://i.imgur.com/UD2NE5U.gif"},
+]
+
+// From 5.0.0
+"emoticons": [
+    {"key": "(rofl2)", "src": "https://i.imgur.com/UD2NE5U.gif"},
+]
+```
+
+* No longer show error messages when there are some emoticon data that can not be loaded.
+Display a `ERRORS` text next to the Emoticon text instead.
+* Immediately turn on or off emoticons when toggle the `E` button in the Chat toolbar.
+
+
 ## 4.3.2
 * Fix bug with "new" text in Chat++ icon
 

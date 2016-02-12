@@ -41,8 +41,8 @@ class Common {
         return app_name.indexOf(Const.VERSION_NAME_DEV, app_name.length - (Const.VERSION_NAME_DEV).length) !== -1;
     }
 
-    getStorage() {
-        if (this.isChromeVersion()) {
+    getStorage(local) {
+        if (!local && this.isChromeVersion()) {
             return chrome.storage.sync;
         }
 
@@ -62,10 +62,10 @@ class Common {
 
     getEmoticonDataUrl(data_name, default_url) {
         if (data_name && this.official_emoticons_data[data_name]) {
-            return this.official_emoticons_data[data_name]["link"];
+            default_url = this.official_emoticons_data[data_name]["link"];
         }
 
-        return default_url;
+        return default_url ? default_url.replace("http://i.imgur.com/", "https://i.imgur.com/") : null;
     }
 
     getObjectLength(object) {

@@ -14,7 +14,6 @@ $(function() {
 
     storage.get(Const.CHROME_SYNC_ROOM_KEY, function(data) {
         if (!$.isEmptyObject(data)) {
-            data = data[Const.CHROME_SYNC_ROOM_KEY];
             rooms = data;
             loadData();
         }

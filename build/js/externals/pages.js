@@ -19,7 +19,6 @@ $(function () {
     common.setPageTitle();
     emo_storage.get(Const.CHROME_SYNC_KEY, function (info) {
         if (!$.isEmptyObject(info)) {
-            info = info[Const.CHROME_SYNC_KEY];
             emo_info = info;
             emo_storage.setFeatureStatus(emo_info);
             console.log(info);
@@ -362,7 +361,6 @@ $(function () {
 
     storage.get(Const.CHROME_SYNC_GROUP_KEY, function (data) {
         if (!$.isEmptyObject(data)) {
-            data = data[Const.CHROME_SYNC_GROUP_KEY];
             groups = data;
             syncData();
         }
@@ -504,7 +502,6 @@ $(function () {
 
     storage.get(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, function (data) {
         if (!$.isEmptyObject(data)) {
-            data = data[Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY];
             disabled_notify_rooms = data;
             loadData();
         }
@@ -546,7 +543,6 @@ $(function () {
 
     storage.get(Const.CHROME_SYNC_ROOM_KEY, function (data) {
         if (!$.isEmptyObject(data)) {
-            data = data[Const.CHROME_SYNC_ROOM_KEY];
             rooms = data;
             loadData();
         }
@@ -587,8 +583,7 @@ $(function () {
     common.setPageTitle();
 
     storage.get(Const.CHROME_SYNC_KEY, function (data) {
-        stored_data = data;
-        data = data[Const.CHROME_SYNC_KEY];
+        stored_data[Const.CHROME_SYNC_KEY] = data;
         if ($.isEmptyObject(data)) {
             common.openNewExtensionPageUrl(common.app_detail.options_page);
         } else {
@@ -696,8 +691,8 @@ var Common = function () {
         }
     }, {
         key: "getStorage",
-        value: function getStorage() {
-            if (this.isChromeVersion()) {
+        value: function getStorage(local) {
+            if (!local && this.isChromeVersion()) {
                 return chrome.storage.sync;
             }
 
@@ -719,10 +714,10 @@ var Common = function () {
         key: "getEmoticonDataUrl",
         value: function getEmoticonDataUrl(data_name, default_url) {
             if (data_name && this.official_emoticons_data[data_name]) {
-                return this.official_emoticons_data[data_name]["link"];
+                default_url = this.official_emoticons_data[data_name]["link"];
             }
 
-            return default_url;
+            return default_url ? default_url.replace("http://i.imgur.com/", "https://i.imgur.com/") : null;
         }
     }, {
         key: "getObjectLength",
@@ -973,17 +968,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var common = require("./Common.js");
 
 var Storage = function () {
-    function Storage() {
+    function Storage(local) {
         _classCallCheck(this, Storage);
 
-        this.common = common;
-        this.storage = this.common.getStorage();
+        this.storage = common.getStorage(local);
     }
 
     _createClass(Storage, [{
         key: "get",
         value: function get(key, callback) {
             this.storage.get(key, function (info) {
+                info = info ? info[key] : undefined;
                 callback(info);
             });
         }

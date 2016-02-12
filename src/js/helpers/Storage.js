@@ -1,13 +1,13 @@
 var common = require("./Common.js");
 
 class Storage {
-    constructor() {
-        this.common = common;
-        this.storage = this.common.getStorage();
+    constructor(local) {
+        this.storage = common.getStorage(local);
     }
 
     get(key, callback) {
         this.storage.get(key, function(info) {
+            info = info ? info[key] : undefined;
             callback(info);
         });
     }

@@ -35,6 +35,5 @@ elixir(function(mix) {
             "internals/main.js",
             "internals/mention.js",
             "internals/notification.js",
-            "internals/shortcut.js"
         ], "build/js/internals/all.js");
 });

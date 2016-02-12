@@ -13,7 +13,6 @@ $(function() {
 
     storage.get(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, function(data) {
         if (!$.isEmptyObject(data)) {
-            data = data[Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY];
             disabled_notify_rooms = data;
             loadData();
         }

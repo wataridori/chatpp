@@ -3,9 +3,9 @@
 
 var common = require("../helpers/Common.js");
 var Storage = require("../helpers/Storage.js");
+var ChromeStorageLocal = require("../helpers/ChromeStorageLocal.js");
 var Const = require("../helpers/Const.js");
 
-var stored_data = {};
 var local_stored_data = {};
 
 $(function () {
@@ -59,8 +59,6 @@ function loadStatus(name, value) {
 function loadChatppEmoData() {
     var storage = new Storage();
     storage.get(Const.CHROME_SYNC_KEY, function (data) {
-        stored_data = data;
-        data = data[Const.CHROME_SYNC_KEY];
         if ($.isEmptyObject(data)) {
             common.openNewExtensionPageUrl(common.app_detail.options_page);
         } else {
@@ -77,7 +75,8 @@ function updateViewData(data) {
 }
 
 function setVersionType() {
-    chrome.storage.local.get(Const.CHROME_LOCAL_KEY, function (data) {
+    var chrome_storage_local = new ChromeStorageLocal();
+    chrome_storage_local.get(function (data) {
         if ($.isEmptyObject(data)) {
             local_stored_data = {};
         } else {
@@ -94,11 +93,52 @@ function setVersionType() {
                 //chrome.tabs.create({url: "change_logs.html"});
             }
         });
-        chrome.storage.local.set(local_stored_data);
+        chrome_storage_local.setData(local_stored_data);
     });
 }
 
-},{"../helpers/Common.js":2,"../helpers/Const.js":3,"../helpers/Storage.js":4}],2:[function(require,module,exports){
+},{"../helpers/ChromeStorageLocal.js":2,"../helpers/Common.js":3,"../helpers/Const.js":4,"../helpers/Storage.js":5}],2:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var common = require("./Common.js");
+var Storage = require("./Storage.js");
+var Const = require("./Const.js");
+
+var ChromeStorageLocal = function () {
+    function ChromeStorageLocal() {
+        _classCallCheck(this, ChromeStorageLocal);
+
+        this.storage = new Storage(true);
+        this.key = Const.CHROME_LOCAL_KEY;
+    }
+
+    _createClass(ChromeStorageLocal, [{
+        key: "get",
+        value: function get(callback) {
+            this.storage.get(this.key, callback);
+        }
+    }, {
+        key: "set",
+        value: function set(data, callback) {
+            this.set(this.key, data, callback);
+        }
+    }, {
+        key: "setData",
+        value: function setData(data, callback) {
+            this.storage.setData(data, callback);
+        }
+    }]);
+
+    return ChromeStorageLocal;
+}();
+
+module.exports = ChromeStorageLocal;
+
+},{"./Common.js":3,"./Const.js":4,"./Storage.js":5}],3:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -155,8 +195,8 @@ var Common = function () {
         }
     }, {
         key: "getStorage",
-        value: function getStorage() {
-            if (this.isChromeVersion()) {
+        value: function getStorage(local) {
+            if (!local && this.isChromeVersion()) {
                 return chrome.storage.sync;
             }
 
@@ -178,10 +218,10 @@ var Common = function () {
         key: "getEmoticonDataUrl",
         value: function getEmoticonDataUrl(data_name, default_url) {
             if (data_name && this.official_emoticons_data[data_name]) {
-                return this.official_emoticons_data[data_name]["link"];
+                default_url = this.official_emoticons_data[data_name]["link"];
             }
 
-            return default_url;
+            return default_url ? default_url.replace("http://i.imgur.com/", "https://i.imgur.com/") : null;
         }
     }, {
         key: "getObjectLength",
@@ -312,7 +352,7 @@ var Common = function () {
 var common = new Common();
 module.exports = common;
 
-},{"./Const.js":3}],3:[function(require,module,exports){
+},{"./Const.js":4}],4:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -344,7 +384,7 @@ Const.ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 
 module.exports = Const;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -354,17 +394,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var common = require("./Common.js");
 
 var Storage = function () {
-    function Storage() {
+    function Storage(local) {
         _classCallCheck(this, Storage);
 
-        this.common = common;
-        this.storage = this.common.getStorage();
+        this.storage = common.getStorage(local);
     }
 
     _createClass(Storage, [{
         key: "get",
         value: function get(key, callback) {
             this.storage.get(key, function (info) {
+                info = info ? info[key] : undefined;
                 callback(info);
             });
         }
@@ -395,4 +435,4 @@ var Storage = function () {
 
 module.exports = Storage;
 
-},{"./Common.js":2}]},{},[1]);
+},{"./Common.js":3}]},{},[1]);

@@ -55,8 +55,8 @@ var Common = function () {
         }
     }, {
         key: "getStorage",
-        value: function getStorage() {
-            if (this.isChromeVersion()) {
+        value: function getStorage(local) {
+            if (!local && this.isChromeVersion()) {
                 return chrome.storage.sync;
             }
 
@@ -78,10 +78,10 @@ var Common = function () {
         key: "getEmoticonDataUrl",
         value: function getEmoticonDataUrl(data_name, default_url) {
             if (data_name && this.official_emoticons_data[data_name]) {
-                return this.official_emoticons_data[data_name]["link"];
+                default_url = this.official_emoticons_data[data_name]["link"];
             }
 
-            return default_url;
+            return default_url ? default_url.replace("http://i.imgur.com/", "https://i.imgur.com/") : null;
         }
     }, {
         key: "getObjectLength",
@@ -247,12 +247,597 @@ module.exports = Const;
 },{}],3:[function(require,module,exports){
 "use strict";
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var common = require("../helpers/Common.js");
 var Const = require("../helpers/Const.js");
 
-var emoticon_status = false;
+var Emoticon = function () {
+    function Emoticon() {
+        _classCallCheck(this, Emoticon);
+
+        this.status = common.getStatus("emoticon");
+    }
+
+    _createClass(Emoticon, [{
+        key: "addExternalEmo",
+        value: function addExternalEmo() {
+            var emo_data = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
+            this.addEmo(emo_data);
+            this.status = true;
+            this.updateEmoticonText();
+            console.log("Emoticon added!");
+        }
+    }, {
+        key: "isSpecialEmo",
+        value: function isSpecialEmo(emo) {
+            var special_emo = [":-ss", ":-??", "~:>", ":@)", "~X(", "3:-O"];
+            return special_emo.indexOf(emo) > -1;
+        }
+    }, {
+        key: "removeExternalEmo",
+        value: function removeExternalEmo() {
+            for (var i = CW.reg_cmp.length - 1; true; i--) {
+                var emo = CW.reg_cmp[i];
+                if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
+                    CW.reg_cmp.splice(i, 1);
+                } else {
+                    break;
+                }
+            }
+            this.status = false;
+            common.setStatus("emoticon", false);
+            this.updateEmoticonText();
+            console.log("Emoticons removed!");
+        }
+    }, {
+        key: "addEmoticonText",
+        value: function addEmoticonText() {
+            var _this = this;
+
+            if ($("#emoticonText").length > 0) {
+                return;
+            }
+            var emoticon_text = "E " + (this.status ? "ON" : "OFF");
+            $("#_chatSendTool").append('<li id="_emoticons" role="button" class=" _showDescription">' + '<span id="emoticonText" class="emoticonText icoSizeSmall">' + emoticon_text + '</span>' + '</li>');
+            this.setEmoticonTextLabel();
+            $("#emoticonText").click(function () {
+                return _this.toggleEmoticonsStatus();
+            });
+            this.addErrorText();
+        }
+    }, {
+        key: "setEmoticonTextLabel",
+        value: function setEmoticonTextLabel() {
+            $("#_emoticons").attr("aria-label", "Data: " + localStorage["emoticon_data_version"]);
+        }
+    }, {
+        key: "updateEmoticonText",
+        value: function updateEmoticonText() {
+            var emoticon_text = "E: " + (this.status ? "ON" : "OFF");
+            var div = $("#emoticonText");
+            div.html(emoticon_text);
+            if (this.status) {
+                div.addClass("emoticonTextEnable");
+            } else {
+                div.removeClass("emoticonTextEnable");
+            }
+        }
+    }, {
+        key: "addErrorText",
+        value: function addErrorText() {
+            if (!localStorage["failed_data"] || $("#errorText").length > 0) {
+                return;
+            }
+            var failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
+            var failed_data_text = "The following data could not be loaded: " + failed_data;
+            $("#_chatSendTool").append('<li id="_chatppErrors" role="button" class=" _showDescription">' + '<span id="chatppErrors" class="emoticonText icoSizeSmall chatppErrorsText">(ERROR)</span>' + '</li>');
+            $("#_chatppErrors").attr("aria-label", failed_data_text);
+        }
+    }, {
+        key: "toggleEmoticonsStatus",
+        value: function toggleEmoticonsStatus() {
+            if (this.status) {
+                this.removeExternalEmo();
+            } else {
+                this.addExternalEmo();
+            }
+            RL.rooms[RM.id].build();
+        }
+    }, {
+        key: "addEmo",
+        value: function addEmo(emo) {
+            for (var index = 0; index < emo.length; index++) {
+                var rep = "";
+                var encoded_text = common.htmlEncode(emo[index].key);
+                var title = encoded_text + " - " + emo[index].data_name;
+                var img_src = common.htmlEncode(common.getEmoUrl(emo[index].src));
+                if (this.isSpecialEmo(emo[index].key)) {
+                    rep = '<img src="' + img_src + '" class="ui_emoticon"/>';
+                } else {
+                    rep = '<img src="' + img_src + '" title="' + title + '" alt="' + encoded_text + '" class="ui_emoticon"/>';
+                }
+                var regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
+                CW.reg_cmp.push({
+                    key: regex,
+                    rep: rep,
+                    reptxt: emo[index].key,
+                    external: true
+                });
+            }
+        }
+    }]);
+
+    return Emoticon;
+}();
+
+module.exports = Emoticon;
+
+},{"../helpers/Common.js":1,"../helpers/Const.js":2}],4:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Const = require("../helpers/Const.js");
+var common = require("../helpers/Common.js");
+
+var DOM_VK_CANCEL = 3,
+    DOM_VK_HELP = 6,
+    DOM_VK_BACK_SPACE = 8,
+    DOM_VK_TAB = 9,
+    DOM_VK_CLEAR = 12,
+    DOM_VK_RETURN = 13,
+    DOM_VK_ENTER = 14,
+    DOM_VK_SHIFT = 16,
+    DOM_VK_CONTROL = 17,
+    DOM_VK_ALT = 18,
+    DOM_VK_PAUSE = 19,
+    DOM_VK_CAPS_LOCK = 20,
+    DOM_VK_ESCAPE = 27,
+    DOM_VK_SPACE = 32,
+    DOM_VK_PAGE_UP = 33,
+    DOM_VK_PAGE_DOWN = 34,
+    DOM_VK_END = 35,
+    DOM_VK_HOME = 36,
+    DOM_VK_LEFT = 37,
+    DOM_VK_UP = 38,
+    DOM_VK_RIGHT = 39,
+    DOM_VK_DOWN = 40,
+    DOM_VK_PRINTSCREEN = 44,
+    DOM_VK_INSERT = 45,
+    DOM_VK_DELETE = 46,
+    DOM_VK_0 = 48,
+    DOM_VK_1 = 49,
+    DOM_VK_2 = 50,
+    DOM_VK_3 = 51,
+    DOM_VK_4 = 52,
+    DOM_VK_5 = 53,
+    DOM_VK_6 = 54,
+    DOM_VK_7 = 55,
+    DOM_VK_8 = 56,
+    DOM_VK_9 = 57,
+    DOM_VK_SEMICOLON = 59,
+    DOM_VK_EQUALS = 61,
+    DOM_VK_A = 65,
+    DOM_VK_B = 66,
+    DOM_VK_C = 67,
+    DOM_VK_D = 68,
+    DOM_VK_E = 69,
+    DOM_VK_F = 70,
+    DOM_VK_G = 71,
+    DOM_VK_H = 72,
+    DOM_VK_I = 73,
+    DOM_VK_J = 74,
+    DOM_VK_K = 75,
+    DOM_VK_L = 76,
+    DOM_VK_M = 77,
+    DOM_VK_N = 78,
+    DOM_VK_O = 79,
+    DOM_VK_P = 80,
+    DOM_VK_Q = 81,
+    DOM_VK_R = 82,
+    DOM_VK_S = 83,
+    DOM_VK_T = 84,
+    DOM_VK_U = 85,
+    DOM_VK_V = 86,
+    DOM_VK_W = 87,
+    DOM_VK_X = 88,
+    DOM_VK_Y = 89,
+    DOM_VK_Z = 90,
+    DOM_VK_CONTEXT_MENU = 93,
+    DOM_VK_NUMPAD0 = 96,
+    DOM_VK_NUMPAD1 = 97,
+    DOM_VK_NUMPAD2 = 98,
+    DOM_VK_NUMPAD3 = 99,
+    DOM_VK_NUMPAD4 = 100,
+    DOM_VK_NUMPAD5 = 101,
+    DOM_VK_NUMPAD6 = 102,
+    DOM_VK_NUMPAD7 = 103,
+    DOM_VK_NUMPAD8 = 104,
+    DOM_VK_NUMPAD9 = 105,
+    DOM_VK_MULTIPLY = 106,
+    DOM_VK_ADD = 107,
+    DOM_VK_SEPARATOR = 108,
+    DOM_VK_SUBTRACT = 109,
+    DOM_VK_DECIMAL = 110,
+    DOM_VK_DIVIDE = 111,
+    DOM_VK_F1 = 112,
+    DOM_VK_F2 = 113,
+    DOM_VK_F3 = 114,
+    DOM_VK_F4 = 115,
+    DOM_VK_F5 = 116,
+    DOM_VK_F6 = 117,
+    DOM_VK_F7 = 118,
+    DOM_VK_F8 = 119,
+    DOM_VK_F9 = 120,
+    DOM_VK_F10 = 121,
+    DOM_VK_F11 = 122,
+    DOM_VK_F12 = 123,
+    DOM_VK_F13 = 124,
+    DOM_VK_F14 = 125,
+    DOM_VK_F15 = 126,
+    DOM_VK_F16 = 127,
+    DOM_VK_F17 = 128,
+    DOM_VK_F18 = 129,
+    DOM_VK_F19 = 130,
+    DOM_VK_F20 = 131,
+    DOM_VK_F21 = 132,
+    DOM_VK_F22 = 133,
+    DOM_VK_F23 = 134,
+    DOM_VK_F24 = 135,
+    DOM_VK_NUM_LOCK = 144,
+    DOM_VK_SCROLL_LOCK = 145,
+    DOM_VK_COMMA = 188,
+    DOM_VK_PERIOD = 190,
+    DOM_VK_SLASH = 191,
+    DOM_VK_BACK_QUOTE = 192,
+    DOM_VK_OPEN_BRACKET = 219,
+    DOM_VK_BACK_SLASH = 220,
+    DOM_VK_CLOSE_BRACKET = 221,
+    DOM_VK_QUOTE = 222,
+    DOM_VK_META = 224;
+
+var Shortcut = function () {
+    function Shortcut() {
+        _classCallCheck(this, Shortcut);
+
+        this.shortcuts_default = {
+            reply: DOM_VK_R,
+            quote: DOM_VK_Q,
+            link: DOM_VK_L,
+            edit: DOM_VK_E,
+            task: DOM_VK_K,
+            my_chat: DOM_VK_A,
+            scroll: DOM_VK_S,
+            previous_mention: DOM_VK_K,
+            next_mention: DOM_VK_J,
+            next_mention_room: DOM_VK_M,
+            next_new_message_room: DOM_VK_N,
+            down_room: DOM_VK_V,
+            up_room: DOM_VK_B,
+            first_room: DOM_VK_Z,
+            first_nonstick_room: DOM_VK_X,
+            focus_chatbox: DOM_VK_SPACE,
+            edit_image_upload: DOM_VK_E
+        };
+        this.room_shortcuts = {};
+        if (localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]) {
+            this.room_shortcuts = JSON.parse(localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]);
+        }
+        this.status = common.getStatus("shortcut");
+    }
+
+    _createClass(Shortcut, [{
+        key: "addShortcutText",
+        value: function addShortcutText() {
+            var _this = this;
+
+            if ($("#_chatppShortcutText").length > 0) {
+                return;
+            }
+            $("#_chatSendTool").append('<li id="_chatppShortcutText" role="button" class=" _showDescription">' + '<span id="chatppShortcutText" class="emoticonText icoSizeSmall"></span>' + '</li>');
+            this.updateShortcutText();
+            $("#chatppShortcutText").click(function () {
+                return _this.toggleShortcutStatus();
+            });
+        }
+    }, {
+        key: "updateShortcutText",
+        value: function updateShortcutText() {
+            var shortcut_text = "S: " + (this.status ? "ON" : "OFF");
+            var div = $("#chatppShortcutText");
+            div.html(shortcut_text);
+            if (this.status) {
+                $("#_chatppShortcutText").attr("aria-label", "Click to disable Shortcut Feature");
+                div.addClass("emoticonTextEnable");
+            } else {
+                $("#_chatppShortcutText").attr("aria-label", "Click to enable Shortcut Feature");
+                div.removeClass("emoticonTextEnable");
+            }
+        }
+    }, {
+        key: "toggleShortcutStatus",
+        value: function toggleShortcutStatus() {
+            this.status = !this.status;
+            common.setStatus("shortcut", this.status);
+            if (this.status) {
+                this.registerShortcut();
+            } else {
+                this.removeRegisteredKeyboardShortcut();
+            }
+            this.updateShortcutText();
+        }
+    }, {
+        key: "registerShortcut",
+        value: function registerShortcut() {
+            var _this2 = this;
+
+            var shortcuts_default = this.shortcuts_default;
+            CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function () {
+                var message_id = _this2.getHoverMessageId();
+                _this2.replyMessage(message_id);
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, function () {
+                _this2.triggerDefaultAction("quote");
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.link, !1, !1, !1, !1, function () {
+                _this2.triggerDefaultAction("link");
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.edit, !1, !1, !1, !1, function () {
+                _this2.triggerDefaultAction("edit");
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.task, !1, !1, !1, !1, function () {
+                _this2.triggerDefaultAction("task");
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.my_chat, !1, !1, !1, !1, function () {
+                RL.selectRoom(AC.getRoomId(AC.myid));
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.scroll, !1, !1, !1, !1, function () {
+                RM.load(RM.timeline.getLastChatId());
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.previous_mention, !1, !1, !1, !1, function () {
+                var message_id = _this2.getHoverMessageId();
+                _this2.goToPreviousMention(message_id);
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, function () {
+                var message_id = _this2.getHoverMessageId();
+                _this2.goToNexMention(message_id);
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.next_mention_room, !1, !1, !1, !1, function () {
+                _this2.nextUnreadRoom(true);
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.next_new_message_room, !1, !1, !1, !1, function () {
+                _this2.nextUnreadRoom();
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.up_room, !1, !1, !1, !1, function () {
+                _this2.nextRoom(true);
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.down_room, !1, !1, !1, !1, function () {
+                _this2.nextRoom();
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.first_room, !1, !1, !1, !1, function () {
+                _this2.firstRoom();
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.first_nonstick_room, !1, !1, !1, !1, function () {
+                _this2.firstRoom(true);
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.focus_chatbox, !1, !1, !1, !1, function () {
+                $("#_chatText").focus();
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.edit_image_upload, !1, !0, !1, !1, function () {
+                _this2.triggerDefaultAction("edit");
+                var chat_text = $("#_chatText");
+                var text = chat_text.val();
+                var img = text.match(/(\[preview id=[0-9]* ht=[0-9]*\])/);
+                if (img && img[0]) {
+                    text = text.replace(/\[info\].*\[\/info\]/, img[0]);
+                    chat_text.val(text);
+                }
+            });
+
+            var selectRoom = function selectRoom(room) {
+                return function () {
+                    RL.selectRoom(room);
+                };
+            };
+            for (var i in this.room_shortcuts) {
+                if (this.room_shortcuts[i]) {
+                    var room = this.room_shortcuts[i];
+                    CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, selectRoom(room));
+                }
+            }
+            console.log("ShortCuts added!");
+        }
+    }, {
+        key: "removeRegisteredKeyboardShortcut",
+        value: function removeRegisteredKeyboardShortcut() {
+            for (var keyboard in this.shortcuts_default) {
+                CW.view.registerKeyboardShortcut(this.shortcuts_default[keyboard], !1, !1, !1, !1, function () {
+                    return false;
+                });
+            }
+        }
+    }, {
+        key: "triggerDefaultAction",
+        value: function triggerDefaultAction(action) {
+            var me = $("._message:hover");
+            var reply = me.find("[data-cwui-ab-type='" + action + "']");
+            if (this.isDomExists(reply)) {
+                reply.trigger("click");
+            }
+        }
+    }, {
+        key: "triggerMoreAction",
+        value: function triggerMoreAction(action) {
+            var more_action = $("._message:hover").find("._cwABMoreTip");
+            if (this.isDomExists(more_action)) {
+                more_action.trigger("click");
+                var delete_button = $("._cwABMoreListBox").find('[data-cwui-ab-type="action"]');
+                if (this.isDomExists(delete_button)) {
+                    delete_button.trigger("click");
+                }
+            }
+        }
+    }, {
+        key: "selectRoom",
+        value: function selectRoom(room) {
+            RL.selectRoom(room);
+        }
+    }, {
+        key: "isDomExists",
+        value: function isDomExists(dom) {
+            return dom.length > 0;
+        }
+    }, {
+        key: "getHoverMessageId",
+        value: function getHoverMessageId() {
+            return $("._message:hover").data("mid");
+        }
+    }, {
+        key: "getMessagePosition",
+        value: function getMessagePosition(id) {
+            var messages = RM.timeline.chat_list;
+            for (var i = messages.length - 1; i >= 0; i--) {
+                if (messages[i].id == id) {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+    }, {
+        key: "goToPreviousMention",
+        value: function goToPreviousMention(current) {
+            var position = this.getMessagePosition(current);
+            var messages = RM.timeline.chat_list;
+            for (var i = position - 1; i >= 0; i--) {
+                if (this.isMentionMessage(messages[i])) {
+                    RM.load(messages[i].id);
+                    return true;
+                }
+            }
+
+            if (!RM.timeline.has_old && messages.length == 0) {
+                return false;
+            }
+
+            RM.timeline.loadOld();
+        }
+    }, {
+        key: "goToNexMention",
+        value: function goToNexMention(current) {
+            var position = this.getMessagePosition(current);
+            var messages = RM.timeline.chat_list;
+            for (var i = position + 1; i > 0 && i < messages.length; i++) {
+                if (this.isMentionMessage(messages[i])) {
+                    RM.load(messages[i].id);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }, {
+        key: "isMentionMessage",
+        value: function isMentionMessage(message) {
+            var regex_reply = new RegExp("\\[.* aid=" + myid + " .*\\]");
+            if (regex_reply.test(message.msg)) {
+                return true;
+            }
+
+            var regex_to = new RegExp("\\[To:" + myid + "\\]");
+            return regex_to.test(message.msg);
+        }
+    }, {
+        key: "replyMessage",
+        value: function replyMessage(message) {
+            var data = RM.timeline.chat_id2chat_dat[message];
+            if (data) {
+                $C("#_chatText").focus();
+                var name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
+                CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
+            }
+        }
+    }, {
+        key: "nextUnreadRoom",
+        value: function nextUnreadRoom(check_mention) {
+            var current_room = RM.id;
+            var sortedRooms = RL.getSortedRoomList();
+            var rooms = RL.rooms;
+            for (var i = 0; i < sortedRooms.length; i++) {
+                if (sortedRooms[i] && sortedRooms[i] !== current_room) {
+                    var room = rooms[sortedRooms[i]];
+                    var check = check_mention ? room.getMentionNum() : room.getUnreadNum();
+                    if (check) {
+                        return RL.selectRoom(room.id);
+                    }
+                }
+            }
+        }
+    }, {
+        key: "nextRoom",
+        value: function nextRoom(back) {
+            var previous;
+            var current_room = RM.id;
+            var sortedRooms = RL.getSortedRoomList();
+            for (var i = 0; i < sortedRooms.length; i++) {
+                if (sortedRooms[i] === current_room) {
+                    if (back) {
+                        if (previous) {
+                            return RL.selectRoom(previous);
+                        }
+                    } else {
+                        if (sortedRooms[i + 1]) {
+                            return RL.selectRoom(sortedRooms[i + 1]);
+                        }
+                    }
+                }
+                previous = sortedRooms[i];
+            }
+        }
+    }, {
+        key: "firstRoom",
+        value: function firstRoom(nonstick) {
+            var sortedRooms = RL.getSortedRoomList();
+            var room_index = nonstick ? RL.getStickyRoomNum() : 0;
+            return RL.selectRoom(sortedRooms[room_index]);
+        }
+    }]);
+
+    return Shortcut;
+}();
+
+module.exports = Shortcut;
+
+},{"../helpers/Common.js":1,"../helpers/Const.js":2}],5:[function(require,module,exports){
+"use strict";
+
+var common = require("../helpers/Common.js");
+var Const = require("../helpers/Const.js");
+var Emoticon = require("./Emoticon.js");
+var Shortcut = require("./Shortcut.js");
+
 var mention_status = false;
-var shortcut_status = false;
 var thumbnail_status = false;
 var highlight_status = false;
 var cw_timer = undefined;
@@ -266,20 +851,22 @@ $(function () {
     cw_timer = setInterval(function () {
         if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
             window.clearInterval(cw_timer);
+            var emoticon_feature = new Emoticon();
+            var shortcut_feature = new Shortcut();
             $("#_chatppPreLoad").remove();
             addStyle();
             addInfoIcon();
             if (common.getStatus("emoticon")) {
                 rebuild = true;
-                addEmoticonText();
+                emoticon_feature.addEmoticonText();
             }
             if (common.getStatus("mention")) {
                 mention_status = true;
                 addMentionText();
             }
             if (common.getStatus("shortcut")) {
-                shortcut_status = true;
-                addShortcutText();
+                shortcut_feature.addShortcutText();
+                shortcut_feature.registerShortcut();
             }
             if (common.getStatus("thumbnail") || common.getStatus("highlight")) {
                 rebuild = true;
@@ -289,7 +876,7 @@ $(function () {
             }
             addAdvertisement();
             if (common.getStatus("emoticon")) {
-                addExternalEmo();
+                emoticon_feature.addExternalEmo();
             }
 
             if (rebuild) {
@@ -301,56 +888,9 @@ $(function () {
     }, 100);
 });
 
-function addEmo(emo) {
-    for (var index = 0; index < emo.length; index++) {
-        var rep = "";
-        var encoded_text = common.htmlEncode(emo[index].key);
-        var title = encoded_text + " - " + emo[index].data_name;
-        var img_src = common.htmlEncode(common.getEmoUrl(emo[index].src));
-        if (isSpecialEmo(emo[index].key)) {
-            rep = '<img src="' + img_src + '" class="ui_emoticon"/>';
-        } else {
-            rep = '<img src="' + img_src + '" title="' + title + '" alt="' + encoded_text + '" class="ui_emoticon"/>';
-        }
-        var regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
-        CW.reg_cmp.push({
-            key: regex,
-            rep: rep,
-            reptxt: emo[index].key,
-            external: true
-        });
-    }
-}
-
-function isSpecialEmo(emo) {
-    var special_emo = [":-ss", ":-??", "~:>", ":@)", "~X(", "3:-O"];
-    return special_emo.indexOf(emo) > -1;
-}
-
-function removeExternalEmo() {
-    for (var i = CW.reg_cmp.length - 1; true; i--) {
-        var emo = CW.reg_cmp[i];
-        if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
-            CW.reg_cmp.splice(i, 1);
-        } else {
-            break;
-        }
-    }
-    emoticon_status = false;
-    updateEmoticonText();
-    console.log("Emoticons removed!");
-}
-
-function addExternalEmo() {
-    var emo_data = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
-    addEmo(emo_data);
-    emoticon_status = true;
-    updateEmoticonText();
-    console.log("Emoticon added!");
-}
-
 function addStyle() {
     $('<style type="text/css"> .emoticonTextEnable{font-weight: bold;};</style>').appendTo("head");
+    $('<style type="text/css"> .chatppErrorsText{font-weight: bold; color: red;};</style>').appendTo("head");
 }
 
 function addInfoIcon() {
@@ -384,39 +924,6 @@ function prepareRoomInfo() {
     $("#_roomInfoTextMyTasks").html(my_tasks);
     var total_files = "<b>Total Files</b>: " + RM.file_num;
     $("#_roomInfoTextTotalFiles").html(total_files);
-}
-
-function addEmoticonText() {
-    if ($("#emoticonText").length > 0) {
-        return;
-    }
-    var emoticon_text = "E " + (emoticon_status ? "ON" : "OFF");
-    $("#_chatSendTool").append('<li id="_emoticons" role="button" class=" _showDescription">' + '<span id="emoticonText" class="emoticonText icoSizeSmall">' + emoticon_text + '</span>' + '</li>');
-    setEmoticonTextLabel();
-    $("#emoticonText").click(function () {
-        toggleEmoticonsStatus();
-    });
-}
-
-function setEmoticonTextLabel() {
-    $("#_emoticons").attr("aria-label", "Data: " + localStorage["emoticon_data_version"]);
-}
-
-function removeEmoticonText() {
-    if ($("#emoticonText").length > 0) {
-        $("#emoticonText").remove();
-    }
-}
-
-function updateEmoticonText() {
-    var emoticon_text = "E: " + (emoticon_status ? "ON" : "OFF");
-    var div = $("#emoticonText");
-    div.html(emoticon_text);
-    if (emoticon_status) {
-        div.addClass("emoticonTextEnable");
-    } else {
-        div.removeClass("emoticonTextEnable");
-    }
 }
 
 function addAdvertisement() {
@@ -461,29 +968,6 @@ function addMentionText() {
     });
 }
 
-function addShortcutText() {
-    if ($("#_chatppShortcutText").length > 0) {
-        return;
-    }
-    $("#_chatSendTool").append('<li id="_chatppShortcutText" role="button" class=" _showDescription">' + '<span id="chatppShortcutText" class="emoticonText icoSizeSmall"></span>' + '</li>');
-    updateShortcutText();
-    $("#chatppShortcutText").click(function () {
-        toggleShortcutStatus();
-    });
-}
-
-function removeMentionText() {
-    if ($("#_chatppMentionText").length > 0) {
-        $("#_chatppMentionText").remove();
-    }
-}
-
-function removeShortcutText() {
-    if ($("#_chatppShortcutText").length > 0) {
-        $("#_chatppShortcutText").remove();
-    }
-}
-
 function updateMentionText() {
     var mention_text = "M: " + (mention_status ? "ON" : "OFF");
     var div = $("#chatppMentionText");
@@ -497,64 +981,10 @@ function updateMentionText() {
     }
 }
 
-function updateShortcutText() {
-    var shortcut_text = "S: " + (shortcut_status ? "ON" : "OFF");
-    var div = $("#chatppShortcutText");
-    div.html(shortcut_text);
-    if (shortcut_status) {
-        $("#_chatppShortcutText").attr("aria-label", "Click to disable Shortcut Feature");
-        div.addClass("emoticonTextEnable");
-    } else {
-        $("#_chatppShortcutText").attr("aria-label", "Click to enable Shortcut Feature");
-        div.removeClass("emoticonTextEnable");
-    }
-}
-
-function toggleEmoticonsStatus() {
-    if (emoticon_status) {
-        removeExternalEmo();
-    } else {
-        addExternalEmo();
-    }
-}
-
 function toggleMentionStatus() {
     mention_status = mention_status !== true;
+    common.setStatus("mention", mention_status);
     updateMentionText();
-}
-
-function toggleShortcutStatus() {
-    shortcut_status = shortcut_status !== true;
-    if (shortcut_status) {
-        registerShortcut();
-    } else {
-        removeRegisteredKeyboardShortcut();
-    }
-    updateShortcutText();
-}
-
-function disableChatpp() {
-    removeEmoticonText();
-    removeMentionText();
-    removeShortcutText();
-    removeAdvertisement();
-    removeExternalEmo();
-}
-
-function enableChatpp() {
-    addEmoticonText();
-    addMentionText();
-    addShortcutText();
-    addAdvertisement();
-    addExternalEmo();
-}
-
-function reloadEmoticions() {
-    removeExternalEmo();
-    console.log("Old emoticons removed");
-    addExternalEmo();
-    console.log("New emoticons removed");
-    setEmoticonTextLabel();
 }
 
 function updateChatSendView() {
@@ -702,7 +1132,7 @@ function getHighlightOption(text) {
     return highlight_options;
 }
 
-},{"../helpers/Common.js":1,"../helpers/Const.js":2}],4:[function(require,module,exports){
+},{"../helpers/Common.js":1,"../helpers/Const.js":2,"./Emoticon.js":3,"./Shortcut.js":4}],6:[function(require,module,exports){
 "use strict";
 
 var common = require("../helpers/Common.js");
@@ -1297,7 +1727,7 @@ $(function () {
     }
 });
 
-},{"../helpers/Common.js":1,"../helpers/Const.js":2}],5:[function(require,module,exports){
+},{"../helpers/Common.js":1,"../helpers/Const.js":2}],7:[function(require,module,exports){
 "use strict";
 
 $(function () {
@@ -1322,394 +1752,4 @@ $(function () {
     })();
 });
 
-},{}],6:[function(require,module,exports){
-"use strict";
-
-var Const = require("../helpers/Const.js");
-var common = require("../helpers/Common.js");
-var shortcut_timer = undefined;
-
-var DOM_VK_CANCEL = 3,
-    DOM_VK_HELP = 6,
-    DOM_VK_BACK_SPACE = 8,
-    DOM_VK_TAB = 9,
-    DOM_VK_CLEAR = 12,
-    DOM_VK_RETURN = 13,
-    DOM_VK_ENTER = 14,
-    DOM_VK_SHIFT = 16,
-    DOM_VK_CONTROL = 17,
-    DOM_VK_ALT = 18,
-    DOM_VK_PAUSE = 19,
-    DOM_VK_CAPS_LOCK = 20,
-    DOM_VK_ESCAPE = 27,
-    DOM_VK_SPACE = 32,
-    DOM_VK_PAGE_UP = 33,
-    DOM_VK_PAGE_DOWN = 34,
-    DOM_VK_END = 35,
-    DOM_VK_HOME = 36,
-    DOM_VK_LEFT = 37,
-    DOM_VK_UP = 38,
-    DOM_VK_RIGHT = 39,
-    DOM_VK_DOWN = 40,
-    DOM_VK_PRINTSCREEN = 44,
-    DOM_VK_INSERT = 45,
-    DOM_VK_DELETE = 46,
-    DOM_VK_0 = 48,
-    DOM_VK_1 = 49,
-    DOM_VK_2 = 50,
-    DOM_VK_3 = 51,
-    DOM_VK_4 = 52,
-    DOM_VK_5 = 53,
-    DOM_VK_6 = 54,
-    DOM_VK_7 = 55,
-    DOM_VK_8 = 56,
-    DOM_VK_9 = 57,
-    DOM_VK_SEMICOLON = 59,
-    DOM_VK_EQUALS = 61,
-    DOM_VK_A = 65,
-    DOM_VK_B = 66,
-    DOM_VK_C = 67,
-    DOM_VK_D = 68,
-    DOM_VK_E = 69,
-    DOM_VK_F = 70,
-    DOM_VK_G = 71,
-    DOM_VK_H = 72,
-    DOM_VK_I = 73,
-    DOM_VK_J = 74,
-    DOM_VK_K = 75,
-    DOM_VK_L = 76,
-    DOM_VK_M = 77,
-    DOM_VK_N = 78,
-    DOM_VK_O = 79,
-    DOM_VK_P = 80,
-    DOM_VK_Q = 81,
-    DOM_VK_R = 82,
-    DOM_VK_S = 83,
-    DOM_VK_T = 84,
-    DOM_VK_U = 85,
-    DOM_VK_V = 86,
-    DOM_VK_W = 87,
-    DOM_VK_X = 88,
-    DOM_VK_Y = 89,
-    DOM_VK_Z = 90,
-    DOM_VK_CONTEXT_MENU = 93,
-    DOM_VK_NUMPAD0 = 96,
-    DOM_VK_NUMPAD1 = 97,
-    DOM_VK_NUMPAD2 = 98,
-    DOM_VK_NUMPAD3 = 99,
-    DOM_VK_NUMPAD4 = 100,
-    DOM_VK_NUMPAD5 = 101,
-    DOM_VK_NUMPAD6 = 102,
-    DOM_VK_NUMPAD7 = 103,
-    DOM_VK_NUMPAD8 = 104,
-    DOM_VK_NUMPAD9 = 105,
-    DOM_VK_MULTIPLY = 106,
-    DOM_VK_ADD = 107,
-    DOM_VK_SEPARATOR = 108,
-    DOM_VK_SUBTRACT = 109,
-    DOM_VK_DECIMAL = 110,
-    DOM_VK_DIVIDE = 111,
-    DOM_VK_F1 = 112,
-    DOM_VK_F2 = 113,
-    DOM_VK_F3 = 114,
-    DOM_VK_F4 = 115,
-    DOM_VK_F5 = 116,
-    DOM_VK_F6 = 117,
-    DOM_VK_F7 = 118,
-    DOM_VK_F8 = 119,
-    DOM_VK_F9 = 120,
-    DOM_VK_F10 = 121,
-    DOM_VK_F11 = 122,
-    DOM_VK_F12 = 123,
-    DOM_VK_F13 = 124,
-    DOM_VK_F14 = 125,
-    DOM_VK_F15 = 126,
-    DOM_VK_F16 = 127,
-    DOM_VK_F17 = 128,
-    DOM_VK_F18 = 129,
-    DOM_VK_F19 = 130,
-    DOM_VK_F20 = 131,
-    DOM_VK_F21 = 132,
-    DOM_VK_F22 = 133,
-    DOM_VK_F23 = 134,
-    DOM_VK_F24 = 135,
-    DOM_VK_NUM_LOCK = 144,
-    DOM_VK_SCROLL_LOCK = 145,
-    DOM_VK_COMMA = 188,
-    DOM_VK_PERIOD = 190,
-    DOM_VK_SLASH = 191,
-    DOM_VK_BACK_QUOTE = 192,
-    DOM_VK_OPEN_BRACKET = 219,
-    DOM_VK_BACK_SLASH = 220,
-    DOM_VK_CLOSE_BRACKET = 221,
-    DOM_VK_QUOTE = 222,
-    DOM_VK_META = 224;
-
-var shortcuts_default = {
-    reply: DOM_VK_R,
-    quote: DOM_VK_Q,
-    link: DOM_VK_L,
-    edit: DOM_VK_E,
-    task: DOM_VK_K,
-    my_chat: DOM_VK_A,
-    scroll: DOM_VK_S,
-    previous_mention: DOM_VK_K,
-    next_mention: DOM_VK_J,
-    next_mention_room: DOM_VK_M,
-    next_new_message_room: DOM_VK_N,
-    down_room: DOM_VK_V,
-    up_room: DOM_VK_B,
-    first_room: DOM_VK_Z,
-    first_nonstick_room: DOM_VK_X,
-    focus_chatbox: DOM_VK_SPACE,
-    edit_image_upload: DOM_VK_E
-};
-
-var room_shortcuts = [];
-
-$(function () {
-    shortcut_timer = setInterval(function () {
-        if (typeof CW !== "undefined" && typeof CW.view !== "undefined") {
-            window.clearInterval(shortcut_timer);
-            if (common.getStatus("shortcut")) {
-                registerShortcut();
-            }
-        }
-    }, 100);
-});
-
-function registerShortcut() {
-    console.log("Registering ShortCuts");
-    CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function () {
-        var message_id = getHoverMessageId();
-        replyMessage(message_id);
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, function () {
-        triggerDefaultAction("quote");
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.link, !1, !1, !1, !1, function () {
-        triggerDefaultAction("link");
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.edit, !1, !1, !1, !1, function () {
-        triggerDefaultAction("edit");
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.task, !1, !1, !1, !1, function () {
-        triggerDefaultAction("task");
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.my_chat, !1, !1, !1, !1, function () {
-        RL.selectRoom(AC.getRoomId(AC.myid));
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.scroll, !1, !1, !1, !1, function () {
-        RM.load(RM.timeline.getLastChatId());
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.previous_mention, !1, !1, !1, !1, function () {
-        var message_id = getHoverMessageId();
-        goToPreviousMention(message_id);
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, function () {
-        var message_id = getHoverMessageId();
-        goToNexMention(message_id);
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.next_mention_room, !1, !1, !1, !1, function () {
-        nextUnreadRoom(true);
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.next_new_message_room, !1, !1, !1, !1, function () {
-        nextUnreadRoom();
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.up_room, !1, !1, !1, !1, function () {
-        nextRoom(true);
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.down_room, !1, !1, !1, !1, function () {
-        nextRoom();
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.first_room, !1, !1, !1, !1, function () {
-        firstRoom();
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.first_nonstick_room, !1, !1, !1, !1, function () {
-        firstRoom(true);
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.focus_chatbox, !1, !1, !1, !1, function () {
-        $("#_chatText").focus();
-    });
-
-    CW.view.registerKeyboardShortcut(shortcuts_default.edit_image_upload, !1, !0, !1, !1, function () {
-        triggerDefaultAction("edit");
-        var chat_text = $("#_chatText");
-        var text = chat_text.val();
-        var img = text.match(/(\[preview id=[0-9]* ht=[0-9]*\])/);
-        if (img && img[0]) {
-            text = text.replace(/\[info\].*\[\/info\]/, img[0]);
-            chat_text.val(text);
-        }
-    });
-
-    if (localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]) {
-        room_shortcuts = JSON.parse(localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]);
-    }
-
-    for (var i in room_shortcuts) {
-        if (room_shortcuts[i]) {
-            var room = room_shortcuts[i];
-            CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, selectRoom(room));
-        }
-    }
-}
-
-var selectRoom = function selectRoom(room) {
-    return function () {
-        RL.selectRoom(room);
-    };
-};
-
-function removeRegisteredKeyboardShortcut() {
-    for (var keyboard in shortcuts_default) {
-        CW.view.registerKeyboardShortcut(shortcuts_default[keyboard], !1, !1, !1, !1, function () {
-            return false;
-        });
-    }
-}
-
-function triggerDefaultAction(action) {
-    var me = $("._message:hover");
-    var reply = me.find("[data-cwui-ab-type='" + action + "']");
-    if (isDomExists(reply)) {
-        reply.trigger("click");
-    }
-}
-
-function triggerMoreAction(action) {
-    var more_action = $("._message:hover").find("._cwABMoreTip");
-    if (isDomExists(more_action)) {
-        more_action.trigger("click");
-        var delete_button = $("._cwABMoreListBox").find('[data-cwui-ab-type="action"]');
-        if (isDomExists(delete_button)) {
-            delete_button.trigger("click");
-        }
-    }
-}
-
-function isDomExists(dom) {
-    return dom.length > 0;
-}
-
-function getHoverMessageId() {
-    return $("._message:hover").data("mid");
-}
-
-function getMessagePosition(id) {
-    var messages = RM.timeline.chat_list;
-    for (var i = messages.length - 1; i >= 0; i--) {
-        if (messages[i].id == id) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
-function goToPreviousMention(current) {
-    var position = getMessagePosition(current);
-    var messages = RM.timeline.chat_list;
-    for (var i = position - 1; i >= 0; i--) {
-        if (isMentionMessage(messages[i])) {
-            RM.load(messages[i].id);
-            return true;
-        }
-    }
-
-    if (!RM.timeline.has_old && messages.length == 0) {
-        return false;
-    }
-
-    RM.timeline.loadOld();
-}
-
-function goToNexMention(current) {
-    var position = getMessagePosition(current);
-    var messages = RM.timeline.chat_list;
-    for (var i = position + 1; i > 0 && i < messages.length; i++) {
-        if (isMentionMessage(messages[i])) {
-            RM.load(messages[i].id);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function isMentionMessage(message) {
-    var regex_reply = new RegExp("\\[.* aid=" + myid + " .*\\]");
-    if (regex_reply.test(message.msg)) {
-        return true;
-    }
-
-    var regex_to = new RegExp("\\[To:" + myid + "\\]");
-    return regex_to.test(message.msg);
-}
-
-function replyMessage(message) {
-    var data = RM.timeline.chat_id2chat_dat[message];
-    if (data) {
-        $C("#_chatText").focus();
-        var name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
-        CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
-    }
-}
-
-function nextUnreadRoom(check_mention) {
-    var current_room = RM.id;
-    var sortedRooms = RL.getSortedRoomList();
-    var rooms = RL.rooms;
-    for (var i = 0; i < sortedRooms.length; i++) {
-        if (sortedRooms[i] && sortedRooms[i] !== current_room) {
-            var room = rooms[sortedRooms[i]];
-            var check = check_mention ? room.getMentionNum() : room.getUnreadNum();
-            if (check) {
-                return RL.selectRoom(room.id);
-            }
-        }
-    }
-}
-
-function nextRoom(back) {
-    var previous;
-    var current_room = RM.id;
-    var sortedRooms = RL.getSortedRoomList();
-    for (var i = 0; i < sortedRooms.length; i++) {
-        if (sortedRooms[i] === current_room) {
-            if (back) {
-                if (previous) {
-                    return RL.selectRoom(previous);
-                }
-            } else {
-                if (sortedRooms[i + 1]) {
-                    return RL.selectRoom(sortedRooms[i + 1]);
-                }
-            }
-        }
-        previous = sortedRooms[i];
-    }
-}
-
-function firstRoom(nonstick) {
-    var sortedRooms = RL.getSortedRoomList();
-    var room_index = nonstick ? RL.getStickyRoomNum() : 0;
-    return RL.selectRoom(sortedRooms[room_index]);
-}
-
-},{"../helpers/Common.js":1,"../helpers/Const.js":2}]},{},[3,4,5,6]);
+},{}]},{},[5,6,7]);

@@ -2,18 +2,18 @@ let Const = require("../helpers/Const.js");
 let common = require("../helpers/Common.js");
 let Storage = require("../helpers/Storage.js");
 let EmoStorage = require("../helpers/EmoStorage.js");
+let ChromeStorageLocal = require("../helpers/ChromeStorageLocal.js");
 
 let storage = new Storage();
 let emo_storage = new EmoStorage();
-var emoticons = [];
-var emo_info = {};
-var urls = {};
+let emoticons = [];
+let emo_info = {};
+let urls = {};
 
 init(true);
 
 function init(inject_script) {
     storage.get(Const.CHROME_SYNC_KEY, function(info) {
-        info = info[Const.CHROME_SYNC_KEY];
         emo_info = info;
         if (!$.isEmptyObject(info)) {
             for (let key in info) {
@@ -55,22 +55,22 @@ function init(inject_script) {
 
     localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = [];
     storage.get(Const.CHROME_SYNC_GROUP_KEY, function(data) {
-        if (!$.isEmptyObject(data) && !$.isEmptyObject(data[Const.CHROME_SYNC_GROUP_KEY])) {
-            localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = JSON.stringify(data[Const.CHROME_SYNC_GROUP_KEY]);
+        if (!$.isEmptyObject(data)) {
+            localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = JSON.stringify(data);
         }
     });
 
     localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = [];
     storage.get(Const.CHROME_SYNC_ROOM_KEY, function(data) {
-        if (!$.isEmptyObject(data) && !$.isEmptyObject(data[Const.CHROME_SYNC_ROOM_KEY])) {
-            localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = JSON.stringify(data[Const.CHROME_SYNC_ROOM_KEY]);
+        if (!$.isEmptyObject(data)) {
+            localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = JSON.stringify(data);
         }
     });
 
     localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = [];
     storage.get(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, function(data) {
-        if (!$.isEmptyObject(data) && !$.isEmptyObject(data[Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY])) {
-            localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = JSON.stringify(data[Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY]);
+        if (!$.isEmptyObject(data)) {
+            localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = JSON.stringify(data);
         }
     });
 }
@@ -79,6 +79,7 @@ function getData(info, inject_script) {
     var loaded_count = 0;
     var emo_count = common.getObjectLength(urls);
     var failed = false;
+    localStorage.removeItem("failed_data");
     $.each(urls, function(data_name, url) {
         $.getJSON(url)
             .done(function(data) {
@@ -91,19 +92,17 @@ function getData(info, inject_script) {
             }).fail(function(jqxhr, textStatus, error) {
                 failed = true;
                 delete emo_info[data_name];
-                var message = "Chat++ Error\n\nThere is an error occurred when loading or parsing the data named '" + data_name + "' (" + url + "). \n\n" +
-                    "It may be because of the failure in downloading file or invalid file format.\n\n" +
-                    "Check your file data carefully and try to reload again."
-                alert(message);
+                pushFailedData(data_name);
             }).always(function() {
                 if (++loaded_count === emo_count) {
                     if (!failed) {
                         emo_storage.syncData();
                     }
-                    chrome.storage.local.get(Const.CHROME_LOCAL_KEY, function(local_data) {
+                    var chrome_storage_local = new ChromeStorageLocal();
+                    chrome_storage_local.get(function(local_data) {
                         var version_name = "";
-                        if (!$.isEmptyObject(local_data[Const.CHROME_LOCAL_KEY])) {
-                            version_name = local_data[Const.CHROME_LOCAL_KEY]["version_name"];
+                        if (!$.isEmptyObject(local_data)) {
+                            version_name = local_data["version_name"];
                         }
                         var current_time = (new Date).toLocaleString();
                         console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
@@ -119,6 +118,12 @@ function getData(info, inject_script) {
                 }
             });
     });
+}
+
+function pushFailedData(data_name) {
+    var data = localStorage["failed_data"] ? JSON.parse(localStorage["failed_data"]) : [];
+    data.push(data_name);
+    localStorage["failed_data"] = JSON.stringify(data);
 }
 
 function parseDataName(data) {
