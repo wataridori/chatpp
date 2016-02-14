@@ -7,11 +7,11 @@ class EmoStorage extends Storage {
         super();
         this.data = {};
         this.data_count = 0;
-    };
+    }
 
     getDataCount() {
         return common.getObjectLength(this.data);
-    };
+    }
 
     setFeatureStatus(emo_info) {
         var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
@@ -20,7 +20,7 @@ class EmoStorage extends Storage {
             this.data[feature_name] = emo_info[feature_name] === undefined ? true : emo_info[feature_name];
         }
         this.data.force_update_version = emo_info.force_update_version;
-    };
+    }
 
     pushData(inputted_data, inputted_priority) {
         var priority = (inputted_priority !== undefined) ? inputted_priority : inputted_data.priority;
@@ -35,17 +35,17 @@ class EmoStorage extends Storage {
             data_version: inputted_data.data_version,
             date_sync: (new Date()).toLocaleString()
         };
-    };
+    }
 
     removeData(data_name) {
         if (this.data[data_name] !== undefined) {
             delete this.data[data_name];
         }
-    };
+    }
 
     syncData(callback) {
         this.set(Const.CHROME_SYNC_KEY, this.data, callback);
-    };
+    }
 }
 
 module.exports = EmoStorage;

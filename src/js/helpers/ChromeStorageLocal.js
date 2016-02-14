@@ -1,4 +1,3 @@
-let common = require("./Common.js");
 let Storage = require("./Storage.js");
 let Const = require("./Const.js");
 

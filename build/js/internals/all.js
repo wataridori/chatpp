@@ -316,6 +316,15 @@ var Emoticon = function () {
     }
 
     _createClass(Emoticon, [{
+        key: "setUp",
+        value: function setUp() {
+            if (!this.status) {
+                return;
+            }
+            this.addEmoticonText();
+            this.addExternalEmo();
+        }
+    }, {
         key: "addExternalEmo",
         value: function addExternalEmo() {
             var emo_data = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
@@ -484,6 +493,9 @@ var Mention = function () {
         value: function setUp() {
             var _this = this;
 
+            if (!this.status) {
+                return;
+            }
             if (localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]) {
                 this.group_mention = JSON.parse(localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]);
             }
@@ -1378,13 +1390,21 @@ var Shortcut = function () {
             edit_image_upload: DOM_VK_E
         };
         this.room_shortcuts = {};
-        if (localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]) {
+        if (localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]) {
             this.room_shortcuts = JSON.parse(localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]);
         }
         this.status = common.getStatus("shortcut");
     }
 
     _createClass(Shortcut, [{
+        key: "setUp",
+        value: function setUp() {
+            if (this.status) {
+                this.addShortcutText();
+                this.registerShortcut();
+            }
+        }
+    }, {
         key: "addShortcutText",
         value: function addShortcutText() {
             var _this = this;
@@ -1889,35 +1909,23 @@ $(function () {
 
             if (emoticon.status) {
                 rebuild = true;
-                emoticon.addEmoticonText();
+                emoticon.setUp();
             }
 
-            if (mention.status) {
-                mention.setUp();
-            }
-
-            if (shortcut.status) {
-                shortcut.addShortcutText();
-                shortcut.registerShortcut();
-            }
+            mention.setUp();
+            shortcut.setUp();
+            advertisement.setUp();
+            NotificationDisabler.setUp();
 
             if (view_enhancer.isActive()) {
                 rebuild = true;
                 view_enhancer.updateChatworkView();
             }
-
-            advertisement.setUp();
-
-            if (emoticon.status) {
-                emoticon.addExternalEmo();
-            }
+            view_enhancer.updateChatSendView();
 
             if (rebuild) {
                 RL.rooms[RM.id].build();
             }
-
-            view_enhancer.updateChatSendView();
-            NotificationDisabler.setUp();
         }
     }, 100);
 });

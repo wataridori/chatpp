@@ -139,10 +139,17 @@ class Shortcut {
             edit_image_upload: DOM_VK_E
         };
         this.room_shortcuts = {};
-        if (localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] !== undefined && localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]) {
+        if (localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]) {
             this.room_shortcuts = JSON.parse(localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]);
         }
         this.status = common.getStatus("shortcut");
+    }
+
+    setUp() {
+        if (this.status) {
+            this.addShortcutText();
+            this.registerShortcut();
+        }
     }
 
     addShortcutText() {

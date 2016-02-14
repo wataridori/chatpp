@@ -6,6 +6,14 @@ class Emoticon {
         this.status = common.getStatus("emoticon");
     }
 
+    setUp() {
+        if (!this.status) {
+            return;
+        }
+        this.addEmoticonText();
+        this.addExternalEmo();
+    }
+
     addExternalEmo() {
         var emo_data = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
         this.addEmo(emo_data);

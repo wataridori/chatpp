@@ -39,6 +39,9 @@ class Mention {
     }
 
     setUp() {
+        if (!this.status) {
+            return;
+        }
         if (localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]) {
             this.group_mention = JSON.parse(localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]);
         }

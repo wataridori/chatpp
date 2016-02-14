@@ -23,35 +23,23 @@ $(function(){
 
                 if (emoticon.status) {
                     rebuild = true;
-                    emoticon.addEmoticonText();
+                    emoticon.setUp();
                 }
 
-                if (mention.status) {
-                    mention.setUp();
-                }
-
-                if (shortcut.status) {
-                    shortcut.addShortcutText();
-                    shortcut.registerShortcut();
-                }
+                mention.setUp();
+                shortcut.setUp();
+                advertisement.setUp();
+                NotificationDisabler.setUp();
 
                 if (view_enhancer.isActive()) {
                     rebuild = true;
                     view_enhancer.updateChatworkView();
                 }
-
-                advertisement.setUp();
-
-                if (emoticon.status) {
-                    emoticon.addExternalEmo();
-                }
+                view_enhancer.updateChatSendView();
 
                 if (rebuild) {
                     RL.rooms[RM.id].build();
                 }
-
-                view_enhancer.updateChatSendView();
-                NotificationDisabler.setUp();
             }
         },
         100
