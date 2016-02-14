@@ -6,42 +6,42 @@ let storage = new Storage();
 
 let groups = [];
 
-$(function() {
+$(() => {
     if (!common.isPage("group")) {
         return;
     }
     common.setPageTitle();
 
-    storage.get(Const.CHROME_SYNC_GROUP_KEY, function(data) {
+    storage.get(Const.CHROME_SYNC_GROUP_KEY, (data) => {
         if (!$.isEmptyObject(data)) {
             groups = data;
             syncData();
         }
     });
 
-    var data_group_name = $("#data-group-name");
-    var data_group_member = $("#data-group-members");
+    let data_group_name = $("#data-group-name");
+    let data_group_member = $("#data-group-members");
 
-    $("#button-group-add").click(function() {
-       var info = {};
-       info.group_name = data_group_name.val().trim();
-       var group_members = getGroupMembers($("#data-group-members").val());
-       if (validateGroupName(info.group_name) && group_members.length > 0) {
-           info.group_members = group_members.join(", ");
-           pushGroup(info);
-           syncData();
-           clearInput();
-           data_group_name.focus();
-       }
+    $("#button-group-add").click(() => {
+        let info = {};
+        info.group_name = data_group_name.val().trim();
+        let group_members = getGroupMembers($("#data-group-members").val());
+        if (validateGroupName(info.group_name) && group_members.length > 0) {
+            info.group_members = group_members.join(", ");
+            pushGroup(info);
+            syncData();
+            clearInput();
+            data_group_name.focus();
+        }
     });
 
-    data_group_name.keyup(function (e) {
+    data_group_name.keyup((e) => {
         if (e.keyCode == 13) {
             data_group_member.focus();
         }
     });
 
-    data_group_member.keyup(function (e) {
+    data_group_member.keyup((e) => {
         if (e.keyCode == 13) {
             $("#button-group-add").trigger("click");
         }
@@ -54,10 +54,10 @@ function clearInput() {
 }
 
 function fillDataTable() {
-    var table_text = "";
-    var table_body = $("#table-data").find("tbody");
+    let table_text = "";
+    let table_body = $("#table-data").find("tbody");
     table_body.html("");
-    $.each(groups, function(key, data) {
+    $.each(groups, (key, data) => {
         if (data.group_name !== undefined && data.group_members !== undefined) {
             table_text += "<tr id='row-" + key + "'>";
             table_text += "<td class='text-center'>" + data.group_name + "</td>";
@@ -68,16 +68,16 @@ function fillDataTable() {
         }
     });
     table_body.append(table_text);
-    $(".btn-data-remove").click(function() {
-        var name = $(this).data("name");
+    $(".btn-data-remove").click(() => {
+        let name = $(this).data("name");
         removeGroup(name);
         syncData();
     });
 }
 
 function pushGroup(info) {
-    var found = false;
-    $.each(groups, function(index, data) {
+    let found = false;
+    $.each(groups, (index, data) => {
         if (info.group_name === data.group_name) {
             groups[index] = info;
             found = true;
@@ -90,8 +90,8 @@ function pushGroup(info) {
 }
 
 function removeGroup(name) {
-    var found = false;
-    $.each(groups, function(index, data) {
+    let found = false;
+    $.each(groups, (index, data) => {
         if (name === data.group_name) {
             found = index;
         }
@@ -111,10 +111,10 @@ function validateGroupName(data) {
 }
 
 function getGroupMembers(data) {
-    var members = data.split(",");
-    var valid_members = [];
-    for (var i = 0; i < members.length; i++) {
-        var member = members[i];
+    let members = data.split(",");
+    let valid_members = [];
+    for (let i = 0; i < members.length; i++) {
+        let member = members[i];
         member = member.trim();
         if (member && $.isNumeric(member)) {
             if (valid_members.indexOf(member) === -1) {
@@ -123,8 +123,8 @@ function getGroupMembers(data) {
         }
     }
 
-    var regex = /\[[a-zA-Z]+:([0-9]+)\]/g;
-    var match;
+    let regex = /\[[a-zA-Z]+:([0-9]+)\]/g;
+    let match;
     while ((match = regex.exec(data)) != null) {
         valid_members.push(match[1]);
     }

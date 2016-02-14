@@ -37,7 +37,7 @@ class Common {
     }
 
     isDevVersion() {
-        var app_name = this.app_detail.name;
+        let app_name = this.app_detail.name;
         return app_name.indexOf(Const.VERSION_NAME_DEV, app_name.length - (Const.VERSION_NAME_DEV).length) !== -1;
     }
 
@@ -50,10 +50,10 @@ class Common {
     }
 
     sync(key, data, callback) {
-        var sync = {};
+        let sync = {};
         sync[key] = data;
-        var storage = this.getStorage();
-        storage.set(sync, function() {
+        let storage = this.getStorage();
+        storage.set(sync, () => {
             if (callback) {
                 callback();
             }
@@ -84,12 +84,12 @@ class Common {
     }
 
     parseRoomId(text) {
-        var room = text.match(/\d+/g);
+        let room = text.match(/\d+/g);
         if (!room || room.length == 0) {
             return null;
         }
         room = room[0];
-        var regex = /^[0-9]{6,10}$/g;
+        let regex = /^[0-9]{6,10}$/g;
         if (regex.test(room)) {
             return room;
         }
@@ -117,13 +117,13 @@ class Common {
     }
 
     getAppFullName() {
-        var version_name = this.getAppVersionName();
+        let version_name = this.getAppVersionName();
 
         return `${this.app_detail.short_name} ${this.app_detail.version} ${version_name}`;
     }
 
     openNewUrl(url) {
-        chrome.tabs.create({url: url});
+        chrome.tabs.create({url});
     }
 
 
@@ -136,7 +136,7 @@ class Common {
     }
 
     validateUrl(url) {
-        var regexp = /(https):\/\/(\w+:?\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+        let regexp = /(https):\/\/(\w+:?\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
         return regexp.test(url);
     }
 
@@ -163,7 +163,7 @@ class Common {
     }
 
     regexEscape(string) {
-        return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
     }
 
     generateEmoticonRegex(text, regex) {

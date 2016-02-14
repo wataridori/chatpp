@@ -5,28 +5,28 @@ let Storage = require("../helpers/Storage.js");
 let storage = new Storage();
 let stored_data = {};
 
-$(function() {
+$(() => {
     if (!common.isPage("setting")) {
         return;
     }
     common.setPageTitle();
 
-    storage.get(Const.CHROME_SYNC_KEY, function(data) {
+    storage.get(Const.CHROME_SYNC_KEY, (data) => {
         stored_data[Const.CHROME_SYNC_KEY] = data;
         if ($.isEmptyObject(data)) {
             common.openNewExtensionPageUrl(common.app_detail.options_page)
         } else {
             updateViewData(data);
-            $("[id$=-status-btn]").click(function() {
-                var status = true;
-                var id = $(this).attr("id");
-                var id_parts = id.split("-");
-                var feature_name = id_parts[0];
-                if ($(this).html() === "Disable") {
+            $("[id$=-status-btn]").click((e) => {
+                let status = true;
+                let id = $(e.target).attr("id");
+                let id_parts = id.split("-");
+                let feature_name = id_parts[0];
+                if ($(e.target).html() === "Disable") {
                     status = false;
                 }
                 stored_data[Const.CHROME_SYNC_KEY][feature_name + "_status"] = status;
-                storage.setData(stored_data, function() {
+                storage.setData(stored_data, () => {
                     loadStatus(feature_name, status);
                 });
             })
@@ -45,8 +45,8 @@ function loadStatus(name, value) {
 }
 
 function updateViewData(data) {
-    var features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
-    for (var i in features) {
+    let features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
+    for (let i in features) {
         loadStatus(features[i], data[features[i] + "_status"]);
     }
 }

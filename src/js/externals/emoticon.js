@@ -7,21 +7,20 @@ let emo_info = {};
 let urls = {};
 let init = false;
 
-var official_emoticons_data = common.official_emoticons_data;
+let official_emoticons_data = common.official_emoticons_data;
 
-$(function() {
+$(() => {
     if (!common.isPage("emoticon")) {
         return;
     }
     common.setPageTitle();
-    emo_storage.get(Const.CHROME_SYNC_KEY, function(info) {
+    emo_storage.get(Const.CHROME_SYNC_KEY, (info) => {
         if (!$.isEmptyObject(info)) {
             emo_info = info;
             emo_storage.setFeatureStatus(emo_info);
-            console.log(info);
-            for (var key in info) {
-                var emo_data = info[key];
-                var url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
+            for (let key in info) {
+                let emo_data = info[key];
+                let url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
                 if (url) {
                     urls[emo_data.data_name] = url;
                 }
@@ -41,7 +40,7 @@ $(function() {
         }
     });
 
-    $("#btn-reset").click(function() {
+    $("#btn-reset").click(() => {
         bootbox.dialog({
             title: "<span class='text-primary'>Reset Emoticon Data",
             message: "<span class='text-danger'>Your are trying to reset emoticon data, which will clear your current data information.<br>" +
@@ -50,7 +49,7 @@ $(function() {
                 success: {
                     label: "OK!",
                     className: "btn-success",
-                    callback: function() {
+                    callback() {
                         emo_info = {};
                         getData({}, reload);
                     }
@@ -63,22 +62,22 @@ $(function() {
         });
     })
 
-    $("#btn-load").click(function() {
+    $("#btn-load").click(() => {
         if ($("#data-select").val() == "default") {
             getData(Const.DEFAULT_DATA_URL, reload);
         } else {
-            var url = $("#data-url").val();
+            let url = $("#data-url").val();
             if (!common.validateUrl(url)) {
                 bootbox.alert("Invalid URL! Make sure your inputted URL is correct, and start with https!");
             } else {
                 bootbox.dialog({
-                    message: 'The data from <a href="' + url + '">' + url + '</a> may contain undesirable emoticons and we will not be responsible for it' ,
+                    message: "The data from <a href=\"" + url + "\">" + url + "</a> may contain undesirable emoticons and we will not be responsible for it" ,
                     title: "<span class='text-danger'>Your are trying to load data that is not officially supported by Chat++.<br/> Do you want to continue ?</span>",
                     buttons: {
                         success: {
                             label: "OK!",
                             className: "btn-success",
-                            callback: function() {
+                            callback() {
                                 urls["added"] = url;
                                 getData(urls, reload);
                             }
@@ -86,7 +85,7 @@ $(function() {
                         danger: {
                             label: "Cancel!",
                             className: "btn-danger",
-                            callback: function() {
+                            callback() {
 
                             }
                         }
@@ -96,8 +95,8 @@ $(function() {
         }
     });
 
-    $("#data-select").change(function (){
-        var val = $(this).val();
+    $("#data-select").change((e) => {
+        let val = $(e.target).val();
         if (val == "default") {
             $("#url-input-div").hide("slow");
         } else {
@@ -110,18 +109,18 @@ function getData(urls, callback) {
     if ($.isEmptyObject(urls)) {
         urls["Default"] = Const.DEFAULT_DATA_URL;
     }
-    var loaded_urls = [];
-    $.each(urls, function(i, url) {
+    let loaded_urls = [];
+    $.each(urls, (i, url) => {
         if (loaded_urls.indexOf(url) === -1) {
             loaded_urls.push(url);
         } else {
             return;
         }
         $.getJSON(url)
-            .done(function(data) {
+            .done((data) => {
                 if (typeof(data.data_version) !== "undefined" && typeof(data.emoticons) !== "undefined") {
                     data.data_url = urls[data.data_name] ? urls[data.data_name] : urls["added"];
-                    var priority = getPriority(data.data_name);
+                    let priority = getPriority(data.data_name);
                     emo_storage.pushData(data, priority);
                     pushEmoticons(data.emoticons, priority, data.data_name);
                     if (emo_storage.data_count === common.getObjectLength(urls)) {
@@ -130,8 +129,8 @@ function getData(urls, callback) {
                 } else {
                     bootbox.alert("Invalid data structure!");
                 }
-            }).fail(function(jqxhr, textStatus, error) {
-                var message = "<span class='text-danger'>There is an error occurred when loading or parsing the following url: <br>" +
+            }).fail(() => {
+                let message = "<span class='text-danger'>There is an error occurred when loading or parsing the following url: <br>" +
                     "<a href='" + url + "'>" + url + "</a>" +
                     "<br>It may be because of the failure in downloading file or invalid file format.<br>" +
                     "Check your file data carefully and try to reload again.</span>"
@@ -145,9 +144,9 @@ function reload() {
 }
 
 function getPriority(data_name) {
-    var max = 0;
-    for (var key in emo_info) {
-        var val = emo_info[key];
+    let max = 0;
+    for (let key in emo_info) {
+        let val = emo_info[key];
         if (val.data_name === data_name) {
             return val.priority;
         }
@@ -160,19 +159,19 @@ function getPriority(data_name) {
 }
 
 function showOfficialData() {
-    var official = $("#official-data");
-    for (var data_name in official_emoticons_data) {
+    let official = $("#official-data");
+    for (let data_name in official_emoticons_data) {
         if (emo_info[data_name] === undefined) {
-            var new_button = '<div class="col-md-12 official-data"><button class="btn btn-info btn-sm btn-official-data" data-name="' + data_name + '">Add ' + data_name + '</button>'
-                + '<span class="text-primary" style="padding-left: 20px"><strong>' + official_emoticons_data[data_name].description + '</strong></span>'
-                + '</div><br>';
+            let new_button = "<div class=\"col-md-12 official-data\"><button class=\"btn btn-info btn-sm btn-official-data\" data-name=\"" + data_name + "\">Add " + data_name + "</button>"
+                + "<span class=\"text-primary\" style=\"padding-left: 20px\"><strong>" + official_emoticons_data[data_name].description + "</strong></span>"
+                + "</div><br>";
             official.append(new_button);
         }
     }
 
-    $(".btn-official-data").click(function() {
-        var data_name = $(this).data("name");
-        var url = official_emoticons_data[data_name].link;
+    $(".btn-official-data").click((e) => {
+        let data_name = $(e.target).data("name");
+        let url = official_emoticons_data[data_name].link;
         if (common.validateUrl(url)) {
             urls[data_name] = url;
             getData(urls, reload);
@@ -181,10 +180,10 @@ function showOfficialData() {
 }
 
 function pushEmoticons(emos, priority, data_name) {
-    for (var i = 0; i < emos.length; i++) {
-        var disable = false;
+    for (let i = 0; i < emos.length; i++) {
+        let disable = false;
         emos[i].priority = priority;
-        for (var j = 0; j < emoticons.length; j++) {
+        for (let j = 0; j < emoticons.length; j++) {
             if (emoticons[j].emo.key === emos[i].key) {
                 if (emoticons[j].emo.priority < emos[i].priority) {
                     emoticons[j].status = true;
@@ -197,7 +196,7 @@ function pushEmoticons(emos, priority, data_name) {
         emoticons.push({
             emo: emos[i],
             status: disable,
-            data_name: data_name
+            data_name
         });
     }
 }
@@ -208,7 +207,7 @@ function clearTable() {
 
 function fillTable() {
     clearTable();
-    var info = emo_storage.data;
+    let info = emo_storage.data;
     if (info.data_name != "Default" && info.data_url) {
         $("#data-select").val("custom");
         $("#data-url").val(info.data_url);
@@ -216,11 +215,11 @@ function fillTable() {
         $("#btn-show-changelog").show("slow");
     }
 
-    var table_text = "";
-    var current_data = null;
-    var last_key = 0;
-    var last_data_name = null;
-    $.each(emoticons, function(key, data) {
+    let table_text = "";
+    let current_data = null;
+    let last_key = 0;
+    let last_data_name = null;
+    $.each(emoticons, (key, data) => {
         if (!current_data || current_data !== data.data_name) {
             if (table_text) {
                 $("#table-emo-" + last_data_name).find("tbody").append(table_text);
@@ -242,34 +241,34 @@ function fillTable() {
 }
 
 function createEmoticonsTable(name) {
-    var table =
-        '<div id="emoticons-table">' +
-            '<div class="panel panel-warning">' +
-                '<div class="panel-heading">' +
+    let table =
+        "<div id=\"emoticons-table\">" +
+            "<div class=\"panel panel-warning\">" +
+                "<div class=\"panel-heading\">" +
                     name +
-                '</div>' +
-                '<table class="table table-emo table-bordered" id="table-emo-' + name + '">' +
-                    '<thead>' +
-                        '<tr class="success text-center">' +
-                        '<th colspan="2" class="text-center">Emo</th>' +
-                        '<th colspan="2" class="text-center">Emo</th>' +
-                        '<th colspan="2" class="text-center">Emo</th>' +
-                        '<th colspan="2" class="text-center">Emo</th>' +
-                        '</tr>' +
-                    '</thead>' +
-                    '<tbody>' +
-                    '</tbody>' +
-                '</table>' +
-            '</div>'
-        '</div>';
+                "</div>" +
+                "<table class=\"table table-emo table-bordered\" id=\"table-emo-" + name + "\">" +
+                    "<thead>" +
+                        "<tr class=\"success text-center\">" +
+                        "<th colspan=\"2\" class=\"text-center\">Emo</th>" +
+                        "<th colspan=\"2\" class=\"text-center\">Emo</th>" +
+                        "<th colspan=\"2\" class=\"text-center\">Emo</th>" +
+                        "<th colspan=\"2\" class=\"text-center\">Emo</th>" +
+                        "</tr>" +
+                    "</thead>" +
+                    "<tbody>" +
+                    "</tbody>" +
+                "</table>" +
+            "</div>"
+    "</div>";
 
     $("#emoticons-table").append(table);
 }
 
 function createTableTd(data) {
-    var src = common.htmlEncode(common.getEmoUrl(data.emo.src));
-    var row = "";
-    var class_name = data.status ? "danger" : "info";
+    let src = common.htmlEncode(common.getEmoUrl(data.emo.src));
+    let row = "";
+    let class_name = data.status ? "danger" : "info";
     row += "<td class='" + class_name + " text-center'>" + data.emo.key + "</td>";
     row += "<td class='text-center'><img class='emoticon' src='" + src + "'/> </td>";
     return row;
@@ -277,11 +276,11 @@ function createTableTd(data) {
 
 function createDataTableText(emo_data) {
     $("#table-data > tbody").html("");
-    var table_text = "";
-    var first = true;
-    $.each(emo_data.slice().reverse(), function(key, data) {
+    let table_text = "";
+    let first = true;
+    $.each(emo_data.slice().reverse(), (key, data) => {
         if (data.data_name !== undefined && data.data_url !== undefined) {
-            var disabled = first ? "disabled" : "";
+            let disabled = first ? "disabled" : "";
             first = false;
             table_text += "<tr>";
             table_text += "<td class='text-center'>" + data.data_name + "</td>";
@@ -297,26 +296,26 @@ function createDataTableText(emo_data) {
 }
 
 function fillDataTable() {
-    var emo_info_array = emoDataObjectToArray(emo_info);
+    let emo_info_array = emoDataObjectToArray(emo_info);
     createDataTableText(emo_info_array);
-    $.each(emo_info_array.slice().reverse(), function(key, data) {
+    $.each(emo_info_array.slice().reverse(), (key, data) => {
         if (data.data_name !== undefined && data.data_url !== undefined) {
             createEmoticonsTable(data.data_name);
         }
     });
-    $("#btn-save").click(function() {
-        var new_emo_storage = new EmoStorage();
-        for (var i in emo_info_array) {
+    $("#btn-save").click(() => {
+        let new_emo_storage = new EmoStorage();
+        for (let i in emo_info_array) {
             new_emo_storage.pushData(emo_info_array[i], emo_info_array[i].priority);
         }
         new_emo_storage.syncData(reload);
     });
-    $("#table-data").on("click", "button", function() {
-        var button = $(this);
+    $("#table-data").on("click", "button", (e) => {
+        let button = $(e.target);
         if (button.hasClass("btn-data-move-up")) {
-            var priority = button.data("priority");
-            var temp;
-            var up = priority + 1;
+            let priority = button.data("priority");
+            let temp;
+            let up = priority + 1;
             if (emo_info_array[up]) {
                 temp = emo_info_array[up];
                 emo_info_array[up] = emo_info_array[priority];
@@ -328,7 +327,7 @@ function fillDataTable() {
         }
 
         if (button.hasClass("btn-data-remove")) {
-            var name = button.data("name");
+            let name = button.data("name");
             emo_storage.removeData(name);
             emo_storage.syncData(reload);
         }
@@ -336,9 +335,9 @@ function fillDataTable() {
 }
 
 function rearrangePriority(data) {
-    var i = 0;
-    var new_data = [];
-    for (var j in data) {
+    let i = 0;
+    let new_data = [];
+    for (let j in data) {
         data[j].priority = i;
         new_data[i++] = data[j];
     }
@@ -347,8 +346,8 @@ function rearrangePriority(data) {
 }
 
 function emoDataObjectToArray(data) {
-    var data_array = [];
-    $.each(data, function(key, emo) {
+    let data_array = [];
+    $.each(data, (key, emo) => {
         if (emo.priority !== undefined) {
             data_array[emo.priority] = emo;
         }
@@ -365,6 +364,6 @@ function createATag(url) {
         href: url,
         text: url,
         target: "_blank"
-    }).prop("outerHTML");;
+    }).prop("outerHTML");
 }
 

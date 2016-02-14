@@ -1,4 +1,4 @@
-var common = require("./Common.js");
+let common = require("./Common.js");
 
 class Storage {
     constructor(local) {
@@ -6,16 +6,16 @@ class Storage {
     }
 
     get(key, callback) {
-        this.storage.get(key, function(info) {
+        this.storage.get(key, (info) => {
             info = info ? info[key] : undefined;
             callback(info);
         });
     }
 
     set(key, data, callback) {
-        var sync = {};
+        let sync = {};
         sync[key] = data;
-        this.storage.set(sync, function() {
+        this.storage.set(sync, () => {
             if (callback) {
                 callback();
             }
@@ -23,7 +23,7 @@ class Storage {
     }
 
     setData(data, callback) {
-        this.storage.set(data, function() {
+        this.storage.set(data, () => {
             if (callback) {
                 callback();
             }

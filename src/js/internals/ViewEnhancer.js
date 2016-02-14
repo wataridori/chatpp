@@ -130,15 +130,15 @@ let support_languages = [
     "xl",
     "xml",
     "xquery",
-    "zephir",
+    "zephir"
 ];
 
 function insertThumbnail(dom) {
     $(".ui_sp_favicon_parent", dom).each((index, link) => {
-        var dom = $(link);
-        var imageLink = getThumbnailLink(dom.attr("href"));
+        let dom = $(link);
+        let imageLink = getThumbnailLink(dom.attr("href"));
         if (imageLink) {
-            var img = '<div><img src="' + imageLink + '" alt="' + imageLink +'" style="max-width: 500px; max-height: 125px"></div>';
+            let img = "<div><img src=\"" + imageLink + "\" alt=\"" + imageLink +"\" style=\"max-width: 500px; max-height: 125px\"></div>";
             dom.after(img);
         }
     });
@@ -146,17 +146,17 @@ function insertThumbnail(dom) {
 }
 
 function getThumbnailLink(link) {
-    var img_regex = /\.(png|jpg|gif|jpeg)$/i;
+    let img_regex = /\.(png|jpg|gif|jpeg)$/i;
     if (link.match(img_regex)) {
         return link;
-    };
+    }
 
-    var fb_img_regex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
+    let fb_img_regex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
     if (link.match(fb_img_regex)) {
         return link;
-    };
+    }
 
-    var gyazo_regex = /^https?:\/\/gyazo.com\//i;
+    let gyazo_regex = /^https?:\/\/gyazo.com\//i;
     if (link.match(gyazo_regex)) {
         return link + ".png";
     }
@@ -165,7 +165,7 @@ function getThumbnailLink(link) {
 }
 
 function getHighLightLanguage(language) {
-    for (var i in support_languages) {
+    for (let i in support_languages) {
         if (support_languages[i] === language.toLowerCase()) {
             return support_languages[i];
         }
@@ -175,19 +175,19 @@ function getHighLightLanguage(language) {
 }
 
 function getHighlightOption(text) {
-    var highlight_options = {
+    let highlight_options = {
         language: null,
         nowrap: false,
         has_valid_options: false
     }
-    var valid_options = ["nowrap"];
-    var options = text.split("\n", 1)[0];
+    let valid_options = ["nowrap"];
+    let options = text.split("\n", 1)[0];
     if (!options) {
         return highlight_options;
     }
 
     options = options.split(" ");
-    for (var i in options) {
+    for (let i in options) {
         if (!options[i]) {
             continue;
         }
@@ -195,7 +195,7 @@ function getHighlightOption(text) {
             highlight_options[options[i]] = true;
             continue
         }
-        var language = getHighLightLanguage(options[i]);
+        let language = getHighLightLanguage(options[i]);
         if (language) {
             highlight_options.language = language;
             continue;
@@ -221,13 +221,15 @@ class ViewEnhancer {
     }
 
     updateChatSendView() {
-        var chatTextKeyUpOld = CS.view.chatTextKeyUp;
+        let chatTextKeyUpOld = CS.view.chatTextKeyUp;
         CS.view.chatTextKeyUp = function(b) {
-            var up_key = b.keyCode;
-            var d = $("#_chatText");
+            let up_key = b.keyCode;
+            let d = $("#_chatText");
             (function() {
+                /* eslint-disable no-undef */
                 if (!(up_key !== 13 || press_key !== 13)) {
-                    var a = d.val(),
+                /* eslint-enable */
+                    let a = d.val(),
                         b = d.prop("selectionStart"),
                         e = d.prop("selectionEnd");
                     b === e && (
@@ -245,18 +247,18 @@ class ViewEnhancer {
     updateChatworkView() {
         TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
         TimeLineView.prototype.getMessagePanel = function(a, b) {
-            var message_panel = this.getMessagePanelOld(a, b);
-            var temp = $("<div></div>");
+            let message_panel = this.getMessagePanelOld(a, b);
+            let temp = $("<div></div>");
             $(temp).html(message_panel);
             if (common.getStatus("thumbnail")) {
                 temp = insertThumbnail(temp);
             }
             if (common.getStatus("highlight")) {
                 $("pre code", temp).each((i, block) => {
-                    var block_text = $(block).html();
-                    var options = getHighlightOption(block_text);
+                    let block_text = $(block).html();
+                    let options = getHighlightOption(block_text);
                     if (options.has_valid_options) {
-                        var first_line = block_text.split("\n", 1)[0];
+                        let first_line = block_text.split("\n", 1)[0];
                         block_text = block_text.replace(first_line + "\n", "");
                         $(block).html(block_text);
                     }
@@ -264,7 +266,7 @@ class ViewEnhancer {
                         $(block).addClass(options.language);
                     }
                     if (!options.nowrap) {
-                        $(block).css({"word-wrap": "break-word"});;
+                        $(block).css({"word-wrap": "break-word"});
                     }
                     hljs.highlightBlock(block);
                 });
@@ -275,11 +277,11 @@ class ViewEnhancer {
         if (common.getStatus("thumbnail_status")) {
             TK.view.getTaskPanelOld = TK.view.getTaskPanel;
             TK.view.getTaskPanel = function(b, d) {
-                var task_panel = this.getTaskPanelOld(b, d);
+                let task_panel = this.getTaskPanelOld(b, d);
                 if ($(task_panel).is("div")) {
                     return task_panel;
                 }
-                var temp = $("<span></span>");
+                let temp = $("<span></span>");
                 temp.html(task_panel);
                 temp = insertThumbnail(temp);
                 return temp.html();

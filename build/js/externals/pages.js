@@ -21,7 +21,6 @@ $(function () {
         if (!$.isEmptyObject(info)) {
             emo_info = info;
             emo_storage.setFeatureStatus(emo_info);
-            console.log(info);
             for (var key in info) {
                 var emo_data = info[key];
                 var url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
@@ -69,35 +68,37 @@ $(function () {
         if ($("#data-select").val() == "default") {
             getData(Const.DEFAULT_DATA_URL, reload);
         } else {
-            var url = $("#data-url").val();
-            if (!common.validateUrl(url)) {
-                bootbox.alert("Invalid URL! Make sure your inputted URL is correct, and start with https!");
-            } else {
-                bootbox.dialog({
-                    message: 'The data from <a href="' + url + '">' + url + '</a> may contain undesirable emoticons and we will not be responsible for it',
-                    title: "<span class='text-danger'>Your are trying to load data that is not officially supported by Chat++.<br/> Do you want to continue ?</span>",
-                    buttons: {
-                        success: {
-                            label: "OK!",
-                            className: "btn-success",
-                            callback: function callback() {
-                                urls["added"] = url;
-                                getData(urls, reload);
+            (function () {
+                var url = $("#data-url").val();
+                if (!common.validateUrl(url)) {
+                    bootbox.alert("Invalid URL! Make sure your inputted URL is correct, and start with https!");
+                } else {
+                    bootbox.dialog({
+                        message: "The data from <a href=\"" + url + "\">" + url + "</a> may contain undesirable emoticons and we will not be responsible for it",
+                        title: "<span class='text-danger'>Your are trying to load data that is not officially supported by Chat++.<br/> Do you want to continue ?</span>",
+                        buttons: {
+                            success: {
+                                label: "OK!",
+                                className: "btn-success",
+                                callback: function callback() {
+                                    urls["added"] = url;
+                                    getData(urls, reload);
+                                }
+                            },
+                            danger: {
+                                label: "Cancel!",
+                                className: "btn-danger",
+                                callback: function callback() {}
                             }
-                        },
-                        danger: {
-                            label: "Cancel!",
-                            className: "btn-danger",
-                            callback: function callback() {}
                         }
-                    }
-                });
-            }
+                    });
+                }
+            })();
         }
     });
 
-    $("#data-select").change(function () {
-        var val = $(this).val();
+    $("#data-select").change(function (e) {
+        var val = $(e.target).val();
         if (val == "default") {
             $("#url-input-div").hide("slow");
         } else {
@@ -129,7 +130,7 @@ function getData(urls, callback) {
             } else {
                 bootbox.alert("Invalid data structure!");
             }
-        }).fail(function (jqxhr, textStatus, error) {
+        }).fail(function () {
             var message = "<span class='text-danger'>There is an error occurred when loading or parsing the following url: <br>" + "<a href='" + url + "'>" + url + "</a>" + "<br>It may be because of the failure in downloading file or invalid file format.<br>" + "Check your file data carefully and try to reload again.</span>";
             bootbox.alert(message);
         });
@@ -159,13 +160,13 @@ function showOfficialData() {
     var official = $("#official-data");
     for (var data_name in official_emoticons_data) {
         if (emo_info[data_name] === undefined) {
-            var new_button = '<div class="col-md-12 official-data"><button class="btn btn-info btn-sm btn-official-data" data-name="' + data_name + '">Add ' + data_name + '</button>' + '<span class="text-primary" style="padding-left: 20px"><strong>' + official_emoticons_data[data_name].description + '</strong></span>' + '</div><br>';
+            var new_button = "<div class=\"col-md-12 official-data\"><button class=\"btn btn-info btn-sm btn-official-data\" data-name=\"" + data_name + "\">Add " + data_name + "</button>" + "<span class=\"text-primary\" style=\"padding-left: 20px\"><strong>" + official_emoticons_data[data_name].description + "</strong></span>" + "</div><br>";
             official.append(new_button);
         }
     }
 
-    $(".btn-official-data").click(function () {
-        var data_name = $(this).data("name");
+    $(".btn-official-data").click(function (e) {
+        var data_name = $(e.target).data("name");
         var url = official_emoticons_data[data_name].link;
         if (common.validateUrl(url)) {
             urls[data_name] = url;
@@ -236,8 +237,8 @@ function fillTable() {
 }
 
 function createEmoticonsTable(name) {
-    var table = '<div id="emoticons-table">' + '<div class="panel panel-warning">' + '<div class="panel-heading">' + name + '</div>' + '<table class="table table-emo table-bordered" id="table-emo-' + name + '">' + '<thead>' + '<tr class="success text-center">' + '<th colspan="2" class="text-center">Emo</th>' + '<th colspan="2" class="text-center">Emo</th>' + '<th colspan="2" class="text-center">Emo</th>' + '<th colspan="2" class="text-center">Emo</th>' + '</tr>' + '</thead>' + '<tbody>' + '</tbody>' + '</table>' + '</div>';
-    '</div>';
+    var table = "<div id=\"emoticons-table\">" + "<div class=\"panel panel-warning\">" + "<div class=\"panel-heading\">" + name + "</div>" + "<table class=\"table table-emo table-bordered\" id=\"table-emo-" + name + "\">" + "<thead>" + "<tr class=\"success text-center\">" + "<th colspan=\"2\" class=\"text-center\">Emo</th>" + "<th colspan=\"2\" class=\"text-center\">Emo</th>" + "<th colspan=\"2\" class=\"text-center\">Emo</th>" + "<th colspan=\"2\" class=\"text-center\">Emo</th>" + "</tr>" + "</thead>" + "<tbody>" + "</tbody>" + "</table>" + "</div>";
+    "</div>";
 
     $("#emoticons-table").append(table);
 }
@@ -285,11 +286,11 @@ function fillDataTable() {
         }
         new_emo_storage.syncData(reload);
     });
-    $("#table-data").on("click", "button", function () {
-        var button = $(this);
+    $("#table-data").on("click", "button", function (e) {
+        var button = $(e.target);
         if (button.hasClass("btn-data-move-up")) {
             var priority = button.data("priority");
-            var temp;
+            var temp = undefined;
             var up = priority + 1;
             if (emo_info_array[up]) {
                 temp = emo_info_array[up];
@@ -339,7 +340,7 @@ function createATag(url) {
         href: url,
         text: url,
         target: "_blank"
-    }).prop("outerHTML");;
+    }).prop("outerHTML");
 }
 
 },{"../helpers/Common.js":7,"../helpers/Const.js":8,"../helpers/EmoStorage.js":9}],2:[function(require,module,exports){
@@ -401,6 +402,8 @@ function clearInput() {
 }
 
 function fillDataTable() {
+    var _this = this;
+
     var table_text = "";
     var table_body = $("#table-data").find("tbody");
     table_body.html("");
@@ -415,7 +418,7 @@ function fillDataTable() {
     });
     table_body.append(table_text);
     $(".btn-data-remove").click(function () {
-        var name = $(this).data("name");
+        var name = $(_this).data("name");
         removeGroup(name);
         syncData();
     });
@@ -470,7 +473,7 @@ function getGroupMembers(data) {
     }
 
     var regex = /\[[a-zA-Z]+:([0-9]+)\]/g;
-    var match;
+    var match = undefined;
     while ((match = regex.exec(data)) != null) {
         valid_members.push(match[1]);
     }
@@ -516,7 +519,7 @@ $(function () {
                 disabled_notify_rooms.push(room_id);
             }
         });
-        storage.set(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, disabled_notify_rooms);
+        storage.set(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, disabled_notify_rooms, common.reload);
     });
 });
 
@@ -549,9 +552,9 @@ $(function () {
     });
 
     $("#save-btn").click(function () {
-        $("input").each(function () {
-            var number = $(this).data("btn");
-            var value = $(this).val();
+        $("input").each(function (index, element) {
+            var number = $(element).data("btn");
+            var value = $(element).val();
             rooms[number] = common.parseRoomId(value);
         });
         storage.set(Const.CHROME_SYNC_ROOM_KEY, rooms, common.reload);
@@ -588,12 +591,12 @@ $(function () {
             common.openNewExtensionPageUrl(common.app_detail.options_page);
         } else {
             updateViewData(data);
-            $("[id$=-status-btn]").click(function () {
+            $("[id$=-status-btn]").click(function (e) {
                 var status = true;
-                var id = $(this).attr("id");
+                var id = $(e.target).attr("id");
                 var id_parts = id.split("-");
                 var feature_name = id_parts[0];
-                if ($(this).html() === "Disable") {
+                if ($(e.target).html() === "Disable") {
                     status = false;
                 }
                 stored_data[Const.CHROME_SYNC_KEY][feature_name + "_status"] = status;
@@ -832,7 +835,7 @@ var Common = function () {
     }, {
         key: "regexEscape",
         value: function regexEscape(string) {
-            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
         }
     }, {
         key: "generateEmoticonRegex",

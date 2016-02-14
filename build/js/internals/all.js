@@ -196,7 +196,7 @@ var Common = function () {
     }, {
         key: "regexEscape",
         value: function regexEscape(string) {
-            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
         }
     }, {
         key: "generateEmoticonRegex",
@@ -245,7 +245,7 @@ Const.ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 module.exports = Const;
 
 },{}],3:[function(require,module,exports){
-'use strict';
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -259,14 +259,14 @@ var Advertisement = function () {
     }
 
     _createClass(Advertisement, [{
-        key: 'setUp',
+        key: "setUp",
         value: function setUp() {
             var _this = this;
 
             if ($("#chatppAdvertisement").length > 0) {
                 return;
             }
-            var text = '<li id="_chatppSponsored" role="button" class=" _showDescription" aria-label="Chat Plus Plus Information">' + '<span id="chatppAdvertisement" class="icoSizeSmall">' + this.getAdvertisementText() + '</span>' + '</li>';
+            var text = "<li id=\"_chatppSponsored\" role=\"button\" class=\" _showDescription\" aria-label=\"Chat Plus Plus Information\">" + "<span id=\"chatppAdvertisement\" class=\"icoSizeSmall\">" + this.getAdvertisementText() + "</span>" + "</li>";
 
             $("#_chatSendTool").append(text);
             setInterval(function () {
@@ -274,13 +274,13 @@ var Advertisement = function () {
             }, ADVERTISEMENT_CHANGE_TIME);
         }
     }, {
-        key: 'changeRandomAdvertisement',
+        key: "changeRandomAdvertisement",
         value: function changeRandomAdvertisement() {
             var text = this.getAdvertisementText();
             $("#chatppAdvertisement").html(text);
         }
     }, {
-        key: 'getAdvertisementText',
+        key: "getAdvertisementText",
         value: function getAdvertisementText() {
             if (localStorage["chatpp_advertisement"] !== undefined && localStorage["chatpp_advertisement"]) {
                 var ads = JSON.parse(localStorage["chatpp_advertisement"]);
@@ -331,7 +331,6 @@ var Emoticon = function () {
             this.addEmo(emo_data);
             this.status = true;
             this.updateEmoticonText();
-            console.log("Emoticon added!");
         }
     }, {
         key: "isSpecialEmo",
@@ -342,7 +341,7 @@ var Emoticon = function () {
     }, {
         key: "removeExternalEmo",
         value: function removeExternalEmo() {
-            for (var i = CW.reg_cmp.length - 1; true; i--) {
+            for (var i = CW.reg_cmp.length - 1; CW.reg_cmp.length > 0; i--) {
                 var emo = CW.reg_cmp[i];
                 if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
                     CW.reg_cmp.splice(i, 1);
@@ -353,7 +352,6 @@ var Emoticon = function () {
             this.status = false;
             common.setStatus("emoticon", false);
             this.updateEmoticonText();
-            console.log("Emoticons removed!");
         }
     }, {
         key: "addEmoticonText",
@@ -364,7 +362,7 @@ var Emoticon = function () {
                 return;
             }
             var emoticon_text = "E " + (this.status ? "ON" : "OFF");
-            $("#_chatSendTool").append('<li id="_emoticons" role="button" class=" _showDescription">' + '<span id="emoticonText" class="emoticonText icoSizeSmall">' + emoticon_text + '</span>' + '</li>');
+            $("#_chatSendTool").append("<li id=\"_emoticons\" role=\"button\" class=\" _showDescription\">" + "<span id=\"emoticonText\" class=\"emoticonText icoSizeSmall\">" + emoticon_text + "</span>" + "</li>");
             this.setEmoticonTextLabel();
             $("#emoticonText").click(function () {
                 return _this.toggleEmoticonsStatus();
@@ -396,7 +394,7 @@ var Emoticon = function () {
             }
             var failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
             var failed_data_text = "The following data could not be loaded: " + failed_data;
-            $("#_chatSendTool").append('<li id="_chatppErrors" role="button" class=" _showDescription">' + '<span id="chatppErrors" class="emoticonText icoSizeSmall chatppErrorsText">(ERROR)</span>' + '</li>');
+            $("#_chatSendTool").append("<li id=\"_chatppErrors\" role=\"button\" class=\" _showDescription\">" + "<span id=\"chatppErrors\" class=\"emoticonText icoSizeSmall chatppErrorsText\">(ERROR)</span>" + "</li>");
             $("#_chatppErrors").attr("aria-label", failed_data_text);
         }
     }, {
@@ -418,9 +416,9 @@ var Emoticon = function () {
                 var title = encoded_text + " - " + emo[index].data_name;
                 var img_src = common.htmlEncode(common.getEmoUrl(emo[index].src));
                 if (this.isSpecialEmo(emo[index].key)) {
-                    rep = '<img src="' + img_src + '" class="ui_emoticon"/>';
+                    rep = "<img src=\"" + img_src + "\" class=\"ui_emoticon\"/>";
                 } else {
-                    rep = '<img src="' + img_src + '" title="' + title + '" alt="' + encoded_text + '" class="ui_emoticon"/>';
+                    rep = "<img src=\"" + img_src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\" class=\"ui_emoticon\"/>";
                 }
                 var regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
                 CW.reg_cmp.push({
@@ -451,7 +449,7 @@ var Const = require("../helpers/Const.js");
 
 var DISPLAY_NUMS = 3;
 var MAX_PATTERN_LENGTH = 20;
-var SPECIAL_CHARS = ["\n", '!', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '[', ']', '{', '}', ';', ':', ',', '/', '`', '\'', '"'];
+var SPECIAL_CHARS = ["\n", "!", "$", "%", "^", "&", "*", "(", ")", "-", "+", "=", "[", "]", "{", "}", ";", ":", ",", "/", "`", "'", "\""];
 
 var Mention = function () {
     function Mention() {
@@ -468,21 +466,21 @@ var Mention = function () {
         this.selected_index = 0;
         this.current_RM = null;
         this.member_objects = [];
-        this.insert_mode = 'normal'; // normal, to, picon, name
-        this.insert_type = 'one'; // one, me, all, contact, group
-        this.selected_group_name = '';
+        this.insert_mode = "normal"; // normal, to, picon, name
+        this.insert_type = "one"; // one, me, all, contact, group
+        this.selected_group_name = "";
         this.fuse = null;
         this.cached_enter_action = ST.data.enter_action;
         this.options = {
-            keys: ['aid2name'],
+            keys: ["aid2name"],
             maxPatternLength: MAX_PATTERN_LENGTH
         };
-        this.chat_text_jquery = $('#_chatText');
-        this.chat_text_element = document.getElementById('_chatText');
+        this.chat_text_jquery = $("#_chatText");
+        this.chat_text_element = document.getElementById("_chatText");
         this.suggestion_messages = {
-            one: { ja: "検索結果はありません", en: 'No Matching Results' },
-            all: { ja: "すべてを選択します", en: 'Select All Members' },
-            group: { ja: "空のグループ", en: 'Empty Group' }
+            one: { ja: "検索結果はありません", en: "No Matching Results" },
+            all: { ja: "すべてを選択します", en: "Select All Members" },
+            group: { ja: "空のグループ", en: "Empty Group" }
         };
 
         this.group_mention = [];
@@ -503,7 +501,7 @@ var Mention = function () {
             $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");
             this.hideSuggestionBox();
             $("#_sendEnterActionArea").click(function () {
-                _this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? 'send' : 'br';
+                _this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
             });
             // http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
             // First, checks if it isn't implemented yet.
@@ -511,7 +509,7 @@ var Mention = function () {
                 String.prototype.format = function () {
                     var args = arguments;
                     return this.replace(/{(\d+)}/g, function (match, number) {
-                        return typeof args[number] != 'undefined' ? args[number] : match;
+                        return typeof args[number] != "undefined" ? args[number] : match;
                     });
                 };
             }
@@ -521,11 +519,11 @@ var Mention = function () {
                 return _this.hideSuggestionBox();
             });
 
-            $('#_roomListArea').click(function () {
+            $("#_roomListArea").click(function () {
                 return _this.hideSuggestionBox();
             });
 
-            $('#_headerSearch').click(function () {
+            $("#_headerSearch").click(function () {
                 return _this.hideSuggestionBox();
             });
 
@@ -553,11 +551,11 @@ var Mention = function () {
                 }
 
                 if (e.which == 9 || e.which == 13) {
-                    if ((_this.insert_type == 'all' || _this.insert_type == 'group') && _this.is_displayed) {
+                    if ((_this.insert_type == "all" || _this.insert_type == "group") && _this.is_displayed) {
                         _this.setSuggestedChatText(_this.getTypedText(), null, null);
                         // dirty hack to prevent message to be sent
-                        if (_this.cached_enter_action == 'send') {
-                            ST.data.enter_action = 'br';
+                        if (_this.cached_enter_action == "send") {
+                            ST.data.enter_action = "br";
                         }
                         e.preventDefault();
                     } else {
@@ -568,8 +566,8 @@ var Mention = function () {
                                 $(".suggested-name").first().click();
                             }
                             // dirty hack to prevent message to be sent
-                            if (_this.cached_enter_action == 'send') {
-                                ST.data.enter_action = 'br';
+                            if (_this.cached_enter_action == "send") {
+                                ST.data.enter_action = "br";
                             }
                             e.preventDefault();
                         } else {
@@ -621,11 +619,11 @@ var Mention = function () {
 
                     var typed_text = _this.getTypedText();
                     if (typed_text.length) {
-                        if (typed_text.charAt(1) == '#') {
-                            if (_this.insert_type != 'contact') {
+                        if (typed_text.charAt(1) == "#") {
+                            if (_this.insert_type != "contact") {
                                 _this.member_objects = _this.buildMemberListData(true);
                                 _this.fuse = new Fuse(_this.member_objects, _this.options);
-                                _this.insert_type = 'contact';
+                                _this.insert_type = "contact";
                             }
                             typed_text = typed_text.substring(1);
                         }
@@ -718,7 +716,6 @@ var Mention = function () {
                         return false;
                     }
                 }
-                ;
 
                 return true;
             } else {
@@ -731,13 +728,13 @@ var Mention = function () {
         value: function getTypedText() {
             var content = this.chat_text_jquery.val();
             var start_pos = this.getNearestAtmarkIndex();
-            if (start_pos == -1) return '';
+            if (start_pos == -1) return "";
             var end_pos = this.doGetCaretPosition(this.chat_text_element);
             var txt = content.substr(start_pos, end_pos - start_pos);
             if (txt) {
                 return txt;
             } else {
-                return '';
+                return "";
             }
         }
     }, {
@@ -754,14 +751,14 @@ var Mention = function () {
             }
             if (rect.height - position.top < 90) {
                 if (position.top < 108) {
-                    $("#_chatTextArea").css({ 'overflow-y': 'visible', 'z-index': 2 });
+                    $("#_chatTextArea").css({ "overflow-y": "visible", "z-index": 2 });
                 }
                 position.top -= 118;
             } else {
-                position.top += parseInt(this.chat_text_jquery.css('font-size')) + 2;
+                position.top += parseInt(this.chat_text_jquery.css("font-size")) + 2;
             }
-            $("#suggestion-container").parent().css({ position: 'relative' });
-            $("#suggestion-container").css({ top: position.top, left: position.left, position: 'absolute' });
+            $("#suggestion-container").parent().css({ position: "relative" });
+            $("#suggestion-container").css({ top: position.top, left: position.left, position: "absolute" });
             this.setCaretPosition(this.chat_text_element, current_pos);
         }
     }, {
@@ -771,7 +768,7 @@ var Mention = function () {
 
             this.is_inserted = false;
             $("#suggestion-container").html(content).show();
-            $("#suggestion-container").css('visibility', 'visible');
+            $("#suggestion-container").css("visibility", "visible");
             if (this.is_navigated) {
                 $(".suggested-name").eq(this.selected_index).css("background-color", "#D8F0F9");
             } else {
@@ -785,24 +782,24 @@ var Mention = function () {
                 _this2.is_inserted = true;
                 var target = $(e.target);
                 target.css("background-color", "#D8F0F9");
-                _this2.setSuggestedChatText(_this2.getTypedText(), target.text(), target.data('cwui-lt-value'));
+                _this2.setSuggestedChatText(_this2.getTypedText(), target.text(), target.data("cwui-lt-value"));
             });
 
-            $(".suggested-name").mouseover(function () {
-                $(this).siblings().css("background-color", "white");
-                $(this).css("background-color", "#D8F0F9");
+            $(".suggested-name").mouseover(function (e) {
+                $(e.target).siblings().css("background-color", "white");
+                $(e.target).css("background-color", "#D8F0F9");
             });
 
-            $(".suggested-name").mouseout(function () {
-                $(this).siblings().first().css("background-color", "#D8F0F9");
-                $(this).css("background-color", "white");
+            $(".suggested-name").mouseout(function (e) {
+                $(e.target).siblings().first().css("background-color", "#D8F0F9");
+                $(e.target).css("background-color", "white");
             });
         }
     }, {
         key: "hideSuggestionBox",
         value: function hideSuggestionBox(content) {
             $("#suggestion-container").html(content).hide();
-            $("#suggestion-container").css('visibility', 'hidden');
+            $("#suggestion-container").css("visibility", "hidden");
             this.cleanUp();
         }
     }, {
@@ -813,19 +810,19 @@ var Mention = function () {
             this.current_index = 0;
             this.selected_index = 0;
             this.actived_atmark_index = -1;
-            this.insert_mode = 'normal';
-            if (this.insert_type == 'contact') {
+            this.insert_mode = "normal";
+            if (this.insert_type == "contact") {
                 this.member_objects = this.buildMemberListData(false);
                 this.fuse = new Fuse(this.member_objects, this.options);
             }
-            if (this.insert_type == 'group') {
-                this.selected_group_name = '';
+            if (this.insert_type == "group") {
+                this.selected_group_name = "";
             }
-            this.insert_type = 'one';
-            $("#suggestion-container").html('');
-            $("#_chatTextArea").css({ 'overflow-y': 'scroll', 'z-index': 0 });
+            this.insert_type = "one";
+            $("#suggestion-container").html("");
+            $("#_chatTextArea").css({ "overflow-y": "scroll", "z-index": 0 });
             // restore setting to correct value
-            if (this.cached_enter_action != ST.data.enter_action && this.cached_enter_action == 'send') {
+            if (this.cached_enter_action != ST.data.enter_action && this.cached_enter_action == "send") {
                 ST.data.enter_action = this.cached_enter_action;
             }
         }
@@ -839,11 +836,11 @@ var Mention = function () {
             if (document.selection) {
                 ctrl.focus();
                 var Sel = document.selection.createRange();
-                Sel.moveStart('character', -ctrl.value.length);
+                Sel.moveStart("character", -ctrl.value.length);
                 CaretPos = Sel.text.length;
             }
             // Firefox support
-            else if (ctrl.selectionStart || ctrl.selectionStart == '0') CaretPos = ctrl.selectionStart;
+            else if (ctrl.selectionStart || ctrl.selectionStart == "0") CaretPos = ctrl.selectionStart;
             return CaretPos;
         }
     }, {
@@ -855,8 +852,8 @@ var Mention = function () {
             } else if (ctrl.createTextRange) {
                 var range = ctrl.createTextRange();
                 range.collapse(true);
-                range.moveEnd('character', pos);
-                range.moveStart('character', pos);
+                range.moveEnd("character", pos);
+                range.moveStart("character", pos);
                 range.select();
             }
         }
@@ -901,44 +898,43 @@ var Mention = function () {
     }, {
         key: "getRawResultsAndSetType",
         value: function getRawResultsAndSetType(typed_text) {
-            if (this.insert_type != 'contact') {
+            if (this.insert_type != "contact") {
                 for (var i = 0; i < this.group_mention.length; i++) {
-                    if (typed_text == this.group_mention[i]['group_name']) {
-                        this.insert_type = 'group';
-                        this.selected_group_name = this.group_mention[i]['group_name'];
+                    if (typed_text == this.group_mention[i]["group_name"]) {
+                        this.insert_type = "group";
+                        this.selected_group_name = this.group_mention[i]["group_name"];
                         return [];
                     }
                 }
-                ;
 
-                if (typed_text == 'me') {
-                    this.insert_type = 'me';
+                if (typed_text == "me") {
+                    this.insert_type = "me";
                     return [this.getMemberObject(AC.myid)];
                 }
-                if (typed_text == 'all') {
-                    this.insert_type = 'all';
+                if (typed_text == "all") {
+                    this.insert_type = "all";
                     return [];
                 }
-                this.insert_type = 'one';
+                this.insert_type = "one";
             }
             return typed_text ? this.fuse.search(typed_text) : this.member_objects;
         }
     }, {
         key: "getRawResultsAndSetMode",
         value: function getRawResultsAndSetMode(typed_text) {
-            if (typed_text.slice(0, 2) == '._') {
-                this.insert_mode = 'picon';
+            if (typed_text.slice(0, 2) == "._") {
+                this.insert_mode = "picon";
                 return this.getRawResultsAndSetType(typed_text.substring(2));
             }
-            if (typed_text.slice(0, 1) == '.') {
-                this.insert_mode = 'name';
+            if (typed_text.slice(0, 1) == ".") {
+                this.insert_mode = "name";
                 return this.getRawResultsAndSetType(typed_text.substring(1));
             }
-            if (typed_text.slice(0, 1) == '_') {
-                this.insert_mode = 'to';
+            if (typed_text.slice(0, 1) == "_") {
+                this.insert_mode = "to";
                 return this.getRawResultsAndSetType(typed_text.substring(1));
             }
-            this.insert_mode = 'normal';
+            this.insert_mode = "normal";
             return this.getRawResultsAndSetType(typed_text);
         }
     }, {
@@ -957,19 +953,19 @@ var Mention = function () {
     }, {
         key: "getReplaceText",
         value: function getReplaceText(format_string, target_name, cwid, members) {
-            var replace_text = '';
+            var replace_text = "";
             switch (this.insert_type) {
-                case 'me':
-                case 'one':
-                case 'contact':
+                case "me":
+                case "one":
+                case "contact":
                     replace_text = format_string.format(cwid, target_name);
                     break;
-                case 'group':
-                case 'all':
+                case "group":
+                case "all":
                     for (var i = 0; i < members.length; i++) {
                         replace_text += format_string.format(members[i].value, members[i].aid2name);
                     }
-                    ;
+
                     break;
                 default:
                     break;
@@ -981,22 +977,22 @@ var Mention = function () {
         value: function setSuggestedChatText(entered_text, target_name, cwid) {
             var old = this.chat_text_jquery.val();
             var start_pos = this.doGetCaretPosition(this.chat_text_element) - entered_text.length;
-            var replace_text = '';
+            var replace_text = "";
             var members = this.member_objects;
-            if (this.insert_type == 'group') {
+            if (this.insert_type == "group") {
                 members = this.buildGroupMemberListData(this.selected_group_name);
             }
             switch (this.insert_mode) {
-                case 'to':
+                case "to":
                     replace_text = this.getReplaceText("[To:{0}] ", target_name, cwid, members);
                     break;
-                case 'normal':
+                case "normal":
                     replace_text = this.getReplaceText("[To:{0}] {1}\n", target_name, cwid, members);
                     break;
-                case 'picon':
+                case "picon":
                     replace_text = this.getReplaceText("[picon:{0}] ", target_name, cwid, members);
                     break;
-                case 'name':
+                case "name":
                     replace_text = this.getReplaceText("[picon:{0}] {1}\n", target_name, cwid, members);
                     break;
                 default:
@@ -1011,44 +1007,50 @@ var Mention = function () {
         key: "buildList",
         value: function buildList(members) {
             switch (this.insert_type) {
-                case 'me':
-                case 'one':
-                case 'contact':
+                case "me":
+                case "one":
+                case "contact":
                     if (members.length) {
-                        var txt = '<ul>';
+                        var txt = "<ul>";
                         for (var i = 0; i < members.length; i++) {
-                            txt += '<li class="suggested-name" role="listitem" data-cwui-lt-value="' + members[i].value + '">' + members[i].avatar + members[i].label + "</li>";
+                            txt += "<li class=\"suggested-name\" role=\"listitem\" data-cwui-lt-value=\"" + members[i].value + "\">" + members[i].avatar + members[i].label + "</li>";
                         }
-                        ;
-                        txt += '</ul>';
+                        txt += "</ul>";
                         return txt;
                     } else {
-                        return '<ul><li>' + this.suggestion_messages['one'][LANGUAGE] + '</li></ul>';
+                        return "<ul><li>" + this.suggestion_messages["one"][LANGUAGE] + "</li></ul>";
                     }
+                    /* eslint-disable no-unreachable */
                     break;
-                case 'group':
+                /* eslint-enable */
+                case "group":
                     members = this.buildGroupMemberListData(this.selected_group_name);
                     if (members.length) {
-                        txt = '<ul><li>';
+                        var txt = "<ul><li>";
                         for (var i = 0; i < members.length; i++) {
                             if (i == 6) {
-                                txt += '<span>+' + (members.length - 6) + '</span>';
+                                txt += "<span>+" + (members.length - 6) + "</span>";
                                 break;
                             }
                             txt += members[i].avatar;
                         }
-                        ;
-                        txt += '</li></ul>';
+                        txt += "</li></ul>";
                         return txt;
                     } else {
-                        return '<ul><li>' + this.suggestion_messages[this.insert_type][LANGUAGE] + '</li></ul>';
+                        return "<ul><li>" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</li></ul>";
                     }
+                    /* eslint-disable no-unreachable */
                     break;
-                case 'all':
-                    return '<ul><li>' + this.suggestion_messages[this.insert_type][LANGUAGE] + '</li></ul>';
+                /* eslint-enable */
+                case "all":
+                    return "<ul><li>" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</li></ul>";
+                    /* eslint-disable no-unreachable */
                     break;
+                /* eslint-enable */
                 default:
+                    /* eslint-disable no-unreachable */
                     break;
+                /* eslint-enable */
             }
         }
     }, {
@@ -1079,16 +1081,16 @@ var Mention = function () {
                     clicktip: !1,
                     size: "small"
                 }),
-                label: '<p class="autotrim">' + escape_html(h) + "</p>",
-                aid2name: escape_html(h)
+                label: "<p class=\"autotrim\">" + common.htmlEncode(h) + "</p>",
+                aid2name: common.htmlEncode(h)
             };
         }
     }, {
         key: "buildGroupMemberListData",
         value: function buildGroupMemberListData(group_name) {
             for (var i = 0; i < this.group_mention.length; i++) {
-                if (this.group_mention[i]['group_name'] == group_name) {
-                    var members = this.group_mention[i]['group_members'].split(',');
+                if (this.group_mention[i]["group_name"] == group_name) {
+                    var members = this.group_mention[i]["group_members"].split(",");
                     var results = [];
                     for (var j = 0; j < members.length; j++) {
                         results.push(this.getMemberObject(members[j].trim()));
@@ -1106,7 +1108,7 @@ var Mention = function () {
             if ($("#_chatppMentionText").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append('<li id="_chatppMentionText" role="button" class=" _showDescription">' + '<span id="chatppMentionText" class="emoticonText icoSizeSmall"></span>' + '</li>');
+            $("#_chatSendTool").append("<li id=\"_chatppMentionText\" role=\"button\" class=\" _showDescription\">" + "<span id=\"chatppMentionText\" class=\"emoticonText icoSizeSmall\"></span>" + "</li>");
             this.updateMentionText();
             $("#chatppMentionText").click(function () {
                 return _this3.toggleMentionStatus();
@@ -1163,15 +1165,19 @@ var NotificationDisabler = function () {
             }
 
             if (disabledNotifyRooms) {
-                var chatworkPopup = CW.popup;
-                var b = null,
-                    d = null,
-                    e = window.navigator.userAgent.toLowerCase().indexOf("chrome") != -1;
-                CW.popup = function wrapper(a, f, j, h) {
-                    if (disabledNotifyRooms.indexOf(h.toString()) == -1) {
-                        chatworkPopup(a, f, j, h);
-                    }
-                };
+                (function () {
+                    var chatworkPopup = CW.popup;
+                    /* eslint-disable no-unused-vars */
+                    var b = null,
+                        d = null,
+                        e = window.navigator.userAgent.toLowerCase().indexOf("chrome") != -1;
+                    /* eslint-enable */
+                    CW.popup = function wrapper(a, f, j, h) {
+                        if (disabledNotifyRooms.indexOf(h.toString()) == -1) {
+                            chatworkPopup(a, f, j, h);
+                        }
+                    };
+                })();
             }
         }
     }]);
@@ -1203,9 +1209,9 @@ var RoomInformation = function () {
             if ($("#roomInfoIcon").length > 0) {
                 return;
             }
-            var room_info = '<li id="_roomInfo" role="button" class="_showDescription" aria-label="Show room Information" style="display: inline-block;"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></li>';
-            $('#_chatSendTool').append(room_info);
-            var room_info_list = '<div id="_roomInfoList" class="roomInfo toolTip toolTipWhite mainContetTooltip" role="tooltip">' + '<div class="_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom"></div>' + '<span id="_roomInfoText">' + '<div id="_roomInfoTextTotalMembers" class="tooltipFooter"></div>' + '<div id="_roomInfoTextTotalMessages" class="tooltipFooter"></div>' + '<div id="_roomInfoTextTotalFiles" class="tooltipFooter"></div>' + '<div id="_roomInfoTextTotalTasks" class="tooltipFooter"></div>' + '<div id="_roomInfoTextMyTasks" class="tooltipFooter"></div>' + '</span>' + '</div>';
+            var room_info = "<li id=\"_roomInfo\" role=\"button\" class=\"_showDescription\" aria-label=\"Show room Information\" style=\"display: inline-block;\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></li>";
+            $("#_chatSendTool").append(room_info);
+            var room_info_list = "<div id=\"_roomInfoList\" class=\"roomInfo toolTip toolTipWhite mainContetTooltip\" role=\"tooltip\">" + "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\"></div>" + "<span id=\"_roomInfoText\">" + "<div id=\"_roomInfoTextTotalMembers\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalMessages\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalFiles\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalTasks\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextMyTasks\" class=\"tooltipFooter\"></div>" + "</span>" + "</div>";
             $("body").append(room_info_list);
             $("#_roomInfo").click(function (e) {
                 _this.prepareRoomInfo();
@@ -1250,121 +1256,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Const = require("../helpers/Const.js");
 var common = require("../helpers/Common.js");
 
-var DOM_VK_CANCEL = 3,
-    DOM_VK_HELP = 6,
-    DOM_VK_BACK_SPACE = 8,
-    DOM_VK_TAB = 9,
-    DOM_VK_CLEAR = 12,
-    DOM_VK_RETURN = 13,
-    DOM_VK_ENTER = 14,
-    DOM_VK_SHIFT = 16,
-    DOM_VK_CONTROL = 17,
-    DOM_VK_ALT = 18,
-    DOM_VK_PAUSE = 19,
-    DOM_VK_CAPS_LOCK = 20,
-    DOM_VK_ESCAPE = 27,
-    DOM_VK_SPACE = 32,
-    DOM_VK_PAGE_UP = 33,
-    DOM_VK_PAGE_DOWN = 34,
-    DOM_VK_END = 35,
-    DOM_VK_HOME = 36,
-    DOM_VK_LEFT = 37,
-    DOM_VK_UP = 38,
-    DOM_VK_RIGHT = 39,
-    DOM_VK_DOWN = 40,
-    DOM_VK_PRINTSCREEN = 44,
-    DOM_VK_INSERT = 45,
-    DOM_VK_DELETE = 46,
+var DOM_VK_SPACE = 32,
     DOM_VK_0 = 48,
-    DOM_VK_1 = 49,
-    DOM_VK_2 = 50,
-    DOM_VK_3 = 51,
-    DOM_VK_4 = 52,
-    DOM_VK_5 = 53,
-    DOM_VK_6 = 54,
-    DOM_VK_7 = 55,
-    DOM_VK_8 = 56,
-    DOM_VK_9 = 57,
-    DOM_VK_SEMICOLON = 59,
-    DOM_VK_EQUALS = 61,
     DOM_VK_A = 65,
     DOM_VK_B = 66,
-    DOM_VK_C = 67,
-    DOM_VK_D = 68,
     DOM_VK_E = 69,
-    DOM_VK_F = 70,
-    DOM_VK_G = 71,
-    DOM_VK_H = 72,
-    DOM_VK_I = 73,
     DOM_VK_J = 74,
     DOM_VK_K = 75,
     DOM_VK_L = 76,
     DOM_VK_M = 77,
     DOM_VK_N = 78,
-    DOM_VK_O = 79,
-    DOM_VK_P = 80,
     DOM_VK_Q = 81,
     DOM_VK_R = 82,
     DOM_VK_S = 83,
-    DOM_VK_T = 84,
-    DOM_VK_U = 85,
     DOM_VK_V = 86,
-    DOM_VK_W = 87,
     DOM_VK_X = 88,
-    DOM_VK_Y = 89,
-    DOM_VK_Z = 90,
-    DOM_VK_CONTEXT_MENU = 93,
-    DOM_VK_NUMPAD0 = 96,
-    DOM_VK_NUMPAD1 = 97,
-    DOM_VK_NUMPAD2 = 98,
-    DOM_VK_NUMPAD3 = 99,
-    DOM_VK_NUMPAD4 = 100,
-    DOM_VK_NUMPAD5 = 101,
-    DOM_VK_NUMPAD6 = 102,
-    DOM_VK_NUMPAD7 = 103,
-    DOM_VK_NUMPAD8 = 104,
-    DOM_VK_NUMPAD9 = 105,
-    DOM_VK_MULTIPLY = 106,
-    DOM_VK_ADD = 107,
-    DOM_VK_SEPARATOR = 108,
-    DOM_VK_SUBTRACT = 109,
-    DOM_VK_DECIMAL = 110,
-    DOM_VK_DIVIDE = 111,
-    DOM_VK_F1 = 112,
-    DOM_VK_F2 = 113,
-    DOM_VK_F3 = 114,
-    DOM_VK_F4 = 115,
-    DOM_VK_F5 = 116,
-    DOM_VK_F6 = 117,
-    DOM_VK_F7 = 118,
-    DOM_VK_F8 = 119,
-    DOM_VK_F9 = 120,
-    DOM_VK_F10 = 121,
-    DOM_VK_F11 = 122,
-    DOM_VK_F12 = 123,
-    DOM_VK_F13 = 124,
-    DOM_VK_F14 = 125,
-    DOM_VK_F15 = 126,
-    DOM_VK_F16 = 127,
-    DOM_VK_F17 = 128,
-    DOM_VK_F18 = 129,
-    DOM_VK_F19 = 130,
-    DOM_VK_F20 = 131,
-    DOM_VK_F21 = 132,
-    DOM_VK_F22 = 133,
-    DOM_VK_F23 = 134,
-    DOM_VK_F24 = 135,
-    DOM_VK_NUM_LOCK = 144,
-    DOM_VK_SCROLL_LOCK = 145,
-    DOM_VK_COMMA = 188,
-    DOM_VK_PERIOD = 190,
-    DOM_VK_SLASH = 191,
-    DOM_VK_BACK_QUOTE = 192,
-    DOM_VK_OPEN_BRACKET = 219,
-    DOM_VK_BACK_SLASH = 220,
-    DOM_VK_CLOSE_BRACKET = 221,
-    DOM_VK_QUOTE = 222,
-    DOM_VK_META = 224;
+    DOM_VK_Z = 90;
 
 var Shortcut = function () {
     function Shortcut() {
@@ -1412,7 +1319,7 @@ var Shortcut = function () {
             if ($("#_chatppShortcutText").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append('<li id="_chatppShortcutText" role="button" class=" _showDescription">' + '<span id="chatppShortcutText" class="emoticonText icoSizeSmall"></span>' + '</li>');
+            $("#_chatSendTool").append("<li id=\"_chatppShortcutText\" role=\"button\" class=\" _showDescription\">" + "<span id=\"chatppShortcutText\" class=\"emoticonText icoSizeSmall\"></span>" + "</li>");
             this.updateShortcutText();
             $("#chatppShortcutText").click(function () {
                 return _this.toggleShortcutStatus();
@@ -1539,7 +1446,6 @@ var Shortcut = function () {
                     CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, selectRoom(room));
                 }
             }
-            console.log("ShortCuts added!");
         }
     }, {
         key: "removeRegisteredKeyboardShortcut",
@@ -1561,11 +1467,11 @@ var Shortcut = function () {
         }
     }, {
         key: "triggerMoreAction",
-        value: function triggerMoreAction(action) {
+        value: function triggerMoreAction() {
             var more_action = $("._message:hover").find("._cwABMoreTip");
             if (this.isDomExists(more_action)) {
                 more_action.trigger("click");
-                var delete_button = $("._cwABMoreListBox").find('[data-cwui-ab-type="action"]');
+                var delete_button = $("._cwABMoreListBox").find("[data-cwui-ab-type=\"action\"]");
                 if (this.isDomExists(delete_button)) {
                     delete_button.trigger("click");
                 }
@@ -1633,12 +1539,12 @@ var Shortcut = function () {
     }, {
         key: "isMentionMessage",
         value: function isMentionMessage(message) {
-            var regex_reply = new RegExp("\\[.* aid=" + myid + " .*\\]");
+            var regex_reply = new RegExp("\\[.* aid=" + AC.myid + " .*\\]");
             if (regex_reply.test(message.msg)) {
                 return true;
             }
 
-            var regex_to = new RegExp("\\[To:" + myid + "\\]");
+            var regex_to = new RegExp("\\[To:" + AC.myid + "\\]");
             return regex_to.test(message.msg);
         }
     }, {
@@ -1646,7 +1552,7 @@ var Shortcut = function () {
         value: function replyMessage(message) {
             var data = RM.timeline.chat_id2chat_dat[message];
             if (data) {
-                $C("#_chatText").focus();
+                $("#_chatText").focus();
                 var name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
                 CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
             }
@@ -1670,7 +1576,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous;
+            var previous = undefined;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -1719,7 +1625,7 @@ function insertThumbnail(dom) {
         var dom = $(link);
         var imageLink = getThumbnailLink(dom.attr("href"));
         if (imageLink) {
-            var img = '<div><img src="' + imageLink + '" alt="' + imageLink + '" style="max-width: 500px; max-height: 125px"></div>';
+            var img = "<div><img src=\"" + imageLink + "\" alt=\"" + imageLink + "\" style=\"max-width: 500px; max-height: 125px\"></div>";
             dom.after(img);
         }
     });
@@ -1730,12 +1636,12 @@ function getThumbnailLink(link) {
     var img_regex = /\.(png|jpg|gif|jpeg)$/i;
     if (link.match(img_regex)) {
         return link;
-    };
+    }
 
     var fb_img_regex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
     if (link.match(fb_img_regex)) {
         return link;
-    };
+    }
 
     var gyazo_regex = /^https?:\/\/gyazo.com\//i;
     if (link.match(gyazo_regex)) {
@@ -1812,11 +1718,13 @@ var ViewEnhancer = function () {
                 var up_key = b.keyCode;
                 var d = $("#_chatText");
                 (function () {
+                    /* eslint-disable no-undef */
                     if (!(up_key !== 13 || press_key !== 13)) {
+                        /* eslint-enable */
                         var a = d.val(),
-                            b = d.prop("selectionStart"),
+                            _b = d.prop("selectionStart"),
                             e = d.prop("selectionEnd");
-                        b === e && (e = a.substr(0, b), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```$/, "$1[code]\n$2\n[/code]") : e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[code]\n$2\n[/code]\n"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```$/, "$1[title]$2[/title]") : e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[title]$2[/title]"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```$/, "$1[info]$2[/info]") : e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[info]$2[/info]\n"), a = a.substr(b), d.val(e + a), d.prop("selectionStart", e.length), d.prop("selectionEnd", e.length));
+                        _b === e && (e = a.substr(0, _b), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```$/, "$1[code]\n$2\n[/code]") : e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[code]\n$2\n[/code]\n"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```$/, "$1[title]$2[/title]") : e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[title]$2[/title]"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```$/, "$1[info]$2[/info]") : e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[info]$2[/info]\n"), a = a.substr(_b), d.val(e + a), d.prop("selectionStart", e.length), d.prop("selectionEnd", e.length));
                     }
                 })();
                 return chatTextKeyUpOld(b);
@@ -1846,7 +1754,7 @@ var ViewEnhancer = function () {
                             $(block).addClass(options.language);
                         }
                         if (!options.nowrap) {
-                            $(block).css({ "word-wrap": "break-word" });;
+                            $(block).css({ "word-wrap": "break-word" });
                         }
                         hljs.highlightBlock(block);
                     });
@@ -1884,8 +1792,6 @@ module.exports = view_enhancer;
 
 },{"../helpers/Common.js":1}],10:[function(require,module,exports){
 "use strict";
-
-var Const = require("../helpers/Const.js");
 
 var emoticon = require("./Emoticon.js");
 var shortcut = require("./Shortcut.js");
@@ -1931,8 +1837,8 @@ $(function () {
 });
 
 function addStyle() {
-    $('<style type="text/css"> .emoticonTextEnable{font-weight: bold;};</style>').appendTo("head");
-    $('<style type="text/css"> .chatppErrorsText{font-weight: bold; color: red;};</style>').appendTo("head");
+    $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
 }
 
-},{"../helpers/Const.js":2,"./Advertisement.js":3,"./Emoticon.js":4,"./Mention.js":5,"./NotificationDisabler.js":6,"./RoomInformation.js":7,"./Shortcut.js":8,"./ViewEnhancer.js":9}]},{},[10]);
+},{"./Advertisement.js":3,"./Emoticon.js":4,"./Mention.js":5,"./NotificationDisabler.js":6,"./RoomInformation.js":7,"./Shortcut.js":8,"./ViewEnhancer.js":9}]},{},[10]);

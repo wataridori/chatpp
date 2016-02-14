@@ -5,37 +5,25 @@ let Const = require("../helpers/Const.js");
 
 let local_stored_data = {};
 
-$(function() {
+$(() => {
     setVersionType();
 
     $("#chatpp_version").html(common.getAppFullName());
 
-    var pages = ["setting", "emoticon", "room", "group", "shortcut", "change_logs", "features", "notification"];
-    pages.forEach(function(page_name) {
-        var url = `html/${page_name}.html`;
-        $("#" + page_name + "_page").click(function() {
+    let pages = ["setting", "emoticon", "room", "group", "shortcut", "change_logs", "features", "notification"];
+    pages.forEach((page_name) => {
+        let url = `html/${page_name}.html`;
+        $("#" + page_name + "_page").click(() => {
             common.openNewUrl(url);
         });
     });
 
-    $(".ext-url").click(function(){
-        common.openNewUrl($(this).attr("href"));
+    $(".ext-url").click((e) => {
+        common.openNewUrl($(e.target).attr("href"));
     });
 
-    $("#btn-emo-status").click(function() {
-        switchEmoticonStatus();
-    });
-
-    $("#btn-mention-status").click(function() {
-        switchMentionStatus();
-    });
-
-    $("#btn-shortcut-status").click(function() {
-        switchShortcutStatus();
-    });
-
-    chrome.storage.onChanged.addListener(function(changes, namespace) {
-        var data = changes[Const.CHROME_SYNC_KEY];
+    chrome.storage.onChanged.addListener((changes) => {
+        let data = changes[Const.CHROME_SYNC_KEY];
         if (!$.isEmptyObject(data) && !$.isEmptyObject(data.newValue)) {
             data = data.newValue;
             updateViewData(data);
@@ -54,8 +42,8 @@ function loadStatus(name, value) {
 }
 
 function loadChatppEmoData() {
-    var storage = new Storage;
-    storage.get(Const.CHROME_SYNC_KEY, function(data) {
+    let storage = new Storage;
+    storage.get(Const.CHROME_SYNC_KEY, (data) => {
         if ($.isEmptyObject(data)) {
             common.openNewExtensionPageUrl(common.app_detail.options_page);
         } else {
@@ -65,15 +53,15 @@ function loadChatppEmoData() {
 }
 
 function updateViewData(data) {
-    var features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
-    for (var i in features) {
+    let features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
+    for (let i in features) {
         loadStatus(features[i], data[features[i] + "_status"]);
     }
 }
 
 function setVersionType() {
-    var chrome_storage_local = new ChromeStorageLocal();
-    chrome_storage_local.get(function(data) {
+    let chrome_storage_local = new ChromeStorageLocal();
+    chrome_storage_local.get((data) => {
         if ($.isEmptyObject(data)) {
             local_stored_data = {};
         } else {
@@ -84,10 +72,10 @@ function setVersionType() {
         }
         local_stored_data[Const.CHROME_LOCAL_KEY]["version"] = common.getAppVersion();
         local_stored_data[Const.CHROME_LOCAL_KEY]["version_name"] = common.getAppVersionName();
-        chrome.browserAction.getBadgeText({}, function(result) {
+        chrome.browserAction.getBadgeText({}, (result) => {
             if (result === "new") {
                 chrome.browserAction.setBadgeText({text: ""});
-                //chrome.tabs.create({url: "change_logs.html"});
+                common.openNewUrl("change_logs.html");
             }
         });
         chrome_storage_local.setData(local_stored_data);

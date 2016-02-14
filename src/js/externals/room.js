@@ -6,23 +6,23 @@ let storage = new Storage();
 
 let rooms = [];
 
-$(function() {
+$(() => {
     if (!common.isPage("room")) {
         return;
     }
     common.setPageTitle();
 
-    storage.get(Const.CHROME_SYNC_ROOM_KEY, function(data) {
+    storage.get(Const.CHROME_SYNC_ROOM_KEY, (data) => {
         if (!$.isEmptyObject(data)) {
             rooms = data;
             loadData();
         }
     });
 
-    $("#save-btn").click(function() {
-        $("input").each(function (){
-            var number = $(this).data("btn");
-            var value = $(this).val();
+    $("#save-btn").click(() => {
+        $("input").each((index, element) => {
+            let number = $(element).data("btn");
+            let value = $(element).val();
             rooms[number] = common.parseRoomId(value);
         });
         storage.set(Const.CHROME_SYNC_ROOM_KEY, rooms, common.reload);
@@ -30,7 +30,7 @@ $(function() {
 });
 
 function loadData() {
-    for (var i in rooms) {
+    for (let i in rooms) {
         if (rooms[i]) {
             $("[data-btn='" + i +"']").val(rooms[i]);
         }

@@ -21,23 +21,11 @@ $(function () {
         });
     });
 
-    $(".ext-url").click(function () {
-        common.openNewUrl($(this).attr("href"));
+    $(".ext-url").click(function (e) {
+        common.openNewUrl($(e.target).attr("href"));
     });
 
-    $("#btn-emo-status").click(function () {
-        switchEmoticonStatus();
-    });
-
-    $("#btn-mention-status").click(function () {
-        switchMentionStatus();
-    });
-
-    $("#btn-shortcut-status").click(function () {
-        switchShortcutStatus();
-    });
-
-    chrome.storage.onChanged.addListener(function (changes, namespace) {
+    chrome.storage.onChanged.addListener(function (changes) {
         var data = changes[Const.CHROME_SYNC_KEY];
         if (!$.isEmptyObject(data) && !$.isEmptyObject(data.newValue)) {
             data = data.newValue;
@@ -90,7 +78,7 @@ function setVersionType() {
         chrome.browserAction.getBadgeText({}, function (result) {
             if (result === "new") {
                 chrome.browserAction.setBadgeText({ text: "" });
-                //chrome.tabs.create({url: "change_logs.html"});
+                common.openNewUrl("change_logs.html");
             }
         });
         chrome_storage_local.setData(local_stored_data);
@@ -335,7 +323,7 @@ var Common = function () {
     }, {
         key: "regexEscape",
         value: function regexEscape(string) {
-            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
         }
     }, {
         key: "generateEmoticonRegex",

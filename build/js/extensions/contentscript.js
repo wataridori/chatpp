@@ -42,9 +42,6 @@ function init(inject_script) {
         var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
         features.forEach(function (feature) {
             var feature_name = feature + "_status";
-            if (info[feature_name] == false) {
-                console.log(feature + " feature is disabled!");
-            }
             info[feature_name] = info[feature_name] === undefined ? true : info[feature_name];
             common.setStatus(feature, info[feature_name]);
         });
@@ -91,7 +88,7 @@ function getData(info, inject_script) {
                 emo_storage.pushData(data, priority);
                 pushEmoticons(data.emoticons, priority, data.data_name);
             }
-        }).fail(function (jqxhr, textStatus, error) {
+        }).fail(function () {
             failed = true;
             delete emo_info[data_name];
             pushFailedData(data_name);
@@ -106,8 +103,8 @@ function getData(info, inject_script) {
                     if (!$.isEmptyObject(local_data)) {
                         version_name = local_data["version_name"];
                     }
-                    var current_time = new Date().toLocaleString();
-                    console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
+                    // let current_time = (new Date).toLocaleString();
+                    // console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
                     localStorage[Const.LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
                     localStorage["chatpp_version_name"] = version_name;
                     localStorage["emoticon_data_version"] = parseDataName(emo_info);
@@ -174,7 +171,7 @@ function addInjectedScript() {
 }
 
 function preLoad() {
-    var text = '<li id="_chatppPreLoad"><span id="chatppPreLoad" class="icoSizeSmall"></span></li>';
+    var text = "<li id=\"_chatppPreLoad\"><span id=\"chatppPreLoad\" class=\"icoSizeSmall\"></span></li>";
     $("#_chatSendTool").append(text);
     var chatpp_pre_load = $("#chatppPreLoad");
     var delay_time = Const.DELAY_TIME / 1000;
@@ -203,20 +200,11 @@ function injectCssFile(file_name) {
     css_link.appendTo("head");
 }
 
-function runFunction(func) {
-    $("body").append($("<script />", {
-        html: func
-    }));
-}
-
 function loadAdvertisement() {
     $.getJSON(Const.ADVERTISEMENT_URL).done(function (data) {
         if (!$.isEmptyObject(data)) {
             localStorage["chatpp_advertisement"] = JSON.stringify(data);
         }
-    }).fail(function (jqxhr, textStatus, error) {
-        var err = textStatus + ", " + error;
-        console.log("Load Ads Failed: " + err);
     });
 }
 
@@ -458,7 +446,7 @@ var Common = function () {
     }, {
         key: "regexEscape",
         value: function regexEscape(string) {
-            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
         }
     }, {
         key: "generateEmoticonRegex",
