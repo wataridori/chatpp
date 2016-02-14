@@ -1,5 +1,14 @@
 # Contribution Guidelines
 
+## Setup
+- Chat++ is written in [ECMAScript 6](http://www.ecma-international.org/publications/standards/Ecma-262.htm)
+and compiled by [babel](https://babeljs.io/).
+- Install `nodejs`, `gulp` first, if you do not have. Use `npm install` to install node modules.
+- Install [ESLint](http://eslint.org/) for checking code styles.
+You can refer the [.eslintrc.json](./.eslintrc.json) file for the rules that Chat++ is following.
+- Run `gulp` to build codes from `src` folder.
+- Run `eslint src` to check whether your codes satisfy the convention or not.
+
 ## Report an Issue
 
 Please follow the guidelines below when creating an issue so that your issue can be more promptly resolved:

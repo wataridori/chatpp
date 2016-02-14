@@ -1,8 +1,9 @@
 Chat++ Change Logs
 =================
 ## 5.0.0
-* Chat++ is rewritten in [**ECMAScript 6**](http://www.ecma-international.org/publications/standards/Ecma-262.htm),
- transformed by [**babel**](https://babeljs.io/), built by [**gulp**](http://gulpjs.com/).
+* Chat++ is rewritten in [ECMAScript 6](http://www.ecma-international.org/publications/standards/Ecma-262.htm),
+ transformed by [babel](https://babeljs.io/), built by [gulp](http://gulpjs.com/).
+ Refer the [Contribution Guidelines](./CONTRIBUTING.md) file for more information.
 * Emoticon Data File Structure changed. The `regex` field is not necessary anymore. (However, you can add it if you want)
 ```
 // Before
