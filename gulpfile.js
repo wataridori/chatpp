@@ -29,5 +29,6 @@ elixir(function(mix) {
             "externals/group.js",
         ], "build/js/externals/pages.js")
         .browserify("extensions/contentscript.js", "build/js/extensions/contentscript.js")
+        .browserify("extensions/background.js", "build/js/extensions/background.js")
         .browserify("internals/main.js", "build/js/internals/all.js");
 });

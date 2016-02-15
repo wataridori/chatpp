@@ -2,90 +2,22 @@
 "use strict";
 
 var common = require("../helpers/Common.js");
-var Storage = require("../helpers/Storage.js");
 var ChromeStorageLocal = require("../helpers/ChromeStorageLocal.js");
-var Const = require("../helpers/Const.js");
+var chrome_storage_local = new ChromeStorageLocal();
 
-var local_stored_data = {};
-
-$(function () {
-    setVersionType();
-
-    $("#chatpp_version").html(common.getAppFullName());
-
-    var pages = ["setting", "emoticon", "room", "group", "shortcut", "change_logs", "features", "notification"];
-    pages.forEach(function (page_name) {
-        var url = "html/" + page_name + ".html";
-        $("#" + page_name + "_page").click(function () {
-            common.openNewUrl(url);
-        });
-    });
-
-    $(".ext-url").click(function (e) {
-        common.openNewUrl($(e.target).attr("href"));
-    });
-
-    chrome.storage.onChanged.addListener(function (changes) {
-        var data = changes[Const.CHROME_SYNC_KEY];
-        if (!$.isEmptyObject(data) && !$.isEmptyObject(data.newValue)) {
-            data = data.newValue;
-            updateViewData(data);
+chrome.runtime.onInstalled.addListener(function () {
+    chrome_storage_local.get(function (data) {
+        var version = undefined;
+        if (data) {
+            version = data["version"];
+        }
+        if (!version || version != common.app_detail.version) {
+            chrome.browserAction.setBadgeText({ text: "new" });
         }
     });
-
-    loadChatppEmoData();
 });
 
-function loadStatus(name, value) {
-    if (value !== undefined && value === false) {
-        $("#" + name + "-status").removeClass().addClass("text-danger").html("DISABLED");
-    } else {
-        $("#" + name + "-status").removeClass().addClass("text-primary").html("ENABLED");
-    }
-}
-
-function loadChatppEmoData() {
-    var storage = new Storage();
-    storage.get(Const.CHROME_SYNC_KEY, function (data) {
-        if ($.isEmptyObject(data)) {
-            common.openNewExtensionPageUrl(common.app_detail.options_page);
-        } else {
-            updateViewData(data);
-        }
-    });
-}
-
-function updateViewData(data) {
-    var features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
-    for (var i in features) {
-        loadStatus(features[i], data[features[i] + "_status"]);
-    }
-}
-
-function setVersionType() {
-    var chrome_storage_local = new ChromeStorageLocal();
-    chrome_storage_local.get(function (data) {
-        if ($.isEmptyObject(data)) {
-            local_stored_data = {};
-        } else {
-            local_stored_data = data;
-        }
-        if (local_stored_data[Const.CHROME_LOCAL_KEY] === undefined) {
-            local_stored_data[Const.CHROME_LOCAL_KEY] = {};
-        }
-        local_stored_data[Const.CHROME_LOCAL_KEY]["version"] = common.getAppVersion();
-        local_stored_data[Const.CHROME_LOCAL_KEY]["version_name"] = common.getAppVersionName();
-        chrome.browserAction.getBadgeText({}, function (result) {
-            if (result === "new") {
-                chrome.browserAction.setBadgeText({ text: "" });
-                common.openNewUrl("html/change_logs.html");
-            }
-        });
-        chrome_storage_local.setData(local_stored_data);
-    });
-}
-
-},{"../helpers/ChromeStorageLocal.js":2,"../helpers/Common.js":3,"../helpers/Const.js":4,"../helpers/Storage.js":5}],2:[function(require,module,exports){
+},{"../helpers/ChromeStorageLocal.js":2,"../helpers/Common.js":3}],2:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();

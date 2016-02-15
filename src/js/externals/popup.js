@@ -75,7 +75,7 @@ function setVersionType() {
         chrome.browserAction.getBadgeText({}, (result) => {
             if (result === "new") {
                 chrome.browserAction.setBadgeText({text: ""});
-                common.openNewUrl("change_logs.html");
+                common.openNewUrl("html/change_logs.html");
             }
         });
         chrome_storage_local.setData(local_stored_data);
