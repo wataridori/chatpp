@@ -22,5 +22,8 @@
     "babel-preset-react": "^6.3.13",
     "gulp": "^3.9.0",
     "laravel-elixir": "^4.2.1"
+  },
+  "scripts": {
+    "test": "eslint src"
   }
 }
