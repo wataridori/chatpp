@@ -1,5 +1,6 @@
 let common = require("../helpers/Common.js");
 let Const = require("../helpers/Const.js");
+let chatwork = require("../helpers/ChatworkFacade.js");
 
 let DISPLAY_NUMS = 3;
 let MAX_PATTERN_LENGTH = 20;
@@ -45,6 +46,10 @@ class Mention {
         if (localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]) {
             this.group_mention = JSON.parse(localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]);
         }
+        this.group_mention.push({
+            "group_name": "ads",
+            "group_members": chatwork.getRoomAdmins().join(",")
+        });
 
         $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");
         this.hideSuggestionBox();
@@ -140,6 +145,7 @@ class Mention {
 
             if (this.current_RM != RM.id) {
                 this.member_objects = this.buildMemberListData(false);
+                this.updateAdminGroupData();
                 this.fuse = new Fuse(this.member_objects, this.options);
                 this.current_RM = RM.id;
             }
@@ -595,6 +601,14 @@ class Mention {
             }
         }
         return b;
+    }
+
+    updateAdminGroupData() {
+        this.group_mention.forEach((data) => {
+            if (data.group_name === "ads") {
+                data.group_members = chatwork.getRoomAdmins().join(",");
+            }
+        })
     }
 
     getMemberObject(member) {

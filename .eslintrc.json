@@ -177,7 +177,7 @@
     "default-case": 0,
     "dot-location": 0,
     "dot-notation": 0,
-    "eol-last": 0,
+    "eol-last": 2,
     "eqeqeq": 0,
     "func-names": 0,
     "func-style": 0,

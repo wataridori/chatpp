@@ -5,6 +5,60 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var ChatworkFacade = function () {
+    function ChatworkFacade() {
+        _classCallCheck(this, ChatworkFacade);
+    }
+
+    _createClass(ChatworkFacade, [{
+        key: "myId",
+        value: function myId() {
+            return AC.myid;
+        }
+    }, {
+        key: "currentRoom",
+        value: function currentRoom() {
+            return RM.id;
+        }
+    }, {
+        key: "getRoomAdmins",
+        value: function getRoomAdmins() {
+            var members = this.getRoomMembers();
+            var admins = [];
+            for (var id in members) {
+                if (members[id] === "admin") {
+                    admins.push(id);
+                }
+            }
+            return admins;
+        }
+    }, {
+        key: "isAdmin",
+        value: function isAdmin(user) {
+            var members = this.getRoomMembers();
+            user = user || this.myId();
+            return members[user] === "admin";
+        }
+    }, {
+        key: "getRoomMembers",
+        value: function getRoomMembers() {
+            return RM.member_dat;
+        }
+    }]);
+
+    return ChatworkFacade;
+}();
+
+var chatwork = new ChatworkFacade();
+module.exports = chatwork;
+
+},{}],2:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var Const = require("./Const.js");
 
 var Common = function () {
@@ -212,7 +266,7 @@ var Common = function () {
 var common = new Common();
 module.exports = common;
 
-},{"./Const.js":2}],2:[function(require,module,exports){
+},{"./Const.js":3}],3:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -245,7 +299,7 @@ Const.ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 
 module.exports = Const;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -299,7 +353,7 @@ var Advertisement = function () {
 var advertisement = new Advertisement();
 module.exports = advertisement;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -471,7 +525,7 @@ var Emoticon = function () {
 var emoticon = new Emoticon();
 module.exports = emoticon;
 
-},{"../helpers/Common.js":1,"../helpers/Const.js":2}],5:[function(require,module,exports){
+},{"../helpers/Common.js":2,"../helpers/Const.js":3}],6:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -480,6 +534,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var common = require("../helpers/Common.js");
 var Const = require("../helpers/Const.js");
+var chatwork = require("../helpers/ChatworkFacade.js");
 
 var DISPLAY_NUMS = 3;
 var MAX_PATTERN_LENGTH = 20;
@@ -531,6 +586,10 @@ var Mention = function () {
             if (localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]) {
                 this.group_mention = JSON.parse(localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]);
             }
+            this.group_mention.push({
+                "group_name": "ads",
+                "group_members": chatwork.getRoomAdmins().join(",")
+            });
 
             $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");
             this.hideSuggestionBox();
@@ -630,6 +689,7 @@ var Mention = function () {
 
                 if (_this.current_RM != RM.id) {
                     _this.member_objects = _this.buildMemberListData(false);
+                    _this.updateAdminGroupData();
                     _this.fuse = new Fuse(_this.member_objects, _this.options);
                     _this.current_RM = RM.id;
                 }
@@ -1106,6 +1166,15 @@ var Mention = function () {
             return b;
         }
     }, {
+        key: "updateAdminGroupData",
+        value: function updateAdminGroupData() {
+            this.group_mention.forEach(function (data) {
+                if (data.group_name === "ads") {
+                    data.group_members = chatwork.getRoomAdmins().join(",");
+                }
+            });
+        }
+    }, {
         key: "getMemberObject",
         value: function getMemberObject(member) {
             var h = CW.is_business && ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(member) : AC.getNickName(member);
@@ -1177,7 +1246,7 @@ var Mention = function () {
 var mention = new Mention();
 module.exports = mention;
 
-},{"../helpers/Common.js":1,"../helpers/Const.js":2}],6:[function(require,module,exports){
+},{"../helpers/ChatworkFacade.js":1,"../helpers/Common.js":2,"../helpers/Const.js":3}],7:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1221,7 +1290,7 @@ var NotificationDisabler = function () {
 
 module.exports = NotificationDisabler;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1280,7 +1349,7 @@ var RoomInformation = function () {
 var room_information = new RoomInformation();
 module.exports = room_information;
 
-},{"../helpers/Common.js":1}],8:[function(require,module,exports){
+},{"../helpers/Common.js":2}],9:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1643,7 +1712,7 @@ var Shortcut = function () {
 var shortcut = new Shortcut();
 module.exports = shortcut;
 
-},{"../helpers/Common.js":1,"../helpers/Const.js":2}],9:[function(require,module,exports){
+},{"../helpers/Common.js":2,"../helpers/Const.js":3}],10:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1824,7 +1893,7 @@ var ViewEnhancer = function () {
 var view_enhancer = new ViewEnhancer();
 module.exports = view_enhancer;
 
-},{"../helpers/Common.js":1}],10:[function(require,module,exports){
+},{"../helpers/Common.js":2}],11:[function(require,module,exports){
 "use strict";
 
 var emoticon = require("./Emoticon.js");
@@ -1875,4 +1944,4 @@ function addStyle() {
     $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
 }
 
-},{"./Advertisement.js":3,"./Emoticon.js":4,"./Mention.js":5,"./NotificationDisabler.js":6,"./RoomInformation.js":7,"./Shortcut.js":8,"./ViewEnhancer.js":9}]},{},[10]);
+},{"./Advertisement.js":4,"./Emoticon.js":5,"./Mention.js":6,"./NotificationDisabler.js":7,"./RoomInformation.js":8,"./Shortcut.js":9,"./ViewEnhancer.js":10}]},{},[11]);
