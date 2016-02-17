@@ -263,6 +263,15 @@ var Common = function () {
             regex = regex || this.htmlEncode(this.regexEscape(text));
             return new RegExp(regex, "g");
         }
+    }, {
+        key: "random",
+        value: function random(items) {
+            if (!items.length) {
+                return null;
+            }
+
+            return items[Math.floor(Math.random() * items.length)];
+        }
     }]);
 
     return Common;

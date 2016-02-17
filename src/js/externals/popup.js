@@ -19,7 +19,7 @@ $(() => {
     });
 
     $(".ext-url").click((e) => {
-        common.openNewUrl($(e.target).attr("href"));
+        common.openNewUrl($(e.currentTarget).attr("href"));
     });
 
     chrome.storage.onChanged.addListener((changes) => {

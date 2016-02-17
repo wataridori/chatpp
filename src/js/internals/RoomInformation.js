@@ -26,7 +26,7 @@ class RoomInformation {
                 fixHeight: !1,
                 search: !1
             });
-            tip.open($(e.target));
+            tip.open($(e.currentTarget));
         });
     }
 

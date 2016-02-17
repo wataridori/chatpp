@@ -170,6 +170,14 @@ class Common {
         regex = regex || this.htmlEncode(this.regexEscape(text));
         return new RegExp(regex, "g");
     }
+
+    random(items) {
+        if (!items.length) {
+            return null;
+        }
+
+        return items[Math.floor(Math.random() * items.length)];
+    }
 }
 
 let common = new Common();

@@ -96,7 +96,7 @@ $(() => {
     });
 
     $("#data-select").change((e) => {
-        let val = $(e.target).val();
+        let val = $(e.currentTarget).val();
         if (val == "default") {
             $("#url-input-div").hide("slow");
         } else {
@@ -170,7 +170,7 @@ function showOfficialData() {
     }
 
     $(".btn-official-data").click((e) => {
-        let data_name = $(e.target).data("name");
+        let data_name = $(e.currentTarget).data("name");
         let url = official_emoticons_data[data_name].link;
         if (common.validateUrl(url)) {
             urls[data_name] = url;
@@ -311,7 +311,7 @@ function fillDataTable() {
         new_emo_storage.syncData(reload);
     });
     $("#table-data").on("click", "button", (e) => {
-        let button = $(e.target);
+        let button = $(e.currentTarget);
         if (button.hasClass("btn-data-move-up")) {
             let priority = button.data("priority");
             let temp;

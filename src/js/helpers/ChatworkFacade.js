@@ -1,3 +1,5 @@
+let common = require("../helpers/Common.js");
+
 class ChatworkFacade {
     constructor() {
 
@@ -30,6 +32,16 @@ class ChatworkFacade {
 
     getRoomMembers() {
         return RM.member_dat;
+    }
+
+    getRoomMembersArray() {
+        let members = this.getRoomMembers();
+        return Object.keys(members);
+    }
+
+    getRandomMemberInRoom() {
+        let members = this.getRoomMembersArray();
+        return common.random(members);
     }
 }
 

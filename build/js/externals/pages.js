@@ -98,7 +98,7 @@ $(function () {
     });
 
     $("#data-select").change(function (e) {
-        var val = $(e.target).val();
+        var val = $(e.currentTarget).val();
         if (val == "default") {
             $("#url-input-div").hide("slow");
         } else {
@@ -166,7 +166,7 @@ function showOfficialData() {
     }
 
     $(".btn-official-data").click(function (e) {
-        var data_name = $(e.target).data("name");
+        var data_name = $(e.currentTarget).data("name");
         var url = official_emoticons_data[data_name].link;
         if (common.validateUrl(url)) {
             urls[data_name] = url;
@@ -287,7 +287,7 @@ function fillDataTable() {
         new_emo_storage.syncData(reload);
     });
     $("#table-data").on("click", "button", function (e) {
-        var button = $(e.target);
+        var button = $(e.currentTarget);
         if (button.hasClass("btn-data-move-up")) {
             var priority = button.data("priority");
             var temp = undefined;
@@ -593,10 +593,10 @@ $(function () {
             updateViewData(data);
             $("[id$=-status-btn]").click(function (e) {
                 var status = true;
-                var id = $(e.target).attr("id");
+                var id = $(e.currentTarget).attr("id");
                 var id_parts = id.split("-");
                 var feature_name = id_parts[0];
-                if ($(e.target).html() === "Disable") {
+                if ($(e.currentTarget).html() === "Disable") {
                     status = false;
                 }
                 stored_data[Const.CHROME_SYNC_KEY][feature_name + "_status"] = status;
@@ -842,6 +842,15 @@ var Common = function () {
         value: function generateEmoticonRegex(text, regex) {
             regex = regex || this.htmlEncode(this.regexEscape(text));
             return new RegExp(regex, "g");
+        }
+    }, {
+        key: "random",
+        value: function random(items) {
+            if (!items.length) {
+                return null;
+            }
+
+            return items[Math.floor(Math.random() * items.length)];
         }
     }]);
 

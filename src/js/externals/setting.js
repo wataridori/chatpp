@@ -19,10 +19,10 @@ $(() => {
             updateViewData(data);
             $("[id$=-status-btn]").click((e) => {
                 let status = true;
-                let id = $(e.target).attr("id");
+                let id = $(e.currentTarget).attr("id");
                 let id_parts = id.split("-");
                 let feature_name = id_parts[0];
-                if ($(e.target).html() === "Disable") {
+                if ($(e.currentTarget).html() === "Disable") {
                     status = false;
                 }
                 stored_data[Const.CHROME_SYNC_KEY][feature_name + "_status"] = status;

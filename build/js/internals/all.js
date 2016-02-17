@@ -5,6 +5,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var common = require("../helpers/Common.js");
+
 var ChatworkFacade = function () {
     function ChatworkFacade() {
         _classCallCheck(this, ChatworkFacade);
@@ -44,6 +46,18 @@ var ChatworkFacade = function () {
         value: function getRoomMembers() {
             return RM.member_dat;
         }
+    }, {
+        key: "getRoomMembersArray",
+        value: function getRoomMembersArray() {
+            var members = this.getRoomMembers();
+            return Object.keys(members);
+        }
+    }, {
+        key: "getRandomMemberInRoom",
+        value: function getRandomMemberInRoom() {
+            var members = this.getRoomMembersArray();
+            return common.random(members);
+        }
     }]);
 
     return ChatworkFacade;
@@ -52,7 +66,7 @@ var ChatworkFacade = function () {
 var chatwork = new ChatworkFacade();
 module.exports = chatwork;
 
-},{}],2:[function(require,module,exports){
+},{"../helpers/Common.js":2}],2:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -257,6 +271,15 @@ var Common = function () {
         value: function generateEmoticonRegex(text, regex) {
             regex = regex || this.htmlEncode(this.regexEscape(text));
             return new RegExp(regex, "g");
+        }
+    }, {
+        key: "random",
+        value: function random(items) {
+            if (!items.length) {
+                return null;
+            }
+
+            return items[Math.floor(Math.random() * items.length)];
         }
     }]);
 
@@ -571,6 +594,10 @@ var Mention = function () {
             all: { ja: "すべてを選択します", en: "Select All Members" },
             group: { ja: "空のグループ", en: "Empty Group" }
         };
+        this.random_user_messages = {
+            ja: "メンバーをランダムする",
+            en: "Random a member"
+        };
 
         this.group_mention = [];
     }
@@ -587,7 +614,11 @@ var Mention = function () {
                 this.group_mention = JSON.parse(localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]);
             }
             this.group_mention.push({
-                "group_name": "ads",
+                "group_name": "random",
+                "group_members": ""
+            });
+            this.group_mention.push({
+                "group_name": "admin",
                 "group_members": chatwork.getRoomAdmins().join(",")
             });
 
@@ -874,19 +905,19 @@ var Mention = function () {
                     return;
                 }
                 _this2.is_inserted = true;
-                var target = $(e.target);
+                var target = $(e.currentTarget);
                 target.css("background-color", "#D8F0F9");
                 _this2.setSuggestedChatText(_this2.getTypedText(), target.text(), target.data("cwui-lt-value"));
             });
 
             $(".suggested-name").mouseover(function (e) {
-                $(e.target).siblings().css("background-color", "white");
-                $(e.target).css("background-color", "#D8F0F9");
+                $(e.currentTarget).siblings().css("background-color", "white");
+                $(e.currentTarget).css("background-color", "#D8F0F9");
             });
 
             $(".suggested-name").mouseout(function (e) {
-                $(e.target).siblings().first().css("background-color", "#D8F0F9");
-                $(e.target).css("background-color", "white");
+                $(e.currentTarget).siblings().first().css("background-color", "#D8F0F9");
+                $(e.currentTarget).css("background-color", "white");
             });
         }
     }, {
@@ -1118,6 +1149,9 @@ var Mention = function () {
                     break;
                 /* eslint-enable */
                 case "group":
+                    if (this.selected_group_name === "random") {
+                        return "<ul><li>" + this.random_user_messages[LANGUAGE] + "</li></ul>";
+                    }
                     members = this.buildGroupMemberListData(this.selected_group_name);
                     if (members.length) {
                         var txt = "<ul><li>";
@@ -1169,7 +1203,7 @@ var Mention = function () {
         key: "updateAdminGroupData",
         value: function updateAdminGroupData() {
             this.group_mention.forEach(function (data) {
-                if (data.group_name === "ads") {
+                if (data.group_name === "admin") {
                     data.group_members = chatwork.getRoomAdmins().join(",");
                 }
             });
@@ -1191,6 +1225,10 @@ var Mention = function () {
     }, {
         key: "buildGroupMemberListData",
         value: function buildGroupMemberListData(group_name) {
+            if (group_name === "random") {
+                var member = chatwork.getRandomMemberInRoom();
+                return [this.getMemberObject(member)];
+            }
             for (var i = 0; i < this.group_mention.length; i++) {
                 if (this.group_mention[i]["group_name"] == group_name) {
                     var members = this.group_mention[i]["group_members"].split(",");
@@ -1324,7 +1362,7 @@ var RoomInformation = function () {
                     fixHeight: !1,
                     search: !1
                 });
-                tip.open($(e.target));
+                tip.open($(e.currentTarget));
             });
         }
     }, {
