@@ -27,6 +27,7 @@
     "ST": true,
     "RM": true,
     "L": true,
+    "_is_mac": true,
     "LANGUAGE": true,
     "TimeLineView": true,
     "RoomView": true,
