@@ -155,10 +155,11 @@ var Common = function () {
     }, {
         key: "getEmoUrl",
         value: function getEmoUrl(img) {
+            var url = Const.DEFAULT_IMG_HOST + "img/emoticons/" + img;
             if (img.indexOf("https://") == 0 || img.indexOf("http://") == 0) {
-                return img;
+                url = img;
             }
-            return Const.DEFAULT_IMG_HOST + "img/emoticons/" + img;
+            return this.htmlEncode(url);
         }
     }, {
         key: "parseRoomId",

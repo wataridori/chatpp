@@ -1,4 +1,4 @@
-![chatpp](./build/img/icon32.png) Chat++ 5.0.0 (Coming Soon) [![Build Status](https://travis-ci.org/wataridori/chatpp.svg?branch=master)](https://travis-ci.org/wataridori/chatpp)
+![chatpp](./build/img/icon32.png) Chat++ 5 (Coming Soon) [![Build Status](https://travis-ci.org/wataridori/chatpp.svg?branch=master)](https://travis-ci.org/wataridori/chatpp)
 =================
 
 Chat++ is an all-in-one Chatwork Enhancement Toolkit.

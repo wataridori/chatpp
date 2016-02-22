@@ -735,10 +735,11 @@ var Common = function () {
     }, {
         key: "getEmoUrl",
         value: function getEmoUrl(img) {
+            var url = Const.DEFAULT_IMG_HOST + "img/emoticons/" + img;
             if (img.indexOf("https://") == 0 || img.indexOf("http://") == 0) {
-                return img;
+                url = img;
             }
-            return Const.DEFAULT_IMG_HOST + "img/emoticons/" + img;
+            return this.htmlEncode(url);
         }
     }, {
         key: "parseRoomId",
@@ -889,7 +890,6 @@ Const.DEFAULT_IMG_HOST = "https://chatpp.thangtd.com/";
 Const.DELAY_TIME = 6000;
 Const.FORCE_TURN_OFF_THUMBNAIL = 1;
 Const.ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
-
 
 module.exports = Const;
 

@@ -18,6 +18,10 @@ Chat++ Features
 
 * Mention your self by typing `@me`
 
+* Mention admins in room by typing `@admin`
+
+* Mention a random member by typing `@random`
+
 * Mention people in your friend list even if they are not present in current chat room by typing `@#`
 
 * Mention a person or all people __without name__ by adding `_`
@@ -85,6 +89,10 @@ Display only picon of people in group, without name @._group name
 * Mention tất cả mọi người trong một group bằng cách gõ `@all`
 
 * Mention bản thân mình bằng cách gõ `@me`
+
+* Mention tất cả các admins trong room bằng cách gõ `@admin`
+
+* Mention một thành viên ngẫu nhiên trong room bằng cách gõ `@random`
 
 * Mention cả những người không có trong room nhưng có trong friend list của bạn bằng cách gõ `@#`
 

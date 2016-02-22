@@ -164,10 +164,11 @@ var Common = function () {
     }, {
         key: "getEmoUrl",
         value: function getEmoUrl(img) {
+            var url = Const.DEFAULT_IMG_HOST + "img/emoticons/" + img;
             if (img.indexOf("https://") == 0 || img.indexOf("http://") == 0) {
-                return img;
+                url = img;
             }
-            return Const.DEFAULT_IMG_HOST + "img/emoticons/" + img;
+            return this.htmlEncode(url);
         }
     }, {
         key: "parseRoomId",
@@ -319,7 +320,6 @@ Const.DELAY_TIME = 6000;
 Const.FORCE_TURN_OFF_THUMBNAIL = 1;
 Const.ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 
-
 module.exports = Const;
 
 },{}],4:[function(require,module,exports){
@@ -391,6 +391,7 @@ var Emoticon = function () {
         _classCallCheck(this, Emoticon);
 
         this.status = common.getStatus("emoticon");
+        this.emoticons = [];
     }
 
     _createClass(Emoticon, [{
@@ -399,6 +400,15 @@ var Emoticon = function () {
             if (!this.status) {
                 return;
             }
+            this.emoticons = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
+            this.emoticons.sort(function (a, b) {
+                if (a.priority < b.priority) {
+                    return 1;
+                } else if (a.priority > b.priority) {
+                    return -1;
+                }
+                return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
+            });
             this.addExternalEmoList();
             this.addEmoticonText();
             this.addExternalEmo();
@@ -409,10 +419,10 @@ var Emoticon = function () {
             if ($("#externalEmoticonsButton").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append("<li id=\"_emoticons\" role=\"button\" class=\" _showDescription\">" + "<span id=\"externalEmoticonsButton\" class=\"icoFontActionMore icoSizeLarge\"></span>" + "</li>");
-            $("#_wrapper").append("<div id=\"_externalEmoticonList\" class=\"emoticonList toolTip toolTipWhite mainContetTooltip\" style=\"opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;\" role=\"tooltip\">" + "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\" style=\"left: 129px;\"></div>" + "<ul id=\"_emoticonGallery\" style=\"display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto\">" + JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]).map(function (emo) {
+            $("#_chatSendTool").append("<li id=\"_externalEmoticonsButton\" role=\"button\" class=\" _showDescription\">" + "<span id=\"externalEmoticonsButton\" class=\"icoFontActionMore icoSizeLarge\"></span>" + "</li>");
+            $("#_wrapper").append("<div id=\"_externalEmoticonList\" class=\"emoticonList toolTip toolTipWhite mainContetTooltip\" style=\"opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;\" role=\"tooltip\">" + "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\" style=\"left: 129px;\"></div>" + "<ul id=\"_emoticonGallery\" style=\"display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto\">" + this.emoticons.map(function (emo) {
                 var encoded_text = common.htmlEncode(emo.key);
-                var title = emo.data_name;
+                var title = encoded_text + " - " + emo.data_name;
                 var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
                 var style = "padding: 5px; cursor: pointer; border: 1px solid #fff; border-radius: 3px; transition: border 0.2s linear 0s;";
                 return "<li style=\"" + style + "\"><img style=\"width:100%; max-width:50px\" src=\"" + img_src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\"></li>";
@@ -425,7 +435,7 @@ var Emoticon = function () {
             });
             $("#_externalEmoticonList").on("mouseenter", "li", function (e) {
                 var a = $(e.target).find("img");
-                $("#_externalEmotionDescription").text(a.attr("title") + " " + a.attr("alt"));
+                $("#_externalEmotionDescription").text(a.attr("title"));
             }).on("mouseleave", "li", function () {
                 return $("#_externalEmotionDescription").text(hint);
             }).on("click", "li", function () {
@@ -438,8 +448,7 @@ var Emoticon = function () {
     }, {
         key: "addExternalEmo",
         value: function addExternalEmo() {
-            var emo_data = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
-            this.addEmo(emo_data);
+            this.addEmo(this.emoticons);
             this.status = true;
             this.updateEmoticonText();
         }
@@ -484,6 +493,7 @@ var Emoticon = function () {
         key: "setEmoticonTextLabel",
         value: function setEmoticonTextLabel() {
             $("#_emoticons").attr("aria-label", "Data: " + localStorage["emoticon_data_version"]);
+            $("#_externalEmoticonsButton").attr("aria-label", "View Chat++ Emoticons");
         }
     }, {
         key: "updateEmoticonText",
@@ -525,7 +535,7 @@ var Emoticon = function () {
                 var rep = "";
                 var encoded_text = common.htmlEncode(emo[index].key);
                 var title = encoded_text + " - " + emo[index].data_name;
-                var img_src = common.htmlEncode(common.getEmoUrl(emo[index].src));
+                var img_src = common.getEmoUrl(emo[index].src);
                 if (this.isSpecialEmo(emo[index].key)) {
                     rep = "<img src=\"" + img_src + "\" class=\"ui_emoticon\"/>";
                 } else {

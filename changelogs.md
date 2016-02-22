@@ -22,7 +22,7 @@ use `@random` to randomly mention a member inside the room.
 * No longer show error messages when there are some emoticon data that can not be loaded.
 Display a `ERRORS` text next to the Emoticon text instead.
 * Immediately turn on or off emoticons when toggle the `E` button in the Chat toolbar.
-
+* Add popup to show all external emoticons
 
 ## 4.3.2
 * Fix bug with "new" text in Chat++ icon
