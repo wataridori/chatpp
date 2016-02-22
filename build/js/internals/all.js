@@ -242,6 +242,7 @@ Const.DELAY_TIME = 6000;
 Const.FORCE_TURN_OFF_THUMBNAIL = 1;
 Const.ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 
+
 module.exports = Const;
 
 },{}],3:[function(require,module,exports){
@@ -321,8 +322,41 @@ var Emoticon = function () {
             if (!this.status) {
                 return;
             }
+            this.addExternalEmoList();
             this.addEmoticonText();
             this.addExternalEmo();
+        }
+    }, {
+        key: "addExternalEmoList",
+        value: function addExternalEmoList() {
+            if ($("#externalEmoticonsButton").length > 0) {
+                return;
+            }
+            $("#_chatSendTool").append("<li id=\"_emoticons\" role=\"button\" class=\" _showDescription\">" + "<span id=\"externalEmoticonsButton\" class=\"icoFontActionMore icoSizeLarge\"></span>" + "</li>");
+            $("#_wrapper").append("<div id=\"_externalEmoticonList\" class=\"emoticonList toolTip toolTipWhite mainContetTooltip\" style=\"opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;\" role=\"tooltip\">" + "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\" style=\"left: 129px;\"></div>" + "<ul id=\"_emoticonGallery\" style=\"display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto\">" + JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]).map(function (emo) {
+                var encoded_text = common.htmlEncode(emo.key);
+                var title = emo.data_name;
+                var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
+                var style = "padding: 5px; cursor: pointer; border: 1px solid #fff; border-radius: 3px; transition: border 0.2s linear 0s;";
+                return "<li style=\"" + style + "\"><img style=\"width:100%; max-width:50px\" src=\"" + img_src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\"></li>";
+            }).join("") + "</ul>" + "<div id=\"_externalEmotionDescription\" class=\"tooltipFooter\"></div>" + "</div>");
+            var hint = _is_mac ? L.chatsend_shift_and_command_hint : L.chatsend_shift_and_ctrl_hint;
+            var u = $("#_externalEmoticonList").cwToolTip({
+                open: function open() {
+                    return $("#_externalEmotionDescription").text(hint);
+                }
+            });
+            $("#_externalEmoticonList").on("mouseenter", "li", function (e) {
+                var a = $(e.target).find("img");
+                $("#_externalEmotionDescription").text(a.attr("title") + " " + a.attr("alt"));
+            }).on("mouseleave", "li", function () {
+                return $("#_externalEmotionDescription").text(hint);
+            }).on("click", "li", function () {
+                CW.view.key.ctrl || CW.view.key.command ? (u.close(), CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(), CS.view.setChatText($(this).find("img").prop("alt"), !0), CW.view.key.shift || u.close());
+            });
+            $("#externalEmoticonsButton").click(function (e) {
+                u.open($(e.target));
+            });
         }
     }, {
         key: "addExternalEmo",

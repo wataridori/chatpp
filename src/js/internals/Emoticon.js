@@ -10,8 +10,53 @@ class Emoticon {
         if (!this.status) {
             return;
         }
+        this.addExternalEmoList();
         this.addEmoticonText();
         this.addExternalEmo();
+    }
+
+    addExternalEmoList() {
+        if ($("#externalEmoticonsButton").length > 0) {
+            return;
+        }
+        $("#_chatSendTool").append(
+            "<li id=\"_emoticons\" role=\"button\" class=\" _showDescription\">" +
+            "<span id=\"externalEmoticonsButton\" class=\"icoFontActionMore icoSizeLarge\"></span>" +
+            "</li>"
+        );
+        $("#_wrapper").append(
+          "<div id=\"_externalEmoticonList\" class=\"emoticonList toolTip toolTipWhite mainContetTooltip\" style=\"opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;\" role=\"tooltip\">" +
+            "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\" style=\"left: 129px;\"></div>" +
+            "<ul id=\"_emoticonGallery\" style=\"display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto\">" +
+              JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]).map((emo) => {
+                  let encoded_text = common.htmlEncode(emo.key);
+                  let title = emo.data_name;
+                  let img_src = common.htmlEncode(common.getEmoUrl(emo.src));
+                  let style = "padding: 5px; cursor: pointer; border: 1px solid #fff; border-radius: 3px; transition: border 0.2s linear 0s;"
+                  return `<li style="${style}"><img style="width:100%; max-width:50px" src="${img_src}" title="${title}" alt="${encoded_text}"></li>`;
+              }).join("") +
+            "</ul>" +
+            "<div id=\"_externalEmotionDescription\" class=\"tooltipFooter\"></div>" +
+          "</div>"
+        )
+        let hint = _is_mac ? L.chatsend_shift_and_command_hint : L.chatsend_shift_and_ctrl_hint;
+        let u = $("#_externalEmoticonList").cwToolTip({
+            open: () => $("#_externalEmotionDescription").text(hint)
+        });
+        $("#_externalEmoticonList").on("mouseenter", "li", (e) => {
+            let a = $(e.target).find("img");
+            $("#_externalEmotionDescription").text(a.attr("title") + " " + a.attr("alt"))
+        }).on("mouseleave", "li", () => $("#_externalEmotionDescription").text(hint)
+        ).on("click", "li", function() {
+            CW.view.key.ctrl || CW.view.key.command ? (u.close(),
+            CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(),
+            CS.view.setChatText($(this).find("img").prop("alt"),
+            !0),
+            CW.view.key.shift || u.close())
+        })
+        $("#externalEmoticonsButton").click((e) => {
+            u.open($(e.target));
+        });
     }
 
     addExternalEmo() {
