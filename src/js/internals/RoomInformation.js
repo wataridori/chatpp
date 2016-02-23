@@ -22,7 +22,7 @@ class RoomInformation {
             this.prepareRoomInfo();
             let room_name = RM.getIcon() + " " + common.htmlEncode(RM.getName());
             let tip = $("#_roomInfoList").cwListTip({
-                selectOptionArea: "<b>" + room_name + "</b>" + " Information",
+                selectOptionArea: `<b>${room_name}</b> Information`,
                 fixHeight: !1,
                 search: !1
             });

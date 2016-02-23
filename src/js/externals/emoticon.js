@@ -71,7 +71,7 @@ $(() => {
                 bootbox.alert("Invalid URL! Make sure your inputted URL is correct, and start with https!");
             } else {
                 bootbox.dialog({
-                    message: "The data from <a href=\"" + url + "\">" + url + "</a> may contain undesirable emoticons and we will not be responsible for it" ,
+                    message: `The data from <a href="${url}">${url}</a> may contain undesirable emoticons and we will not be responsible for it` ,
                     title: "<span class='text-danger'>Your are trying to load data that is not officially supported by Chat++.<br/> Do you want to continue ?</span>",
                     buttons: {
                         success: {
@@ -222,7 +222,7 @@ function fillTable() {
     $.each(emoticons, (key, data) => {
         if (!current_data || current_data !== data.data_name) {
             if (table_text) {
-                $("#table-emo-" + last_data_name).find("tbody").append(table_text);
+                $(`#table-emo-${last_data_name}`).find("tbody").append(table_text);
             }
             current_data = data.data_name;
             table_text = "";
@@ -237,7 +237,7 @@ function fillTable() {
             table_text += "</tr>";
         }
     });
-    $("#table-emo-" + last_data_name).find("tbody").append(table_text);
+    $(`#table-emo-${last_data_name}`).find("tbody").append(table_text);
 }
 
 function createEmoticonsTable(name) {
@@ -269,8 +269,8 @@ function createTableTd(data) {
     let src = common.htmlEncode(common.getEmoUrl(data.emo.src));
     let row = "";
     let class_name = data.status ? "danger" : "info";
-    row += "<td class='" + class_name + " text-center'>" + data.emo.key + "</td>";
-    row += "<td class='text-center'><img class='emoticon' src='" + src + "'/> </td>";
+    row += `<td class='${class_name} text-center'>${data.emo.key}</td>`;
+    row += `<td class='text-center'><img class='emoticon' src='${src}'/></td>`;
     return row;
 }
 
@@ -283,8 +283,8 @@ function createDataTableText(emo_data) {
             let disabled = first ? "disabled" : "";
             first = false;
             table_text += "<tr>";
-            table_text += "<td class='text-center'>" + data.data_name + "</td>";
-            table_text += "<td class='text-center'>" + data.data_version + "</td>";
+            table_text += `<td class='text-center'>${data.data_name}</td>`;
+            table_text += `<td class='text-center'>${data.data_version}</td>`;
             table_text += "<td class='text-center'>" + createATag(data.data_url) + "</td>";
             table_text += "<td class='text-center'>" +
                 " <button class='btn btn-primary btn-sm btn-data-move-up " + disabled + "' data-priority='" + data.priority + "' id='btn-move-up" + data.data_name + "'> Move Up </button>" +

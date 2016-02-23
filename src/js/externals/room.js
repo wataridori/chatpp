@@ -32,7 +32,7 @@ $(() => {
 function loadData() {
     for (let i in rooms) {
         if (rooms[i]) {
-            $("[data-btn='" + i +"']").val(rooms[i]);
+            $(`[data-btn='${i}']`).val(rooms[i]);
         }
     }
 }

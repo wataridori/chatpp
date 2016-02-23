@@ -125,12 +125,12 @@ function pushFailedData(data_name) {
 
 function parseDataName(data) {
     if (data.data_name !== undefined && data.data_version !== undefined) {
-        return data.data_name + "_" + data.data_version;
+        return `${data.data_name}_${data.data_version}`;
     }
     let data_name = "";
     for (let key in data) {
         if (data[key].data_name !== undefined) {
-            data_name += data[key].data_name + "_" + data[key].data_version + "  ";
+            data_name += `${data[key].data_name}_${data[key].data_version}  `;
         }
     }
     return data_name;
@@ -179,14 +179,14 @@ function preLoad() {
             $("#_chatppPreLoad").remove();
             window.clearInterval(pre_load_interval);
         }
-        let text = "Chat++ will be loaded in about " + delay_time + " second" + (delay_time > 1 ? "s" : "");
+        let text = `Chat++ will be loaded in about ${delay_time} second${delay_time > 1 ? "s" : ""}`;
         chatpp_pre_load.html(text);
     }, 1000);
 }
 
 function injectJsFile(file_name) {
     let script = document.createElement("script");
-    script.src = common.getExtensionPageUrl("js/" + file_name);
+    script.src = common.getExtensionPageUrl(`js/${file_name}`);
     (document.documentElement).appendChild(script);
 }
 
@@ -194,7 +194,7 @@ function injectCssFile(file_name) {
     let css_link = $("<link>", {
         rel: "stylesheet",
         type: "text/css",
-        href: common.getExtensionPageUrl("css/" + file_name)
+        href: common.getExtensionPageUrl(`css/${file_name}`)
     });
     css_link.appendTo("head");
 }

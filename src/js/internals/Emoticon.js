@@ -54,7 +54,7 @@ class Emoticon {
             open: () => $("#_externalEmotionDescription").text(hint)
         });
         $("#_externalEmoticonList").on("mouseenter", "li", (e) => {
-            let a = $(e.target).find("img");
+            let a = $(e.currentTarget).find("img");
             $("#_externalEmotionDescription").text(a.attr("title"))
         }).on("mouseleave", "li", () => $("#_externalEmotionDescription").text(hint)
         ).on("click", "li", function() {
@@ -64,7 +64,7 @@ class Emoticon {
             CW.view.key.shift || u.close())
         })
         $("#externalEmoticonsButton").click((e) => {
-            u.open($(e.target));
+            u.open($(e.currentTarget));
         });
     }
 

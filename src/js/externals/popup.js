@@ -13,7 +13,7 @@ $(() => {
     let pages = ["setting", "emoticon", "room", "group", "shortcut", "change_logs", "features", "notification"];
     pages.forEach((page_name) => {
         let url = `html/${page_name}.html`;
-        $("#" + page_name + "_page").click(() => {
+        $(`#${page_name}_page`).click(() => {
             common.openNewUrl(url);
         });
     });
@@ -35,9 +35,9 @@ $(() => {
 
 function loadStatus(name, value) {
     if (value !== undefined && value === false) {
-        $("#" + name + "-status").removeClass().addClass("text-danger").html("DISABLED");
+        $(`#${name}-status`).removeClass().addClass("text-danger").html("DISABLED");
     } else {
-        $("#" + name + "-status").removeClass().addClass("text-primary").html("ENABLED");
+        $(`#${name}-status`).removeClass().addClass("text-primary").html("ENABLED");
     }
 }
 
@@ -55,7 +55,7 @@ function loadChatppEmoData() {
 function updateViewData(data) {
     let features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
     for (let i in features) {
-        loadStatus(features[i], data[features[i] + "_status"]);
+        loadStatus(features[i], `${data[features[i]]}_status]`);
     }
 }
 
