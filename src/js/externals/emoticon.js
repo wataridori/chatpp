@@ -131,7 +131,7 @@ function getData(urls, callback) {
                 }
             }).fail(() => {
                 let message = "<span class='text-danger'>There is an error occurred when loading or parsing the following url: <br>" +
-                    "<a href='" + url + "'>" + url + "</a>" +
+                    `<a href='${url}'>${url}</a>` +
                     "<br>It may be because of the failure in downloading file or invalid file format.<br>" +
                     "Check your file data carefully and try to reload again.</span>"
                 bootbox.alert(message);
@@ -162,8 +162,8 @@ function showOfficialData() {
     let official = $("#official-data");
     for (let data_name in official_emoticons_data) {
         if (emo_info[data_name] === undefined) {
-            let new_button = "<div class=\"col-md-12 official-data\"><button class=\"btn btn-info btn-sm btn-official-data\" data-name=\"" + data_name + "\">Add " + data_name + "</button>"
-                + "<span class=\"text-primary\" style=\"padding-left: 20px\"><strong>" + official_emoticons_data[data_name].description + "</strong></span>"
+            let new_button = `<div class="col-md-12 official-data"><button class="btn btn-info btn-sm btn-official-data" data-name="${data_name}">Add ${data_name}</button>`
+                + `<span class="text-primary" style="padding-left: 20px"><strong>${official_emoticons_data[data_name].description}</strong></span>`
                 + "</div><br>";
             official.append(new_button);
         }
@@ -244,10 +244,8 @@ function createEmoticonsTable(name) {
     let table =
         "<div id=\"emoticons-table\">" +
             "<div class=\"panel panel-warning\">" +
-                "<div class=\"panel-heading\">" +
-                    name +
-                "</div>" +
-                "<table class=\"table table-emo table-bordered\" id=\"table-emo-" + name + "\">" +
+                `<div class="panel-heading">${name}</div>` +
+                `<table class="table table-emo table-bordered" id="table-emo-${name}">` +
                     "<thead>" +
                         "<tr class=\"success text-center\">" +
                         "<th colspan=\"2\" class=\"text-center\">Emo</th>" +
@@ -285,10 +283,10 @@ function createDataTableText(emo_data) {
             table_text += "<tr>";
             table_text += `<td class='text-center'>${data.data_name}</td>`;
             table_text += `<td class='text-center'>${data.data_version}</td>`;
-            table_text += "<td class='text-center'>" + createATag(data.data_url) + "</td>";
+            table_text += `<td class='text-center'>${createATag(data.data_url)}</td>`;
             table_text += "<td class='text-center'>" +
-                " <button class='btn btn-primary btn-sm btn-data-move-up " + disabled + "' data-priority='" + data.priority + "' id='btn-move-up" + data.data_name + "'> Move Up </button>" +
-                " <button class='btn btn-warning btn-sm btn-data-remove' data-name='" + data.data_name + "' id='btn-" + data.data_name + "'> Remove </button></td>";
+                `<button class='btn btn-primary btn-sm btn-data-move-up ${disabled}' data-priority='${data.priority}' id='btn-move-up${data.data_name}'> Move Up </button>` +
+                `<button class='btn btn-warning btn-sm btn-data-remove' data-name='${data.data_name}' id='btn-${data.data_name}'> Remove </button></td>`;
             table_text += "</tr>";
         }
     });

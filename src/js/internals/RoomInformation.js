@@ -20,7 +20,7 @@ class RoomInformation {
         $("body").append(room_info_list);
         $("#_roomInfo").click((e) => {
             this.prepareRoomInfo();
-            let room_name = RM.getIcon() + " " + common.htmlEncode(RM.getName());
+            let room_name = `${RM.getIcon()} ${common.htmlEncode(RM.getName())}`;
             let tip = $("#_roomInfoList").cwListTip({
                 selectOptionArea: `<b>${room_name}</b> Information`,
                 fixHeight: !1,
@@ -31,15 +31,15 @@ class RoomInformation {
     }
 
     prepareRoomInfo() {
-        let total_members = "<b>Total Members</b>: " + RM.getSortedMemberList().length;
+        let total_members = `<b>Total Members</b>: ${RM.getSortedMemberList().length}`;
         $("#_roomInfoTextTotalMembers").html(total_members);
-        let total_messages = "<b>Total Messages</b>: " + RM.chat_num;
+        let total_messages = `<b>Total Messages</b>: ${RM.chat_num}`;
         $("#_roomInfoTextTotalMessages").html(total_messages);
-        let total_tasks = "<b>Total Tasks</b>: " + RM.task_num;
+        let total_tasks = `<b>Total Tasks</b>: ${RM.task_num}`;
         $("#_roomInfoTextTotalTasks").html(total_tasks);
-        let my_tasks = "<b>My Tasks</b>: " + RM.mytask_num;
+        let my_tasks = `<b>My Tasks</b>: ${RM.mytask_num}`;
         $("#_roomInfoTextMyTasks").html(my_tasks);
-        let total_files = "<b>Total Files</b>: " + RM.file_num;
+        let total_files = `<b>Total Files</b>: ${RM.file_num}`;
         $("#_roomInfoTextTotalFiles").html(total_files);
     }
 

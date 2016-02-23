@@ -138,7 +138,7 @@ function insertThumbnail(dom) {
         let dom = $(link);
         let imageLink = getThumbnailLink(dom.attr("href"));
         if (imageLink) {
-            let img = "<div><img src=\"" + imageLink + "\" alt=\"" + imageLink +"\" style=\"max-width: 500px; max-height: 125px\"></div>";
+            let img = `<div><img src="${imageLink}" alt="${imageLink}" style="max-width: 500px; max-height: 125px"></div>`;
             dom.after(img);
         }
     });
@@ -158,7 +158,7 @@ function getThumbnailLink(link) {
 
     let gyazo_regex = /^https?:\/\/gyazo.com\//i;
     if (link.match(gyazo_regex)) {
-        return link + ".png";
+        return `${link}.png`;
     }
 
     return false;
@@ -259,7 +259,9 @@ class ViewEnhancer {
                     let options = getHighlightOption(block_text);
                     if (options.has_valid_options) {
                         let first_line = block_text.split("\n", 1)[0];
+                        /* eslint-disable prefer-template */
                         block_text = block_text.replace(first_line + "\n", "");
+                        /* eslint-enable */
                         $(block).html(block_text);
                     }
                     if (options.language) {

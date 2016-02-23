@@ -67,7 +67,7 @@ class Shortcut {
     }
 
     updateShortcutText() {
-        let shortcut_text = "S: " + (this.status ? "ON" : "OFF");
+        let shortcut_text = `S: ${this.status ? "ON" : "OFF"}`;
         let div = $("#chatppShortcutText");
         div.html(shortcut_text);
         if (this.status) {
@@ -191,7 +191,7 @@ class Shortcut {
 
     triggerDefaultAction(action) {
         let me = $("._message:hover");
-        let reply = me.find("[data-cwui-ab-type='" + action + "']");
+        let reply = me.find(`[data-cwui-ab-type='${action}']`);
         if (this.isDomExists(reply)) {
             reply.trigger("click");
         }
@@ -262,12 +262,12 @@ class Shortcut {
     }
 
     isMentionMessage(message) {
-        let regex_reply = new RegExp("\\[.* aid=" + AC.myid + " .*\\]");
+        let regex_reply = new RegExp(`\[.* aid=${AC.myid} .*\]`);
         if (regex_reply.test(message.msg)) {
             return true;
         }
 
-        let regex_to = new RegExp("\\[To:" + AC.myid + "\\]");
+        let regex_to = new RegExp(`\[To:${AC.myid}\]`);
         return regex_to.test(message.msg);
     }
 
@@ -276,7 +276,9 @@ class Shortcut {
         if (data) {
             $("#_chatText").focus();
             let name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
-            CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
+            /* eslint-disable no-useless-concat */
+            CS.view.setChatText(`[${L.chatsend_reply} aid=${data.aid} to=${RM.id}-${message}] ${name}` + "\n", !0);
+            /* eslint-enable */
         }
     }
 

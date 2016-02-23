@@ -62,8 +62,8 @@ function fillDataTable() {
             table_text += `<tr id='row-${key}'>`;
             table_text += `<td class='text-center'>${data.group_name}</td>`;
             table_text += `<td class='text-center'>${data.group_members}</td>`;
-            table_text += "<td class='text-center'><button class='btn btn-warning btn-sm btn-data-remove' data-name='" + data.group_name
-            + "' id='btn-" + key + "'> Remove </button></td>";
+            table_text += `<td class='text-center'><button class='btn btn-warning btn-sm btn-data-remove' data-name='${data.group_name}'`
+             + `id='btn-${key}'> Remove </button></td>`;
             table_text += "</tr>";
         }
     });

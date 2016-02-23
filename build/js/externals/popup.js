@@ -37,7 +37,7 @@ $(function () {
 });
 
 function loadStatus(name, value) {
-    if (value !== undefined && value === false) {
+    if (value !== undefined && (value === false || value === "false")) {
         $("#" + name + "-status").removeClass().addClass("text-danger").html("DISABLED");
     } else {
         $("#" + name + "-status").removeClass().addClass("text-primary").html("ENABLED");

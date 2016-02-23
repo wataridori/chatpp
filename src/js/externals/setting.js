@@ -25,7 +25,7 @@ $(() => {
                 if ($(e.currentTarget).html() === "Disable") {
                     status = false;
                 }
-                stored_data[Const.CHROME_SYNC_KEY][feature_name + "_status"] = status;
+                stored_data[Const.CHROME_SYNC_KEY][`${feature_name}_status`] = status;
                 storage.setData(stored_data, () => {
                     loadStatus(feature_name, status);
                 });
@@ -36,17 +36,17 @@ $(() => {
 
 function loadStatus(name, value) {
     if (value !== undefined && value === false) {
-        $("#" + name + "-status").removeClass().addClass("text-danger").html("DISABLED");
-        $("#" + name + "-status-btn").removeClass().addClass("btn btn-success btn-xs").html("Enable");
+        $(`#${name}-status`).removeClass().addClass("text-danger").html("DISABLED");
+        $(`#${name}-status-btn`).removeClass().addClass("btn btn-success btn-xs").html("Enable");
     } else {
-        $("#" + name + "-status").removeClass().addClass("text-success").html("ENABLED");
-        $("#" + name + "-status-btn").removeClass().addClass("btn btn-danger btn-xs").html("Disable");
+        $(`#${name}-status`).removeClass().addClass("text-success").html("ENABLED");
+        $(`#${name}-status-btn`).removeClass().addClass("btn btn-danger btn-xs").html("Disable");
     }
 }
 
 function updateViewData(data) {
     let features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
     for (let i in features) {
-        loadStatus(features[i], data[features[i] + "_status"]);
+        loadStatus(features[i], data[`${features[i]}_status`]);
     }
 }

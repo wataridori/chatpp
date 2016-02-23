@@ -77,7 +77,7 @@ class Common {
     }
 
     getEmoUrl(img) {
-        let url = Const.DEFAULT_IMG_HOST + "img/emoticons/" + img;
+        let url = `${Const.DEFAULT_IMG_HOST}img/emoticons/${img}`;
         if (img.indexOf("https://") == 0 || img.indexOf("http://") == 0) {
             url = img;
         }

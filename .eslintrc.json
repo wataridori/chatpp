@@ -213,7 +213,7 @@
     "prefer-reflect": 0,
     "prefer-rest-params": 0,
     "prefer-spread": 2,
-    "prefer-template": 0,
+    "prefer-template": 2,
     "quote-props": 0,
     "quotes": [2, "double", "avoid-escape"],
     "radix": 0,

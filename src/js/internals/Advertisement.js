@@ -5,8 +5,8 @@ class Advertisement {
         if ($("#chatppAdvertisement").length > 0) {
             return;
         }
-        let text = "<li id=\"_chatppSponsored\" role=\"button\" class=\" _showDescription\" aria-label=\"Chat Plus Plus Information\">" +
-            "<span id=\"chatppAdvertisement\" class=\"icoSizeSmall\">" + this.getAdvertisementText() + "</span>" +
+        let text = "<li id='_chatppSponsored' role='button' class=' _showDescription' aria-label='Chat Plus Plus Information'>" +
+            `<span id="chatppAdvertisement" class="icoSizeSmall">${this.getAdvertisementText()}</span>` +
             "</li>";
 
         $("#_chatSendTool").append(text);

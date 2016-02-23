@@ -552,26 +552,26 @@ class Mention {
                 if (members.length) {
                     let txt = "<ul>";
                     for (let i = 0; i < members.length; i++) {
-                        txt += "<li class=\"suggested-name\" role=\"listitem\" data-cwui-lt-value=\"" + members[i].value + "\">" + members[i].avatar + members[i].label + "</li>"
+                        txt += `<li class="suggested-name" role="listitem" data-cwui-lt-value="${members[i].value}">${members[i].avatar + members[i].label}</li>`;
                     }
                     txt += "</ul>";
                     return txt;
                 } else {
-                    return "<ul><li>" + this.suggestion_messages["one"][LANGUAGE] + "</li></ul>";
+                    return `<ul><li>${this.suggestion_messages["one"][LANGUAGE]}</li></ul>`;
                 }
                 /* eslint-disable no-unreachable */
                 break;
                 /* eslint-enable */
             case "group":
                 if (this.selected_group_name === "random") {
-                    return "<ul><li>" + this.random_user_messages[LANGUAGE] + "</li></ul>";
+                    return `<ul><li>${this.random_user_messages[LANGUAGE]}</li></ul>`;
                 }
                 members = this.buildGroupMemberListData(this.selected_group_name);
                 if (members.length) {
                     let txt = "<ul><li>";
                     for (let i = 0; i < members.length; i++) {
                         if (i == 6) {
-                            txt += "<span>+" + (members.length - 6) + "</span>";
+                            txt += `<span>+${(members.length - 6)}</span>`;
                             break;
                         }
                         txt += members[i].avatar;
@@ -579,13 +579,13 @@ class Mention {
                     txt += "</li></ul>";
                     return txt;
                 } else {
-                    return "<ul><li>" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</li></ul>";
+                    return `<ul><li>${this.suggestion_messages[this.insert_type][LANGUAGE]}</li></ul>`;
                 }
                 /* eslint-disable no-unreachable */
                 break;
                 /* eslint-enable */
             case "all":
-                return "<ul><li>" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</li></ul>";
+                return `<ul><li>${this.suggestion_messages[this.insert_type][LANGUAGE]}</li></ul>`;
                 /* eslint-disable no-unreachable */
                 break;
                 /* eslint-enable */
@@ -630,7 +630,7 @@ class Mention {
                 clicktip: !1,
                 size: "small"
             }),
-            label: "<p class=\"autotrim\">" + common.htmlEncode(h) + "</p>",
+            label: `<p class="autotrim">${common.htmlEncode(h)}</p>`,
             aid2name: common.htmlEncode(h)
         }
     }
@@ -658,8 +658,8 @@ class Mention {
             return;
         }
         $("#_chatSendTool").append(
-            "<li id=\"_chatppMentionText\" role=\"button\" class=\" _showDescription\">" +
-            "<span id=\"chatppMentionText\" class=\"emoticonText icoSizeSmall\"></span>" +
+            "<li id='_chatppMentionText' role='button' class=' _showDescription'>" +
+            "<span id='chatppMentionText' class='emoticonText icoSizeSmall'></span>" +
             "</li>"
         );
         this.updateMentionText();
@@ -667,7 +667,7 @@ class Mention {
     }
 
     updateMentionText() {
-        let mention_text = "M: " + (this.status ? "ON" : "OFF");
+        let mention_text = `M: ${this.status ? "ON" : "OFF"}`;
         let div = $("#chatppMentionText");
         div.html(mention_text);
         if (this.status) {

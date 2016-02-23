@@ -344,7 +344,7 @@ var Advertisement = function () {
             if ($("#chatppAdvertisement").length > 0) {
                 return;
             }
-            var text = "<li id=\"_chatppSponsored\" role=\"button\" class=\" _showDescription\" aria-label=\"Chat Plus Plus Information\">" + "<span id=\"chatppAdvertisement\" class=\"icoSizeSmall\">" + this.getAdvertisementText() + "</span>" + "</li>";
+            var text = "<li id='_chatppSponsored' role='button' class=' _showDescription' aria-label='Chat Plus Plus Information'>" + ("<span id=\"chatppAdvertisement\" class=\"icoSizeSmall\">" + this.getAdvertisementText() + "</span>") + "</li>";
 
             $("#_chatSendTool").append(text);
             setInterval(function () {
@@ -419,14 +419,16 @@ var Emoticon = function () {
             if ($("#externalEmoticonsButton").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append("<li id=\"_externalEmoticonsButton\" role=\"button\" class=\" _showDescription\">" + "<span id=\"externalEmoticonsButton\" class=\"icoFontActionMore icoSizeLarge\"></span>" + "</li>");
-            $("#_wrapper").append("<div id=\"_externalEmoticonList\" class=\"emoticonList toolTip toolTipWhite mainContetTooltip\" style=\"opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;\" role=\"tooltip\">" + "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\" style=\"left: 129px;\"></div>" + "<ul id=\"_emoticonGallery\" style=\"display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto\">" + this.emoticons.map(function (emo) {
+            $("#_chatSendTool").append("<li id='_externalEmoticonsButton' role='button' class=' _showDescription'>" + "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" + "</li>");
+            var emo_list_div = this.emoticons.map(function (emo) {
                 var encoded_text = common.htmlEncode(emo.key);
-                var title = encoded_text + " - " + emo.data_name;
+                var title = emo.data_name + " - " + encoded_text;
                 var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
                 var style = "padding: 5px; cursor: pointer; border: 1px solid #fff; border-radius: 3px; transition: border 0.2s linear 0s;";
                 return "<li style=\"" + style + "\"><img style=\"width:100%; max-width:50px\" src=\"" + img_src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\"></li>";
-            }).join("") + "</ul>" + "<div id=\"_externalEmotionDescription\" class=\"tooltipFooter\"></div>" + "</div>");
+            }).join("");
+
+            $("#_wrapper").append("<div id='_externalEmoticonList' class='emoticonList toolTip toolTipWhite mainContetTooltip' style='opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;' role='tooltip'>" + "<div class='_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom' style='left: 129px;'></div>" + ("<ul id='_emoticonGallery' style='display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto'>" + emo_list_div + "</ul>") + "<div id=\"_externalEmotionDescription\" class=\"tooltipFooter\"></div>" + "</div>");
             var hint = _is_mac ? L.chatsend_shift_and_command_hint : L.chatsend_shift_and_ctrl_hint;
             var u = $("#_externalEmoticonList").cwToolTip({
                 open: function open() {
@@ -434,7 +436,7 @@ var Emoticon = function () {
                 }
             });
             $("#_externalEmoticonList").on("mouseenter", "li", function (e) {
-                var a = $(e.target).find("img");
+                var a = $(e.currentTarget).find("img");
                 $("#_externalEmotionDescription").text(a.attr("title"));
             }).on("mouseleave", "li", function () {
                 return $("#_externalEmotionDescription").text(hint);
@@ -442,7 +444,7 @@ var Emoticon = function () {
                 CW.view.key.ctrl || CW.view.key.command ? (u.close(), CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(), CS.view.setChatText($(this).find("img").prop("alt"), !0), CW.view.key.shift || u.close());
             });
             $("#externalEmoticonsButton").click(function (e) {
-                u.open($(e.target));
+                u.open($(e.currentTarget));
             });
         }
     }, {
@@ -481,8 +483,8 @@ var Emoticon = function () {
             if ($("#emoticonText").length > 0) {
                 return;
             }
-            var emoticon_text = "E " + (this.status ? "ON" : "OFF");
-            $("#_chatSendTool").append("<li id=\"_emoticons\" role=\"button\" class=\" _showDescription\">" + "<span id=\"emoticonText\" class=\"emoticonText icoSizeSmall\">" + emoticon_text + "</span>" + "</li>");
+            var emoticon_text = "E: " + (this.status ? "ON" : "OFF");
+            $("#_chatSendTool").append("<li id=\"_emoticons\" role=\"button\" class=\" _showDescription\">\n                <span id=\"emoticonText\" class=\"emoticonText icoSizeSmall\">" + emoticon_text + "</span>\n            </li>");
             this.setEmoticonTextLabel();
             $("#emoticonText").click(function () {
                 return _this.toggleEmoticonsStatus();
@@ -515,7 +517,7 @@ var Emoticon = function () {
             }
             var failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
             var failed_data_text = "The following data could not be loaded: " + failed_data;
-            $("#_chatSendTool").append("<li id=\"_chatppErrors\" role=\"button\" class=\" _showDescription\">" + "<span id=\"chatppErrors\" class=\"emoticonText icoSizeSmall chatppErrorsText\">(ERROR)</span>" + "</li>");
+            $("#_chatSendTool").append("<li id=\"_chatppErrors\" role=\"button\" class=\" _showDescription\">\n                <span id=\"chatppErrors\" class=\"emoticonText icoSizeSmall chatppErrorsText\">(ERROR)</span>\n            </li>");
             $("#_chatppErrors").attr("aria-label", failed_data_text);
         }
     }, {
@@ -535,7 +537,7 @@ var Emoticon = function () {
                 var rep = "";
                 var encoded_text = common.htmlEncode(emo[index].key);
                 var title = encoded_text + " - " + emo[index].data_name;
-                var img_src = common.getEmoUrl(emo[index].src);
+                var img_src = common.htmlEncode(common.getEmoUrl(emo[index].src));
                 if (this.isSpecialEmo(emo[index].key)) {
                     rep = "<img src=\"" + img_src + "\" class=\"ui_emoticon\"/>";
                 } else {
@@ -1148,7 +1150,7 @@ var Mention = function () {
                     if (members.length) {
                         var txt = "<ul>";
                         for (var i = 0; i < members.length; i++) {
-                            txt += "<li class=\"suggested-name\" role=\"listitem\" data-cwui-lt-value=\"" + members[i].value + "\">" + members[i].avatar + members[i].label + "</li>";
+                            txt += "<li class=\"suggested-name\" role=\"listitem\" data-cwui-lt-value=\"" + members[i].value + "\">" + (members[i].avatar + members[i].label) + "</li>";
                         }
                         txt += "</ul>";
                         return txt;
@@ -1259,7 +1261,7 @@ var Mention = function () {
             if ($("#_chatppMentionText").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append("<li id=\"_chatppMentionText\" role=\"button\" class=\" _showDescription\">" + "<span id=\"chatppMentionText\" class=\"emoticonText icoSizeSmall\"></span>" + "</li>");
+            $("#_chatSendTool").append("<li id='_chatppMentionText' role='button' class=' _showDescription'>" + "<span id='chatppMentionText' class='emoticonText icoSizeSmall'></span>" + "</li>");
             this.updateMentionText();
             $("#chatppMentionText").click(function () {
                 return _this3.toggleMentionStatus();
@@ -1368,7 +1370,7 @@ var RoomInformation = function () {
                 _this.prepareRoomInfo();
                 var room_name = RM.getIcon() + " " + common.htmlEncode(RM.getName());
                 var tip = $("#_roomInfoList").cwListTip({
-                    selectOptionArea: "<b>" + room_name + "</b>" + " Information",
+                    selectOptionArea: "<b>" + room_name + "</b> Information",
                     fixHeight: !1,
                     search: !1
                 });
@@ -1690,12 +1692,12 @@ var Shortcut = function () {
     }, {
         key: "isMentionMessage",
         value: function isMentionMessage(message) {
-            var regex_reply = new RegExp("\\[.* aid=" + AC.myid + " .*\\]");
+            var regex_reply = new RegExp("[.* aid=" + AC.myid + " .*]");
             if (regex_reply.test(message.msg)) {
                 return true;
             }
 
-            var regex_to = new RegExp("\\[To:" + AC.myid + "\\]");
+            var regex_to = new RegExp("[To:" + AC.myid + "]");
             return regex_to.test(message.msg);
         }
     }, {
@@ -1705,7 +1707,9 @@ var Shortcut = function () {
             if (data) {
                 $("#_chatText").focus();
                 var name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
+                /* eslint-disable no-useless-concat */
                 CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
+                /* eslint-enable */
             }
         }
     }, {
@@ -1898,7 +1902,9 @@ var ViewEnhancer = function () {
                         var options = getHighlightOption(block_text);
                         if (options.has_valid_options) {
                             var first_line = block_text.split("\n", 1)[0];
+                            /* eslint-disable prefer-template */
                             block_text = block_text.replace(first_line + "\n", "");
+                            /* eslint-enable */
                             $(block).html(block_text);
                         }
                         if (options.language) {
