@@ -25,5 +25,8 @@
   },
   "scripts": {
     "test": "eslint src"
+  },
+  "devDependencies": {
+    "babel-eslint": "^5.0.0"
   }
 }

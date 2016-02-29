@@ -1,13 +1,19 @@
 # Contribution Guidelines
 
 ## Setup
-- Chat++ is written in [ECMAScript 6](http://www.ecma-international.org/publications/standards/Ecma-262.htm)
+- Chat++ is rewritten in [ECMAScript 6](http://www.ecma-international.org/publications/standards/Ecma-262.htm)
 and compiled by [babel](https://babeljs.io/).
-- Install `nodejs`, `gulp` first, if you do not have. Use `npm install` to install node modules.
-- Install [ESLint](http://eslint.org/) for checking code styles.
-You can refer the [.eslintrc.json](./.eslintrc.json) file for the rules that Chat++ is following.
+- Install `nodejs` and `gulp`, if you do not have.
+- Run `npm install` to install the required node modules.
+- Chat++ uses [ESLint](http://eslint.org/) for checking code styles. It uses `eslint-babel` parser instead of the default ESLint parser.
+You have to install them first.
+```
+npm install -g eslint babel-eslint
+```
+- You can refer the [.eslintrc.json](./.eslintrc.json) file for the rules that Chat++ is following. Check [ESLint Rules Document](http://eslint.org/docs/rules/)
+for the rules in detail.
 - Run `gulp` to build codes from `src` folder.
-- Run `eslint src` to check whether your codes satisfy the convention or not.
+- Run `npm test` or `eslint src` to check whether your codes satisfy the convention or not.
 
 ## Report an Issue
 
@@ -19,5 +25,5 @@ Please follow the guidelines below when creating an issue so that your issue can
 
 ## Contribute to the project
 
-Pull requests to [wataridori/chatpp](../../) are always welcome. :+1:
+Pull requests to the **develop** branch at [wataridori/chatpp](../../) are always welcome. :+1:
 
