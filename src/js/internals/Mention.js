@@ -39,6 +39,10 @@ class Mention {
             ja: "\u30e1\u30f3\u30d0\u30fc\u3092\u30e9\u30f3\u30c0\u30e0\u3059\u308b",
             en: "Random a member"
         }
+        this.no_admin_messages = {
+            ja: "\u30A2\u30C9\u30DF\u30F3\u304C\u5B58\u5728\u3057\u307E\u305B\u3093",
+            en: "There is no Admin in this Room"
+        }
 
         this.group_mention = [];
     }
@@ -494,6 +498,9 @@ class Mention {
     }
 
     getReplaceText(format_string, target_name, cwid, members) {
+        if (!members) {
+            return null;
+        }
         let replace_text = "";
         switch (this.insert_type) {
             case "me":
@@ -557,18 +564,18 @@ class Mention {
                     txt += "</ul>";
                     return txt;
                 } else {
-                    return `<ul><li>${this.suggestion_messages["one"][LANGUAGE]}</li></ul>`;
+                    return `<ul><li class="suggested-name" role="listitem">${this.suggestion_messages["one"][LANGUAGE]}</li></ul>`;
                 }
                 /* eslint-disable no-unreachable */
                 break;
                 /* eslint-enable */
             case "group":
                 if (this.selected_group_name === "random") {
-                    return `<ul><li>${this.random_user_messages[LANGUAGE]}</li></ul>`;
+                    return `<ul><li class="suggested-name" role="listitem">${this.random_user_messages[LANGUAGE]}</li></ul>`;
                 }
                 members = this.buildGroupMemberListData(this.selected_group_name);
                 if (members.length) {
-                    let txt = "<ul><li>";
+                    let txt = "<ul><li class='suggested-name' role='listitem'>";
                     for (let i = 0; i < members.length; i++) {
                         if (i == 6) {
                             txt += `<span>+${(members.length - 6)}</span>`;
@@ -579,13 +586,19 @@ class Mention {
                     txt += "</li></ul>";
                     return txt;
                 } else {
-                    return `<ul><li>${this.suggestion_messages[this.insert_type][LANGUAGE]}</li></ul>`;
+                    let message = null;
+                    if (this.selected_group_name === "admin") {
+                        message = this.no_admin_messages[LANGUAGE];
+                    } else {
+                        message = this.suggestion_messages[this.insert_type][LANGUAGE];
+                    }
+                    return `<ul><li class="suggested-name" role="listitem">${message}</li></ul>`;
                 }
                 /* eslint-disable no-unreachable */
                 break;
                 /* eslint-enable */
             case "all":
-                return `<ul><li>${this.suggestion_messages[this.insert_type][LANGUAGE]}</li></ul>`;
+                return `<ul><li class="suggested-name" role="listitem">${this.suggestion_messages[this.insert_type][LANGUAGE]}</lia></ul>`;
                 /* eslint-disable no-unreachable */
                 break;
                 /* eslint-enable */
@@ -642,7 +655,11 @@ class Mention {
         }
         for (let i = 0; i < this.group_mention.length; i++) {
             if (this.group_mention[i]["group_name"] == group_name) {
-                let members = this.group_mention[i]["group_members"].split(",");
+                let members = this.group_mention[i]["group_members"];
+                if (!members) {
+                    return [];
+                }
+                members = members.split(",");
                 let results = [];
                 for (let j = 0; j < members.length; j++) {
                     results.push(this.getMemberObject(members[j].trim()));

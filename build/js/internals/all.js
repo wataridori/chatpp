@@ -610,6 +610,10 @@ var Mention = function () {
             ja: "メンバーをランダムする",
             en: "Random a member"
         };
+        this.no_admin_messages = {
+            ja: "アドミンが存在しません",
+            en: "There is no Admin in this Room"
+        };
 
         this.group_mention = [];
     }
@@ -1090,6 +1094,9 @@ var Mention = function () {
     }, {
         key: "getReplaceText",
         value: function getReplaceText(format_string, target_name, cwid, members) {
+            if (!members) {
+                return null;
+            }
             var replace_text = "";
             switch (this.insert_type) {
                 case "me":
@@ -1155,18 +1162,18 @@ var Mention = function () {
                         txt += "</ul>";
                         return txt;
                     } else {
-                        return "<ul><li>" + this.suggestion_messages["one"][LANGUAGE] + "</li></ul>";
+                        return "<ul><li class=\"suggested-name\" role=\"listitem\">" + this.suggestion_messages["one"][LANGUAGE] + "</li></ul>";
                     }
                     /* eslint-disable no-unreachable */
                     break;
                 /* eslint-enable */
                 case "group":
                     if (this.selected_group_name === "random") {
-                        return "<ul><li>" + this.random_user_messages[LANGUAGE] + "</li></ul>";
+                        return "<ul><li class=\"suggested-name\" role=\"listitem\">" + this.random_user_messages[LANGUAGE] + "</li></ul>";
                     }
                     members = this.buildGroupMemberListData(this.selected_group_name);
                     if (members.length) {
-                        var txt = "<ul><li>";
+                        var txt = "<ul><li class='suggested-name' role='listitem'>";
                         for (var i = 0; i < members.length; i++) {
                             if (i == 6) {
                                 txt += "<span>+" + (members.length - 6) + "</span>";
@@ -1177,13 +1184,19 @@ var Mention = function () {
                         txt += "</li></ul>";
                         return txt;
                     } else {
-                        return "<ul><li>" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</li></ul>";
+                        var message = null;
+                        if (this.selected_group_name === "admin") {
+                            message = this.no_admin_messages[LANGUAGE];
+                        } else {
+                            message = this.suggestion_messages[this.insert_type][LANGUAGE];
+                        }
+                        return "<ul><li class=\"suggested-name\" role=\"listitem\">" + message + "</li></ul>";
                     }
                     /* eslint-disable no-unreachable */
                     break;
                 /* eslint-enable */
                 case "all":
-                    return "<ul><li>" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</li></ul>";
+                    return "<ul><li class=\"suggested-name\" role=\"listitem\">" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</lia></ul>";
                     /* eslint-disable no-unreachable */
                     break;
                 /* eslint-enable */
@@ -1243,7 +1256,11 @@ var Mention = function () {
             }
             for (var i = 0; i < this.group_mention.length; i++) {
                 if (this.group_mention[i]["group_name"] == group_name) {
-                    var members = this.group_mention[i]["group_members"].split(",");
+                    var members = this.group_mention[i]["group_members"];
+                    if (!members) {
+                        return [];
+                    }
+                    members = members.split(",");
                     var results = [];
                     for (var j = 0; j < members.length; j++) {
                         results.push(this.getMemberObject(members[j].trim()));
