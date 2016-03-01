@@ -1,4 +1,6 @@
 # Contribution Guidelines
+If you can understand Vietnamese, please refer [this post in Viblo](https://viblo.asia/thangtd90/posts/157G5noZvAje),
+which describes in detail about how to contribute to Chat++.
 
 ## Setup
 - Chat++ is rewritten in [ECMAScript 6](http://www.ecma-international.org/publications/standards/Ecma-262.htm)
