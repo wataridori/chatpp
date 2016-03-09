@@ -12,14 +12,14 @@ class Emoticon {
             return;
         }
         this.emoticons = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
-        this.emoticons.sort((a, b) => {
+        this.sorted_emoticons = this.emoticons.slice().sort((a, b) => {
             if (a.priority < b.priority) {
                 return 1;
             } else if (a.priority > b.priority) {
                 return -1;
             }
             return a.key < b.key ? -1 : (a.key > b.key) ? 1 : 0;
-        })
+        });
         this.addExternalEmoList();
         this.addEmoticonText();
         this.addExternalEmo();
@@ -34,7 +34,7 @@ class Emoticon {
             "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" +
             "</li>"
         );
-        let emo_list_div = this.emoticons.map((emo) => {
+        let emo_list_div = this.sorted_emoticons.map((emo) => {
             let encoded_text = common.htmlEncode(emo.key);
             let title = `${emo.data_name} - ${encoded_text}`;
             let img_src = common.htmlEncode(common.getEmoUrl(emo.src));

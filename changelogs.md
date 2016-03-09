@@ -1,5 +1,9 @@
 Chat++ Change Logs
 =================
+
+## 5.0.1
+* Fix bug with some special emoticons
+
 ## 5.0.0
 * Chat++ is rewritten in [ECMAScript 6](http://www.ecma-international.org/publications/standards/Ecma-262.htm),
  transformed by [babel](https://babeljs.io/), built by [gulp](http://gulpjs.com/).

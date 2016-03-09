@@ -401,7 +401,7 @@ var Emoticon = function () {
                 return;
             }
             this.emoticons = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
-            this.emoticons.sort(function (a, b) {
+            this.sorted_emoticons = this.emoticons.slice().sort(function (a, b) {
                 if (a.priority < b.priority) {
                     return 1;
                 } else if (a.priority > b.priority) {
@@ -420,7 +420,7 @@ var Emoticon = function () {
                 return;
             }
             $("#_chatSendTool").append("<li id='_externalEmoticonsButton' role='button' class=' _showDescription'>" + "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" + "</li>");
-            var emo_list_div = this.emoticons.map(function (emo) {
+            var emo_list_div = this.sorted_emoticons.map(function (emo) {
                 var encoded_text = common.htmlEncode(emo.key);
                 var title = emo.data_name + " - " + encoded_text;
                 var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
