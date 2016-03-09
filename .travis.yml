@@ -4,4 +4,4 @@ node_js:
   - "4"
   - "5"
 before_script:
-  - npm install -g eslint babel-eslint
+  - npm install -g eslint babel-eslint estraverse estraverse-fb
