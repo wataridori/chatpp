@@ -402,8 +402,6 @@ function clearInput() {
 }
 
 function fillDataTable() {
-    var _this = this;
-
     var table_text = "";
     var table_body = $("#table-data").find("tbody");
     table_body.html("");
@@ -417,8 +415,8 @@ function fillDataTable() {
         }
     });
     table_body.append(table_text);
-    $(".btn-data-remove").click(function () {
-        var name = $(_this).data("name");
+    $(".btn-data-remove").click(function (e) {
+        var name = $(e.currentTarget).data("name");
         removeGroup(name);
         syncData();
     });
@@ -427,7 +425,7 @@ function fillDataTable() {
 function pushGroup(info) {
     var found = false;
     $.each(groups, function (index, data) {
-        if (info.group_name === data.group_name) {
+        if (info.group_name == data.group_name) {
             groups[index] = info;
             found = true;
         }
@@ -439,9 +437,9 @@ function pushGroup(info) {
 }
 
 function removeGroup(name) {
-    var found = false;
+    var found = -1;
     $.each(groups, function (index, data) {
-        if (name === data.group_name) {
+        if (name == data.group_name) {
             found = index;
         }
     });

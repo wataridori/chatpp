@@ -68,8 +68,8 @@ function fillDataTable() {
         }
     });
     table_body.append(table_text);
-    $(".btn-data-remove").click(() => {
-        let name = $(this).data("name");
+    $(".btn-data-remove").click((e) => {
+        let name = $(e.currentTarget).data("name");
         removeGroup(name);
         syncData();
     });
@@ -78,7 +78,7 @@ function fillDataTable() {
 function pushGroup(info) {
     let found = false;
     $.each(groups, (index, data) => {
-        if (info.group_name === data.group_name) {
+        if (info.group_name == data.group_name) {
             groups[index] = info;
             found = true;
         }
@@ -90,9 +90,9 @@ function pushGroup(info) {
 }
 
 function removeGroup(name) {
-    let found = false;
+    let found = -1;
     $.each(groups, (index, data) => {
-        if (name === data.group_name) {
+        if (name == data.group_name) {
             found = index;
         }
     });
