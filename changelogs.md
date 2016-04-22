@@ -1,6 +1,9 @@
 Chat++ Change Logs
 =================
 
+## 5.0.2
+* Fix bug with group remove button in Group page
+
 ## 5.0.1
 * Fix bug with some special emoticons
 
