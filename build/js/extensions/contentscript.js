@@ -3,76 +3,83 @@
 
 var Const = require("../helpers/Const.js");
 var common = require("../helpers/Common.js");
-var Storage = require("../helpers/Storage.js");
 var EmoStorage = require("../helpers/EmoStorage.js");
-var ChromeStorageLocal = require("../helpers/ChromeStorageLocal.js");
 
-var storage = new Storage();
 var emo_storage = new EmoStorage();
 var emoticons = [];
 var emo_info = {};
 var urls = {};
 
-init(true);
+var keys = [Const.CHROME_SYNC_KEY, Const.CHROME_SYNC_GROUP_KEY, Const.CHROME_SYNC_ROOM_KEY, Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, Const.CHROME_LOCAL_KEY];
+
+setTimeout(function () {
+    for (var i in keys) {
+        chrome.runtime.sendMessage({ action: "init", data: keys[i] }, function () {});
+    }
+}, 500);
+
+setTimeout(function () {
+    var _loop = function _loop(i) {
+        chrome.runtime.sendMessage({ action: "getLocalStorage", data: keys[i] }, function (response) {
+            localStorage[keys[i]] = response;
+        });
+    };
+
+    for (var i in keys) {
+        _loop(i);
+    }
+}, 1000);
+
+setTimeout(function () {
+    init(true);
+}, 1500);
 
 function init(inject_script) {
-    storage.get(Const.CHROME_SYNC_KEY, function (info) {
-        emo_info = info;
-        if (!$.isEmptyObject(info)) {
-            for (var key in info) {
-                var emo_data = info[key];
-                var url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
-                if (url) {
-                    urls[emo_data.data_name] = url;
-                }
+    var info = localStorage[Const.CHROME_SYNC_KEY];
+    info = info === "undefined" ? undefined : JSON.parse(info);
+    emo_info = info;
+    if (!$.isEmptyObject(info)) {
+        for (var key in info) {
+            var emo_data = info[key];
+            var url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
+            if (url) {
+                urls[emo_data.data_name] = url;
             }
         }
-        if ($.isEmptyObject(urls)) {
-            urls["Default"] = Const.DEFAULT_DATA_URL;
-        }
-        if (info === undefined) {
-            info = {};
-        }
-        if (!info.force_update_version || info.force_update_version < Const.FORCE_TURN_OFF_THUMBNAIL) {
-            info.force_update_version = Const.FORCE_TURN_OFF_THUMBNAIL;
-            info.thumbnail_status = false;
-            info.emoticon_status = true;
-        }
-        localStorage.force_update_version = info.force_update_version;
-        var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
-        features.forEach(function (feature) {
-            var feature_name = feature + "_status";
-            info[feature_name] = info[feature_name] === undefined ? true : info[feature_name];
-            common.setStatus(feature, info[feature_name]);
-        });
-        emo_storage.setFeatureStatus(info);
-        if (info.emoticon_status == false) {
-            addInjectedScript();
-        } else {
-            getData(info, inject_script);
-        }
+    }
+    if ($.isEmptyObject(urls)) {
+        urls["Default"] = Const.DEFAULT_DATA_URL;
+    }
+    if (info === undefined) {
+        info = {};
+    }
+    if (!info.force_update_version || info.force_update_version < Const.FORCE_TURN_OFF_THUMBNAIL) {
+        info.force_update_version = Const.FORCE_TURN_OFF_THUMBNAIL;
+        info.thumbnail_status = false;
+        info.emoticon_status = true;
+    }
+    localStorage.force_update_version = info.force_update_version;
+    var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
+    features.forEach(function (feature) {
+        var feature_name = feature + "_status";
+        info[feature_name] = info[feature_name] === undefined ? true : info[feature_name];
+        common.setStatus(feature, info[feature_name]);
     });
+    emo_storage.setFeatureStatus(info);
+    if (info.emoticon_status == false) {
+        addInjectedScript();
+    } else {
+        getData(info, inject_script);
+    }
 
-    localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = [];
-    storage.get(Const.CHROME_SYNC_GROUP_KEY, function (data) {
-        if (!$.isEmptyObject(data)) {
-            localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = JSON.stringify(data);
-        }
-    });
+    var data = localStorage[Const.CHROME_SYNC_GROUP_KEY];
+    localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = data === "undefined" ? [] : data;
 
-    localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = [];
-    storage.get(Const.CHROME_SYNC_ROOM_KEY, function (data) {
-        if (!$.isEmptyObject(data)) {
-            localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = JSON.stringify(data);
-        }
-    });
+    data = localStorage[Const.CHROME_SYNC_ROOM_KEY];
+    localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = data === "undefined" ? [] : data;
 
-    localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = [];
-    storage.get(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, function (data) {
-        if (!$.isEmptyObject(data)) {
-            localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = JSON.stringify(data);
-        }
-    });
+    data = localStorage[Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY];
+    localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = data === "undefined" ? [] : data;
 }
 
 function getData(info, inject_script) {
@@ -95,25 +102,15 @@ function getData(info, inject_script) {
         }).always(function () {
             if (++loaded_count === emo_count) {
                 if (!failed) {
-                    emo_storage.syncData();
+                    // emo_storage.syncData();
                 }
-                var chrome_storage_local = new ChromeStorageLocal();
-                chrome_storage_local.get(function (local_data) {
-                    var version_name = "";
-                    if (!$.isEmptyObject(local_data)) {
-                        version_name = local_data["version_name"];
-                    }
-                    // let current_time = (new Date).toLocaleString();
-                    // console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
-                    localStorage[Const.LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
-                    localStorage["chatpp_version_name"] = version_name;
-                    localStorage["emoticon_data_version"] = parseDataName(emo_info);
-                    if (inject_script !== undefined && inject_script) {
-                        addInjectedScript();
-                    } else {
-                        // runFunction("reloadEmoticions()");
-                    }
-                });
+                localStorage[Const.LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
+                localStorage["emoticon_data_version"] = parseDataName(emo_info);
+                if (inject_script !== undefined && inject_script) {
+                    addInjectedScript();
+                } else {
+                    // runFunction("reloadEmoticions()");
+                }
             }
         });
     });
@@ -208,47 +205,7 @@ function loadAdvertisement() {
     });
 }
 
-},{"../helpers/ChromeStorageLocal.js":2,"../helpers/Common.js":3,"../helpers/Const.js":4,"../helpers/EmoStorage.js":5,"../helpers/Storage.js":6}],2:[function(require,module,exports){
-"use strict";
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Storage = require("./Storage.js");
-var Const = require("./Const.js");
-
-var ChromeStorageLocal = function () {
-    function ChromeStorageLocal() {
-        _classCallCheck(this, ChromeStorageLocal);
-
-        this.storage = new Storage(true);
-        this.key = Const.CHROME_LOCAL_KEY;
-    }
-
-    _createClass(ChromeStorageLocal, [{
-        key: "get",
-        value: function get(callback) {
-            this.storage.get(this.key, callback);
-        }
-    }, {
-        key: "set",
-        value: function set(data, callback) {
-            this.set(this.key, data, callback);
-        }
-    }, {
-        key: "setData",
-        value: function setData(data, callback) {
-            this.storage.setData(data, callback);
-        }
-    }]);
-
-    return ChromeStorageLocal;
-}();
-
-module.exports = ChromeStorageLocal;
-
-},{"./Const.js":4,"./Storage.js":6}],3:[function(require,module,exports){
+},{"../helpers/Common.js":2,"../helpers/Const.js":3,"../helpers/EmoStorage.js":4}],2:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -261,7 +218,7 @@ var Common = function () {
     function Common() {
         _classCallCheck(this, Common);
 
-        this.version = Const.VERSION_CHROME;
+        this.version = Const.VERSION_FIREFOX;
         this.app_detail = this.getAppDetail();
         this.official_emoticons_data = {
             Default: {
@@ -374,7 +331,16 @@ var Common = function () {
     }, {
         key: "getAppDetail",
         value: function getAppDetail() {
-            return chrome.app.getDetails();
+            if (this.isChromeVersion()) {
+                return chrome.app.getDetails();
+            }
+
+            return {
+                "name": "Chat++ for Chatwork",
+                "short_name": "Chat++",
+                "version": "0.1.1",
+                "option_page": "option.html"
+            };
         }
     }, {
         key: "getAppVersion",
@@ -472,7 +438,7 @@ var Common = function () {
 var common = new Common();
 module.exports = common;
 
-},{"./Const.js":4}],4:[function(require,module,exports){
+},{"./Const.js":3}],3:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -504,7 +470,7 @@ Const.ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 
 module.exports = Const;
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -582,7 +548,7 @@ var EmoStorage = function (_Storage) {
 
 module.exports = EmoStorage;
 
-},{"./Common.js":3,"./Const.js":4,"./Storage.js":6}],6:[function(require,module,exports){
+},{"./Common.js":2,"./Const.js":3,"./Storage.js":5}],5:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -633,4 +599,4 @@ var Storage = function () {
 
 module.exports = Storage;
 
-},{"./Common.js":3}]},{},[1]);
+},{"./Common.js":2}]},{},[1]);

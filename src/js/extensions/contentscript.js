@@ -1,75 +1,78 @@
 let Const = require("../helpers/Const.js");
 let common = require("../helpers/Common.js");
-let Storage = require("../helpers/Storage.js");
 let EmoStorage = require("../helpers/EmoStorage.js");
-let ChromeStorageLocal = require("../helpers/ChromeStorageLocal.js");
 
-let storage = new Storage();
 let emo_storage = new EmoStorage();
 let emoticons = [];
 let emo_info = {};
 let urls = {};
 
-init(true);
+let keys = [Const.CHROME_SYNC_KEY, Const.CHROME_SYNC_GROUP_KEY, Const.CHROME_SYNC_ROOM_KEY, Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, Const.CHROME_LOCAL_KEY];
+
+setTimeout(() => {
+    for (let i in keys) {
+        chrome.runtime.sendMessage({action: "init", data: keys[i]}, () => {});
+    }
+}, 500);
+
+setTimeout(() => {
+    for (let i in keys) {
+        chrome.runtime.sendMessage({action: "getLocalStorage", data: keys[i]}, (response) => {
+            localStorage[keys[i]] = response;
+        });
+    }
+}, 1000);
+
+setTimeout(() => {
+    init(true);
+}, 1500);
 
 function init(inject_script) {
-    storage.get(Const.CHROME_SYNC_KEY, (info) => {
-        emo_info = info;
-        if (!$.isEmptyObject(info)) {
-            for (let key in info) {
-                let emo_data = info[key];
-                let url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
-                if (url) {
-                    urls[emo_data.data_name] = url;
-                }
+    let info = localStorage[Const.CHROME_SYNC_KEY];
+    info = info === "undefined" ? undefined : JSON.parse(info);
+    emo_info = info;
+    if (!$.isEmptyObject(info)) {
+        for (let key in info) {
+            let emo_data = info[key];
+            let url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
+            if (url) {
+                urls[emo_data.data_name] = url;
             }
         }
-        if ($.isEmptyObject(urls)) {
-            urls["Default"] = Const.DEFAULT_DATA_URL;
-        }
-        if (info === undefined) {
-            info = {};
-        }
-        if (!info.force_update_version || info.force_update_version < Const.FORCE_TURN_OFF_THUMBNAIL) {
-            info.force_update_version = Const.FORCE_TURN_OFF_THUMBNAIL;
-            info.thumbnail_status = false;
-            info.emoticon_status = true;
-        }
-        localStorage.force_update_version = info.force_update_version;
-        let features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
-        features.forEach((feature) => {
-            let feature_name = `${feature}_status`;
-            info[feature_name] = info[feature_name] === undefined ? true : info[feature_name];
-            common.setStatus(feature, info[feature_name]);
-        });
-        emo_storage.setFeatureStatus(info);
-        if (info.emoticon_status == false) {
-            addInjectedScript();
-        } else {
-            getData(info, inject_script);
-        }
+    }
+    if ($.isEmptyObject(urls)) {
+        urls["Default"] = Const.DEFAULT_DATA_URL;
+    }
+    if (info === undefined) {
+        info = {};
+    }
+    if (!info.force_update_version || info.force_update_version < Const.FORCE_TURN_OFF_THUMBNAIL) {
+        info.force_update_version = Const.FORCE_TURN_OFF_THUMBNAIL;
+        info.thumbnail_status = false;
+        info.emoticon_status = true;
+    }
+    localStorage.force_update_version = info.force_update_version;
+    let features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
+    features.forEach((feature) => {
+        let feature_name = `${feature}_status`;
+        info[feature_name] = info[feature_name] === undefined ? true : info[feature_name];
+        common.setStatus(feature, info[feature_name]);
     });
+    emo_storage.setFeatureStatus(info);
+    if (info.emoticon_status == false) {
+        addInjectedScript();
+    } else {
+        getData(info, inject_script);
+    }
 
-    localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = [];
-    storage.get(Const.CHROME_SYNC_GROUP_KEY, (data) => {
-        if (!$.isEmptyObject(data)) {
-            localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = JSON.stringify(data);
-        }
-    });
+    let data = localStorage[Const.CHROME_SYNC_GROUP_KEY];
+    localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = data === "undefined" ? [] : data;
 
-    localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = [];
-    storage.get(Const.CHROME_SYNC_ROOM_KEY, (data) => {
-        if (!$.isEmptyObject(data)) {
-            localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = JSON.stringify(data);
-        }
-    });
+    data = localStorage[Const.CHROME_SYNC_ROOM_KEY];
+    localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = data === "undefined" ? [] : data;
 
-    localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = [];
-    storage.get(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, (data) => {
-        if (!$.isEmptyObject(data)) {
-            localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = JSON.stringify(data);
-        }
-    });
+    data = localStorage[Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY];
+    localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = data === "undefined" ? [] : data;
 }
 
 function getData(info, inject_script) {
@@ -93,25 +96,15 @@ function getData(info, inject_script) {
             }).always(() => {
                 if (++loaded_count === emo_count) {
                     if (!failed) {
-                        emo_storage.syncData();
+                        // emo_storage.syncData();
                     }
-                    let chrome_storage_local = new ChromeStorageLocal();
-                    chrome_storage_local.get((local_data) => {
-                        let version_name = "";
-                        if (!$.isEmptyObject(local_data)) {
-                            version_name = local_data["version_name"];
-                        }
-                        // let current_time = (new Date).toLocaleString();
-                        // console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
-                        localStorage[Const.LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
-                        localStorage["chatpp_version_name"] = version_name;
-                        localStorage["emoticon_data_version"] = parseDataName(emo_info);
-                        if (inject_script !== undefined && inject_script) {
-                            addInjectedScript();
-                        } else {
-                            // runFunction("reloadEmoticions()");
-                        }
-                    });
+                    localStorage[Const.LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
+                    localStorage["emoticon_data_version"] = parseDataName(emo_info);
+                    if (inject_script !== undefined && inject_script) {
+                        addInjectedScript();
+                    } else {
+                        // runFunction("reloadEmoticions()");
+                    }
                 }
             });
     });

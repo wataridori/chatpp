@@ -15,7 +15,7 @@ $(function () {
 
     var pages = ["setting", "emoticon", "room", "group", "shortcut", "change_logs", "features", "notification"];
     pages.forEach(function (page_name) {
-        var url = "html/" + page_name + ".html";
+        var url = page_name + ".html";
         $("#" + page_name + "_page").click(function () {
             common.openNewUrl(url);
         });
@@ -23,14 +23,6 @@ $(function () {
 
     $(".ext-url").click(function (e) {
         common.openNewUrl($(e.currentTarget).attr("href"));
-    });
-
-    chrome.storage.onChanged.addListener(function (changes) {
-        var data = changes[Const.CHROME_SYNC_KEY];
-        if (!$.isEmptyObject(data) && !$.isEmptyObject(data.newValue)) {
-            data = data.newValue;
-            updateViewData(data);
-        }
     });
 
     loadChatppEmoData();
@@ -48,7 +40,7 @@ function loadChatppEmoData() {
     var storage = new Storage();
     storage.get(Const.CHROME_SYNC_KEY, function (data) {
         if ($.isEmptyObject(data)) {
-            common.openNewExtensionPageUrl(common.app_detail.options_page);
+            common.openNewUrl("emoticon.html");
         } else {
             updateViewData(data);
         }
@@ -138,7 +130,7 @@ var Common = function () {
     function Common() {
         _classCallCheck(this, Common);
 
-        this.version = Const.VERSION_CHROME;
+        this.version = Const.VERSION_FIREFOX;
         this.app_detail = this.getAppDetail();
         this.official_emoticons_data = {
             Default: {
@@ -251,7 +243,16 @@ var Common = function () {
     }, {
         key: "getAppDetail",
         value: function getAppDetail() {
-            return chrome.app.getDetails();
+            if (this.isChromeVersion()) {
+                return chrome.app.getDetails();
+            }
+
+            return {
+                "name": "Chat++ for Chatwork",
+                "short_name": "Chat++",
+                "version": "0.1.1",
+                "option_page": "option.html"
+            };
         }
     }, {
         key: "getAppVersion",

@@ -2,7 +2,7 @@ let Const = require("./Const.js");
 
 class Common {
     constructor() {
-        this.version = Const.VERSION_CHROME;
+        this.version = Const.VERSION_FIREFOX;
         this.app_detail = this.getAppDetail();
         this.official_emoticons_data = {
             Default: {
@@ -102,7 +102,16 @@ class Common {
     }
 
     getAppDetail() {
-        return chrome.app.getDetails();
+        if (this.isChromeVersion()) {
+            return chrome.app.getDetails();
+        }
+
+        return {
+            "name": "Chat++ for Chatwork",
+            "short_name": "Chat++",
+            "version": "0.1.1",
+            "option_page": "option.html"
+        };
     }
 
     getAppVersion() {

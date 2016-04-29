@@ -12,7 +12,7 @@ $(() => {
 
     let pages = ["setting", "emoticon", "room", "group", "shortcut", "change_logs", "features", "notification"];
     pages.forEach((page_name) => {
-        let url = `html/${page_name}.html`;
+        let url = `${page_name}.html`;
         $(`#${page_name}_page`).click(() => {
             common.openNewUrl(url);
         });
@@ -20,14 +20,6 @@ $(() => {
 
     $(".ext-url").click((e) => {
         common.openNewUrl($(e.currentTarget).attr("href"));
-    });
-
-    chrome.storage.onChanged.addListener((changes) => {
-        let data = changes[Const.CHROME_SYNC_KEY];
-        if (!$.isEmptyObject(data) && !$.isEmptyObject(data.newValue)) {
-            data = data.newValue;
-            updateViewData(data);
-        }
     });
 
     loadChatppEmoData();
@@ -45,7 +37,7 @@ function loadChatppEmoData() {
     let storage = new Storage;
     storage.get(Const.CHROME_SYNC_KEY, (data) => {
         if ($.isEmptyObject(data)) {
-            common.openNewExtensionPageUrl(common.app_detail.options_page);
+            common.openNewUrl("emoticon.html");
         } else {
             updateViewData(data);
         }

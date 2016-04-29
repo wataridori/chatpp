@@ -1,63 +1,28 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 
-var common = require("../helpers/Common.js");
-var ChromeStorageLocal = require("../helpers/ChromeStorageLocal.js");
-var chrome_storage_local = new ChromeStorageLocal();
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-chrome.runtime.onInstalled.addListener(function () {
-    chrome_storage_local.get(function (data) {
-        var version = undefined;
-        if (data) {
-            version = data["version"];
-        }
-        if (!version || version != common.app_detail.version) {
-            chrome.browserAction.setBadgeText({ text: "new" });
-        }
-    });
+var Storage = require("../helpers/Storage.js");
+var chrome_storage_local = new Storage(true);
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.action === "init") {
+        chrome_storage_local.get(request.data, function (info) {
+            info = (typeof info === "undefined" ? "undefined" : _typeof(info)) === "object" ? JSON.stringify(info) : info;
+            localStorage[request.data] = info;
+        });
+    }
+    if (request.action == "getLocalStorage") {
+        sendResponse(localStorage[request.data]);
+    }
+    if (request.action == "setLocalStorage") {
+        chrome_storage_local.set(request.data);
+        sendResponse();
+    }
 });
 
-},{"../helpers/ChromeStorageLocal.js":2,"../helpers/Common.js":3}],2:[function(require,module,exports){
-"use strict";
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Storage = require("./Storage.js");
-var Const = require("./Const.js");
-
-var ChromeStorageLocal = function () {
-    function ChromeStorageLocal() {
-        _classCallCheck(this, ChromeStorageLocal);
-
-        this.storage = new Storage(true);
-        this.key = Const.CHROME_LOCAL_KEY;
-    }
-
-    _createClass(ChromeStorageLocal, [{
-        key: "get",
-        value: function get(callback) {
-            this.storage.get(this.key, callback);
-        }
-    }, {
-        key: "set",
-        value: function set(data, callback) {
-            this.set(this.key, data, callback);
-        }
-    }, {
-        key: "setData",
-        value: function setData(data, callback) {
-            this.storage.setData(data, callback);
-        }
-    }]);
-
-    return ChromeStorageLocal;
-}();
-
-module.exports = ChromeStorageLocal;
-
-},{"./Const.js":4,"./Storage.js":5}],3:[function(require,module,exports){
+},{"../helpers/Storage.js":4}],2:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70,7 +35,7 @@ var Common = function () {
     function Common() {
         _classCallCheck(this, Common);
 
-        this.version = Const.VERSION_CHROME;
+        this.version = Const.VERSION_FIREFOX;
         this.app_detail = this.getAppDetail();
         this.official_emoticons_data = {
             Default: {
@@ -183,7 +148,16 @@ var Common = function () {
     }, {
         key: "getAppDetail",
         value: function getAppDetail() {
-            return chrome.app.getDetails();
+            if (this.isChromeVersion()) {
+                return chrome.app.getDetails();
+            }
+
+            return {
+                "name": "Chat++ for Chatwork",
+                "short_name": "Chat++",
+                "version": "0.1.1",
+                "option_page": "option.html"
+            };
         }
     }, {
         key: "getAppVersion",
@@ -281,7 +255,7 @@ var Common = function () {
 var common = new Common();
 module.exports = common;
 
-},{"./Const.js":4}],4:[function(require,module,exports){
+},{"./Const.js":3}],3:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -313,7 +287,7 @@ Const.ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 
 module.exports = Const;
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -364,4 +338,4 @@ var Storage = function () {
 
 module.exports = Storage;
 
-},{"./Common.js":3}]},{},[1]);
+},{"./Common.js":2}]},{},[1]);
