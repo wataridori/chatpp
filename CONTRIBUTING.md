@@ -26,6 +26,9 @@ Please follow the guidelines below when creating an issue so that your issue can
 * Please search through [existing issues](../../issues/) to see if your issue is already reported or fixed to make sure you are not reporting a duplicated issue.
 
 ## Contribute to the project
+- With Pull Requests about the new features, bug fixes, code refactoring ... please send to **develop** branch.
+- With Pull Requests for the **Firefox version** ... please send to **firefox** branch.
 
-Pull requests to the **develop** branch at [wataridori/chatpp](../../) are always welcome. :+1:
+They are always welcome. :+1:
+
 
