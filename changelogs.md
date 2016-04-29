@@ -1,6 +1,9 @@
 Chat++ Change Logs
 =================
 
+## 5.0.3
+* Add notice about the **Thumbnail** and **Code Highlight** features.
+
 ## 5.0.2
 * Fix bug with group remove button in Group page
 
