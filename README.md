@@ -7,7 +7,7 @@ It is a free Chrome Extension which provides more funny emoticons as well as man
 
 * [Homepage](https://chatpp.thangtd.com)
 * [Chrome Web Store](https://chrome.google.com/webstore/detail/chat%20%20-for-chatwork/amhfnpimdfcdcpnchjionbddjjbmofnl)
-* [Firefox AMO](https://addons.mozilla.org/en-US/firefox/addon/chat-for-chatwork/)
+* [Firefox AMO](https://addons.mozilla.org/en-US/firefox/addon/chatpp-for-chatwork/)
 * [Twitter](https://twitter.com/chatplusplus)
 * [Qiita](http://qiita.com/thangtd90/items/4433ca440f9ca4b0938f) (in Japanese)
 * [Viblo](https://viblo.asia/thangtd90/posts/157G5noZvAje) (in Vietnamese)
