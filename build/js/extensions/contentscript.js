@@ -158,7 +158,9 @@ function pushEmoticons(emos, priority, data_name) {
 function addInjectedScript() {
     loadAdvertisement();
     preLoad();
-    injectJsFile("internals/libs.js");
+    injectJsFile("libraries/caretposition.js");
+    injectJsFile("libraries/fuse.min.js");
+    injectJsFile("libraries/highlight.min.js");
     injectCssFile("highlight.min.css");
     setTimeout(function () {
         injectJsFile("internals/all.js");
