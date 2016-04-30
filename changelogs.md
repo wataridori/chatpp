@@ -1,6 +1,9 @@
 Chat++ Change Logs
 =================
 
+## 5.0.4
+* Rearrange third party libraries structure according to requirement from Firefox.
+
 ## 5.0.3
 * Add notice about the **Thumbnail** and **Code Highlight** features.
 
