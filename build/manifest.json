@@ -1,7 +1,7 @@
 {
     "name": "Chat++ for Chatwork dev",
     "short_name": "Chat++",
-    "version": "5.0.8",
+    "version": "5.0.9",
     "manifest_version": 2,
     "description": "An all-in-one Chatwork Enhancement Toolkit which provides many useful features!",
     "content_scripts": [
@@ -11,7 +11,7 @@
                 "https://kcw.kddi.ne.jp/*"
             ],
             "js": [
-                "js/jquery.min.js",
+                "js/libraries/jquery.min.js",
                 "js/extensions/contentscript.js"
             ],
             "run_at": "document_end"
@@ -20,7 +20,13 @@
     "background": {
         "scripts": ["js/extensions/background.js"]
     },
-    "web_accessible_resources": ["js/internals/libs.js", "js/internals/all.js", "css/highlight.min.css"],
+    "web_accessible_resources": [
+        "js/libraries/caretposition.js",
+        "js/libraries/fuse.min.js",
+        "js/libraries/highlight.min.js",
+        "js/internals/all.js",
+        "css/highlight.min.css"
+    ],
     "browser_action": {
         "default_icon": "img/icon64.png",
         "default_popup": "html/popup.html"

@@ -11,14 +11,9 @@ elixir.config.js.browserify.transformers
 
 elixir(function(mix) {
     mix.scripts([
-            "libs/bootstrap.min.js",
-            "libs/bootbox.min.js"
+            "libraries/bootstrap.min.js",
+            "libraries/bootbox.min.js"
         ], "build/js/externals/libs.js")
-        .scripts([
-            "libs/caretposition.js",
-            "libs/fuse.min.js",
-            "libs/highlight.min.js"
-        ], "build/js/internals/libs.js")
         .browserify("externals/popup.js", "build/js/externals/popup.js")
         .browserify([
             "externals/emoticon.js",
