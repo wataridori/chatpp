@@ -1,6 +1,9 @@
 Chat++ Change Logs
 =================
 
+## 5.0.5
+* Wrap long text inside code tag by default, when Code Highlight Feature is turned on.
+
 ## 5.0.4
 * Rearrange third party libraries structure according to requirement from Firefox.
 
