@@ -1937,7 +1937,7 @@ var ViewEnhancer = function () {
                             $(block).addClass(options.language);
                         }
                         if (!options.nowrap) {
-                            $(block).css({ "word-wrap": "break-word" });
+                            $(block).css({ "word-wrap": "break-word", "white-space": "normal" });
                         }
                         hljs.highlightBlock(block);
                     });
