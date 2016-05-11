@@ -1928,7 +1928,7 @@ var ViewEnhancer = function () {
                             $(block).addClass(options.language);
                         }
                         if (!options.nowrap) {
-                            $(block).css({ "word-wrap": "break-word", "white-space": "normal" });
+                            $(block).css({ "word-wrap": "break-word", "white-space": "pre-wrap" });
                         }
                         hljs.highlightBlock(block);
                     });
