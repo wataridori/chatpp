@@ -58,6 +58,23 @@ var ChatworkFacade = function () {
             var members = this.getRoomMembersArray();
             return common.random(members);
         }
+    }, {
+        key: "searchRoomsByPerson",
+        value: function searchRoomsByPerson(account_id) {
+            var rooms = RL.rooms;
+            var sameRooms = [];
+            for (var room_id in rooms) {
+                var room = rooms[room_id];
+                if (room._name && room.member_dat && room.member_dat.hasOwnProperty(account_id)) {
+                    sameRooms.push(room);
+                }
+            }
+            sameRooms.forEach(function (room) {
+                /* eslint-disable no-console */
+                console.log(room._name + "   https://www.chatwork.com/#!rid" + room.id);
+                /* eslint-enable */
+            });
+        }
     }]);
 
     return ChatworkFacade;
@@ -1974,13 +1991,14 @@ var room_information = require("./RoomInformation.js");
 var view_enhancer = require("./ViewEnhancer.js");
 var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
-
+var chatwork = require("../helpers/ChatworkFacade.js");
 var cw_timer = undefined;
 
 $(function () {
     var rebuild = false;
     cw_timer = setInterval(function () {
         if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
+            window.search = chatwork.searchRoomsByPerson;
             window.clearInterval(cw_timer);
             $("#_chatppPreLoad").remove();
             addStyle();
@@ -2015,4 +2033,4 @@ function addStyle() {
     $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
 }
 
-},{"./Advertisement.js":4,"./Emoticon.js":5,"./Mention.js":6,"./NotificationDisabler.js":7,"./RoomInformation.js":8,"./Shortcut.js":9,"./ViewEnhancer.js":10}]},{},[11]);
+},{"../helpers/ChatworkFacade.js":1,"./Advertisement.js":4,"./Emoticon.js":5,"./Mention.js":6,"./NotificationDisabler.js":7,"./RoomInformation.js":8,"./Shortcut.js":9,"./ViewEnhancer.js":10}]},{},[11]);
