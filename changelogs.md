@@ -1,6 +1,12 @@
 Chat++ Change Logs
 =================
 
+## 5.0.7
+* Add function for searching the same rooms by person
+
+## 5.0.6
+* Fix bug do not display new line with code tag
+
 ## 5.0.5
 * Wrap long text inside code tag by default, when Code Highlight Feature is turned on.
 
@@ -126,7 +132,7 @@ puts "This is a super long text. This is a super long text. This is a super long
 * Drop OFFENSIVE mode.
 * Allow users to reply their own message.
 * Add room info button.
-* Several Bug Fixes. 
+* Several Bug Fixes.
 
 ## 2.0.0 - Big Update
 * View list issues at [Happy Lunar New Year Release Milestone](../../milestones/Happy%20Lunar%20New%20Year%20Release)
