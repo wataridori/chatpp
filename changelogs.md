@@ -1,6 +1,10 @@
 Chat++ Change Logs
 =================
 
+## 5.0.8
+* Fix bugs with scroll to mentioned messages by using shortcut (`j` and `k`)
+* Change the mechanism for scrolling to bottom by using shortcut (`s`)
+
 ## 5.0.7
 * Add function for searching the same rooms by person
 

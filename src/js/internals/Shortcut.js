@@ -14,6 +14,7 @@ let DOM_VK_SPACE = 32,
     DOM_VK_Q = 81,
     DOM_VK_R = 82,
     DOM_VK_S = 83,
+    DOM_VK_T = 84,
     DOM_VK_V = 86,
     DOM_VK_X = 88,
     DOM_VK_Z = 90;
@@ -25,7 +26,7 @@ class Shortcut {
             quote: DOM_VK_Q,
             link: DOM_VK_L,
             edit: DOM_VK_E,
-            task: DOM_VK_K,
+            task: DOM_VK_T,
             my_chat: DOM_VK_A,
             scroll: DOM_VK_S,
             previous_mention: DOM_VK_K,
@@ -118,17 +119,15 @@ class Shortcut {
         });
 
         CW.view.registerKeyboardShortcut(shortcuts_default.scroll, !1, !1, !1, !1, () => {
-            RM.load(RM.timeline.getLastChatId());
+            this.goToBottom();
         });
 
         CW.view.registerKeyboardShortcut(shortcuts_default.previous_mention, !1, !1, !1, !1, () => {
-            let message_id = this.getHoverMessageId();
-            this.goToPreviousMention(message_id);
+            this.goToPreviousMention();
         });
 
         CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, () => {
-            let message_id = this.getHoverMessageId();
-            this.goToNexMention(message_id);
+            this.goToNexMention();
         });
 
         CW.view.registerKeyboardShortcut(shortcuts_default.next_mention_room, !1, !1, !1, !1, () => {
@@ -170,22 +169,25 @@ class Shortcut {
             }
         });
 
-        let selectRoom = function (room) {
-            return function() {
-                RL.selectRoom(room);
-            }
-        };
         for (let i in this.room_shortcuts) {
-            if (this.room_shortcuts[i]) {
+            if (this.room_shortcuts[i] && this.room_shortcuts.hasOwnProperty(i)) {
                 let room = this.room_shortcuts[i];
-                CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, selectRoom(room));
+                CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, () => {
+                    RL.selectRoom(room);
+                });
             }
         }
     }
 
+    isScrollable() {
+        return this.get(0).scrollHeight > this.height();
+    }
+
     removeRegisteredKeyboardShortcut() {
         for (let keyboard in this.shortcuts_default) {
-            CW.view.registerKeyboardShortcut(this.shortcuts_default[keyboard], !1, !1, !1, !1, () => false);
+            if (this.shortcuts_default.hasOwnProperty(keyboard)) {
+                CW.view.registerKeyboardShortcut(this.shortcuts_default[keyboard], !1, !1, !1, !1, () => false);
+            }
         }
     }
 
@@ -220,6 +222,10 @@ class Shortcut {
         return $("._message:hover").data("mid");
     }
 
+    getPivotMessage() {
+        return this.getHoverMessageId() || $("#_timeLine ._messageSelected").data("mid");
+    }
+
     getMessagePosition(id) {
         let messages = RM.timeline.chat_list;
         for (let i = messages.length - 1; i >= 0; i--) {
@@ -231,12 +237,18 @@ class Shortcut {
         return -1;
     }
 
-    goToPreviousMention(current) {
+    goToBottom() {
+        let timeline = $("#_timeLine");
+        timeline.animate({scrollTop: timeline[0].scrollHeight}, 200);
+    }
+
+    goToPreviousMention() {
+        let current = this.getPivotMessage();
         let position = this.getMessagePosition(current);
         let messages = RM.timeline.chat_list;
         for (let i = position - 1; i >= 0; i--) {
             if (this.isMentionMessage(messages[i])) {
-                RM.load(messages[i].id);
+                this.goToMessageInRoom(messages[i].id);
                 return true;
             }
         }
@@ -248,12 +260,13 @@ class Shortcut {
         RM.timeline.loadOld();
     }
 
-    goToNexMention(current) {
+    goToNexMention() {
+        let current = this.getPivotMessage();
         let position = this.getMessagePosition(current);
         let messages = RM.timeline.chat_list;
         for (let i = position + 1; i > 0 && i < messages.length; i++) {
             if (this.isMentionMessage(messages[i])) {
-                RM.load(messages[i].id);
+                this.goToMessageInRoom(messages[i].id);
                 return true;
             }
         }
@@ -261,13 +274,19 @@ class Shortcut {
         return false;
     }
 
+    goToMessageInRoom(message_id) {
+        RL.selectRoom(RM.id, message_id, {
+            smoothScroll: true
+        })
+    }
+
     isMentionMessage(message) {
-        let regex_reply = new RegExp(`\[.* aid=${AC.myid} .*\]`);
+        let regex_reply = new RegExp(`\\[.* aid=${AC.myid} .*\\]`);
         if (regex_reply.test(message.msg)) {
             return true;
         }
 
-        let regex_to = new RegExp(`\[To:${AC.myid}\]`);
+        let regex_to = new RegExp(`\\[To:${AC.myid}\\]`);
         return regex_to.test(message.msg);
     }
 

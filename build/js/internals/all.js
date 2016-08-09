@@ -310,32 +310,28 @@ module.exports = common;
 },{"./Const.js":3}],3:[function(require,module,exports){
 "use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Const = function Const() {
-    _classCallCheck(this, Const);
+var Const = {
+    LOCAL_STORAGE_DATA_KEY: "YACEP_EMO_DATA",
+    LOCAL_STORAGE_INFO_KEY: "YACEP_EMO_INFO",
+    LOCAL_STORAGE_GROUP_MENTION: "CHATPP_GROUP_MENTION",
+    LOCAL_STORAGE_ROOM_SHORTCUT: "CHATPP_ROOM_SHORTCUT",
+    LOCAL_STORAGE_DISABLE_NOTIFY_ROOM: "CHATPP_DISABLE_NOTIFY_ROOM",
+    CHROME_LOCAL_KEY: "CHATPP_CHROME_LOCAL_DATA",
+    CHROME_SYNC_KEY: "CHATPP_CHROME_SYNC_DATA",
+    CHROME_SYNC_GROUP_KEY: "CHATPP_CHROME_SYNC_GROUP",
+    CHROME_SYNC_ROOM_KEY: "CHATPP_CHROME_SYNC_ROOM",
+    CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY: "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM",
+    DEFAULT_DATA_URL: "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1",
+    ADVERTISEMENT_URL: "https://dl.dropboxusercontent.com/s/jsmceot0pqi8lpk/chatppad.json?dl=1",
+    VERSION_CHROME: "VERSION_CHROME",
+    VERSION_FIREFOX: "VERSION_FIREFOX",
+    VERSION_NAME_DEV: "dev",
+    VERSION_NAME_RELEASE: "final",
+    DEFAULT_IMG_HOST: "https://chatpp.thangtd.com/",
+    DELAY_TIME: 6000,
+    FORCE_TURN_OFF_THUMBNAIL: 1,
+    ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30
 };
-
-Const.LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
-Const.LOCAL_STORAGE_INFO_KEY = "YACEP_EMO_INFO";
-Const.LOCAL_STORAGE_GROUP_MENTION = "CHATPP_GROUP_MENTION";
-Const.LOCAL_STORAGE_ROOM_SHORTCUT = "CHATPP_ROOM_SHORTCUT";
-Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM = "CHATPP_DISABLE_NOTIFY_ROOM";
-Const.CHROME_LOCAL_KEY = "CHATPP_CHROME_LOCAL_DATA";
-Const.CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
-Const.CHROME_SYNC_GROUP_KEY = "CHATPP_CHROME_SYNC_GROUP";
-Const.CHROME_SYNC_ROOM_KEY = "CHATPP_CHROME_SYNC_ROOM";
-Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY = "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM";
-Const.DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1";
-Const.ADVERTISEMENT_URL = "https://dl.dropboxusercontent.com/s/jsmceot0pqi8lpk/chatppad.json?dl=1";
-Const.VERSION_CHROME = "VERSION_CHROME";
-Const.VERSION_FIREFOX = "VERSION_FIREFOX";
-Const.VERSION_NAME_DEV = "dev";
-Const.VERSION_NAME_RELEASE = "final";
-Const.DEFAULT_IMG_HOST = "https://chatpp.thangtd.com/";
-Const.DELAY_TIME = 6000;
-Const.FORCE_TURN_OFF_THUMBNAIL = 1;
-Const.ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 
 module.exports = Const;
 
@@ -1190,16 +1186,16 @@ var Mention = function () {
                     }
                     members = this.buildGroupMemberListData(this.selected_group_name);
                     if (members.length) {
-                        var txt = "<ul><li class='suggested-name' role='listitem'>";
-                        for (var i = 0; i < members.length; i++) {
-                            if (i == 6) {
-                                txt += "<span>+" + (members.length - 6) + "</span>";
+                        var _txt = "<ul><li class='suggested-name' role='listitem'>";
+                        for (var _i = 0; _i < members.length; _i++) {
+                            if (_i == 6) {
+                                _txt += "<span>+" + (members.length - 6) + "</span>";
                                 break;
                             }
-                            txt += members[i].avatar;
+                            _txt += members[_i].avatar;
                         }
-                        txt += "</li></ul>";
-                        return txt;
+                        _txt += "</li></ul>";
+                        return _txt;
                     } else {
                         var message = null;
                         if (this.selected_group_name === "admin") {
@@ -1456,6 +1452,7 @@ var DOM_VK_SPACE = 32,
     DOM_VK_Q = 81,
     DOM_VK_R = 82,
     DOM_VK_S = 83,
+    DOM_VK_T = 84,
     DOM_VK_V = 86,
     DOM_VK_X = 88,
     DOM_VK_Z = 90;
@@ -1469,7 +1466,7 @@ var Shortcut = function () {
             quote: DOM_VK_Q,
             link: DOM_VK_L,
             edit: DOM_VK_E,
-            task: DOM_VK_K,
+            task: DOM_VK_T,
             my_chat: DOM_VK_A,
             scroll: DOM_VK_S,
             previous_mention: DOM_VK_K,
@@ -1570,17 +1567,15 @@ var Shortcut = function () {
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.scroll, !1, !1, !1, !1, function () {
-                RM.load(RM.timeline.getLastChatId());
+                _this2.goToBottom();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.previous_mention, !1, !1, !1, !1, function () {
-                var message_id = _this2.getHoverMessageId();
-                _this2.goToPreviousMention(message_id);
+                _this2.goToPreviousMention();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, function () {
-                var message_id = _this2.getHoverMessageId();
-                _this2.goToNexMention(message_id);
+                _this2.goToNexMention();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.next_mention_room, !1, !1, !1, !1, function () {
@@ -1622,25 +1617,31 @@ var Shortcut = function () {
                 }
             });
 
-            var selectRoom = function selectRoom(room) {
-                return function () {
-                    RL.selectRoom(room);
-                };
-            };
             for (var i in this.room_shortcuts) {
-                if (this.room_shortcuts[i]) {
-                    var room = this.room_shortcuts[i];
-                    CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, selectRoom(room));
+                if (this.room_shortcuts[i] && this.room_shortcuts.hasOwnProperty(i)) {
+                    (function () {
+                        var room = _this2.room_shortcuts[i];
+                        CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, function () {
+                            RL.selectRoom(room);
+                        });
+                    })();
                 }
             }
+        }
+    }, {
+        key: "isScrollable",
+        value: function isScrollable() {
+            return this.get(0).scrollHeight > this.height();
         }
     }, {
         key: "removeRegisteredKeyboardShortcut",
         value: function removeRegisteredKeyboardShortcut() {
             for (var keyboard in this.shortcuts_default) {
-                CW.view.registerKeyboardShortcut(this.shortcuts_default[keyboard], !1, !1, !1, !1, function () {
-                    return false;
-                });
+                if (this.shortcuts_default.hasOwnProperty(keyboard)) {
+                    CW.view.registerKeyboardShortcut(this.shortcuts_default[keyboard], !1, !1, !1, !1, function () {
+                        return false;
+                    });
+                }
             }
         }
     }, {
@@ -1680,6 +1681,11 @@ var Shortcut = function () {
             return $("._message:hover").data("mid");
         }
     }, {
+        key: "getPivotMessage",
+        value: function getPivotMessage() {
+            return this.getHoverMessageId() || $("#_timeLine ._messageSelected").data("mid");
+        }
+    }, {
         key: "getMessagePosition",
         value: function getMessagePosition(id) {
             var messages = RM.timeline.chat_list;
@@ -1692,13 +1698,20 @@ var Shortcut = function () {
             return -1;
         }
     }, {
+        key: "goToBottom",
+        value: function goToBottom() {
+            var timeline = $("#_timeLine");
+            timeline.animate({ scrollTop: timeline[0].scrollHeight }, 200);
+        }
+    }, {
         key: "goToPreviousMention",
-        value: function goToPreviousMention(current) {
+        value: function goToPreviousMention() {
+            var current = this.getPivotMessage();
             var position = this.getMessagePosition(current);
             var messages = RM.timeline.chat_list;
             for (var i = position - 1; i >= 0; i--) {
                 if (this.isMentionMessage(messages[i])) {
-                    RM.load(messages[i].id);
+                    this.goToMessageInRoom(messages[i].id);
                     return true;
                 }
             }
@@ -1711,12 +1724,13 @@ var Shortcut = function () {
         }
     }, {
         key: "goToNexMention",
-        value: function goToNexMention(current) {
+        value: function goToNexMention() {
+            var current = this.getPivotMessage();
             var position = this.getMessagePosition(current);
             var messages = RM.timeline.chat_list;
             for (var i = position + 1; i > 0 && i < messages.length; i++) {
                 if (this.isMentionMessage(messages[i])) {
-                    RM.load(messages[i].id);
+                    this.goToMessageInRoom(messages[i].id);
                     return true;
                 }
             }
@@ -1724,14 +1738,21 @@ var Shortcut = function () {
             return false;
         }
     }, {
+        key: "goToMessageInRoom",
+        value: function goToMessageInRoom(message_id) {
+            RL.selectRoom(RM.id, message_id, {
+                smoothScroll: true
+            });
+        }
+    }, {
         key: "isMentionMessage",
         value: function isMentionMessage(message) {
-            var regex_reply = new RegExp("[.* aid=" + AC.myid + " .*]");
+            var regex_reply = new RegExp("\\[.* aid=" + AC.myid + " .*\\]");
             if (regex_reply.test(message.msg)) {
                 return true;
             }
 
-            var regex_to = new RegExp("[To:" + AC.myid + "]");
+            var regex_to = new RegExp("\\[To:" + AC.myid + "\\]");
             return regex_to.test(message.msg);
         }
     }, {
@@ -1765,7 +1786,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = undefined;
+            var previous = void 0;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -1992,7 +2013,7 @@ var view_enhancer = require("./ViewEnhancer.js");
 var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var chatwork = require("../helpers/ChatworkFacade.js");
-var cw_timer = undefined;
+var cw_timer = void 0;
 
 $(function () {
     var rebuild = false;
