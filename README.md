@@ -18,14 +18,7 @@ About Firefox Version
 Firefox version, I decided to port the extension to Firefox.<br>
 It was a hard work! But fortunately, Firefox is currently supporting something called [WebExtensions](https://developer.mozilla.org/en-US/Add-ons/WebExtensions),
 which make life easier :D<br>
-After long time waiting for the **Firefox WebExtensions** become more stable, as well as [a try on the old Firefox version](https://github.com/wataridori/chatpp/tree/firefox-old)
-finally, the **Firefox Version** of Chat++ is out.
-- According to the announcement in [Mozilla Developer Network page](https://developer.mozilla.org/en-US/Add-ons/WebExtensions) about the **WebExtensions**,
-they are **currently in an experimental alpha state**, and Mozilla is **aiming for a first stable release in Firefox 48**.<br>
-**WebExtensions** are now still working not well with version 46 and 47,
-therefore, **Chat++ for Firefox** requires at least **version 48** to run. <br>
-We'd suggest using [Firefox Nightly](https://nightly.mozilla.org/).<br>
-See more about Firefox release schedule [here](https://wiki.mozilla.org/RapidRelease/Calendar).
+- **Chat++ for Firefox** only supports Firefox 48 or above.
 - All the features in Chrome should work in Firefox as well, except for the syncing features. <br>
 It means that your custom data will not be synced,
 and if you use **Chat++ for Firefox** in two different computers, you must do config by your self.

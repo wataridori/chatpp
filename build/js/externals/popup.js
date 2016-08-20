@@ -353,32 +353,28 @@ module.exports = common;
 },{"./Const.js":4}],4:[function(require,module,exports){
 "use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Const = function Const() {
-    _classCallCheck(this, Const);
+var Const = {
+    LOCAL_STORAGE_DATA_KEY: "YACEP_EMO_DATA",
+    LOCAL_STORAGE_INFO_KEY: "YACEP_EMO_INFO",
+    LOCAL_STORAGE_GROUP_MENTION: "CHATPP_GROUP_MENTION",
+    LOCAL_STORAGE_ROOM_SHORTCUT: "CHATPP_ROOM_SHORTCUT",
+    LOCAL_STORAGE_DISABLE_NOTIFY_ROOM: "CHATPP_DISABLE_NOTIFY_ROOM",
+    CHROME_LOCAL_KEY: "CHATPP_CHROME_LOCAL_DATA",
+    CHROME_SYNC_KEY: "CHATPP_CHROME_SYNC_DATA",
+    CHROME_SYNC_GROUP_KEY: "CHATPP_CHROME_SYNC_GROUP",
+    CHROME_SYNC_ROOM_KEY: "CHATPP_CHROME_SYNC_ROOM",
+    CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY: "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM",
+    DEFAULT_DATA_URL: "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1",
+    ADVERTISEMENT_URL: "https://dl.dropboxusercontent.com/s/jsmceot0pqi8lpk/chatppad.json?dl=1",
+    VERSION_CHROME: "VERSION_CHROME",
+    VERSION_FIREFOX: "VERSION_FIREFOX",
+    VERSION_NAME_DEV: "dev",
+    VERSION_NAME_RELEASE: "final",
+    DEFAULT_IMG_HOST: "https://chatpp.thangtd.com/",
+    DELAY_TIME: 6000,
+    FORCE_TURN_OFF_THUMBNAIL: 1,
+    ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30
 };
-
-Const.LOCAL_STORAGE_DATA_KEY = "YACEP_EMO_DATA";
-Const.LOCAL_STORAGE_INFO_KEY = "YACEP_EMO_INFO";
-Const.LOCAL_STORAGE_GROUP_MENTION = "CHATPP_GROUP_MENTION";
-Const.LOCAL_STORAGE_ROOM_SHORTCUT = "CHATPP_ROOM_SHORTCUT";
-Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM = "CHATPP_DISABLE_NOTIFY_ROOM";
-Const.CHROME_LOCAL_KEY = "CHATPP_CHROME_LOCAL_DATA";
-Const.CHROME_SYNC_KEY = "CHATPP_CHROME_SYNC_DATA";
-Const.CHROME_SYNC_GROUP_KEY = "CHATPP_CHROME_SYNC_GROUP";
-Const.CHROME_SYNC_ROOM_KEY = "CHATPP_CHROME_SYNC_ROOM";
-Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY = "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM";
-Const.DEFAULT_DATA_URL = "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1";
-Const.ADVERTISEMENT_URL = "https://dl.dropboxusercontent.com/s/jsmceot0pqi8lpk/chatppad.json?dl=1";
-Const.VERSION_CHROME = "VERSION_CHROME";
-Const.VERSION_FIREFOX = "VERSION_FIREFOX";
-Const.VERSION_NAME_DEV = "dev";
-Const.VERSION_NAME_RELEASE = "final";
-Const.DEFAULT_IMG_HOST = "https://chatpp.thangtd.com/";
-Const.DELAY_TIME = 6000;
-Const.FORCE_TURN_OFF_THUMBNAIL = 1;
-Const.ADVERTISEMENT_LOAD_TIMEOUT = 1000 * 60 * 30;
 
 module.exports = Const;
 
