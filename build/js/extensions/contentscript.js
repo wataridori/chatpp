@@ -53,12 +53,6 @@ function init(inject_script) {
     if (info === undefined) {
         info = {};
     }
-    if (!info.force_update_version || info.force_update_version < Const.FORCE_TURN_OFF_THUMBNAIL) {
-        info.force_update_version = Const.FORCE_TURN_OFF_THUMBNAIL;
-        info.thumbnail_status = false;
-        info.emoticon_status = true;
-    }
-    localStorage.force_update_version = info.force_update_version;
     var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
     features.forEach(function (feature) {
         var feature_name = feature + "_status";
