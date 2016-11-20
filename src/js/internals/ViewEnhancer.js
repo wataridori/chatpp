@@ -1,4 +1,6 @@
 let common = require("../helpers/Common.js");
+let chatwork = require("../helpers/ChatworkFacade.js");
+let Const = require("../helpers/Const.js");
 
 let support_languages = [
     "1c",
@@ -214,10 +216,11 @@ class ViewEnhancer {
     constructor() {
         this.thumbnail_status = common.getStatus("thumbnail");
         this.highlight_status = common.getStatus("highlight");
+        this.to_all_status = true;
     }
 
     isActive() {
-        return this.thumbnail_status || this.highlight_status;
+        return this.to_all_status || this.thumbnail_status || this.highlight_status;
     }
 
     updateChatSendView() {
@@ -247,7 +250,15 @@ class ViewEnhancer {
     updateChatworkView() {
         TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
         TimeLineView.prototype.getMessagePanel = function(a, b) {
+            if (a.msg.indexOf(Const.TO_ALL_MARK) === 0) {
+                let index = Const.TO_ALL_MARK.length - 1;
+                a.msg = `${a.msg.substr(0, index)} [To:${chatwork.myId()}] ${a.msg.substr(index)}`;
+                a.mn = true;
+            }
             let message_panel = this.getMessagePanelOld(a, b);
+            if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
+                return message_panel;
+            }
             let temp = $("<div></div>");
             $(temp).html(message_panel);
             if (common.getStatus("thumbnail")) {

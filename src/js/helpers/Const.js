@@ -18,7 +18,8 @@ let Const = {
     DEFAULT_IMG_HOST: "https://chatpp.thangtd.com/",
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
-    ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30
+    ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
+    TO_ALL_MARK: "TO ALL >>>\n"
 };
 
 module.exports = Const;

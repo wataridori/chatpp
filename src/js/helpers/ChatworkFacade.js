@@ -59,6 +59,18 @@ class ChatworkFacade {
             /* eslint-enable */
         });
     }
+
+    getChatText() {
+        return $("#_chatText").val();
+    }
+
+    clearChatText() {
+        CS.view.setChatText("");
+    }
+
+    checkNotifyAllCondition() {
+        return common.checkDevVersionInternal() || this.getRoomMembers().length > 100;
+    }
 }
 
 let chatwork = new ChatworkFacade();

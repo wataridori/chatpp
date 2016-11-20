@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 5.1.0
+* Add **TO ALL** feature
+* Change the mechanism for scrolling to bottom by using shortcut (`s`)
 
 ## 5.0.8
 * Fix bugs with scroll to mentioned messages by using shortcut (`j` and `k`)

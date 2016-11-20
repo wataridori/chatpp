@@ -41,6 +41,10 @@ class Common {
         return app_name.indexOf(Const.VERSION_NAME_DEV, app_name.length - (Const.VERSION_NAME_DEV).length) !== -1;
     }
 
+    checkDevVersionInternal() {
+        return localStorage["chatpp_version_name"] === Const.VERSION_NAME_DEV;
+    }
+
     getStorage(local) {
         if (!local && this.isChromeVersion()) {
             return chrome.storage.sync;
