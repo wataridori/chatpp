@@ -69,11 +69,12 @@ var ChatworkFacade = function () {
                     sameRooms.push(room);
                 }
             }
+            var result = "";
             sameRooms.forEach(function (room) {
-                /* eslint-disable no-console */
-                console.log(room._name + "   https://www.chatwork.com/#!rid" + room.id);
-                /* eslint-enable */
+                result += "<a href=\"https://www.chatwork.com/#!rid" + room.id + "\"><div class=\"searchResultTitle _messageSearchChatGroup\"><div>" + room.getIcon() + " " + room.getName() + "</div></div></a>";
             });
+            result = "<div class=\"searchResultListBox\"><div class=\"searchResultTitle _messageSearchChatGroup\"><strong>" + sameRooms.length + " room" + (sameRooms.length > 1 ? "s" : "") + " found!</strong></div>" + result + "</div>";
+            CW.view.alert(result, null, true);
         }
     }, {
         key: "getChatText",
@@ -2020,6 +2021,26 @@ var ViewEnhancer = function () {
             return this.to_all_status || this.thumbnail_status || this.highlight_status;
         }
     }, {
+        key: "updateGetContactPanelView",
+        value: function updateGetContactPanelView() {
+            var getContactPanelOld = AC.view.getContactPanel;
+            AC.view.getContactPanel = function (b, d) {
+                var panel = getContactPanelOld(b, d);
+                if (b == chatwork.myId()) {
+                    return panel;
+                }
+                var temp = $("<div></div>");
+                var label = LANGUAGE == "ja" ? "同じグループチャットを探す" : "Search for the same Group Chat";
+                $(temp).html(panel);
+                $(".btnGroup ._profileTipButton", temp).first().append("<div class=\"button searchSameRooms _showDescription\" aria-label=\"" + label + "\" data-uid=\"" + b + "\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></div>");
+                return $(temp).html();
+            };
+            $(document).on("click", ".searchSameRooms", function (e) {
+                var uid = $(e.currentTarget).data("uid");
+                chatwork.searchRoomsByPerson(uid);
+            });
+        }
+    }, {
         key: "updateChatSendView",
         value: function updateChatSendView() {
             var chatTextKeyUpOld = CS.view.chatTextKeyUp;
@@ -2119,7 +2140,6 @@ var room_information = require("./RoomInformation.js");
 var view_enhancer = require("./ViewEnhancer.js");
 var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
-var chatwork = require("../helpers/ChatworkFacade.js");
 var NotifyAll = require("./NotifyAll.js");
 
 var cw_timer = void 0;
@@ -2128,7 +2148,6 @@ $(function () {
     var rebuild = false;
     cw_timer = setInterval(function () {
         if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
-            window.search = chatwork.searchRoomsByPerson;
             window.clearInterval(cw_timer);
             $("#_chatppPreLoad").remove();
             addStyle();
@@ -2151,6 +2170,7 @@ $(function () {
                 view_enhancer.updateChatworkView();
             }
             view_enhancer.updateChatSendView();
+            view_enhancer.updateGetContactPanelView();
 
             if (rebuild) {
                 RL.rooms[RM.id].build();
@@ -2164,4 +2184,4 @@ function addStyle() {
     $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
 }
 
-},{"../helpers/ChatworkFacade.js":1,"./Advertisement.js":4,"./Emoticon.js":5,"./Mention.js":6,"./NotificationDisabler.js":7,"./NotifyAll.js":8,"./RoomInformation.js":9,"./Shortcut.js":10,"./ViewEnhancer.js":11}]},{},[12]);
+},{"./Advertisement.js":4,"./Emoticon.js":5,"./Mention.js":6,"./NotificationDisabler.js":7,"./NotifyAll.js":8,"./RoomInformation.js":9,"./Shortcut.js":10,"./ViewEnhancer.js":11}]},{},[12]);

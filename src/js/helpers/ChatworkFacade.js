@@ -53,11 +53,12 @@ class ChatworkFacade {
                 sameRooms.push(room);
             }
         }
+        let result = "";
         sameRooms.forEach((room) => {
-            /* eslint-disable no-console */
-            console.log(`${room._name}   https://www.chatwork.com/#!rid${room.id}`);
-            /* eslint-enable */
+            result += `<a href="https://www.chatwork.com/#!rid${room.id}"><div class="searchResultTitle _messageSearchChatGroup"><div>${room.getIcon()} ${room.getName()}</div></div></a>`;
         });
+        result = `<div class="searchResultListBox"><div class="searchResultTitle _messageSearchChatGroup"><strong>${sameRooms.length} room${sameRooms.length > 1 ? "s" : ""} found!</strong></div>${result}</div>`;
+        CW.view.alert(result, null, true);
     }
 
     getChatText() {

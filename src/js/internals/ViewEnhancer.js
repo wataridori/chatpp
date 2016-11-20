@@ -223,6 +223,25 @@ class ViewEnhancer {
         return this.to_all_status || this.thumbnail_status || this.highlight_status;
     }
 
+    updateGetContactPanelView() {
+        let getContactPanelOld = AC.view.getContactPanel;
+        AC.view.getContactPanel = function(b, d) {
+            let panel = getContactPanelOld(b, d);
+            if (b == chatwork.myId()) {
+                return panel;
+            }
+            let temp = $("<div></div>");
+            let label = LANGUAGE == "ja" ? "同じグループチャットを探す" : "Search for the same Group Chat";
+            $(temp).html(panel);
+            $(".btnGroup ._profileTipButton", temp).first().append(`<div class="button searchSameRooms _showDescription" aria-label="${label}" data-uid="${b}"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></div>`);
+            return $(temp).html();
+        };
+        $(document).on("click", ".searchSameRooms", (e) => {
+            let uid = $(e.currentTarget).data("uid");
+            chatwork.searchRoomsByPerson(uid);
+        })
+    }
+
     updateChatSendView() {
         let chatTextKeyUpOld = CS.view.chatTextKeyUp;
         CS.view.chatTextKeyUp = function(b) {
