@@ -6,6 +6,8 @@ let view_enhancer = require("./ViewEnhancer.js");
 let advertisement = require("./Advertisement.js");
 let NotificationDisabler = require("./NotificationDisabler.js");
 let chatwork = require("../helpers/ChatworkFacade.js");
+let NotifyAll = require("./NotifyAll.js");
+
 let cw_timer;
 
 $(() => {
@@ -28,6 +30,7 @@ $(() => {
             shortcut.setUp();
             advertisement.setUp();
             NotificationDisabler.setUp();
+            NotifyAll.setUp();
 
             if (view_enhancer.isActive()) {
                 rebuild = true;
