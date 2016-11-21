@@ -85,11 +85,12 @@ class Emoticon {
             if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
                 CW.reg_cmp.splice(i, 1);
             } else {
-                break;
+                if (!emo.special) {
+                    break;
+                }
             }
         }
         this.status = false;
-        common.setStatus("emoticon", false);
         this.updateEmoticonText();
     }
 
@@ -153,9 +154,7 @@ class Emoticon {
             let encoded_text = common.htmlEncode(emo[index].key);
             let title = `${encoded_text} - ${emo[index].data_name}`;
             let src = common.htmlEncode(common.getEmoUrl(emo[index].src));
-            if (emo[index].raw == true) {
-                rep = src;
-            } else if (this.isSpecialEmo(emo[index].key)) {
+            if (this.isSpecialEmo(emo[index].key)) {
                 rep = `<img src="${src}" class="ui_emoticon"/>`;
             } else {
                 rep = `<img src="${src}" title="${title}" alt="${encoded_text}" class="ui_emoticon"/>`;
@@ -168,12 +167,6 @@ class Emoticon {
                 external: true
             });
         }
-        CW.reg_cmp.push({
-            key: /TO ALL &gt;&gt;&gt;/g,
-            rep: "<span class=\"chatTimeLineTo\">TO ALL</span>",
-            reptxt: "TO ALL",
-            external: true
-        });
     }
 }
 

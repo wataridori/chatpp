@@ -5,7 +5,7 @@ let room_information = require("./RoomInformation.js");
 let view_enhancer = require("./ViewEnhancer.js");
 let advertisement = require("./Advertisement.js");
 let NotificationDisabler = require("./NotificationDisabler.js");
-let NotifyAll = require("./NotifyAll.js");
+let notify_all = require("./NotifyAll.js");
 
 let cw_timer;
 
@@ -28,7 +28,7 @@ $(() => {
             shortcut.setUp();
             advertisement.setUp();
             NotificationDisabler.setUp();
-            NotifyAll.setUp();
+            notify_all.setUp();
 
             if (view_enhancer.isActive()) {
                 rebuild = true;

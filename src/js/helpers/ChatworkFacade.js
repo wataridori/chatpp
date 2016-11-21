@@ -34,6 +34,10 @@ class ChatworkFacade {
         return RM.member_dat;
     }
 
+    getRoomMembersCount() {
+        return RM.sorted_member_list.length;
+    }
+
     getRoomMembersArray() {
         let members = this.getRoomMembers();
         return Object.keys(members);
@@ -70,7 +74,7 @@ class ChatworkFacade {
     }
 
     checkNotifyAllCondition() {
-        return common.checkDevVersionInternal() || this.getRoomMembers().length > 100;
+        return common.checkDevVersionInternal() || (this.getRoomMembersCount() > 10 && this.isAdmin());
     }
 }
 

@@ -31,6 +31,7 @@
     "LANGUAGE": true,
     "TimeLineView": true,
     "RoomView": true,
+    "Room": true,
     "bootbox": true,
     "Fuse": true,
     "Measurement": true,

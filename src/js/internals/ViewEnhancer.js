@@ -270,8 +270,6 @@ class ViewEnhancer {
         TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
         TimeLineView.prototype.getMessagePanel = function(a, b) {
             if (a.msg.indexOf(Const.TO_ALL_MARK) === 0) {
-                let index = Const.TO_ALL_MARK.length - 1;
-                a.msg = `${a.msg.substr(0, index)} [To:${chatwork.myId()}] ${a.msg.substr(index)}`;
                 a.mn = true;
             }
             let message_panel = this.getMessagePanelOld(a, b);

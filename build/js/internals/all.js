@@ -47,6 +47,11 @@ var ChatworkFacade = function () {
             return RM.member_dat;
         }
     }, {
+        key: "getRoomMembersCount",
+        value: function getRoomMembersCount() {
+            return RM.sorted_member_list.length;
+        }
+    }, {
         key: "getRoomMembersArray",
         value: function getRoomMembersArray() {
             var members = this.getRoomMembers();
@@ -89,7 +94,7 @@ var ChatworkFacade = function () {
     }, {
         key: "checkNotifyAllCondition",
         value: function checkNotifyAllCondition() {
-            return common.checkDevVersionInternal() || this.getRoomMembers().length > 100;
+            return common.checkDevVersionInternal() || this.getRoomMembersCount() > 10 && this.isAdmin();
         }
     }]);
 
@@ -513,11 +518,12 @@ var Emoticon = function () {
                 if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
                     CW.reg_cmp.splice(i, 1);
                 } else {
-                    break;
+                    if (!emo.special) {
+                        break;
+                    }
                 }
             }
             this.status = false;
-            common.setStatus("emoticon", false);
             this.updateEmoticonText();
         }
     }, {
@@ -583,9 +589,7 @@ var Emoticon = function () {
                 var encoded_text = common.htmlEncode(emo[index].key);
                 var title = encoded_text + " - " + emo[index].data_name;
                 var src = common.htmlEncode(common.getEmoUrl(emo[index].src));
-                if (emo[index].raw == true) {
-                    rep = src;
-                } else if (this.isSpecialEmo(emo[index].key)) {
+                if (this.isSpecialEmo(emo[index].key)) {
                     rep = "<img src=\"" + src + "\" class=\"ui_emoticon\"/>";
                 } else {
                     rep = "<img src=\"" + src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\" class=\"ui_emoticon\"/>";
@@ -598,12 +602,6 @@ var Emoticon = function () {
                     external: true
                 });
             }
-            CW.reg_cmp.push({
-                key: /TO ALL &gt;&gt;&gt;/g,
-                rep: "<span class=\"chatTimeLineTo\">TO ALL</span>",
-                reptxt: "TO ALL",
-                external: true
-            });
         }
     }]);
 
@@ -1426,14 +1424,14 @@ var NotifyAll = function () {
         _classCallCheck(this, NotifyAll);
     }
 
-    _createClass(NotifyAll, null, [{
+    _createClass(NotifyAll, [{
         key: "setUp",
         value: function setUp() {
             var text = LANGUAGE == "ja" ? "全員に通知" : "TO ALL",
-                msg = "",
                 token = "~" + common.randomString(8) + "~";
-            $("#_sendEnterActionArea").after("<div id=\"_notifyButton\" role=\"button\" tabindex=\"2\" class=\"button btnPrimary _cwBN\" aria-disabled=\"false\" style=\"margin-left: 5px;\">" + text + "</div>");
-            $("#_notifyButton").click(function () {
+            $("#_sendEnterActionArea").after("<div id=\"_notifyAllButton\" role=\"button\" tabindex=\"2\" class=\"button btnPrimary _cwBN\" aria-disabled=\"false\" style=\"margin-left: 5px;\">" + text + "</div>");
+            NotifyAll.checkNotifyAllButton();
+            $("#_notifyAllButton").click(function () {
                 if (chatwork.getChatText().trim() === "") {
                     return;
                 }
@@ -1442,6 +1440,7 @@ var NotifyAll = function () {
                     return;
                 }
                 var tl = RM.timeline,
+                    msg = "",
                     last_id = tl.getLastChatId();
                 for (var id in RM.member_dat) {
                     msg += "[To:" + id + "]";
@@ -1460,13 +1459,44 @@ var NotifyAll = function () {
                     }
                 }, 100);
             });
+            this.registerRegex();
+            this.setUpButton();
+        }
+    }, {
+        key: "setUpButton",
+        value: function setUpButton() {
+            Room.prototype.buildOld = Room.prototype.build;
+            Room.prototype.build = function (b) {
+                this.buildOld(b);
+                NotifyAll.checkNotifyAllButton();
+            };
+        }
+    }, {
+        key: "registerRegex",
+        value: function registerRegex() {
+            CW.reg_cmp.push({
+                key: /TO ALL &gt;&gt;&gt;/g,
+                rep: "<span class=\"chatTimeLineTo\">TO ALL</span>",
+                reptxt: "TO ALL",
+                special: true
+            });
+        }
+    }], [{
+        key: "checkNotifyAllButton",
+        value: function checkNotifyAllButton() {
+            if (!chatwork.checkNotifyAllCondition()) {
+                $("#_notifyAllButton").hide();
+            } else {
+                $("#_notifyAllButton").show();
+            }
         }
     }]);
 
     return NotifyAll;
 }();
 
-module.exports = NotifyAll;
+var notify_all = new NotifyAll();
+module.exports = notify_all;
 
 },{"../helpers/ChatworkFacade.js":1,"../helpers/Common.js":2,"../helpers/Const.js":3}],9:[function(require,module,exports){
 "use strict";
@@ -2066,8 +2096,6 @@ var ViewEnhancer = function () {
             TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
             TimeLineView.prototype.getMessagePanel = function (a, b) {
                 if (a.msg.indexOf(Const.TO_ALL_MARK) === 0) {
-                    var index = Const.TO_ALL_MARK.length - 1;
-                    a.msg = a.msg.substr(0, index) + " [To:" + chatwork.myId() + "] " + a.msg.substr(index);
                     a.mn = true;
                 }
                 var message_panel = this.getMessagePanelOld(a, b);
@@ -2140,7 +2168,7 @@ var room_information = require("./RoomInformation.js");
 var view_enhancer = require("./ViewEnhancer.js");
 var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
-var NotifyAll = require("./NotifyAll.js");
+var notify_all = require("./NotifyAll.js");
 
 var cw_timer = void 0;
 
@@ -2163,7 +2191,7 @@ $(function () {
             shortcut.setUp();
             advertisement.setUp();
             NotificationDisabler.setUp();
-            NotifyAll.setUp();
+            notify_all.setUp();
 
             if (view_enhancer.isActive()) {
                 rebuild = true;
