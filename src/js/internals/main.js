@@ -5,14 +5,14 @@ let room_information = require("./RoomInformation.js");
 let view_enhancer = require("./ViewEnhancer.js");
 let advertisement = require("./Advertisement.js");
 let NotificationDisabler = require("./NotificationDisabler.js");
-let chatwork = require("../helpers/ChatworkFacade.js");
+let notify_all = require("./NotifyAll.js");
+
 let cw_timer;
 
 $(() => {
     let rebuild = false;
     cw_timer = setInterval(() => {
         if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
-            window.search = chatwork.searchRoomsByPerson;
             window.clearInterval(cw_timer);
             $("#_chatppPreLoad").remove();
             addStyle();
@@ -28,12 +28,14 @@ $(() => {
             shortcut.setUp();
             advertisement.setUp();
             NotificationDisabler.setUp();
+            notify_all.setUp();
 
             if (view_enhancer.isActive()) {
                 rebuild = true;
                 view_enhancer.updateChatworkView();
             }
             view_enhancer.updateChatSendView();
+            view_enhancer.updateGetContactPanelView();
 
             if (rebuild) {
                 RL.rooms[RM.id].build();

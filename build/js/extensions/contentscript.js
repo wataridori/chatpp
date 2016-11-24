@@ -306,6 +306,11 @@ var Common = function () {
             return app_name.indexOf(Const.VERSION_NAME_DEV, app_name.length - Const.VERSION_NAME_DEV.length) !== -1;
         }
     }, {
+        key: "checkDevVersionInternal",
+        value: function checkDevVersionInternal() {
+            return localStorage["chatpp_version_name"] === Const.VERSION_NAME_DEV;
+        }
+    }, {
         key: "getStorage",
         value: function getStorage(local) {
             if (!local && this.isChromeVersion()) {
@@ -466,6 +471,16 @@ var Common = function () {
 
             return items[Math.floor(Math.random() * items.length)];
         }
+    }, {
+        key: "randomString",
+        value: function randomString(n) {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for (var i = 0; i < n; i++) {
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }return text;
+        }
     }]);
 
     return Common;
@@ -497,7 +512,8 @@ var Const = {
     DEFAULT_IMG_HOST: "https://chatpp.thangtd.com/",
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
-    ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30
+    ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
+    TO_ALL_MARK: "TO ALL >>>"
 };
 
 module.exports = Const;

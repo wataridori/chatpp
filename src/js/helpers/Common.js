@@ -41,6 +41,10 @@ class Common {
         return app_name.indexOf(Const.VERSION_NAME_DEV, app_name.length - (Const.VERSION_NAME_DEV).length) !== -1;
     }
 
+    checkDevVersionInternal() {
+        return localStorage["chatpp_version_name"] === Const.VERSION_NAME_DEV;
+    }
+
     getStorage(local) {
         if (!local && this.isChromeVersion()) {
             return chrome.storage.sync;
@@ -178,6 +182,16 @@ class Common {
         }
 
         return items[Math.floor(Math.random() * items.length)];
+    }
+
+    randomString(n) {
+        let text = "";
+        let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for( let i = 0; i < n; i++ )
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
     }
 }
 

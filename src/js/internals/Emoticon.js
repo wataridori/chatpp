@@ -85,11 +85,12 @@ class Emoticon {
             if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
                 CW.reg_cmp.splice(i, 1);
             } else {
-                break;
+                if (!emo.special) {
+                    break;
+                }
             }
         }
         this.status = false;
-        common.setStatus("emoticon", false);
         this.updateEmoticonText();
     }
 
@@ -152,11 +153,11 @@ class Emoticon {
             let rep = "";
             let encoded_text = common.htmlEncode(emo[index].key);
             let title = `${encoded_text} - ${emo[index].data_name}`;
-            let img_src = common.htmlEncode(common.getEmoUrl(emo[index].src));
+            let src = common.htmlEncode(common.getEmoUrl(emo[index].src));
             if (this.isSpecialEmo(emo[index].key)) {
-                rep = `<img src="${img_src}" class="ui_emoticon"/>`;
+                rep = `<img src="${src}" class="ui_emoticon"/>`;
             } else {
-                rep = `<img src="${img_src}" title="${title}" alt="${encoded_text}" class="ui_emoticon"/>`;
+                rep = `<img src="${src}" title="${title}" alt="${encoded_text}" class="ui_emoticon"/>`;
             }
             let regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
             CW.reg_cmp.push({

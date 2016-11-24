@@ -238,8 +238,7 @@ class Shortcut {
     }
 
     goToBottom() {
-        let timeline = $("#_timeLine");
-        timeline.animate({scrollTop: timeline[0].scrollHeight}, 200);
+        this.goToMessageInRoom(RM.timeline.getLastChatId());
     }
 
     goToPreviousMention() {
