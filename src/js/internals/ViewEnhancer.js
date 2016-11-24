@@ -246,7 +246,7 @@ class ViewEnhancer {
             let delete_button = "";
             if (result) {
                 delete_button = '<div class="searchResultTitle _messageSearchChatGroup">' +
-                    "<strong>Remove users from the Rooms above!<br>Please be careful!</strong><br>" +
+                    "<strong>Remove this user from the Rooms above!<br>Please be careful!</strong><br>" +
                     `<div id="_removeSameRoomsBtn" role="button" tabindex="2" class="button btnDanger _cwBN" data-uid="${uid}">Delete</div>` +
                     "</div>";
             }

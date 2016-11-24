@@ -66,12 +66,13 @@ class ChatworkFacade {
             if (!window.confirm(`Are you sure to delete this user from ${room.getName()} ?`)) {
                 return false;
             }
-            // delete room.member_dat[user_id];
-            // CW.post("gateway.php", {
-            //    cmd: "update_room",
-            //    room_id,
-            //    role: room.member_dat
-            // });
+            delete room.member_dat[user_id];
+            CW.post("gateway.php", {
+                cmd: "update_room",
+                room_id,
+                role: room.member_dat
+            });
+            return true;
         }
 
         return false;
@@ -86,7 +87,7 @@ class ChatworkFacade {
     }
 
     checkNotifyAllCondition() {
-        return common.checkDevVersionInternal() || (this.getRoomMembersCount() > 10 && this.isAdmin());
+        return this.getRoomMembersCount() > 100 && this.isAdmin();
     }
 }
 

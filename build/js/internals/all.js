@@ -84,12 +84,13 @@ var ChatworkFacade = function () {
                 if (!window.confirm("Are you sure to delete this user from " + room.getName() + " ?")) {
                     return false;
                 }
-                // delete room.member_dat[user_id];
-                // CW.post("gateway.php", {
-                //    cmd: "update_room",
-                //    room_id,
-                //    role: room.member_dat
-                // });
+                delete room.member_dat[user_id];
+                CW.post("gateway.php", {
+                    cmd: "update_room",
+                    room_id: room_id,
+                    role: room.member_dat
+                });
+                return true;
             }
 
             return false;
@@ -107,7 +108,7 @@ var ChatworkFacade = function () {
     }, {
         key: "checkNotifyAllCondition",
         value: function checkNotifyAllCondition() {
-            return common.checkDevVersionInternal() || this.getRoomMembersCount() > 10 && this.isAdmin();
+            return this.getRoomMembersCount() > 100 && this.isAdmin();
         }
     }]);
 
@@ -1237,16 +1238,16 @@ var Mention = function () {
                     }
                     members = this.buildGroupMemberListData(this.selected_group_name);
                     if (members.length) {
-                        var txt = "<ul><li class='suggested-name' role='listitem'>";
-                        for (var i = 0; i < members.length; i++) {
-                            if (i == 6) {
-                                txt += "<span>+" + (members.length - 6) + "</span>";
+                        var _txt = "<ul><li class='suggested-name' role='listitem'>";
+                        for (var _i = 0; _i < members.length; _i++) {
+                            if (_i == 6) {
+                                _txt += "<span>+" + (members.length - 6) + "</span>";
                                 break;
                             }
-                            txt += members[i].avatar;
+                            _txt += members[_i].avatar;
                         }
-                        txt += "</li></ul>";
-                        return txt;
+                        _txt += "</li></ul>";
+                        return _txt;
                     } else {
                         var message = null;
                         if (this.selected_group_name === "admin") {
@@ -1442,14 +1443,15 @@ var NotifyAll = function () {
         value: function setUp() {
             var text = LANGUAGE == "ja" ? "全員に通知" : "TO ALL",
                 token = "~" + common.randomString(8) + "~";
-            $("#_sendEnterActionArea").after("<div id=\"_notifyAllButton\" role=\"button\" tabindex=\"2\" class=\"button btnPrimary _cwBN\" aria-disabled=\"false\" style=\"margin-left: 5px;\">" + text + "</div>");
+            var tooltip = LANGUAGE == "ja" ? "この機能についてはChat++のFeatureページにてご確認ください" : "Please refer Chat++'s Feature page for more details about this feature";
+            $("#_sendEnterActionArea").after("<div id=\"_notifyAllButton\" role=\"button\" tabindex=\"2\" class=\"button btnDanger _cwBN _showDescription\" aria-label=\"" + tooltip + "\" style=\"margin-left: 5px;\">" + text + "</div>");
             NotifyAll.checkNotifyAllButton();
             $("#_notifyAllButton").click(function () {
                 if (chatwork.getChatText().trim() === "") {
                     return;
                 }
                 if (!chatwork.checkNotifyAllCondition()) {
-                    CW.alert("You are not allow to use this feature in this room");
+                    CW.alert("You are not allowed to use this feature in this room");
                     return;
                 }
                 var tl = RM.timeline,
@@ -1926,7 +1928,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = undefined;
+            var previous = void 0;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -2087,7 +2089,7 @@ var ViewEnhancer = function () {
                 });
                 var delete_button = "";
                 if (result) {
-                    delete_button = '<div class="searchResultTitle _messageSearchChatGroup">' + "<strong>Remove users from the Rooms above!<br>Please be careful!</strong><br>" + ("<div id=\"_removeSameRoomsBtn\" role=\"button\" tabindex=\"2\" class=\"button btnDanger _cwBN\" data-uid=\"" + uid + "\">Delete</div>") + "</div>";
+                    delete_button = '<div class="searchResultTitle _messageSearchChatGroup">' + "<strong>Remove this user from the Rooms above!<br>Please be careful!</strong><br>" + ("<div id=\"_removeSameRoomsBtn\" role=\"button\" tabindex=\"2\" class=\"button btnDanger _cwBN\" data-uid=\"" + uid + "\">Delete</div>") + "</div>";
                 }
                 result = '<div class="searchResultListBox">' + ("<div class=\"searchResultTitle _messageSearchChatGroup\"><strong><span id=\"_sameRoomsNumber\">" + same_rooms.length + "</span> room(s) found!</strong></div>") + ("" + result + delete_button) + "</div>";
                 CW.view.alert(result, null, true);
@@ -2206,7 +2208,7 @@ var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var notify_all = require("./NotifyAll.js");
 
-var cw_timer = undefined;
+var cw_timer = void 0;
 
 $(function () {
     var rebuild = false;

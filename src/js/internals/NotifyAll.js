@@ -6,14 +6,15 @@ class NotifyAll {
     setUp() {
         let text = LANGUAGE == "ja" ? "全員に通知" : "TO ALL",
             token = `~${common.randomString(8)}~`;
-        $("#_sendEnterActionArea").after(`<div id=\"_notifyAllButton\" role=\"button\" tabindex=\"2\" class=\"button btnPrimary _cwBN\" aria-disabled=\"false\" style=\"margin-left: 5px;\">${text}</div>`);
+        let tooltip = LANGUAGE == "ja" ? "この機能についてはChat++のFeatureページにてご確認ください" : "Please refer Chat++'s Feature page for more details about this feature";
+        $("#_sendEnterActionArea").after(`<div id="_notifyAllButton" role="button" tabindex="2" class="button btnDanger _cwBN _showDescription" aria-label="${tooltip}" style="margin-left: 5px;">${text}</div>`);
         NotifyAll.checkNotifyAllButton();
         $("#_notifyAllButton").click(() => {
             if (chatwork.getChatText().trim() === "") {
                 return;
             }
             if (!chatwork.checkNotifyAllCondition()) {
-                CW.alert("You are not allow to use this feature in this room");
+                CW.alert("You are not allowed to use this feature in this room");
                 return;
             }
             let tl = RM.timeline,

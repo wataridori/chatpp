@@ -290,7 +290,7 @@ function fillDataTable() {
         var button = $(e.currentTarget);
         if (button.hasClass("btn-data-move-up")) {
             var priority = button.data("priority");
-            var temp = undefined;
+            var temp = void 0;
             var up = priority + 1;
             if (emo_info_array[up]) {
                 temp = emo_info_array[up];
@@ -471,7 +471,7 @@ function getGroupMembers(data) {
     }
 
     var regex = /\[[a-zA-Z]+:([0-9]+)\]/g;
-    var match = undefined;
+    var match = void 0;
     while ((match = regex.exec(data)) != null) {
         valid_members.push(match[1]);
     }
