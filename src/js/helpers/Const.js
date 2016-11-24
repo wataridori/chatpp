@@ -19,7 +19,7 @@ let Const = {
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
     ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL >>>\n"
+    TO_ALL_MARK: "TO ALL >>>"
 };
 
 module.exports = Const;

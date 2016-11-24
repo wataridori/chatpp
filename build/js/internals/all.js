@@ -65,21 +65,34 @@ var ChatworkFacade = function () {
         }
     }, {
         key: "searchRoomsByPerson",
-        value: function searchRoomsByPerson(account_id) {
+        value: function searchRoomsByPerson(user_id) {
             var rooms = RL.rooms;
-            var sameRooms = [];
+            var same_rooms = [];
             for (var room_id in rooms) {
                 var room = rooms[room_id];
-                if (room._name && room.member_dat && room.member_dat.hasOwnProperty(account_id)) {
-                    sameRooms.push(room);
+                if (room._name && room.member_dat && room.member_dat.hasOwnProperty(user_id)) {
+                    same_rooms.push(room);
                 }
             }
-            var result = "";
-            sameRooms.forEach(function (room) {
-                result += "<a href=\"https://www.chatwork.com/#!rid" + room.id + "\"><div class=\"searchResultTitle _messageSearchChatGroup\"><div>" + room.getIcon() + " " + room.getName() + "</div></div></a>";
-            });
-            result = "<div class=\"searchResultListBox\"><div class=\"searchResultTitle _messageSearchChatGroup\"><strong>" + sameRooms.length + " room" + (sameRooms.length > 1 ? "s" : "") + " found!</strong></div>" + result + "</div>";
-            CW.view.alert(result, null, true);
+            return same_rooms;
+        }
+    }, {
+        key: "removeMemberFromRoom",
+        value: function removeMemberFromRoom(user_id, room_id) {
+            var room = RL.rooms[room_id];
+            if (room.type === "group" && room.member_dat.hasOwnProperty(user_id) && room.member_dat[this.myId()] === "admin") {
+                if (!window.confirm("Are you sure to delete this user from " + room.getName() + " ?")) {
+                    return false;
+                }
+                // delete room.member_dat[user_id];
+                // CW.post("gateway.php", {
+                //    cmd: "update_room",
+                //    room_id,
+                //    role: room.member_dat
+                // });
+            }
+
+            return false;
         }
     }, {
         key: "getChatText",
@@ -367,7 +380,7 @@ var Const = {
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
     ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL >>>\n"
+    TO_ALL_MARK: "TO ALL >>>"
 };
 
 module.exports = Const;
@@ -1224,16 +1237,16 @@ var Mention = function () {
                     }
                     members = this.buildGroupMemberListData(this.selected_group_name);
                     if (members.length) {
-                        var _txt = "<ul><li class='suggested-name' role='listitem'>";
-                        for (var _i = 0; _i < members.length; _i++) {
-                            if (_i == 6) {
-                                _txt += "<span>+" + (members.length - 6) + "</span>";
+                        var txt = "<ul><li class='suggested-name' role='listitem'>";
+                        for (var i = 0; i < members.length; i++) {
+                            if (i == 6) {
+                                txt += "<span>+" + (members.length - 6) + "</span>";
                                 break;
                             }
-                            _txt += members[_i].avatar;
+                            txt += members[i].avatar;
                         }
-                        _txt += "</li></ul>";
-                        return _txt;
+                        txt += "</li></ul>";
+                        return txt;
                     } else {
                         var message = null;
                         if (this.selected_group_name === "admin") {
@@ -1451,7 +1464,7 @@ var NotifyAll = function () {
                         for (var i = tl.chat_list.length - 1; i > 0; i--) {
                             if (~tl.chat_list[i].msg.indexOf(token)) {
                                 CS.deleteChat(tl.chat_list[i].id, null, null);
-                                CS.sendMessage(RM.id, "" + Const.TO_ALL_MARK + chatwork.getChatText());
+                                CS.sendMessage(RM.id, Const.TO_ALL_MARK + "\n" + chatwork.getChatText());
                                 chatwork.clearChatText();
                                 break;
                             }
@@ -1913,7 +1926,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = void 0;
+            var previous = undefined;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -2067,7 +2080,30 @@ var ViewEnhancer = function () {
             };
             $(document).on("click", ".searchSameRooms", function (e) {
                 var uid = $(e.currentTarget).data("uid");
-                chatwork.searchRoomsByPerson(uid);
+                var same_rooms = chatwork.searchRoomsByPerson(uid);
+                var result = "";
+                same_rooms.forEach(function (room) {
+                    result += "<a href=\"https://www.chatwork.com/#!rid" + room.id + "\"><div class=\"searchResultTitle _messageSearchChatGroup sameRoomInfo\" data-rid=\"" + room.id + "\"><div>" + room.getIcon() + " " + room.getName() + "</div></div></a>";
+                });
+                var delete_button = "";
+                if (result) {
+                    delete_button = '<div class="searchResultTitle _messageSearchChatGroup">' + "<strong>Remove users from the Rooms above!<br>Please be careful!</strong><br>" + ("<div id=\"_removeSameRoomsBtn\" role=\"button\" tabindex=\"2\" class=\"button btnDanger _cwBN\" data-uid=\"" + uid + "\">Delete</div>") + "</div>";
+                }
+                result = '<div class="searchResultListBox">' + ("<div class=\"searchResultTitle _messageSearchChatGroup\"><strong><span id=\"_sameRoomsNumber\">" + same_rooms.length + "</span> room(s) found!</strong></div>") + ("" + result + delete_button) + "</div>";
+                CW.view.alert(result, null, true);
+            });
+            $(document).on("click", "#_removeSameRoomsBtn", function (e) {
+                CW.confirm("Are you sure to delete this user from all the rooms that you are an Administrator?", function () {
+                    var uid = $(e.currentTarget).data("uid");
+                    var same_rooms = chatwork.searchRoomsByPerson(uid);
+                    same_rooms.forEach(function (room) {
+                        if (chatwork.removeMemberFromRoom(uid, room.id)) {
+                            $(".sameRoomInfo[data-rid=\"" + room.id + "\"]").hide();
+                            var sameRoomNumberElement = $("#_sameRoomsNumber");
+                            sameRoomNumberElement.html(sameRoomNumberElement.html() - 1);
+                        }
+                    });
+                });
             });
         }
     }, {
@@ -2170,7 +2206,7 @@ var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var notify_all = require("./NotifyAll.js");
 
-var cw_timer = void 0;
+var cw_timer = undefined;
 
 $(function () {
     var rebuild = false;

@@ -27,7 +27,7 @@ class NotifyAll {
                     for (let i = tl.chat_list.length - 1; i > 0; i--) {
                         if (~tl.chat_list[i].msg.indexOf(token)) {
                             CS.deleteChat(tl.chat_list[i].id, null, null);
-                            CS.sendMessage(RM.id, `${Const.TO_ALL_MARK}${chatwork.getChatText()}`);
+                            CS.sendMessage(RM.id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`);
                             chatwork.clearChatText();
                             break;
                         }

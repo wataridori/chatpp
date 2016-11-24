@@ -48,21 +48,33 @@ class ChatworkFacade {
         return common.random(members);
     }
 
-    searchRoomsByPerson(account_id) {
+    searchRoomsByPerson(user_id) {
         let rooms = RL.rooms;
-        let sameRooms = [];
+        let same_rooms = [];
         for (let room_id in rooms) {
             let room = rooms[room_id];
-            if (room._name && room.member_dat && room.member_dat.hasOwnProperty(account_id)) {
-                sameRooms.push(room);
+            if (room._name && room.member_dat && room.member_dat.hasOwnProperty(user_id)) {
+                same_rooms.push(room);
             }
         }
-        let result = "";
-        sameRooms.forEach((room) => {
-            result += `<a href="https://www.chatwork.com/#!rid${room.id}"><div class="searchResultTitle _messageSearchChatGroup"><div>${room.getIcon()} ${room.getName()}</div></div></a>`;
-        });
-        result = `<div class="searchResultListBox"><div class="searchResultTitle _messageSearchChatGroup"><strong>${sameRooms.length} room${sameRooms.length > 1 ? "s" : ""} found!</strong></div>${result}</div>`;
-        CW.view.alert(result, null, true);
+        return same_rooms;
+    }
+
+    removeMemberFromRoom(user_id, room_id) {
+        let room = RL.rooms[room_id];
+        if (room.type === "group" && room.member_dat.hasOwnProperty(user_id) && room.member_dat[this.myId()] === "admin") {
+            if (!window.confirm(`Are you sure to delete this user from ${room.getName()} ?`)) {
+                return false;
+            }
+            // delete room.member_dat[user_id];
+            // CW.post("gateway.php", {
+            //    cmd: "update_room",
+            //    room_id,
+            //    role: room.member_dat
+            // });
+        }
+
+        return false;
     }
 
     getChatText() {

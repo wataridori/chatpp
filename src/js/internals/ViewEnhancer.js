@@ -238,8 +238,37 @@ class ViewEnhancer {
         };
         $(document).on("click", ".searchSameRooms", (e) => {
             let uid = $(e.currentTarget).data("uid");
-            chatwork.searchRoomsByPerson(uid);
-        })
+            let same_rooms = chatwork.searchRoomsByPerson(uid);
+            let result = "";
+            same_rooms.forEach((room) => {
+                result += `<a href="https://www.chatwork.com/#!rid${room.id}"><div class="searchResultTitle _messageSearchChatGroup sameRoomInfo" data-rid="${room.id}"><div>${room.getIcon()} ${room.getName()}</div></div></a>`;
+            });
+            let delete_button = "";
+            if (result) {
+                delete_button = '<div class="searchResultTitle _messageSearchChatGroup">' +
+                    "<strong>Remove users from the Rooms above!<br>Please be careful!</strong><br>" +
+                    `<div id="_removeSameRoomsBtn" role="button" tabindex="2" class="button btnDanger _cwBN" data-uid="${uid}">Delete</div>` +
+                    "</div>";
+            }
+            result = '<div class="searchResultListBox">' +
+                `<div class="searchResultTitle _messageSearchChatGroup"><strong><span id="_sameRoomsNumber">${same_rooms.length}</span> room(s) found!</strong></div>` +
+                `${result}${delete_button}` +
+                "</div>";
+            CW.view.alert(result, null, true);
+        });
+        $(document).on("click", "#_removeSameRoomsBtn", (e) => {
+            CW.confirm("Are you sure to delete this user from all the rooms that you are an Administrator?", () => {
+                let uid = $(e.currentTarget).data("uid");
+                let same_rooms = chatwork.searchRoomsByPerson(uid);
+                same_rooms.forEach((room) => {
+                    if (chatwork.removeMemberFromRoom(uid, room.id)) {
+                        $(`.sameRoomInfo[data-rid="${room.id}"]`).hide();
+                        let sameRoomNumberElement = $("#_sameRoomsNumber");
+                        sameRoomNumberElement.html(sameRoomNumberElement.html() - 1);
+                    }
+                });
+            });
+        });
     }
 
     updateChatSendView() {

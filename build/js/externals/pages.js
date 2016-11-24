@@ -290,7 +290,7 @@ function fillDataTable() {
         var button = $(e.currentTarget);
         if (button.hasClass("btn-data-move-up")) {
             var priority = button.data("priority");
-            var temp = void 0;
+            var temp = undefined;
             var up = priority + 1;
             if (emo_info_array[up]) {
                 temp = emo_info_array[up];
@@ -471,7 +471,7 @@ function getGroupMembers(data) {
     }
 
     var regex = /\[[a-zA-Z]+:([0-9]+)\]/g;
-    var match = void 0;
+    var match = undefined;
     while ((match = regex.exec(data)) != null) {
         valid_members.push(match[1]);
     }
@@ -898,7 +898,7 @@ var Const = {
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
     ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL >>>\n"
+    TO_ALL_MARK: "TO ALL >>>"
 };
 
 module.exports = Const;

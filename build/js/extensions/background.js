@@ -7,7 +7,7 @@ var chrome_storage_local = new ChromeStorageLocal();
 
 chrome.runtime.onInstalled.addListener(function () {
     chrome_storage_local.get(function (data) {
-        var version = void 0;
+        var version = undefined;
         if (data) {
             version = data["version"];
         }
@@ -320,7 +320,7 @@ var Const = {
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
     ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL >>>\n"
+    TO_ALL_MARK: "TO ALL >>>"
 };
 
 module.exports = Const;
