@@ -5,8 +5,7 @@ let Const = require("../helpers/Const.js");
 class NotifyAll {
     setUp() {
         let text = LANGUAGE == "ja" ? "全員に通知" : "TO ALL",
-            token = `~${common.randomString(8)}~`;
-        let tooltip = LANGUAGE == "ja" ? "この機能についてはChat++のFeatureページにてご確認ください" : "Please refer Chat++'s Feature page for more details about this feature";
+            tooltip = LANGUAGE == "ja" ? "この機能についてはChat++のFeatureページにてご確認ください" : "Please refer Chat++'s Feature page for more details about this feature";
         $("#_sendEnterActionArea").after(`<div id="_notifyAllButton" role="button" tabindex="2" class="button btnDanger _cwBN _showDescription" aria-label="${tooltip}" style="margin-left: 5px;">${text}</div>`);
         NotifyAll.checkNotifyAllButton();
         $("#_notifyAllButton").click(() => {
@@ -17,19 +16,27 @@ class NotifyAll {
                 CW.alert("You are not allowed to use this feature in this room");
                 return;
             }
-            let tl = RM.timeline,
+            let room_id = RM.id,
+                tl = RL.rooms[room_id].timeline,
                 msg = "",
-                last_id = tl.getLastChatId();
-            for (let id in RM.member_dat) msg += `[To:${id}]`;
-            CS.sendMessage(RM.id, msg + token);
+                last_id = tl.getLastChatId(),
+                token = `~${common.randomString(8)}~`;
+            for (let id in RL.rooms[room_id].member_dat) msg += `[To:${id}]`;
+            CS.sendMessage(room_id, msg + token);
             let update_timer = setInterval(() => {
+                tl.build();
                 if (tl.getLastChatId() != last_id) {
-                    window.clearInterval(update_timer);
                     for (let i = tl.chat_list.length - 1; i > 0; i--) {
                         if (~tl.chat_list[i].msg.indexOf(token)) {
-                            CS.deleteChat(tl.chat_list[i].id, null, null);
-                            CS.sendMessage(RM.id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`);
+                            window.clearInterval(update_timer);
+                            CS.sendMessage(room_id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`);
                             chatwork.clearChatText();
+                            $("#_notifyAllButton").addClass("btnDisable").css("pointer-events", "none");
+                            let delete_timeout = setTimeout(() => {
+                                window.clearTimeout(delete_timeout);
+                                CS.deleteChat(tl.chat_list[i].id, null, null);
+                                $("#_notifyAllButton").removeClass("btnDisable").css("pointer-events", "");
+                            }, 2000);
                             break;
                         }
                     }
@@ -68,3 +75,4 @@ class NotifyAll {
 
 let notify_all = new NotifyAll();
 module.exports = notify_all;
+
