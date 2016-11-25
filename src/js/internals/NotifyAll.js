@@ -28,15 +28,16 @@ class NotifyAll {
                 if (tl.getLastChatId() != last_id) {
                     for (let i = tl.chat_list.length - 1; i > 0; i--) {
                         if (~tl.chat_list[i].msg.indexOf(token)) {
+                            let chat_id = tl.chat_list[i].id;
                             window.clearInterval(update_timer);
                             CS.sendMessage(room_id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`);
                             chatwork.clearChatText();
                             $("#_notifyAllButton").addClass("btnDisable").css("pointer-events", "none");
                             let delete_timeout = setTimeout(() => {
                                 window.clearTimeout(delete_timeout);
-                                CS.deleteChat(tl.chat_list[i].id, null, null);
+                                CS.deleteChat(chat_id, null, null);
                                 $("#_notifyAllButton").removeClass("btnDisable").css("pointer-events", "");
-                            }, 2000);
+                            }, 1000);
                             break;
                         }
                     }

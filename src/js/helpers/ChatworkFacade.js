@@ -9,6 +9,10 @@ class ChatworkFacade {
         return AC.myid;
     }
 
+    getUserName(user_id) {
+        return AC.getDefaultNickName(user_id);
+    }
+
     currentRoom() {
         return RM.id;
     }
