@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 5.1.2
+* Improve *TO ALL* feature mechanism
+
 ## 5.1.1
 * Fix bugs with **TO ALL** feature
 * Improve the feature for removing user from same rooms

@@ -91,7 +91,7 @@ class ChatworkFacade {
     }
 
     checkNotifyAllCondition() {
-        return this.getRoomMembersCount() > 100 && this.isAdmin();
+        return common.checkDevVersionInternal() || (this.getRoomMembersCount() > 100 && this.isAdmin());
     }
 }
 
