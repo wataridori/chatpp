@@ -1,4 +1,3 @@
-let common = require("../helpers/Common.js");
 let chatwork = require("../helpers/ChatworkFacade.js");
 let Const = require("../helpers/Const.js");
 
@@ -7,8 +6,27 @@ class NotifyAll {
         let text = LANGUAGE == "ja" ? "全員に通知" : "TO ALL",
             tooltip = LANGUAGE == "ja" ? "この機能についてはChat++のFeatureページにてご確認ください" : "Please refer Chat++'s Feature page for more details about this feature";
         $("#_sendEnterActionArea").after(`<div id="_notifyAllButton" role="button" tabindex="2" class="button btnDanger _cwBN _showDescription" aria-label="${tooltip}" style="margin-left: 5px;">${text}</div>`);
+        let btn = $("#_notifyAllButton");
         NotifyAll.checkNotifyAllButton();
-        $("#_notifyAllButton").click(() => {
+        RL.updateRoomDataOld = RL.updateRoomData;
+        RL.updateRoomData = (a) => {
+            RL.updateRoomDataOld(a);
+            let room_id = btn.attr("data-room_id"), last_id = btn.attr("data-last_id"), msg = btn.attr("data-msg");
+            if (room_id && last_id) {
+                let tl = RL.rooms[room_id].timeline;
+                for (let i = tl.chat_list.length - 1; tl.chat_list[i].id >= last_id; i--) {
+                    if (tl.chat_list[i].aid == AC.myid && tl.chat_list[i].msg == msg) {
+                        CS.sendMessage(room_id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`);
+                        chatwork.clearChatText();
+                        CS.deleteChat(tl.chat_list[i].id, null, null);
+                        btn.attr("data-room_id", "").attr("data-last_id", "").attr("data-msg", "");
+                        btn.removeClass("btnDisable").addClass("btnDanger").css("pointer-events", "");
+                        break;
+                    }
+                }
+            }
+        }
+        btn.click(() => {
             if (chatwork.getChatText().trim() === "") {
                 return;
             }
@@ -16,34 +34,15 @@ class NotifyAll {
                 CW.alert("You are not allowed to use this feature in this room");
                 return;
             }
-            let room_id = RM.id,
-                tl = RL.rooms[room_id].timeline,
-                msg = "",
-                last_id = tl.getLastChatId(),
-                token = `~${common.randomString(8)}~`;
-            for (let id in RL.rooms[room_id].member_dat) msg += `[To:${id}]`;
-            CS.sendMessage(room_id, msg + token);
-            let update_timer = setInterval(() => {
-                tl.build();
-                if (tl.getLastChatId() != last_id) {
-                    for (let i = tl.chat_list.length - 1; i > 0; i--) {
-                        if (~tl.chat_list[i].msg.indexOf(token)) {
-                            let chat_id = tl.chat_list[i].id;
-                            window.clearInterval(update_timer);
-                            CS.sendMessage(room_id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`);
-                            chatwork.clearChatText();
-                            $("#_notifyAllButton").addClass("btnDisable").css("pointer-events", "none");
-                            let delete_timeout = setTimeout(() => {
-                                window.clearTimeout(delete_timeout);
-                                CS.deleteChat(chat_id, null, null);
-                                $("#_notifyAllButton").removeClass("btnDisable").css("pointer-events", "");
-                            }, 1000);
-                            break;
-                        }
-                    }
-                }
-            }, 100);
+            let msg = "", room_id = RM.id;
+            for (let id in RL.rooms[room_id].member_dat) {
+                msg += `[To:${id}]`;
+            }
+            btn.attr("data-room_id", room_id).attr("data-last_id", RM.timeline.getLastChatId()).attr("data-msg", msg);
+            CS.sendMessage(room_id, msg);
+            btn.addClass("btnDisable").css("pointer-events", "none");
         });
+
         this.registerRegex();
         this.setUpButton();
     }
@@ -76,4 +75,3 @@ class NotifyAll {
 
 let notify_all = new NotifyAll();
 module.exports = notify_all;
-
