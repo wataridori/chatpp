@@ -113,7 +113,7 @@ var ChatworkFacade = function () {
     }, {
         key: "checkNotifyAllCondition",
         value: function checkNotifyAllCondition() {
-            return this.getRoomMembersCount() > 100 && this.isAdmin();
+            return common.checkDevVersionInternal() || this.getRoomMembersCount() > 100 && this.isAdmin();
         }
     }]);
 
@@ -1434,7 +1434,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var common = require("../helpers/Common.js");
 var chatwork = require("../helpers/ChatworkFacade.js");
 var Const = require("../helpers/Const.js");
 
@@ -1449,8 +1448,28 @@ var NotifyAll = function () {
             var text = LANGUAGE == "ja" ? "全員に通知" : "TO ALL",
                 tooltip = LANGUAGE == "ja" ? "この機能についてはChat++のFeatureページにてご確認ください" : "Please refer Chat++'s Feature page for more details about this feature";
             $("#_sendEnterActionArea").after("<div id=\"_notifyAllButton\" role=\"button\" tabindex=\"2\" class=\"button btnDanger _cwBN _showDescription\" aria-label=\"" + tooltip + "\" style=\"margin-left: 5px;\">" + text + "</div>");
+            var btn = $("#_notifyAllButton");
             NotifyAll.checkNotifyAllButton();
-            $("#_notifyAllButton").click(function () {
+            RL.updateRoomDataOld = RL.updateRoomData;
+            RL.updateRoomData = function (a) {
+                RL.updateRoomDataOld(a);
+                if (!window.CHATPP_NOTIFY_ALL) {
+                    return;
+                }
+                var room_id = window.CHATPP_NOTIFY_ALL.room_id;
+                if (a[room_id]) {
+                    var tl = RL.rooms[room_id].timeline;
+                    for (var i = tl.chat_list.length - 1; tl.chat_list[i].id > window.CHATPP_NOTIFY_ALL.last_id; i--) {
+                        if (tl.chat_list[i].aid == chatwork.myId() && tl.chat_list[i].msg == window.CHATPP_NOTIFY_ALL.msg) {
+                            CS.deleteChat(tl.chat_list[i].id, null, null);
+                            window.CHATPP_NOTIFY_ALL = null;
+                            btn.removeClass("btnDisable").addClass("btnDanger").css("pointer-events", "");
+                            break;
+                        }
+                    }
+                }
+            };
+            btn.click(function () {
                 if (chatwork.getChatText().trim() === "") {
                     return;
                 }
@@ -1458,39 +1477,25 @@ var NotifyAll = function () {
                     CW.alert("You are not allowed to use this feature in this room");
                     return;
                 }
-                var room_id = RM.id,
-                    tl = RL.rooms[room_id].timeline,
-                    msg = "",
-                    last_id = tl.getLastChatId(),
-                    token = "~" + common.randomString(8) + "~";
+                var msg = "",
+                    room_id = RM.id;
                 for (var id in RL.rooms[room_id].member_dat) {
                     msg += "[To:" + id + "]";
-                }CS.sendMessage(room_id, msg + token);
-                var update_timer = setInterval(function () {
-                    tl.build();
-                    if (tl.getLastChatId() != last_id) {
-                        for (var i = tl.chat_list.length - 1; i > 0; i--) {
-                            if (~tl.chat_list[i].msg.indexOf(token)) {
-                                var _ret = function () {
-                                    var chat_id = tl.chat_list[i].id;
-                                    window.clearInterval(update_timer);
-                                    CS.sendMessage(room_id, Const.TO_ALL_MARK + "\n" + chatwork.getChatText());
-                                    chatwork.clearChatText();
-                                    $("#_notifyAllButton").addClass("btnDisable").css("pointer-events", "none");
-                                    var delete_timeout = setTimeout(function () {
-                                        window.clearTimeout(delete_timeout);
-                                        CS.deleteChat(chat_id, null, null);
-                                        $("#_notifyAllButton").removeClass("btnDisable").css("pointer-events", "");
-                                    }, 1000);
-                                    return "break";
-                                }();
+                }
+                CS.sendMessage(room_id, msg);
+                window.CHATPP_NOTIFY_ALL = {
+                    room_id: room_id,
+                    msg: msg,
+                    last_id: RM.timeline.getLastChatId()
+                };
 
-                                if (_ret === "break") break;
-                            }
-                        }
-                    }
-                }, 100);
+                setTimeout(function () {
+                    CS.sendMessage(room_id, Const.TO_ALL_MARK + "\n" + chatwork.getChatText());
+                    chatwork.clearChatText();
+                }, 1000);
+                btn.addClass("btnDisable").css("pointer-events", "none");
             });
+
             this.registerRegex();
             this.setUpButton();
         }
@@ -1530,7 +1535,7 @@ var NotifyAll = function () {
 var notify_all = new NotifyAll();
 module.exports = notify_all;
 
-},{"../helpers/ChatworkFacade.js":1,"../helpers/Common.js":2,"../helpers/Const.js":3}],9:[function(require,module,exports){
+},{"../helpers/ChatworkFacade.js":1,"../helpers/Const.js":3}],9:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();

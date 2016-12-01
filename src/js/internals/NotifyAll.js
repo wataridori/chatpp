@@ -11,21 +11,22 @@ class NotifyAll {
         RL.updateRoomDataOld = RL.updateRoomData;
         RL.updateRoomData = (a) => {
             RL.updateRoomDataOld(a);
-            let room_id = btn.attr("data-room_id"), last_id = btn.attr("data-last_id"), msg = btn.attr("data-msg");
-            if (room_id && last_id) {
+            if (!window.CHATPP_NOTIFY_ALL) {
+                return;
+            }
+            let room_id = window.CHATPP_NOTIFY_ALL.room_id;
+            if (a[room_id]) {
                 let tl = RL.rooms[room_id].timeline;
-                for (let i = tl.chat_list.length - 1; tl.chat_list[i].id >= last_id; i--) {
-                    if (tl.chat_list[i].aid == AC.myid && tl.chat_list[i].msg == msg) {
-                        CS.sendMessage(room_id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`);
-                        chatwork.clearChatText();
+                for (let i = tl.chat_list.length - 1; tl.chat_list[i].id > window.CHATPP_NOTIFY_ALL.last_id; i--) {
+                    if (tl.chat_list[i].aid == chatwork.myId() && tl.chat_list[i].msg == window.CHATPP_NOTIFY_ALL.msg) {
                         CS.deleteChat(tl.chat_list[i].id, null, null);
-                        btn.attr("data-room_id", "").attr("data-last_id", "").attr("data-msg", "");
+                        window.CHATPP_NOTIFY_ALL = null;
                         btn.removeClass("btnDisable").addClass("btnDanger").css("pointer-events", "");
                         break;
                     }
                 }
             }
-        }
+        };
         btn.click(() => {
             if (chatwork.getChatText().trim() === "") {
                 return;
@@ -38,8 +39,17 @@ class NotifyAll {
             for (let id in RL.rooms[room_id].member_dat) {
                 msg += `[To:${id}]`;
             }
-            btn.attr("data-room_id", room_id).attr("data-last_id", RM.timeline.getLastChatId()).attr("data-msg", msg);
             CS.sendMessage(room_id, msg);
+            window.CHATPP_NOTIFY_ALL = {
+                room_id,
+                msg,
+                last_id: RM.timeline.getLastChatId()
+            };
+
+            setTimeout(() => {
+                CS.sendMessage(room_id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`);
+                chatwork.clearChatText();
+            }, 1000);
             btn.addClass("btnDisable").css("pointer-events", "none");
         });
 
