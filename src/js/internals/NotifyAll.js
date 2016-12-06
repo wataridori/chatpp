@@ -20,15 +20,11 @@ class NotifyAll {
             for (let id in RL.rooms[room_id].member_dat) {
                 msg += `[To:${id}]`;
             }
-            window.CHATPP_NOTIFY_ALL = {
-                room_id,
-                msg,
-                last_id: RM.timeline.getLastChatId()
-            };
+            window.CHATPP_NOTIFY_ALL_MSG = msg;
             let callback = (data) => {
-                if (window.CHATPP_NOTIFY_ALL && data.chat_list) {
+                if (data.chat_list) {
                     for (let i = 0; i < data.chat_list.length; i++) {
-                        if (data.chat_list[i].msg === window.CHATPP_NOTIFY_ALL.msg && data.chat_list[i].aid === chatwork.myId()) {
+                        if (data.chat_list[i].msg === window.CHATPP_NOTIFY_ALL_MSG && data.chat_list[i].aid === chatwork.myId()) {
                             CS.deleteChat(data.chat_list[i].id, room_id, () => {
                                 setTimeout(() => {
                                     CS.sendMessage(room_id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`, void 0, () => {
@@ -37,7 +33,6 @@ class NotifyAll {
                                     });
                                 }, 1000);
                             }, null);
-                            window.CHATPP_NOTIFY_ALL = null;
                         }
                     }
                 }
