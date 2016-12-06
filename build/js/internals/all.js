@@ -1450,25 +1450,6 @@ var NotifyAll = function () {
             $("#_sendEnterActionArea").after("<div id=\"_notifyAllButton\" role=\"button\" tabindex=\"2\" class=\"button btnDanger _cwBN _showDescription\" aria-label=\"" + tooltip + "\" style=\"margin-left: 5px;\">" + text + "</div>");
             var btn = $("#_notifyAllButton");
             NotifyAll.checkNotifyAllButton();
-            RL.updateRoomDataOld = RL.updateRoomData;
-            RL.updateRoomData = function (a) {
-                RL.updateRoomDataOld(a);
-                if (!window.CHATPP_NOTIFY_ALL) {
-                    return;
-                }
-                var room_id = window.CHATPP_NOTIFY_ALL.room_id;
-                if (a[room_id]) {
-                    var tl = RL.rooms[room_id].timeline;
-                    for (var i = tl.chat_list.length - 1; tl.chat_list[i].id > window.CHATPP_NOTIFY_ALL.last_id; i--) {
-                        if (tl.chat_list[i].aid == chatwork.myId() && tl.chat_list[i].msg == window.CHATPP_NOTIFY_ALL.msg) {
-                            CS.deleteChat(tl.chat_list[i].id, null, null);
-                            window.CHATPP_NOTIFY_ALL = null;
-                            btn.removeClass("btnDisable").addClass("btnDanger").css("pointer-events", "");
-                            break;
-                        }
-                    }
-                }
-            };
             btn.click(function () {
                 if (chatwork.getChatText().trim() === "") {
                     return;
@@ -1482,17 +1463,30 @@ var NotifyAll = function () {
                 for (var id in RL.rooms[room_id].member_dat) {
                     msg += "[To:" + id + "]";
                 }
-                CS.sendMessage(room_id, msg);
                 window.CHATPP_NOTIFY_ALL = {
                     room_id: room_id,
                     msg: msg,
                     last_id: RM.timeline.getLastChatId()
                 };
-
-                setTimeout(function () {
-                    CS.sendMessage(room_id, Const.TO_ALL_MARK + "\n" + chatwork.getChatText());
-                    chatwork.clearChatText();
-                }, 1000);
+                var callback = function callback(data) {
+                    if (window.CHATPP_NOTIFY_ALL && data.chat_list) {
+                        for (var i = 0; i < data.chat_list.length; i++) {
+                            if (data.chat_list[i].msg === window.CHATPP_NOTIFY_ALL.msg && data.chat_list[i].aid === chatwork.myId()) {
+                                console.log(data.chat_list[i].id, i);
+                                CS.deleteChat(data.chat_list[i].id, room_id, function () {
+                                    setTimeout(function () {
+                                        CS.sendMessage(room_id, Const.TO_ALL_MARK + "\n" + chatwork.getChatText(), void 0, function () {
+                                            chatwork.clearChatText();
+                                            btn.removeClass("btnDisable").addClass("btnDanger").css("pointer-events", "");
+                                        });
+                                    }, 1000);
+                                }, null);
+                                window.CHATPP_NOTIFY_ALL = null;
+                            }
+                        }
+                    }
+                };
+                CS.sendMessage(room_id, msg, void 0, callback);
                 btn.addClass("btnDisable").css("pointer-events", "none");
             });
 

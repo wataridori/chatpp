@@ -8,25 +8,6 @@ class NotifyAll {
         $("#_sendEnterActionArea").after(`<div id="_notifyAllButton" role="button" tabindex="2" class="button btnDanger _cwBN _showDescription" aria-label="${tooltip}" style="margin-left: 5px;">${text}</div>`);
         let btn = $("#_notifyAllButton");
         NotifyAll.checkNotifyAllButton();
-        RL.updateRoomDataOld = RL.updateRoomData;
-        RL.updateRoomData = (a) => {
-            RL.updateRoomDataOld(a);
-            if (!window.CHATPP_NOTIFY_ALL) {
-                return;
-            }
-            let room_id = window.CHATPP_NOTIFY_ALL.room_id;
-            if (a[room_id]) {
-                let tl = RL.rooms[room_id].timeline;
-                for (let i = tl.chat_list.length - 1; tl.chat_list[i].id > window.CHATPP_NOTIFY_ALL.last_id; i--) {
-                    if (tl.chat_list[i].aid == chatwork.myId() && tl.chat_list[i].msg == window.CHATPP_NOTIFY_ALL.msg) {
-                        CS.deleteChat(tl.chat_list[i].id, null, null);
-                        window.CHATPP_NOTIFY_ALL = null;
-                        btn.removeClass("btnDisable").addClass("btnDanger").css("pointer-events", "");
-                        break;
-                    }
-                }
-            }
-        };
         btn.click(() => {
             if (chatwork.getChatText().trim() === "") {
                 return;
@@ -39,17 +20,30 @@ class NotifyAll {
             for (let id in RL.rooms[room_id].member_dat) {
                 msg += `[To:${id}]`;
             }
-            CS.sendMessage(room_id, msg);
             window.CHATPP_NOTIFY_ALL = {
                 room_id,
                 msg,
                 last_id: RM.timeline.getLastChatId()
             };
-
-            setTimeout(() => {
-                CS.sendMessage(room_id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`);
-                chatwork.clearChatText();
-            }, 1000);
+            let callback = (data) => {
+                if (window.CHATPP_NOTIFY_ALL && data.chat_list) {
+                    for (let i = 0; i < data.chat_list.length; i++) {
+                        if (data.chat_list[i].msg === window.CHATPP_NOTIFY_ALL.msg && data.chat_list[i].aid === chatwork.myId()) {
+                            console.log(data.chat_list[i].id, i);
+                            CS.deleteChat(data.chat_list[i].id, room_id, () => {
+                                setTimeout(() => {
+                                    CS.sendMessage(room_id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`, void 0, () => {
+                                        chatwork.clearChatText();
+                                        btn.removeClass("btnDisable").addClass("btnDanger").css("pointer-events", "");
+                                    });
+                                }, 1000);
+                            }, null);
+                            window.CHATPP_NOTIFY_ALL = null;
+                        }
+                    }
+                }
+            };
+            CS.sendMessage(room_id, msg, void 0, callback);
             btn.addClass("btnDisable").css("pointer-events", "none");
         });
 
