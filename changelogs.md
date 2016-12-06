@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 5.1.3
+* Improve *TO ALL* feature mechanism
+
 ## 5.1.2
 * Improve *TO ALL* feature mechanism
 

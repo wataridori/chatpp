@@ -29,7 +29,6 @@ class NotifyAll {
                 if (window.CHATPP_NOTIFY_ALL && data.chat_list) {
                     for (let i = 0; i < data.chat_list.length; i++) {
                         if (data.chat_list[i].msg === window.CHATPP_NOTIFY_ALL.msg && data.chat_list[i].aid === chatwork.myId()) {
-                            console.log(data.chat_list[i].id, i);
                             CS.deleteChat(data.chat_list[i].id, room_id, () => {
                                 setTimeout(() => {
                                     CS.sendMessage(room_id, `${Const.TO_ALL_MARK}\n${chatwork.getChatText()}`, void 0, () => {
