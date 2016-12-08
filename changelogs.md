@@ -1,5 +1,21 @@
 Chat++ Change Logs
 =================
+## 5.1.3
+* Improve *TO ALL* feature mechanism
+
+## 5.1.2
+* Improve *TO ALL* feature mechanism
+
+## 5.1.1
+* Fix bugs with **TO ALL** feature
+* Improve the feature for removing user from same rooms
+
+## 5.1.0
+* Add **TO ALL** feature
+* Add button to search for the same rooms with other users on their profile popup
+(which is appeared when clicks on users avatar)
+* Add feature to quickly remove a user from all the rooms that you are an Administrator
+* Change the mechanism for scrolling to bottom by using shortcut (`s`)
 
 ## 5.0.8
 * Fix bugs with scroll to mentioned messages by using shortcut (`j` and `k`)

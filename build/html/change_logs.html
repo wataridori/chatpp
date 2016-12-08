@@ -9,6 +9,39 @@
 <div class="container">
     <h1>Chat++ Change Logs</h1>
     <hr>
+    <h2>5.1.3</h2>
+    <ul>
+        <li>Improve <strong>TO ALL</strong> feature mechanism</li>
+    </ul>
+    <h2>5.1.2</h2>
+    <ul>
+        <li>Improve <strong>TO ALL</strong> feature mechanism</li>
+    </ul>
+    <h2>5.1.1</h2>
+    <ul>
+        <li>Fix bugs with <strong>TO ALL</strong> feature</li>
+        <li>Improve the feature for removing user from same rooms</li>
+    </ul>
+    <h2>5.1.0</h2>
+    <ul>
+        <li><strong>TO ALL</strong>: By clicking <strong>"TO ALL"</strong> (or <strong>"全員に通知"</strong>) button which is set next to the message sending button,<br>
+            a message that mentions all people in the room will be created, then automatically deleted.<br>
+            It's only used to gain notification from Chatwork. Your real message will be sent later.<br>
+            This feature is expected to be used in the room that has too many people so the normal way to mention all can make browser freeze.<br>
+            You can make TO ALL message without notification by <strong>starting</strong> your message with <code>TO ALL >>></code><br>
+            For example:
+            <pre>
+                <code>
+                    TO ALL >>> This message will have special effect
+                </code>
+            </pre>
+            Currently, this feature is limited to only the <strong>administrators</strong> of the rooms that have more than <strong>100</strong> users.
+        </li>
+        <li>Add button to search for the same rooms with other users on their profile popup
+            (which is appeared when clicks on users avatar)</li>
+        <li>Add feature to quickly remove a user from all the rooms that you are an Administrator</li>
+        <li>Change the mechanism for scrolling to bottom by using shortcut (<code>s</code>)</li>
+    </ul>
     <h2>5.0.8</h2>
     <ul>
         <li>Fix bugs with scroll to mentioned messages by using shortcut (<code>j</code> and <code>k</code>)</li>

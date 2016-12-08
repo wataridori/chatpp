@@ -42,6 +42,17 @@ Mention all people in a registered group @group name
 Display only picon of people in group, without name @._group name
 ```
 
+* **TO ALL**: By clicking "TO ALL" (or "全員に通知") button which is set next to the message sending button, 
+a message that mentions all people in the room will be created, then automatically deleted.<br>
+It's only used to gain notification from Chatwork. Your real message will be sent later.<br>
+This feature is expected to be used in the room that has too many people so the normal way to mention all can make browser freeze.<br>
+You can make TO ALL message without notification by **starting** your message with `TO ALL >>>`<br>
+For example:
+```
+TO ALL >>> This message will have special effect
+```
+Currently, this feature is limited to only the **administrators** of the rooms that have more than **100** users.
+
 ### Shortcuts
 * Many additional shortcuts, such as
     *  Scroll to the end of Chat room
@@ -67,6 +78,10 @@ Display only picon of people in group, without name @._group name
 
 ### Other
 * Easily check Room Information.
+
+* Search for same rooms with another user
+
+* Remove a user from all the rooms that you are a administrator
 
 * Disabled Desktop Notification Feature (base on registered rooms)
 
@@ -113,6 +128,17 @@ Mention tất cả mọi người ở trong một group đã đăng ký @group n
 Hiện picon của tất cả mọi người ở trong một group đã đăng ký mà không thêm vào tên tên @._group name
 ```
 
+* **TO ALL**: Bằng việc sử dụng nút **"TO ALL"** (hay **"全員に通知"**), nút được đặt cạnh nút send message thông thường,<br> 
+bạn sẽ có thể gửi một message mentions tất cả các thành viên trong room, và rồi message đó sẽ tự động được xoá.<br>
+Message đó được sử dụng với mục đích là lấy notification từ Chatwork. Nội dung thật sự của bạn sẽ được gửi ngay sau đấy.<br>
+Tính năng này được hy vọng sẽ là giải pháp cho tình trạng mention tất cả các thành viên trong một room có quá nhiều người dẫn đến việc làm freeze trình duyệt.<br>
+Ngoài ra, bạn cũng có thể tạo message TO ALL có hiệu ứng đặt biệt mà không có notification bằng cách bắt đầu message của bình với `TO ALL >>>`<br>
+Ví dụ:
+```
+TO ALL >>> Đây là một message có hiệu ứng đặc biệt
+```
+Hiện tại, chức năng này chỉ có thể được sử dụng bởi **admin** của một room có hơn **100** thành viên.
+
 ### Shortcuts
 * Thêm vào rất nhiều những phím tắt, ví dụ:
     *  Scroll xuống cuối của Chat room
@@ -127,7 +153,7 @@ Hiện picon của tất cả mọi người ở trong một group đã đăng k
     *  Di chuyển đến room phía dưới room hiện tại
     *  Di chuyển đến room phía trên room hiện tại
     *  Di chuyển đến room có message chưa đọc ở trên cùng 
-    *  Di chuyển đến rooom có mention message chưa đọc ở trên cùng 
+    *  Di chuyển đến room có mention message chưa đọc ở trên cùng 
 
 * Đăng ký một room với một trong các phím số từ 0 đến 9. Khi một room được gắn với một số nào đó thì bạn có thể dùng số đó để di chuyển đến room đã đăng ký.
  
@@ -138,6 +164,10 @@ Hiện picon của tất cả mọi người ở trong một group đã đăng k
 
 ### Other
 * Dễ dàng check thông tim về một room
+
+* Tìm kiếm những room chung với một user khác
+
+* Xoá một user ra khỏi các room mà bạn là Administrator
 
 * Tắt Desktop Notification dựa trên những room đăng ký
 
