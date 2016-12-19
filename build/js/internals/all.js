@@ -1434,9 +1434,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var chatwork = require("../helpers/ChatworkFacade.js");
-var Const = require("../helpers/Const.js");
-
 var NotifyAll = function () {
     function NotifyAll() {
         _classCallCheck(this, NotifyAll);
@@ -1445,56 +1442,7 @@ var NotifyAll = function () {
     _createClass(NotifyAll, [{
         key: "setUp",
         value: function setUp() {
-            var text = LANGUAGE == "ja" ? "全員に通知" : "TO ALL",
-                tooltip = LANGUAGE == "ja" ? "この機能についてはChat++のFeatureページにてご確認ください" : "Please refer Chat++'s Feature page for more details about this feature";
-            $("#_sendEnterActionArea").after("<div id=\"_notifyAllButton\" role=\"button\" tabindex=\"2\" class=\"button btnDanger _cwBN _showDescription\" aria-label=\"" + tooltip + "\" style=\"margin-left: 5px;\">" + text + "</div>");
-            var btn = $("#_notifyAllButton");
-            NotifyAll.checkNotifyAllButton();
-            btn.click(function () {
-                if (chatwork.getChatText().trim() === "") {
-                    return;
-                }
-                if (!chatwork.checkNotifyAllCondition()) {
-                    CW.alert("You are not allowed to use this feature in this room");
-                    return;
-                }
-                var msg = "",
-                    room_id = RM.id;
-                for (var id in RL.rooms[room_id].member_dat) {
-                    msg += "[To:" + id + "]";
-                }
-                window.CHATPP_NOTIFY_ALL_MSG = msg;
-                var callback = function callback(data) {
-                    if (data.chat_list) {
-                        for (var i = 0; i < data.chat_list.length; i++) {
-                            if (data.chat_list[i].msg === window.CHATPP_NOTIFY_ALL_MSG && data.chat_list[i].aid === chatwork.myId()) {
-                                CS.deleteChat(data.chat_list[i].id, room_id, function () {
-                                    setTimeout(function () {
-                                        CS.sendMessage(room_id, Const.TO_ALL_MARK + "\n" + chatwork.getChatText(), void 0, function () {
-                                            chatwork.clearChatText();
-                                            btn.removeClass("btnDisable").addClass("btnDanger").css("pointer-events", "");
-                                        });
-                                    }, 1000);
-                                }, null);
-                            }
-                        }
-                    }
-                };
-                CS.sendMessage(room_id, msg, void 0, callback);
-                btn.addClass("btnDisable").css("pointer-events", "none");
-            });
-
             this.registerRegex();
-            this.setUpButton();
-        }
-    }, {
-        key: "setUpButton",
-        value: function setUpButton() {
-            Room.prototype.buildOld = Room.prototype.build;
-            Room.prototype.build = function (b) {
-                this.buildOld(b);
-                NotifyAll.checkNotifyAllButton();
-            };
         }
     }, {
         key: "registerRegex",
@@ -1506,15 +1454,6 @@ var NotifyAll = function () {
                 special: true
             });
         }
-    }], [{
-        key: "checkNotifyAllButton",
-        value: function checkNotifyAllButton() {
-            if (!chatwork.checkNotifyAllCondition()) {
-                $("#_notifyAllButton").hide();
-            } else {
-                $("#_notifyAllButton").show();
-            }
-        }
     }]);
 
     return NotifyAll;
@@ -1523,7 +1462,7 @@ var NotifyAll = function () {
 var notify_all = new NotifyAll();
 module.exports = notify_all;
 
-},{"../helpers/ChatworkFacade.js":1,"../helpers/Const.js":3}],9:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
