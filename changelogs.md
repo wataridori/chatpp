@@ -1,10 +1,14 @@
 Chat++ Change Logs
 =================
 ## 5.1.3
-* Improve *TO ALL* feature mechanism
+* Remove **TO ALL** button due to the change of ChatWork
+(which makes **TO ALL** button does not work anymore)
+
+## 5.1.3
+* Improve **TO ALL** feature mechanism
 
 ## 5.1.2
-* Improve *TO ALL* feature mechanism
+* Improve **TO ALL** feature mechanism
 
 ## 5.1.1
 * Fix bugs with **TO ALL** feature
