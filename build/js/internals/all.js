@@ -259,7 +259,7 @@ var Common = function () {
             }
 
             return {
-                "name": "Chat++ for Chatwork dev",
+                "name": "Chat++ for Chatwork",
                 "short_name": "Chat++",
                 "version": "5.1.3",
                 "option_page": "option.html"
