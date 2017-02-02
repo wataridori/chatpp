@@ -466,6 +466,11 @@ var Emoticon = function () {
     _createClass(Emoticon, [{
         key: "setUp",
         value: function setUp() {
+            // Chatwork has updated Javascript code, therefore the Emoticons feature does not work anymore.
+            // Temporarily disable this feature
+            return;
+            // Normal code
+            /* eslint-disable */
             if (!this.status) {
                 return;
             }
@@ -488,7 +493,7 @@ var Emoticon = function () {
             if ($("#externalEmoticonsButton").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append("<li id='_externalEmoticonsButton' role='button' class=' _showDescription'>" + "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" + "</li>");
+            $("#_chatSendTool").append("<li id='_externalEmoticonsButton' role='button' class=' _showDescription chatInput__element'>" + "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" + "</li>");
             var emo_list_div = this.sorted_emoticons.map(function (emo) {
                 var encoded_text = common.htmlEncode(emo.key);
                 var title = emo.data_name + " - " + encoded_text;
@@ -554,7 +559,7 @@ var Emoticon = function () {
                 return;
             }
             var emoticon_text = "E: " + (this.status ? "ON" : "OFF");
-            $("#_chatSendTool").append("<li id=\"_emoticons\" role=\"button\" class=\" _showDescription\">\n                <span id=\"emoticonText\" class=\"emoticonText icoSizeSmall\">" + emoticon_text + "</span>\n            </li>");
+            $("#_chatSendTool").append("<li id=\"_emoticons\" role=\"button\" class=\" _showDescription chatInput__element\">\n                <span id=\"emoticonText\" class=\"emoticonText icoSizeSmall\">" + emoticon_text + "</span>\n            </li>");
             this.setEmoticonTextLabel();
             $("#emoticonText").click(function () {
                 return _this.toggleEmoticonsStatus();
@@ -587,7 +592,7 @@ var Emoticon = function () {
             }
             var failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
             var failed_data_text = "The following data could not be loaded: " + failed_data;
-            $("#_chatSendTool").append("<li id=\"_chatppErrors\" role=\"button\" class=\" _showDescription\">\n                <span id=\"chatppErrors\" class=\"emoticonText icoSizeSmall chatppErrorsText\">(ERROR)</span>\n            </li>");
+            $("#_chatSendTool").append("<li id=\"_chatppErrors\" role=\"button\" class=\" _showDescription chatInput__element\">\n                <span id=\"chatppErrors\" class=\"emoticonText icoSizeSmall chatppErrorsText\">(ERROR)</span>\n            </li>");
             $("#_chatppErrors").attr("aria-label", failed_data_text);
         }
     }, {
@@ -1243,16 +1248,16 @@ var Mention = function () {
                     }
                     members = this.buildGroupMemberListData(this.selected_group_name);
                     if (members.length) {
-                        var _txt = "<ul><li class='suggested-name' role='listitem'>";
-                        for (var _i = 0; _i < members.length; _i++) {
-                            if (_i == 6) {
-                                _txt += "<span>+" + (members.length - 6) + "</span>";
+                        var txt = "<ul><li class='suggested-name' role='listitem'>";
+                        for (var i = 0; i < members.length; i++) {
+                            if (i == 6) {
+                                txt += "<span>+" + (members.length - 6) + "</span>";
                                 break;
                             }
-                            _txt += members[_i].avatar;
+                            txt += members[i].avatar;
                         }
-                        _txt += "</li></ul>";
-                        return _txt;
+                        txt += "</li></ul>";
+                        return txt;
                     } else {
                         var message = null;
                         if (this.selected_group_name === "admin") {
@@ -1360,6 +1365,7 @@ var Mention = function () {
             var mention_text = "M: " + (this.status ? "ON" : "OFF");
             var div = $("#chatppMentionText");
             div.html(mention_text);
+            div.addClass("chatInput__element");
             if (this.status) {
                 $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
                 div.addClass("emoticonTextEnable");
@@ -1484,7 +1490,7 @@ var RoomInformation = function () {
             if ($("#roomInfoIcon").length > 0) {
                 return;
             }
-            var room_info = "<li id=\"_roomInfo\" role=\"button\" class=\"_showDescription\" aria-label=\"Show room Information\" style=\"display: inline-block;\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></li>";
+            var room_info = "<li id=\"_roomInfo\" role=\"button\" class=\"_showDescription chatInput__element\" aria-label=\"Show room Information\" style=\"display: inline-block;\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></li>";
             $("#_chatSendTool").append(room_info);
             var room_info_list = "<div id=\"_roomInfoList\" class=\"roomInfo toolTip toolTipWhite mainContetTooltip\" role=\"tooltip\">" + "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\"></div>" + "<span id=\"_roomInfoText\">" + "<div id=\"_roomInfoTextTotalMembers\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalMessages\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalFiles\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalTasks\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextMyTasks\" class=\"tooltipFooter\"></div>" + "</span>" + "</div>";
             $("body").append(room_info_list);
@@ -1607,6 +1613,7 @@ var Shortcut = function () {
             var shortcut_text = "S: " + (this.status ? "ON" : "OFF");
             var div = $("#chatppShortcutText");
             div.html(shortcut_text);
+            div.addClass("chatInput__element");
             if (this.status) {
                 $("#_chatppShortcutText").attr("aria-label", "Click to disable Shortcut Feature");
                 div.addClass("emoticonTextEnable");
@@ -1877,7 +1884,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = void 0;
+            var previous = undefined;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -2165,7 +2172,7 @@ var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var notify_all = require("./NotifyAll.js");
 
-var cw_timer = void 0;
+var cw_timer = undefined;
 
 $(function () {
     var rebuild = false;
@@ -2205,6 +2212,7 @@ $(function () {
 function addStyle() {
     $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
 }
 
 },{"./Advertisement.js":4,"./Emoticon.js":5,"./Mention.js":6,"./NotificationDisabler.js":7,"./NotifyAll.js":8,"./RoomInformation.js":9,"./Shortcut.js":10,"./ViewEnhancer.js":11}]},{},[12]);
