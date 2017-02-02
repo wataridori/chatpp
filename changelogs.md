@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 5.1.6
+* Fix the problem with Emoticon feature
+
 ## 5.1.5
 * Temporarily disable Emoticon feature due to the changes in ChatWork's Javascript Codes
 
