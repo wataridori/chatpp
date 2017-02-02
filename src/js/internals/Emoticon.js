@@ -8,6 +8,11 @@ class Emoticon {
     }
 
     setUp() {
+        // Chatwork has updated Javascript code, therefore the Emoticons feature does not work anymore.
+        // Temporarily disable this feature
+        return;
+        // Normal code
+        /* eslint-disable */
         if (!this.status) {
             return;
         }
@@ -30,7 +35,7 @@ class Emoticon {
             return;
         }
         $("#_chatSendTool").append(
-            "<li id='_externalEmoticonsButton' role='button' class=' _showDescription'>" +
+            "<li id='_externalEmoticonsButton' role='button' class=' _showDescription chatInput__element'>" +
             "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" +
             "</li>"
         );
@@ -100,7 +105,7 @@ class Emoticon {
         }
         let emoticon_text = `E: ${this.status ? "ON" : "OFF"}`;
         $("#_chatSendTool").append(
-            `<li id="_emoticons" role="button" class=" _showDescription">
+            `<li id="_emoticons" role="button" class=" _showDescription chatInput__element">
                 <span id="emoticonText" class="emoticonText icoSizeSmall">${emoticon_text}</span>
             </li>`
         );
@@ -132,7 +137,7 @@ class Emoticon {
         let failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
         let failed_data_text = `The following data could not be loaded: ${failed_data}`;
         $("#_chatSendTool").append(
-            `<li id="_chatppErrors" role="button" class=" _showDescription">
+            `<li id="_chatppErrors" role="button" class=" _showDescription chatInput__element">
                 <span id="chatppErrors" class="emoticonText icoSizeSmall chatppErrorsText">(ERROR)</span>
             </li>`
         );

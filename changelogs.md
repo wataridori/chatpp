@@ -1,6 +1,9 @@
 Chat++ Change Logs
 =================
-## 5.1.3
+## 5.1.5
+* Temporarily disable Emoticon feature due to the changes in ChatWork's Javascript Codes
+
+## 5.1.4
 * Remove **TO ALL** button due to the change of ChatWork
 (which makes **TO ALL** button does not work anymore)
 

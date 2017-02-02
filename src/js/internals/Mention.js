@@ -277,7 +277,7 @@ class Mention {
                     return false;
                 }
             }
-            
+
 
             return true;
         } else {
@@ -454,7 +454,7 @@ class Mention {
                     return [];
                 }
             }
-            
+
 
             if (typed_text == "me") {
                 this.insert_type = "me";
@@ -513,7 +513,7 @@ class Mention {
                 for (let i = 0; i < members.length; i++) {
                     replace_text += format_string.format(members[i].value, members[i].aid2name);
                 }
-                
+
                 break;
             default:
                 break;
@@ -687,6 +687,7 @@ class Mention {
         let mention_text = `M: ${this.status ? "ON" : "OFF"}`;
         let div = $("#chatppMentionText");
         div.html(mention_text);
+        div.addClass("chatInput__element");
         if (this.status) {
             $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
             div.addClass("emoticonTextEnable");

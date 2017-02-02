@@ -172,7 +172,7 @@ function addInjectedScript() {
 }
 
 function preLoad() {
-    let text = "<li id=\"_chatppPreLoad\"><span id=\"chatppPreLoad\" class=\"icoSizeSmall\"></span></li>";
+    let text = "<li id=\"_chatppPreLoad\" style=\"display: inline-block\"><span id=\"chatppPreLoad\"></span></li>";
     $("#_chatSendTool").append(text);
     let chatpp_pre_load = $("#chatppPreLoad");
     let delay_time = Const.DELAY_TIME / 1000;
