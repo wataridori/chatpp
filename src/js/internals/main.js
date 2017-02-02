@@ -12,7 +12,7 @@ let cw_timer;
 $(() => {
     let rebuild = false;
     cw_timer = setInterval(() => {
-        if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
+        if (typeof CW !== "undefined" && typeof RM !== "undefined") {
             window.clearInterval(cw_timer);
             $("#_chatppPreLoad").remove();
             addStyle();
