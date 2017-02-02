@@ -35,7 +35,9 @@
     "bootbox": true,
     "Fuse": true,
     "Measurement": true,
-    "hljs": true
+    "hljs": true,
+    "emoticons": true,
+    "tokenizer": true
   },
   "rules": {
     "no-alert": 0,

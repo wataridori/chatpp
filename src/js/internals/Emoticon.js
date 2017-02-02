@@ -8,11 +8,6 @@ class Emoticon {
     }
 
     setUp() {
-        // Chatwork has updated Javascript code, therefore the Emoticons feature does not work anymore.
-        // Temporarily disable this feature
-        return;
-        // Normal code
-        /* eslint-disable */
         if (!this.status) {
             return;
         }
@@ -85,10 +80,12 @@ class Emoticon {
     }
 
     removeExternalEmo() {
-        for (let i = CW.reg_cmp.length - 1; CW.reg_cmp.length > 0; i--) {
-            let emo = CW.reg_cmp[i];
+        for (let i = emoticons.baseEmoticons.length - 1; emoticons.baseEmoticons.length > 0; i--) {
+            let emo = emoticons.baseEmoticons[i];
             if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
-                CW.reg_cmp.splice(i, 1);
+                emoticons.baseEmoticons.splice(i, 1);
+                delete emoticons.tagHash[emo.key];
+                tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
             } else {
                 if (!emo.special) {
                     break;
@@ -155,23 +152,23 @@ class Emoticon {
 
     addEmo(emo) {
         for (let index = 0; index < emo.length; index++) {
-            let rep = "";
             let encoded_text = common.htmlEncode(emo[index].key);
             let title = `${encoded_text} - ${emo[index].data_name}`;
             let src = common.htmlEncode(common.getEmoUrl(emo[index].src));
             if (this.isSpecialEmo(emo[index].key)) {
-                rep = `<img src="${src}" class="ui_emoticon"/>`;
-            } else {
-                rep = `<img src="${src}" title="${title}" alt="${encoded_text}" class="ui_emoticon"/>`;
+                title = "";
             }
-            let regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
-            CW.reg_cmp.push({
-                key: regex,
-                rep,
-                reptxt: emo[index].key,
+            let one_emo = {
+                name: encoded_text,
+                title,
+                src,
+                tag: emo[index].key,
                 external: true
-            });
+            };
+            emoticons.baseEmoticons.push(one_emo);
+            emoticons.tagHash[emo[index].key] = one_emo;
         }
+        tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
     }
 }
 
