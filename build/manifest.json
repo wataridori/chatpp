@@ -1,7 +1,7 @@
 {
     "name": "Chat++ for Chatwork dev",
     "short_name": "Chat++",
-    "version": "5.1.7",
+    "version": "5.1.8",
     "manifest_version": 2,
     "description": "An all-in-one Chatwork Enhancement Toolkit which provides many useful features!",
     "content_scripts": [
