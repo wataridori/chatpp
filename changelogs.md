@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 5.1.7
+* Add support for both Chatwork's old and new Javascript code
+
 ## 5.1.6
 * Fix the problem with Emoticon feature
 

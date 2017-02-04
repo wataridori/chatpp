@@ -539,7 +539,7 @@ var EmoStorage = function (_Storage) {
     function EmoStorage() {
         _classCallCheck(this, EmoStorage);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EmoStorage).call(this));
+        var _this = _possibleConstructorReturn(this, (EmoStorage.__proto__ || Object.getPrototypeOf(EmoStorage)).call(this));
 
         _this.data = {};
         _this.data_count = 0;

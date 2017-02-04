@@ -532,19 +532,27 @@ var Emoticon = function () {
     }, {
         key: "removeExternalEmo",
         value: function removeExternalEmo() {
-            for (var i = emoticons.baseEmoticons.length - 1; emoticons.baseEmoticons.length > 0; i--) {
-                var emo = emoticons.baseEmoticons[i];
+            var emoticons_list = this.isNewMechanism() ? emoticons.baseEmoticons : CW.reg_cmp;
+            for (var i = emoticons_list.length - 1; emoticons_list.length > 0; i--) {
+                var emo = emoticons_list[i];
                 if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
-                    emoticons.baseEmoticons.splice(i, 1);
-                    delete emoticons.tagHash[emo.key];
-                    tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
-                        return emo.tag;
-                    }));
+                    // Check whether Chatwork uses new Javascript Code
+                    if (this.isNewMechanism()) {
+                        emoticons.baseEmoticons.splice(i, 1);
+                        delete emoticons.tagHash[emo.key];
+                    } else {
+                        CW.reg_cmp.splice(i, 1);
+                    }
                 } else {
                     if (!emo.special) {
                         break;
                     }
                 }
+            }
+            if (this.isNewMechanism()) {
+                tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
+                    return emo.tag;
+                }));
             }
             this.status = false;
             this.updateEmoticonText();
@@ -614,19 +622,39 @@ var Emoticon = function () {
                 if (this.isSpecialEmo(emo[index].key)) {
                     title = "";
                 }
-                var one_emo = {
-                    name: encoded_text,
-                    title: title,
-                    src: src,
-                    tag: emo[index].key,
-                    external: true
-                };
-                emoticons.baseEmoticons.push(one_emo);
-                emoticons.tagHash[emo[index].key] = one_emo;
+                // Check whether Chatworks use new Javascript Code
+                if (this.isNewMechanism()) {
+                    var one_emo = {
+                        name: encoded_text,
+                        title: title,
+                        src: src,
+                        tag: emo[index].key,
+                        external: true
+                    };
+                    emoticons.baseEmoticons.push(one_emo);
+                    emoticons.tagHash[emo[index].key] = one_emo;
+                } else {
+                    // If Chatwork uses old Javascript code, then use the old method
+                    var rep = "<img src=\"" + src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\" class=\"ui_emoticon\"/>";
+                    var regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
+                    CW.reg_cmp.push({
+                        key: regex,
+                        rep: rep,
+                        reptxt: emo[index].key,
+                        external: true
+                    });
+                }
             }
-            tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
-                return emo.tag;
-            }));
+            if (this.isNewMechanism()) {
+                tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
+                    return emo.tag;
+                }));
+            }
+        }
+    }, {
+        key: "isNewMechanism",
+        value: function isNewMechanism() {
+            return typeof emoticons !== "undefined" && typeof tokenizer !== "undefined";
         }
     }]);
 
@@ -1249,16 +1277,16 @@ var Mention = function () {
                     }
                     members = this.buildGroupMemberListData(this.selected_group_name);
                     if (members.length) {
-                        var txt = "<ul><li class='suggested-name' role='listitem'>";
-                        for (var i = 0; i < members.length; i++) {
-                            if (i == 6) {
-                                txt += "<span>+" + (members.length - 6) + "</span>";
+                        var _txt = "<ul><li class='suggested-name' role='listitem'>";
+                        for (var _i = 0; _i < members.length; _i++) {
+                            if (_i == 6) {
+                                _txt += "<span>+" + (members.length - 6) + "</span>";
                                 break;
                             }
-                            txt += members[i].avatar;
+                            _txt += members[_i].avatar;
                         }
-                        txt += "</li></ul>";
-                        return txt;
+                        _txt += "</li></ul>";
+                        return _txt;
                     } else {
                         var message = null;
                         if (this.selected_group_name === "admin") {
@@ -1885,7 +1913,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = undefined;
+            var previous = void 0;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -2173,7 +2201,7 @@ var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var notify_all = require("./NotifyAll.js");
 
-var cw_timer = undefined;
+var cw_timer = void 0;
 
 $(function () {
     var rebuild = false;

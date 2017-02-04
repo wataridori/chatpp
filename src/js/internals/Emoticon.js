@@ -80,17 +80,25 @@ class Emoticon {
     }
 
     removeExternalEmo() {
-        for (let i = emoticons.baseEmoticons.length - 1; emoticons.baseEmoticons.length > 0; i--) {
-            let emo = emoticons.baseEmoticons[i];
+        let emoticons_list = this.isNewMechanism() ? emoticons.baseEmoticons : CW.reg_cmp;
+        for (let i = emoticons_list.length - 1; emoticons_list.length > 0; i--) {
+            let emo = emoticons_list[i];
             if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
-                emoticons.baseEmoticons.splice(i, 1);
-                delete emoticons.tagHash[emo.key];
-                tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
+                // Check whether Chatwork uses new Javascript Code
+                if (this.isNewMechanism()) {
+                    emoticons.baseEmoticons.splice(i, 1);
+                    delete emoticons.tagHash[emo.key];
+                } else {
+                    CW.reg_cmp.splice(i, 1);
+                }
             } else {
                 if (!emo.special) {
                     break;
                 }
             }
+        }
+        if (this.isNewMechanism()) {
+            tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
         }
         this.status = false;
         this.updateEmoticonText();
@@ -158,17 +166,36 @@ class Emoticon {
             if (this.isSpecialEmo(emo[index].key)) {
                 title = "";
             }
-            let one_emo = {
-                name: encoded_text,
-                title,
-                src,
-                tag: emo[index].key,
-                external: true
-            };
-            emoticons.baseEmoticons.push(one_emo);
-            emoticons.tagHash[emo[index].key] = one_emo;
+            // Check whether Chatworks use new Javascript Code
+            if (this.isNewMechanism()) {
+                let one_emo = {
+                    name: encoded_text,
+                    title,
+                    src,
+                    tag: emo[index].key,
+                    external: true
+                };
+                emoticons.baseEmoticons.push(one_emo);
+                emoticons.tagHash[emo[index].key] = one_emo;
+            } else {
+                // If Chatwork uses old Javascript code, then use the old method
+                let rep = `<img src="${src}" title="${title}" alt="${encoded_text}" class="ui_emoticon"/>`;
+                let regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
+                CW.reg_cmp.push({
+                    key: regex,
+                    rep,
+                    reptxt: emo[index].key,
+                    external: true
+                });
+            }
         }
-        tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
+        if (this.isNewMechanism()) {
+            tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
+        }
+    }
+
+    isNewMechanism() {
+        return typeof emoticons !== "undefined" && typeof tokenizer !== "undefined";
     }
 }
 
