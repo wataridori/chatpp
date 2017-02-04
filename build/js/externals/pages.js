@@ -773,7 +773,7 @@ var Common = function () {
             return {
                 "name": "Chat++ for Chatwork",
                 "short_name": "Chat++",
-                "version": "5.1.4",
+                "version": "5.1.7",
                 "option_page": "option.html"
             };
         }
@@ -933,7 +933,7 @@ var EmoStorage = function (_Storage) {
     function EmoStorage() {
         _classCallCheck(this, EmoStorage);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EmoStorage).call(this));
+        var _this = _possibleConstructorReturn(this, (EmoStorage.__proto__ || Object.getPrototypeOf(EmoStorage)).call(this));
 
         _this.data = {};
         _this.data_count = 0;
