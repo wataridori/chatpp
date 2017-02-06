@@ -163,9 +163,6 @@ class Emoticon {
             let encoded_text = common.htmlEncode(emo[index].key);
             let title = `${encoded_text} - ${emo[index].data_name}`;
             let src = common.htmlEncode(common.getEmoUrl(emo[index].src));
-            if (this.isSpecialEmo(emo[index].key)) {
-                title = "";
-            }
             // Check whether Chatworks use new Javascript Code
             if (this.isNewMechanism()) {
                 let one_emo = {
@@ -178,6 +175,10 @@ class Emoticon {
                 emoticons.baseEmoticons.push(one_emo);
                 emoticons.tagHash[emo[index].key] = one_emo;
             } else {
+                if (this.isSpecialEmo(emo[index].key)) {
+                    title = "";
+                    encoded_text = "";
+                }
                 // If Chatwork uses old Javascript code, then use the old method
                 let rep = `<img src="${src}" title="${title}" alt="${encoded_text}" class="ui_emoticon"/>`;
                 let regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);

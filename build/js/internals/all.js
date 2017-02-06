@@ -619,9 +619,6 @@ var Emoticon = function () {
                 var encoded_text = common.htmlEncode(emo[index].key);
                 var title = encoded_text + " - " + emo[index].data_name;
                 var src = common.htmlEncode(common.getEmoUrl(emo[index].src));
-                if (this.isSpecialEmo(emo[index].key)) {
-                    title = "";
-                }
                 // Check whether Chatworks use new Javascript Code
                 if (this.isNewMechanism()) {
                     var one_emo = {
@@ -634,6 +631,10 @@ var Emoticon = function () {
                     emoticons.baseEmoticons.push(one_emo);
                     emoticons.tagHash[emo[index].key] = one_emo;
                 } else {
+                    if (this.isSpecialEmo(emo[index].key)) {
+                        title = "";
+                        encoded_text = "";
+                    }
                     // If Chatwork uses old Javascript code, then use the old method
                     var rep = "<img src=\"" + src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\" class=\"ui_emoticon\"/>";
                     var regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
@@ -678,6 +679,12 @@ var chatwork = require("../helpers/ChatworkFacade.js");
 var DISPLAY_NUMS = 3;
 var MAX_PATTERN_LENGTH = 20;
 var SPECIAL_CHARS = ["\n", "!", "$", "%", "^", "&", "*", "(", ")", "-", "+", "=", "[", "]", "{", "}", ";", ":", ",", "/", "`", "'", "\""];
+var INSERT_MODE_SYM = {
+    "PICON": "._",
+    "NAME": ".",
+    "TO": "_",
+    "CC": "_cc_"
+};
 
 var Mention = function () {
     function Mention() {
@@ -694,7 +701,7 @@ var Mention = function () {
         this.selected_index = 0;
         this.current_RM = null;
         this.member_objects = [];
-        this.insert_mode = "normal"; // normal, to, picon, name
+        this.insert_mode = "normal"; // normal, to, picon, name, cc
         this.insert_type = "one"; // one, me, all, contact, group
         this.selected_group_name = "";
         this.fuse = null;
@@ -911,6 +918,7 @@ var Mention = function () {
             });
 
             this.addMentionText();
+            this.ccMention();
         }
     }, {
         key: "getNearestAtmarkIndex",
@@ -1167,15 +1175,19 @@ var Mention = function () {
     }, {
         key: "getRawResultsAndSetMode",
         value: function getRawResultsAndSetMode(typed_text) {
-            if (typed_text.slice(0, 2) == "._") {
+            if (typed_text.slice(0, 2) == INSERT_MODE_SYM.PICON) {
                 this.insert_mode = "picon";
                 return this.getRawResultsAndSetType(typed_text.substring(2));
             }
-            if (typed_text.slice(0, 1) == ".") {
+            if (typed_text.slice(0, 1) == INSERT_MODE_SYM.NAME) {
                 this.insert_mode = "name";
                 return this.getRawResultsAndSetType(typed_text.substring(1));
             }
-            if (typed_text.slice(0, 1) == "_") {
+            if (typed_text.slice(0, 4) == INSERT_MODE_SYM.CC) {
+                this.insert_mode = "CC";
+                return this.getRawResultsAndSetType(typed_text.substring(4));
+            }
+            if (typed_text.slice(0, 1) == INSERT_MODE_SYM.TO) {
                 this.insert_mode = "to";
                 return this.getRawResultsAndSetType(typed_text.substring(1));
             }
@@ -1242,6 +1254,9 @@ var Mention = function () {
                     break;
                 case "name":
                     replace_text = this.getReplaceText("[picon:{0}] {1}\n", target_name, cwid, members);
+                    break;
+                case "CC":
+                    replace_text = this.getReplaceText("[CC][To:{0}] {1}\n", target_name, cwid, members);
                     break;
                 default:
                     break;
@@ -1373,6 +1388,15 @@ var Mention = function () {
                 }
             }
             return [];
+        }
+    }, {
+        key: "ccMention",
+        value: function ccMention() {
+            CW.reg_cmp.push({
+                key: /\[CC\]<span class=\"chatTimeLineTo\">TO<\/span>/g,
+                rep: '<span class="chatTimeLineTo">CC</span>',
+                reptxt: "[CC]"
+            });
         }
     }, {
         key: "addMentionText",
@@ -1913,7 +1937,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = void 0;
+            var previous = undefined;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -2201,7 +2225,7 @@ var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var notify_all = require("./NotifyAll.js");
 
-var cw_timer = void 0;
+var cw_timer = undefined;
 
 $(function () {
     var rebuild = false;
