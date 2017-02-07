@@ -688,7 +688,8 @@ class Mention {
         CW.reg_cmp.push({
             key: /\[CC\]<span class=\"chatTimeLineTo\">TO<\/span>/g,
             rep: '<span class="chatTimeLineTo">CC</span>',
-            reptxt: "[CC]"
+            reptxt: "[CC]",
+            special: true
         });
 
     }
