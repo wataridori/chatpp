@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 5.1.9
+* Fix bug when turning off Emoticon feature
+
 ## 5.1.8
 * Add CC feature by using `@_cc_`. See [PR#60](../../pull/60)
 * Fix problem with some special emoticons
