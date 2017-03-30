@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 5.1.10
+* Add external css to fix the problem when displaying user avatar with large emoticons
+
 ## 5.1.9
 * Fix bug when turning off Emoticon feature
 
