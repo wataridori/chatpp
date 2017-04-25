@@ -5,6 +5,12 @@ let chatwork = require("../helpers/ChatworkFacade.js");
 let DISPLAY_NUMS = 3;
 let MAX_PATTERN_LENGTH = 20;
 let SPECIAL_CHARS = ["\n", "!", "$", "%", "^", "&", "*", "(", ")", "-", "+", "=", "[", "]", "{", "}", ";", ":", ",", "/", "`", "'", "\""];
+let INSERT_MODE_SYM = {
+    "PICON": "._",
+    "NAME": ".",
+    "TO": "_",
+    "CC": "_cc_"
+}
 
 class Mention {
     constructor() {
@@ -19,7 +25,7 @@ class Mention {
         this.selected_index = 0;
         this.current_RM = null;
         this.member_objects = [];
-        this.insert_mode = "normal"; // normal, to, picon, name
+        this.insert_mode = "normal"; // normal, to, picon, name, cc
         this.insert_type = "one"; // one, me, all, contact, group
         this.selected_group_name = "";
         this.fuse = null;
@@ -229,6 +235,7 @@ class Mention {
         });
 
         this.addMentionText();
+        this.ccMention();
     }
 
     getNearestAtmarkIndex() {
@@ -277,7 +284,7 @@ class Mention {
                     return false;
                 }
             }
-            
+
 
             return true;
         } else {
@@ -454,7 +461,7 @@ class Mention {
                     return [];
                 }
             }
-            
+
 
             if (typed_text == "me") {
                 this.insert_type = "me";
@@ -470,15 +477,19 @@ class Mention {
     }
 
     getRawResultsAndSetMode(typed_text) {
-        if (typed_text.slice(0, 2) == "._") {
+        if (typed_text.slice(0, 2) == INSERT_MODE_SYM.PICON) {
             this.insert_mode = "picon";
             return this.getRawResultsAndSetType(typed_text.substring(2));
         }
-        if (typed_text.slice(0, 1) == ".") {
+        if (typed_text.slice(0, 1) == INSERT_MODE_SYM.NAME) {
             this.insert_mode = "name";
             return this.getRawResultsAndSetType(typed_text.substring(1));
         }
-        if (typed_text.slice(0, 1) == "_") {
+        if (typed_text.slice(0, 4) == INSERT_MODE_SYM.CC){
+            this.insert_mode = "CC";
+            return this.getRawResultsAndSetType(typed_text.substring(4));
+        }
+        if (typed_text.slice(0, 1) == INSERT_MODE_SYM.TO) {
             this.insert_mode = "to";
             return this.getRawResultsAndSetType(typed_text.substring(1));
         }
@@ -513,7 +524,7 @@ class Mention {
                 for (let i = 0; i < members.length; i++) {
                     replace_text += format_string.format(members[i].value, members[i].aid2name);
                 }
-                
+
                 break;
             default:
                 break;
@@ -541,6 +552,9 @@ class Mention {
                 break;
             case "name":
                 replace_text = this.getReplaceText("[picon:{0}] {1}\n", target_name, cwid, members);
+                break;
+            case "CC":
+                replace_text = this.getReplaceText("[CC][To:{0}] {1}\n", target_name, cwid, members);
                 break;
             default:
                 break;
@@ -670,6 +684,17 @@ class Mention {
         return [];
     }
 
+    ccMention() {
+        CW.reg_cmp.push({
+            key: /\[CC\]<span class=\"chatTimeLineTo\">TO<\/span>/g,
+            rep: '<span class="chatTimeLineTo">CC</span>',
+            reptxt: "[CC]",
+            special: true
+        });
+
+    }
+
+
     addMentionText() {
         if ($("#_chatppMentionText").length > 0) {
             return;
@@ -687,6 +712,7 @@ class Mention {
         let mention_text = `M: ${this.status ? "ON" : "OFF"}`;
         let div = $("#chatppMentionText");
         div.html(mention_text);
+        div.addClass("chatInput__element");
         if (this.status) {
             $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
             div.addClass("emoticonTextEnable");

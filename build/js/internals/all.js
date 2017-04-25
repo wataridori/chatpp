@@ -261,7 +261,7 @@ var Common = function () {
             return {
                 "name": "Chat++ for Chatwork",
                 "short_name": "Chat++",
-                "version": "5.1.4",
+                "version": "5.1.11",
                 "option_page": "option.html"
             };
         }
@@ -497,7 +497,7 @@ var Emoticon = function () {
             if ($("#externalEmoticonsButton").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append("<li id='_externalEmoticonsButton' role='button' class=' _showDescription'>" + "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" + "</li>");
+            $("#_chatSendTool").append("<li id='_externalEmoticonsButton' role='button' class=' _showDescription chatInput__element'>" + "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" + "</li>");
             var emo_list_div = this.sorted_emoticons.map(function (emo) {
                 var encoded_text = common.htmlEncode(emo.key);
                 var title = emo.data_name + " - " + encoded_text;
@@ -541,15 +541,27 @@ var Emoticon = function () {
     }, {
         key: "removeExternalEmo",
         value: function removeExternalEmo() {
-            for (var i = CW.reg_cmp.length - 1; CW.reg_cmp.length > 0; i--) {
-                var emo = CW.reg_cmp[i];
+            var emoticons_list = this.isNewMechanism() ? emoticons.baseEmoticons : CW.reg_cmp;
+            for (var i = emoticons_list.length - 1; emoticons_list.length > 0; i--) {
+                var emo = emoticons_list[i];
                 if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
-                    CW.reg_cmp.splice(i, 1);
+                    // Check whether Chatwork uses new Javascript Code
+                    if (this.isNewMechanism()) {
+                        emoticons.baseEmoticons.splice(i, 1);
+                        delete emoticons.tagHash[emo.key];
+                    } else {
+                        CW.reg_cmp.splice(i, 1);
+                    }
                 } else {
                     if (!emo.special) {
                         break;
                     }
                 }
+            }
+            if (this.isNewMechanism()) {
+                tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
+                    return emo.tag;
+                }));
             }
             this.status = false;
             this.updateEmoticonText();
@@ -563,7 +575,7 @@ var Emoticon = function () {
                 return;
             }
             var emoticon_text = "E: " + (this.status ? "ON" : "OFF");
-            $("#_chatSendTool").append("<li id=\"_emoticons\" role=\"button\" class=\" _showDescription\">\n                <span id=\"emoticonText\" class=\"emoticonText icoSizeSmall\">" + emoticon_text + "</span>\n            </li>");
+            $("#_chatSendTool").append("<li id=\"_emoticons\" role=\"button\" class=\" _showDescription chatInput__element\">\n                <span id=\"emoticonText\" class=\"emoticonText icoSizeSmall\">" + emoticon_text + "</span>\n            </li>");
             this.setEmoticonTextLabel();
             $("#emoticonText").click(function () {
                 return _this.toggleEmoticonsStatus();
@@ -596,7 +608,7 @@ var Emoticon = function () {
             }
             var failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
             var failed_data_text = "The following data could not be loaded: " + failed_data;
-            $("#_chatSendTool").append("<li id=\"_chatppErrors\" role=\"button\" class=\" _showDescription\">\n                <span id=\"chatppErrors\" class=\"emoticonText icoSizeSmall chatppErrorsText\">(ERROR)</span>\n            </li>");
+            $("#_chatSendTool").append("<li id=\"_chatppErrors\" role=\"button\" class=\" _showDescription chatInput__element\">\n                <span id=\"chatppErrors\" class=\"emoticonText icoSizeSmall chatppErrorsText\">(ERROR)</span>\n            </li>");
             $("#_chatppErrors").attr("aria-label", failed_data_text);
         }
     }, {
@@ -613,23 +625,46 @@ var Emoticon = function () {
         key: "addEmo",
         value: function addEmo(emo) {
             for (var index = 0; index < emo.length; index++) {
-                var rep = "";
                 var encoded_text = common.htmlEncode(emo[index].key);
                 var title = encoded_text + " - " + emo[index].data_name;
                 var src = common.htmlEncode(common.getEmoUrl(emo[index].src));
-                if (this.isSpecialEmo(emo[index].key)) {
-                    rep = "<img src=\"" + src + "\" class=\"ui_emoticon\"/>";
+                // Check whether Chatworks use new Javascript Code
+                if (this.isNewMechanism()) {
+                    var one_emo = {
+                        name: encoded_text,
+                        title: title,
+                        src: src,
+                        tag: emo[index].key,
+                        external: true
+                    };
+                    emoticons.baseEmoticons.push(one_emo);
+                    emoticons.tagHash[emo[index].key] = one_emo;
                 } else {
-                    rep = "<img src=\"" + src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\" class=\"ui_emoticon\"/>";
+                    if (this.isSpecialEmo(emo[index].key)) {
+                        title = "";
+                        encoded_text = "";
+                    }
+                    // If Chatwork uses old Javascript code, then use the old method
+                    var rep = "<img src=\"" + src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\" class=\"ui_emoticon\"/>";
+                    var regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
+                    CW.reg_cmp.push({
+                        key: regex,
+                        rep: rep,
+                        reptxt: emo[index].key,
+                        external: true
+                    });
                 }
-                var regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
-                CW.reg_cmp.push({
-                    key: regex,
-                    rep: rep,
-                    reptxt: emo[index].key,
-                    external: true
-                });
             }
+            if (this.isNewMechanism()) {
+                tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
+                    return emo.tag;
+                }));
+            }
+        }
+    }, {
+        key: "isNewMechanism",
+        value: function isNewMechanism() {
+            return typeof emoticons !== "undefined" && typeof tokenizer !== "undefined";
         }
     }]);
 
@@ -653,6 +688,12 @@ var chatwork = require("../helpers/ChatworkFacade.js");
 var DISPLAY_NUMS = 3;
 var MAX_PATTERN_LENGTH = 20;
 var SPECIAL_CHARS = ["\n", "!", "$", "%", "^", "&", "*", "(", ")", "-", "+", "=", "[", "]", "{", "}", ";", ":", ",", "/", "`", "'", "\""];
+var INSERT_MODE_SYM = {
+    "PICON": "._",
+    "NAME": ".",
+    "TO": "_",
+    "CC": "_cc_"
+};
 
 var Mention = function () {
     function Mention() {
@@ -669,7 +710,7 @@ var Mention = function () {
         this.selected_index = 0;
         this.current_RM = null;
         this.member_objects = [];
-        this.insert_mode = "normal"; // normal, to, picon, name
+        this.insert_mode = "normal"; // normal, to, picon, name, cc
         this.insert_type = "one"; // one, me, all, contact, group
         this.selected_group_name = "";
         this.fuse = null;
@@ -886,6 +927,7 @@ var Mention = function () {
             });
 
             this.addMentionText();
+            this.ccMention();
         }
     }, {
         key: "getNearestAtmarkIndex",
@@ -1142,15 +1184,19 @@ var Mention = function () {
     }, {
         key: "getRawResultsAndSetMode",
         value: function getRawResultsAndSetMode(typed_text) {
-            if (typed_text.slice(0, 2) == "._") {
+            if (typed_text.slice(0, 2) == INSERT_MODE_SYM.PICON) {
                 this.insert_mode = "picon";
                 return this.getRawResultsAndSetType(typed_text.substring(2));
             }
-            if (typed_text.slice(0, 1) == ".") {
+            if (typed_text.slice(0, 1) == INSERT_MODE_SYM.NAME) {
                 this.insert_mode = "name";
                 return this.getRawResultsAndSetType(typed_text.substring(1));
             }
-            if (typed_text.slice(0, 1) == "_") {
+            if (typed_text.slice(0, 4) == INSERT_MODE_SYM.CC) {
+                this.insert_mode = "CC";
+                return this.getRawResultsAndSetType(typed_text.substring(4));
+            }
+            if (typed_text.slice(0, 1) == INSERT_MODE_SYM.TO) {
                 this.insert_mode = "to";
                 return this.getRawResultsAndSetType(typed_text.substring(1));
             }
@@ -1217,6 +1263,9 @@ var Mention = function () {
                     break;
                 case "name":
                     replace_text = this.getReplaceText("[picon:{0}] {1}\n", target_name, cwid, members);
+                    break;
+                case "CC":
+                    replace_text = this.getReplaceText("[CC][To:{0}] {1}\n", target_name, cwid, members);
                     break;
                 default:
                     break;
@@ -1350,6 +1399,16 @@ var Mention = function () {
             return [];
         }
     }, {
+        key: "ccMention",
+        value: function ccMention() {
+            CW.reg_cmp.push({
+                key: /\[CC\]<span class=\"chatTimeLineTo\">TO<\/span>/g,
+                rep: '<span class="chatTimeLineTo">CC</span>',
+                reptxt: "[CC]",
+                special: true
+            });
+        }
+    }, {
         key: "addMentionText",
         value: function addMentionText() {
             var _this3 = this;
@@ -1369,6 +1428,7 @@ var Mention = function () {
             var mention_text = "M: " + (this.status ? "ON" : "OFF");
             var div = $("#chatppMentionText");
             div.html(mention_text);
+            div.addClass("chatInput__element");
             if (this.status) {
                 $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
                 div.addClass("emoticonTextEnable");
@@ -1493,7 +1553,7 @@ var RoomInformation = function () {
             if ($("#roomInfoIcon").length > 0) {
                 return;
             }
-            var room_info = "<li id=\"_roomInfo\" role=\"button\" class=\"_showDescription\" aria-label=\"Show room Information\" style=\"display: inline-block;\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></li>";
+            var room_info = "<li id=\"_roomInfo\" role=\"button\" class=\"_showDescription chatInput__element\" aria-label=\"Show room Information\" style=\"display: inline-block;\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></li>";
             $("#_chatSendTool").append(room_info);
             var room_info_list = "<div id=\"_roomInfoList\" class=\"roomInfo toolTip toolTipWhite mainContetTooltip\" role=\"tooltip\">" + "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\"></div>" + "<span id=\"_roomInfoText\">" + "<div id=\"_roomInfoTextTotalMembers\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalMessages\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalFiles\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalTasks\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextMyTasks\" class=\"tooltipFooter\"></div>" + "</span>" + "</div>";
             $("body").append(room_info_list);
@@ -1616,6 +1676,7 @@ var Shortcut = function () {
             var shortcut_text = "S: " + (this.status ? "ON" : "OFF");
             var div = $("#chatppShortcutText");
             div.html(shortcut_text);
+            div.addClass("chatInput__element");
             if (this.status) {
                 $("#_chatppShortcutText").attr("aria-label", "Click to disable Shortcut Feature");
                 div.addClass("emoticonTextEnable");
@@ -2026,9 +2087,9 @@ var ViewEnhancer = function () {
     }, {
         key: "updateGetContactPanelView",
         value: function updateGetContactPanelView() {
-            var getContactPanelOld = AC.view.getContactPanel;
+            AC.view.getContactPanelOld = AC.view.getContactPanel;
             AC.view.getContactPanel = function (b, d) {
-                var panel = getContactPanelOld(b, d);
+                var panel = AC.view.getContactPanelOld(b, d);
                 if (b == chatwork.myId()) {
                     return panel;
                 }
@@ -2077,7 +2138,7 @@ var ViewEnhancer = function () {
     }, {
         key: "updateChatSendView",
         value: function updateChatSendView() {
-            var chatTextKeyUpOld = CS.view.chatTextKeyUp;
+            CS.view.chatTextKeyUpOld = CS.view.chatTextKeyUp;
             CS.view.chatTextKeyUp = function (b) {
                 var up_key = b.keyCode;
                 var d = $("#_chatText");
@@ -2091,7 +2152,7 @@ var ViewEnhancer = function () {
                         _b === e && (e = a.substr(0, _b), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```$/, "$1[code]\n$2\n[/code]") : e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[code]\n$2\n[/code]\n"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```$/, "$1[title]$2[/title]") : e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[title]$2[/title]"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```$/, "$1[info]$2[/info]") : e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[info]$2[/info]\n"), a = a.substr(_b), d.val(e + a), d.prop("selectionStart", e.length), d.prop("selectionEnd", e.length));
                     }
                 })();
-                return chatTextKeyUpOld(b);
+                return CS.view.chatTextKeyUpOld(b);
             };
         }
     }, {
@@ -2179,7 +2240,7 @@ var cw_timer = void 0;
 $(function () {
     var rebuild = false;
     cw_timer = setInterval(function () {
-        if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
+        if (typeof CW !== "undefined" && typeof RM !== "undefined") {
             window.clearInterval(cw_timer);
             $("#_chatppPreLoad").remove();
             addStyle();
@@ -2214,6 +2275,8 @@ $(function () {
 function addStyle() {
     $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .messageBadge{vertical-align: initial !important;};</style>").appendTo("head");
 }
 
 },{"./Advertisement.js":4,"./Emoticon.js":5,"./Mention.js":6,"./NotificationDisabler.js":7,"./NotifyAll.js":8,"./RoomInformation.js":9,"./Shortcut.js":10,"./ViewEnhancer.js":11}]},{},[12]);

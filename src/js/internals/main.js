@@ -12,7 +12,7 @@ let cw_timer;
 $(() => {
     let rebuild = false;
     cw_timer = setInterval(() => {
-        if (typeof CW !== "undefined" && typeof CW.reg_cmp !== "undefined") {
+        if (typeof CW !== "undefined" && typeof RM !== "undefined") {
             window.clearInterval(cw_timer);
             $("#_chatppPreLoad").remove();
             addStyle();
@@ -47,4 +47,6 @@ $(() => {
 function addStyle() {
     $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .messageBadge{vertical-align: initial !important;};</style>").appendTo("head");
 }

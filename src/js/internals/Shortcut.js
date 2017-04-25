@@ -71,6 +71,7 @@ class Shortcut {
         let shortcut_text = `S: ${this.status ? "ON" : "OFF"}`;
         let div = $("#chatppShortcutText");
         div.html(shortcut_text);
+        div.addClass("chatInput__element");
         if (this.status) {
             $("#_chatppShortcutText").attr("aria-label", "Click to disable Shortcut Feature");
             div.addClass("emoticonTextEnable");

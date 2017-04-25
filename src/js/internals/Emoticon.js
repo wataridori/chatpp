@@ -30,7 +30,7 @@ class Emoticon {
             return;
         }
         $("#_chatSendTool").append(
-            "<li id='_externalEmoticonsButton' role='button' class=' _showDescription'>" +
+            "<li id='_externalEmoticonsButton' role='button' class=' _showDescription chatInput__element'>" +
             "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" +
             "</li>"
         );
@@ -80,15 +80,25 @@ class Emoticon {
     }
 
     removeExternalEmo() {
-        for (let i = CW.reg_cmp.length - 1; CW.reg_cmp.length > 0; i--) {
-            let emo = CW.reg_cmp[i];
+        let emoticons_list = this.isNewMechanism() ? emoticons.baseEmoticons : CW.reg_cmp;
+        for (let i = emoticons_list.length - 1; emoticons_list.length > 0; i--) {
+            let emo = emoticons_list[i];
             if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
-                CW.reg_cmp.splice(i, 1);
+                // Check whether Chatwork uses new Javascript Code
+                if (this.isNewMechanism()) {
+                    emoticons.baseEmoticons.splice(i, 1);
+                    delete emoticons.tagHash[emo.key];
+                } else {
+                    CW.reg_cmp.splice(i, 1);
+                }
             } else {
                 if (!emo.special) {
                     break;
                 }
             }
+        }
+        if (this.isNewMechanism()) {
+            tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
         }
         this.status = false;
         this.updateEmoticonText();
@@ -100,7 +110,7 @@ class Emoticon {
         }
         let emoticon_text = `E: ${this.status ? "ON" : "OFF"}`;
         $("#_chatSendTool").append(
-            `<li id="_emoticons" role="button" class=" _showDescription">
+            `<li id="_emoticons" role="button" class=" _showDescription chatInput__element">
                 <span id="emoticonText" class="emoticonText icoSizeSmall">${emoticon_text}</span>
             </li>`
         );
@@ -132,7 +142,7 @@ class Emoticon {
         let failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
         let failed_data_text = `The following data could not be loaded: ${failed_data}`;
         $("#_chatSendTool").append(
-            `<li id="_chatppErrors" role="button" class=" _showDescription">
+            `<li id="_chatppErrors" role="button" class=" _showDescription chatInput__element">
                 <span id="chatppErrors" class="emoticonText icoSizeSmall chatppErrorsText">(ERROR)</span>
             </li>`
         );
@@ -150,23 +160,43 @@ class Emoticon {
 
     addEmo(emo) {
         for (let index = 0; index < emo.length; index++) {
-            let rep = "";
             let encoded_text = common.htmlEncode(emo[index].key);
             let title = `${encoded_text} - ${emo[index].data_name}`;
             let src = common.htmlEncode(common.getEmoUrl(emo[index].src));
-            if (this.isSpecialEmo(emo[index].key)) {
-                rep = `<img src="${src}" class="ui_emoticon"/>`;
+            // Check whether Chatworks use new Javascript Code
+            if (this.isNewMechanism()) {
+                let one_emo = {
+                    name: encoded_text,
+                    title,
+                    src,
+                    tag: emo[index].key,
+                    external: true
+                };
+                emoticons.baseEmoticons.push(one_emo);
+                emoticons.tagHash[emo[index].key] = one_emo;
             } else {
-                rep = `<img src="${src}" title="${title}" alt="${encoded_text}" class="ui_emoticon"/>`;
+                if (this.isSpecialEmo(emo[index].key)) {
+                    title = "";
+                    encoded_text = "";
+                }
+                // If Chatwork uses old Javascript code, then use the old method
+                let rep = `<img src="${src}" title="${title}" alt="${encoded_text}" class="ui_emoticon"/>`;
+                let regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
+                CW.reg_cmp.push({
+                    key: regex,
+                    rep,
+                    reptxt: emo[index].key,
+                    external: true
+                });
             }
-            let regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
-            CW.reg_cmp.push({
-                key: regex,
-                rep,
-                reptxt: emo[index].key,
-                external: true
-            });
         }
+        if (this.isNewMechanism()) {
+            tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
+        }
+    }
+
+    isNewMechanism() {
+        return typeof emoticons !== "undefined" && typeof tokenizer !== "undefined";
     }
 }
 

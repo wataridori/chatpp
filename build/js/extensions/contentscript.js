@@ -164,7 +164,7 @@ function addInjectedScript() {
 }
 
 function preLoad() {
-    var text = "<li id=\"_chatppPreLoad\"><span id=\"chatppPreLoad\" class=\"icoSizeSmall\"></span></li>";
+    var text = "<li id=\"_chatppPreLoad\" style=\"display: inline-block\"><span id=\"chatppPreLoad\"></span></li>";
     $("#_chatSendTool").append(text);
     var chatpp_pre_load = $("#chatppPreLoad");
     var delay_time = Const.DELAY_TIME / 1000;
@@ -339,7 +339,7 @@ var Common = function () {
             return {
                 "name": "Chat++ for Chatwork",
                 "short_name": "Chat++",
-                "version": "5.1.7",
+                "version": "5.1.11",
                 "option_page": "option.html"
             };
         }

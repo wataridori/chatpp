@@ -1,6 +1,28 @@
 Chat++ Change Logs
 =================
-## 5.1.3
+## 5.1.11
+* Fix bug with sending message by Enter key
+
+## 5.1.10
+* Add external css to fix the problem when displaying user avatar with large emoticons
+
+## 5.1.9
+* Fix bug when turning off Emoticon feature
+
+## 5.1.8
+* Add CC feature by using `@_cc_`. See [PR#60](../../pull/60)
+* Fix problem with some special emoticons
+
+## 5.1.7
+* Add support for both Chatwork's old and new Javascript code
+
+## 5.1.6
+* Fix the problem with Emoticon feature
+
+## 5.1.5
+* Temporarily disable Emoticon feature due to the changes in ChatWork's Javascript Codes
+
+## 5.1.4
 * Remove **TO ALL** button due to the change of ChatWork
 (which makes **TO ALL** button does not work anymore)
 
