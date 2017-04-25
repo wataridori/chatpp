@@ -224,9 +224,9 @@ class ViewEnhancer {
     }
 
     updateGetContactPanelView() {
-        let getContactPanelOld = AC.view.getContactPanel;
+        AC.view.getContactPanelOld = AC.view.getContactPanel;
         AC.view.getContactPanel = function(b, d) {
-            let panel = getContactPanelOld(b, d);
+            let panel = AC.view.getContactPanelOld(b, d);
             if (b == chatwork.myId()) {
                 return panel;
             }
@@ -283,7 +283,7 @@ class ViewEnhancer {
     }
 
     updateChatSendView() {
-        let chatTextKeyUpOld = CS.view.chatTextKeyUp;
+        CS.view.chatTextKeyUpOld = CS.view.chatTextKeyUp;
         CS.view.chatTextKeyUp = function(b) {
             let up_key = b.keyCode;
             let d = $("#_chatText");
@@ -302,7 +302,7 @@ class ViewEnhancer {
                     )
                 }
             })();
-            return chatTextKeyUpOld(b);
+            return CS.view.chatTextKeyUpOld(b);
         };
     }
 

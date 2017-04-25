@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 5.1.11
+* Fix bug with sending message by Enter key
+
 ## 5.1.10
 * Add external css to fix the problem when displaying user avatar with large emoticons
 
