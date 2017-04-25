@@ -1938,7 +1938,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = undefined;
+            var previous = void 0;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -2078,9 +2078,9 @@ var ViewEnhancer = function () {
     }, {
         key: "updateGetContactPanelView",
         value: function updateGetContactPanelView() {
-            var getContactPanelOld = AC.view.getContactPanel;
+            AC.view.getContactPanelOld = AC.view.getContactPanel;
             AC.view.getContactPanel = function (b, d) {
-                var panel = getContactPanelOld(b, d);
+                var panel = AC.view.getContactPanelOld(b, d);
                 if (b == chatwork.myId()) {
                     return panel;
                 }
@@ -2129,7 +2129,7 @@ var ViewEnhancer = function () {
     }, {
         key: "updateChatSendView",
         value: function updateChatSendView() {
-            var chatTextKeyUpOld = CS.view.chatTextKeyUp;
+            CS.view.chatTextKeyUpOld = CS.view.chatTextKeyUp;
             CS.view.chatTextKeyUp = function (b) {
                 var up_key = b.keyCode;
                 var d = $("#_chatText");
@@ -2143,7 +2143,7 @@ var ViewEnhancer = function () {
                         _b === e && (e = a.substr(0, _b), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```$/, "$1[code]\n$2\n[/code]") : e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[code]\n$2\n[/code]\n"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```$/, "$1[title]$2[/title]") : e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[title]$2[/title]"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```$/, "$1[info]$2[/info]") : e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[info]$2[/info]\n"), a = a.substr(_b), d.val(e + a), d.prop("selectionStart", e.length), d.prop("selectionEnd", e.length));
                     }
                 })();
-                return chatTextKeyUpOld(b);
+                return CS.view.chatTextKeyUpOld(b);
             };
         }
     }, {
@@ -2226,7 +2226,7 @@ var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var notify_all = require("./NotifyAll.js");
 
-var cw_timer = undefined;
+var cw_timer = void 0;
 
 $(function () {
     var rebuild = false;
