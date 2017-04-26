@@ -1,10 +1,14 @@
 Chat++ Change Logs
 =================
+## 5.1.12
+* Fix bug with popup notification
+* Add external css to fix the problem when displaying url with big emoticons
+
 ## 5.1.11
 * Fix bug with sending message by Enter key
 
 ## 5.1.10
-* Add external css to fix the problem when displaying user avatar with large emoticons
+* Add external css to fix the problem when displaying user avatar with big emoticons
 
 ## 5.1.9
 * Fix bug when turning off Emoticon feature
