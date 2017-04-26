@@ -1458,26 +1458,24 @@ var NotificationDisabler = function () {
     _createClass(NotificationDisabler, null, [{
         key: "setUp",
         value: function setUp() {
-            var disabledNotifyRooms = [];
+            var disabledNotifyRooms = null;
 
-            if (localStorage["CHATPP_DISABLE_NOTIFY_ROOM"] !== undefined && localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]) {
+            if (localStorage["CHATPP_DISABLE_NOTIFY_ROOM"] !== "" && localStorage["CHATPP_DISABLE_NOTIFY_ROOM"] !== "undefined" && localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]) {
                 disabledNotifyRooms = JSON.parse(localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]);
             }
 
             if (disabledNotifyRooms) {
-                (function () {
-                    var chatworkPopup = CW.popup;
-                    /* eslint-disable no-unused-vars */
-                    var b = null,
-                        d = null,
-                        e = window.navigator.userAgent.toLowerCase().indexOf("chrome") != -1;
-                    /* eslint-enable */
-                    CW.popup = function wrapper(a, f, j, h) {
-                        if (disabledNotifyRooms.indexOf(h.toString()) == -1) {
-                            chatworkPopup(a, f, j, h);
-                        }
-                    };
-                })();
+                CW.popupOld = CW.popup;
+                /* eslint-disable no-unused-vars */
+                var b = null,
+                    d = null,
+                    e = window.navigator.userAgent.toLowerCase().indexOf("chrome") != -1;
+                /* eslint-enable */
+                CW.popup = function wrapper(icon, title, body, room_id) {
+                    if (disabledNotifyRooms.indexOf(room_id.toString()) == -1) {
+                        CW.popupOld(icon, title, body, room_id);
+                    }
+                };
             }
         }
     }]);
@@ -2267,7 +2265,8 @@ function addStyle() {
     $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .messageBadge{vertical-align: initial !important;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
 }
 
 },{"./Advertisement.js":4,"./Emoticon.js":5,"./Mention.js":6,"./NotificationDisabler.js":7,"./NotifyAll.js":8,"./RoomInformation.js":9,"./Shortcut.js":10,"./ViewEnhancer.js":11}]},{},[12]);
