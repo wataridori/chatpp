@@ -69,7 +69,7 @@ class Mention {
             "group_members": chatwork.getRoomAdmins().join(",")
         });
 
-        $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");
+        $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
         this.hideSuggestionBox();
         $("#_sendEnterActionArea").click(() => {
             this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
@@ -573,23 +573,23 @@ class Mention {
                 if (members.length) {
                     let txt = "<ul>";
                     for (let i = 0; i < members.length; i++) {
-                        txt += `<li class="suggested-name" role="listitem" data-cwui-lt-value="${members[i].value}">${members[i].avatar + members[i].label}</li>`;
+                        txt += `<li class="suggested-name tooltipList__item" role="listitem" data-cwui-lt-value="${members[i].value}">${members[i].avatar + members[i].label}</li>`;
                     }
                     txt += "</ul>";
                     return txt;
                 } else {
-                    return `<ul><li class="suggested-name" role="listitem">${this.suggestion_messages["one"][LANGUAGE]}</li></ul>`;
+                    return `<ul><li class="suggested-name tooltipList__item" role="listitem">${this.suggestion_messages["one"][LANGUAGE]}</li></ul>`;
                 }
                 /* eslint-disable no-unreachable */
                 break;
                 /* eslint-enable */
             case "group":
                 if (this.selected_group_name === "random") {
-                    return `<ul><li class="suggested-name" role="listitem">${this.random_user_messages[LANGUAGE]}</li></ul>`;
+                    return `<ul><li class="suggested-name tooltipList__item" role="listitem">${this.random_user_messages[LANGUAGE]}</li></ul>`;
                 }
                 members = this.buildGroupMemberListData(this.selected_group_name);
                 if (members.length) {
-                    let txt = "<ul><li class='suggested-name' role='listitem'>";
+                    let txt = "<ul><li class='suggested-name tooltipList__item' role='listitem'>";
                     for (let i = 0; i < members.length; i++) {
                         if (i == 6) {
                             txt += `<span>+${(members.length - 6)}</span>`;
@@ -606,13 +606,13 @@ class Mention {
                     } else {
                         message = this.suggestion_messages[this.insert_type][LANGUAGE];
                     }
-                    return `<ul><li class="suggested-name" role="listitem">${message}</li></ul>`;
+                    return `<ul><li class="suggested-name tooltipList__item" role="listitem">${message}</li></ul>`;
                 }
                 /* eslint-disable no-unreachable */
                 break;
                 /* eslint-enable */
             case "all":
-                return `<ul><li class="suggested-name" role="listitem">${this.suggestion_messages[this.insert_type][LANGUAGE]}</lia></ul>`;
+                return `<ul><li class="suggested-name tooltipList__item" role="listitem">${this.suggestion_messages[this.insert_type][LANGUAGE]}</lia></ul>`;
                 /* eslint-disable no-unreachable */
                 break;
                 /* eslint-enable */

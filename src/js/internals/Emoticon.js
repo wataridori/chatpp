@@ -59,9 +59,9 @@ class Emoticon {
         }).on("mouseleave", "li", () => $("#_externalEmotionDescription").text(hint)
         ).on("click", "li", function() {
             CW.view.key.ctrl || CW.view.key.command ? (u.close(),
-            CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(),
-            CS.view.setChatText($(this).find("img").prop("alt"), !0),
-            CW.view.key.shift || u.close())
+                CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(),
+                CS.view.setChatText($(this).find("img").prop("alt"), !0),
+                CW.view.key.shift || u.close())
         })
         $("#externalEmoticonsButton").click((e) => {
             u.open($(e.currentTarget));
