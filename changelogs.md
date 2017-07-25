@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 5.1.13
+* Fix several bugs with Room Info button, Emoticon list button, Mention Suggestion popup style (due to Chatwork's codes changed)
+
 ## 5.1.12
 * Fix bug with popup notification
 * Add external css to fix the problem when displaying url with big emoticons
