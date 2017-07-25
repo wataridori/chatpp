@@ -290,7 +290,7 @@ function fillDataTable() {
         var button = $(e.currentTarget);
         if (button.hasClass("btn-data-move-up")) {
             var priority = button.data("priority");
-            var temp = void 0;
+            var temp = undefined;
             var up = priority + 1;
             if (emo_info_array[up]) {
                 temp = emo_info_array[up];
@@ -471,7 +471,7 @@ function getGroupMembers(data) {
     }
 
     var regex = /\[[a-zA-Z]+:([0-9]+)\]/g;
-    var match = void 0;
+    var match = undefined;
     while ((match = regex.exec(data)) != null) {
         valid_members.push(match[1]);
     }
@@ -773,7 +773,7 @@ var Common = function () {
             return {
                 "name": "Chat++ for Chatwork",
                 "short_name": "Chat++",
-                "version": "5.1.12",
+                "version": "5.1.13",
                 "option_page": "option.html"
             };
         }

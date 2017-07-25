@@ -261,7 +261,7 @@ var Common = function () {
             return {
                 "name": "Chat++ for Chatwork",
                 "short_name": "Chat++",
-                "version": "5.1.12",
+                "version": "5.1.13",
                 "option_page": "option.html"
             };
         }
@@ -506,7 +506,7 @@ var Emoticon = function () {
                 return "<li style=\"" + style + "\"><img style=\"width:100%; max-width:50px\" src=\"" + img_src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\"></li>";
             }).join("");
 
-            $("#_wrapper").append("<div id='_externalEmoticonList' class='emoticonList toolTip toolTipWhite mainContetTooltip' style='opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;' role='tooltip'>" + "<div class='_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom' style='left: 129px;'></div>" + ("<ul id='_emoticonGallery' style='display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto'>" + emo_list_div + "</ul>") + "<div id=\"_externalEmotionDescription\" class=\"tooltipFooter\"></div>" + "</div>");
+            $("#_wrapper").append("<div id='_externalEmoticonList' class='emoticonList emoticonTooltip toolTip tooltip--white mainContetTooltip' style='opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;' role='tooltip'>" + "<div class='_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom' style='left: 129px;'></div>" + ("<ul id='_emoticonGallery' style='display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto'>" + emo_list_div + "</ul>") + "<div id=\"_externalEmotionDescription\" class=\"tooltipFooter\"></div>" + "</div>");
             var hint = _is_mac ? L.chatsend_shift_and_command_hint : L.chatsend_shift_and_ctrl_hint;
             var u = $("#_externalEmoticonList").cwToolTip({
                 open: function open() {
@@ -758,7 +758,7 @@ var Mention = function () {
                 "group_members": chatwork.getRoomAdmins().join(",")
             });
 
-            $("<div id='suggestion-container' class='toolTipListWidth toolTip toolTipWhite mainContetTooltip'></div>").insertAfter("#_chatText");
+            $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
             this.hideSuggestionBox();
             $("#_sendEnterActionArea").click(function () {
                 _this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
@@ -1285,23 +1285,23 @@ var Mention = function () {
                     if (members.length) {
                         var txt = "<ul>";
                         for (var i = 0; i < members.length; i++) {
-                            txt += "<li class=\"suggested-name\" role=\"listitem\" data-cwui-lt-value=\"" + members[i].value + "\">" + (members[i].avatar + members[i].label) + "</li>";
+                            txt += "<li class=\"suggested-name tooltipList__item\" role=\"listitem\" data-cwui-lt-value=\"" + members[i].value + "\">" + (members[i].avatar + members[i].label) + "</li>";
                         }
                         txt += "</ul>";
                         return txt;
                     } else {
-                        return "<ul><li class=\"suggested-name\" role=\"listitem\">" + this.suggestion_messages["one"][LANGUAGE] + "</li></ul>";
+                        return "<ul><li class=\"suggested-name tooltipList__item\" role=\"listitem\">" + this.suggestion_messages["one"][LANGUAGE] + "</li></ul>";
                     }
                     /* eslint-disable no-unreachable */
                     break;
                 /* eslint-enable */
                 case "group":
                     if (this.selected_group_name === "random") {
-                        return "<ul><li class=\"suggested-name\" role=\"listitem\">" + this.random_user_messages[LANGUAGE] + "</li></ul>";
+                        return "<ul><li class=\"suggested-name tooltipList__item\" role=\"listitem\">" + this.random_user_messages[LANGUAGE] + "</li></ul>";
                     }
                     members = this.buildGroupMemberListData(this.selected_group_name);
                     if (members.length) {
-                        var _txt = "<ul><li class='suggested-name' role='listitem'>";
+                        var _txt = "<ul><li class='suggested-name tooltipList__item' role='listitem'>";
                         for (var _i = 0; _i < members.length; _i++) {
                             if (_i == 6) {
                                 _txt += "<span>+" + (members.length - 6) + "</span>";
@@ -1318,13 +1318,13 @@ var Mention = function () {
                         } else {
                             message = this.suggestion_messages[this.insert_type][LANGUAGE];
                         }
-                        return "<ul><li class=\"suggested-name\" role=\"listitem\">" + message + "</li></ul>";
+                        return "<ul><li class=\"suggested-name tooltipList__item\" role=\"listitem\">" + message + "</li></ul>";
                     }
                     /* eslint-disable no-unreachable */
                     break;
                 /* eslint-enable */
                 case "all":
-                    return "<ul><li class=\"suggested-name\" role=\"listitem\">" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</lia></ul>";
+                    return "<ul><li class=\"suggested-name tooltipList__item\" role=\"listitem\">" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</lia></ul>";
                     /* eslint-disable no-unreachable */
                     break;
                 /* eslint-enable */
@@ -1553,7 +1553,7 @@ var RoomInformation = function () {
             }
             var room_info = "<li id=\"_roomInfo\" role=\"button\" class=\"_showDescription chatInput__element\" aria-label=\"Show room Information\" style=\"display: inline-block;\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></li>";
             $("#_chatSendTool").append(room_info);
-            var room_info_list = "<div id=\"_roomInfoList\" class=\"roomInfo toolTip toolTipWhite mainContetTooltip\" role=\"tooltip\">" + "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\"></div>" + "<span id=\"_roomInfoText\">" + "<div id=\"_roomInfoTextTotalMembers\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalMessages\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalFiles\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalTasks\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextMyTasks\" class=\"tooltipFooter\"></div>" + "</span>" + "</div>";
+            var room_info_list = "<div id=\"_roomInfoList\" class=\"roomInfo emoticonTooltip toolTip tooltip--white mainContetTooltip\" role=\"tooltip\">" + "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\"></div>" + "<span id=\"_roomInfoText\">" + "<div id=\"_roomInfoTextTotalMembers\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalMessages\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalFiles\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalTasks\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextMyTasks\" class=\"tooltipFooter\"></div>" + "</span>" + "</div>";
             $("body").append(room_info_list);
             $("#_roomInfo").click(function (e) {
                 _this.prepareRoomInfo();
@@ -1945,7 +1945,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = void 0;
+            var previous = undefined;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -2233,7 +2233,7 @@ var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var notify_all = require("./NotifyAll.js");
 
-var cw_timer = void 0;
+var cw_timer = undefined;
 
 $(function () {
     var rebuild = false;

@@ -43,7 +43,7 @@ class Emoticon {
         }).join("");
 
         $("#_wrapper").append(
-            "<div id='_externalEmoticonList' class='emoticonList toolTip toolTipWhite mainContetTooltip' style='opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;' role='tooltip'>" +
+            "<div id='_externalEmoticonList' class='emoticonList emoticonTooltip toolTip tooltip--white mainContetTooltip' style='opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;' role='tooltip'>" +
             "<div class='_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom' style='left: 129px;'></div>" +
             `<ul id='_emoticonGallery' style='display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto'>${emo_list_div}</ul>` +
             "<div id=\"_externalEmotionDescription\" class=\"tooltipFooter\"></div>" +
@@ -59,9 +59,9 @@ class Emoticon {
         }).on("mouseleave", "li", () => $("#_externalEmotionDescription").text(hint)
         ).on("click", "li", function() {
             CW.view.key.ctrl || CW.view.key.command ? (u.close(),
-            CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(),
-            CS.view.setChatText($(this).find("img").prop("alt"), !0),
-            CW.view.key.shift || u.close())
+                CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(),
+                CS.view.setChatText($(this).find("img").prop("alt"), !0),
+                CW.view.key.shift || u.close())
         })
         $("#externalEmoticonsButton").click((e) => {
             u.open($(e.currentTarget));
