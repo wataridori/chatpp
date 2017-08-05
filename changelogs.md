@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 5.1.14
+* Fix bug can not delete a user from a room
+
 ## 5.1.13
 * Fix several bugs with Room Info button, Emoticon list button, Mention Suggestion popup style (due to Chatwork's codes changed)
 
