@@ -90,11 +90,15 @@ var ChatworkFacade = function () {
                     return false;
                 }
                 delete room.member_dat[user_id];
-                CW.post("gateway.php", {
-                    cmd: "update_room",
-                    room_id: room_id,
-                    role: room.member_dat
-                });
+                var params = {
+                    body_params: {
+                        cmd: "update_room",
+                        room_id: room_id,
+                        role: room.member_dat
+                    },
+                    query_params: {}
+                };
+                CW.post("gateway.php", params);
                 return true;
             }
 
@@ -713,16 +717,16 @@ var Mention = function () {
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
         this.suggestion_messages = {
-            one: { ja: "検索結果はありません", en: "No Matching Results" },
-            all: { ja: "すべてを選択します", en: "Select All Members" },
-            group: { ja: "空のグループ", en: "Empty Group" }
+            one: { ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093", en: "No Matching Results" },
+            all: { ja: "\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059", en: "Select All Members" },
+            group: { ja: "\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7", en: "Empty Group" }
         };
         this.random_user_messages = {
-            ja: "メンバーをランダムする",
+            ja: "\u30E1\u30F3\u30D0\u30FC\u3092\u30E9\u30F3\u30C0\u30E0\u3059\u308B",
             en: "Random a member"
         };
         this.no_admin_messages = {
-            ja: "アドミンが存在しません",
+            ja: "\u30A2\u30C9\u30DF\u30F3\u304C\u5B58\u5728\u3057\u307E\u305B\u3093",
             en: "There is no Admin in this Room"
         };
 
@@ -1936,7 +1940,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = undefined;
+            var previous = void 0;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -2224,7 +2228,7 @@ var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var notify_all = require("./NotifyAll.js");
 
-var cw_timer = undefined;
+var cw_timer = void 0;
 
 $(function () {
     var rebuild = false;
