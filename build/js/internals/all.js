@@ -495,7 +495,7 @@ var Emoticon = function () {
             $("#_chatSendTool").append("<li id='_externalEmoticonsButton' role='button' class=' _showDescription chatInput__element'>" + "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" + "</li>");
             var emo_list_div = this.sorted_emoticons.map(function (emo) {
                 var encoded_text = common.htmlEncode(emo.key);
-                var title = emo.data_name + " - " + encoded_text;
+                var title = encoded_text + " - " + emo.data_name + " - Chatpp";
                 var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
                 var style = "padding: 5px; cursor: pointer; border: 1px solid #fff; border-radius: 3px; transition: border 0.2s linear 0s;";
                 return "<li style=\"" + style + "\"><img style=\"width:100%; max-width:50px\" src=\"" + img_src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\"></li>";
@@ -621,7 +621,7 @@ var Emoticon = function () {
         value: function addEmo(emo) {
             for (var index = 0; index < emo.length; index++) {
                 var encoded_text = common.htmlEncode(emo[index].key);
-                var title = encoded_text + " - " + emo[index].data_name;
+                var title = encoded_text + " - " + emo[index].data_name + " - Chatpp";
                 var src = common.htmlEncode(common.getEmoUrl(emo[index].src));
                 // Check whether Chatworks use new Javascript Code
                 if (this.isNewMechanism()) {
@@ -717,16 +717,16 @@ var Mention = function () {
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
         this.suggestion_messages = {
-            one: { ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093", en: "No Matching Results" },
-            all: { ja: "\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059", en: "Select All Members" },
-            group: { ja: "\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7", en: "Empty Group" }
+            one: { ja: "検索結果はありません", en: "No Matching Results" },
+            all: { ja: "すべてを選択します", en: "Select All Members" },
+            group: { ja: "空のグループ", en: "Empty Group" }
         };
         this.random_user_messages = {
-            ja: "\u30E1\u30F3\u30D0\u30FC\u3092\u30E9\u30F3\u30C0\u30E0\u3059\u308B",
+            ja: "メンバーをランダムする",
             en: "Random a member"
         };
         this.no_admin_messages = {
-            ja: "\u30A2\u30C9\u30DF\u30F3\u304C\u5B58\u5728\u3057\u307E\u305B\u3093",
+            ja: "アドミンが存在しません",
             en: "There is no Admin in this Room"
         };
 
@@ -1940,7 +1940,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = void 0;
+            var previous = undefined;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -1989,10 +1989,21 @@ var support_languages = ["1c", "actionscript", "apache", "applescript", "armasm"
 function insertThumbnail(dom) {
     $(".ui_sp_favicon_parent", dom).each(function (index, link) {
         var dom = $(link);
-        var imageLink = getThumbnailLink(dom.attr("href"));
-        if (imageLink) {
-            var img = "<div><img src=\"" + imageLink + "\" alt=\"" + imageLink + "\" style=\"max-width: 500px; max-height: 125px\"></div>";
+        var image_link = getThumbnailLink(dom.attr("href"));
+        if (image_link) {
+            var img = "<div><img src=\"" + image_link + "\" alt=\"" + image_link + "\" style=\"max-width: 500px; max-height: 125px\"></div>";
             dom.after(img);
+        }
+    });
+    return dom;
+}
+
+function insertChatppEmoticonClass(dom) {
+    $(".ui_emoticon", dom).each(function (index, image) {
+        var image_dom = $(image);
+        var title = image_dom.attr("title");
+        if (title.indexOf("Chatpp") > 0) {
+            image_dom.addClass("chatpp_ui_emoticon");
         }
     });
     return dom;
@@ -2157,11 +2168,15 @@ var ViewEnhancer = function () {
                     a.mn = true;
                 }
                 var message_panel = this.getMessagePanelOld(a, b);
-                if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
-                    return message_panel;
-                }
                 var temp = $("<div></div>");
                 $(temp).html(message_panel);
+                if (common.getStatus("emoticon")) {
+                    temp = insertChatppEmoticonClass(temp);
+                }
+
+                if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
+                    return $(temp).html();
+                }
                 if (common.getStatus("thumbnail")) {
                     temp = insertThumbnail(temp);
                 }
@@ -2228,7 +2243,7 @@ var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var notify_all = require("./NotifyAll.js");
 
-var cw_timer = void 0;
+var cw_timer = undefined;
 
 $(function () {
     var rebuild = false;
@@ -2243,6 +2258,7 @@ $(function () {
             if (emoticon.status) {
                 rebuild = true;
                 emoticon.setUp();
+                view_enhancer.updateChatworkView();
             }
 
             mention.setUp();
@@ -2251,10 +2267,6 @@ $(function () {
             NotificationDisabler.setUp();
             notify_all.setUp();
 
-            if (view_enhancer.isActive()) {
-                rebuild = true;
-                view_enhancer.updateChatworkView();
-            }
             view_enhancer.updateChatSendView();
             view_enhancer.updateGetContactPanelView();
 
@@ -2271,6 +2283,7 @@ function addStyle() {
     $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatpp_ui_emoticon{width: initial !important; height: initial !important};</style>").appendTo("head");
 }
 
 },{"./Advertisement.js":4,"./Emoticon.js":5,"./Mention.js":6,"./NotificationDisabler.js":7,"./NotifyAll.js":8,"./RoomInformation.js":9,"./Shortcut.js":10,"./ViewEnhancer.js":11}]},{},[12]);

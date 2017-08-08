@@ -138,10 +138,21 @@ let support_languages = [
 function insertThumbnail(dom) {
     $(".ui_sp_favicon_parent", dom).each((index, link) => {
         let dom = $(link);
-        let imageLink = getThumbnailLink(dom.attr("href"));
-        if (imageLink) {
-            let img = `<div><img src="${imageLink}" alt="${imageLink}" style="max-width: 500px; max-height: 125px"></div>`;
+        let image_link = getThumbnailLink(dom.attr("href"));
+        if (image_link) {
+            let img = `<div><img src="${image_link}" alt="${image_link}" style="max-width: 500px; max-height: 125px"></div>`;
             dom.after(img);
+        }
+    });
+    return dom;
+}
+
+function insertChatppEmoticonClass(dom) {
+    $(".ui_emoticon", dom).each((index, image) => {
+        let image_dom = $(image);
+        let title = image_dom.attr("title");
+        if (title.indexOf("Chatpp") > 0) {
+            image_dom.addClass("chatpp_ui_emoticon");
         }
     });
     return dom;
@@ -313,11 +324,15 @@ class ViewEnhancer {
                 a.mn = true;
             }
             let message_panel = this.getMessagePanelOld(a, b);
-            if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
-                return message_panel;
-            }
             let temp = $("<div></div>");
             $(temp).html(message_panel);
+            if (common.getStatus("emoticon")) {
+                temp = insertChatppEmoticonClass(temp);
+            }
+
+            if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
+                return $(temp).html();
+            }
             if (common.getStatus("thumbnail")) {
                 temp = insertThumbnail(temp);
             }

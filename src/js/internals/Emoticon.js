@@ -36,7 +36,7 @@ class Emoticon {
         );
         let emo_list_div = this.sorted_emoticons.map((emo) => {
             let encoded_text = common.htmlEncode(emo.key);
-            let title = `${emo.data_name} - ${encoded_text}`;
+            let title = `${encoded_text} - ${emo.data_name} - Chatpp`;
             let img_src = common.htmlEncode(common.getEmoUrl(emo.src));
             let style = "padding: 5px; cursor: pointer; border: 1px solid #fff; border-radius: 3px; transition: border 0.2s linear 0s;"
             return `<li style="${style}"><img style="width:100%; max-width:50px" src="${img_src}" title="${title}" alt="${encoded_text}"></li>`;
@@ -161,7 +161,7 @@ class Emoticon {
     addEmo(emo) {
         for (let index = 0; index < emo.length; index++) {
             let encoded_text = common.htmlEncode(emo[index].key);
-            let title = `${encoded_text} - ${emo[index].data_name}`;
+            let title = `${encoded_text} - ${emo[index].data_name} - Chatpp`;
             let src = common.htmlEncode(common.getEmoUrl(emo[index].src));
             // Check whether Chatworks use new Javascript Code
             if (this.isNewMechanism()) {
