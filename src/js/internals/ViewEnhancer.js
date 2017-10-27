@@ -136,7 +136,7 @@ let support_languages = [
 ];
 
 function insertThumbnail(dom) {
-    $(".ui_sp_favicon_parent", dom).each((index, link) => {
+    $(".chatwork-token-url", dom).each((index, link) => {
         let dom = $(link);
         let image_link = getThumbnailLink(dom.attr("href"));
         if (image_link) {
@@ -167,6 +167,12 @@ function getThumbnailLink(link) {
     let fb_img_regex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
     if (link.match(fb_img_regex)) {
         return link;
+    }
+
+    let media_giphy_regex = /^https:\/\/media.giphy.com\/media\/(.*)\/giphy\.gif/i;
+    let giphy_code = link.match(media_giphy_regex);
+    if (giphy_code && giphy_code[1]) {
+        return `https://i.giphy.com/${giphy_code[1]}.gif`;
     }
 
     let gyazo_regex = /^https?:\/\/gyazo.com\//i;
