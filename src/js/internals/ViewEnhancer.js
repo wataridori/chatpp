@@ -245,6 +245,8 @@ class ViewEnhancer {
             let label = LANGUAGE == "ja" ? "同じグループチャットを探す" : "Search for the same Group Chat";
             $(temp).html(panel);
             $(".btnGroup ._profileTipButton", temp).first().append(`<div class="button searchSameRooms _showDescription" aria-label="${label}" data-uid="${b}"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></div>`);
+            //Prevent Munchkin handle click 
+            $("a.chatwork-token-url:not([class*='mchNoDecorate'])").addClass("mchNoDecorate");
             return $(temp).html();
         };
         $(document).on("click", ".searchSameRooms", (e) => {
