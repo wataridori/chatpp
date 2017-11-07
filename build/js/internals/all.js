@@ -717,16 +717,16 @@ var Mention = function () {
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
         this.suggestion_messages = {
-            one: { ja: "検索結果はありません", en: "No Matching Results" },
-            all: { ja: "すべてを選択します", en: "Select All Members" },
-            group: { ja: "空のグループ", en: "Empty Group" }
+            one: { ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093", en: "No Matching Results" },
+            all: { ja: "\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059", en: "Select All Members" },
+            group: { ja: "\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7", en: "Empty Group" }
         };
         this.random_user_messages = {
-            ja: "メンバーをランダムする",
+            ja: "\u30E1\u30F3\u30D0\u30FC\u3092\u30E9\u30F3\u30C0\u30E0\u3059\u308B",
             en: "Random a member"
         };
         this.no_admin_messages = {
-            ja: "アドミンが存在しません",
+            ja: "\u30A2\u30C9\u30DF\u30F3\u304C\u5B58\u5728\u3057\u307E\u305B\u3093",
             en: "There is no Admin in this Room"
         };
 
@@ -1940,7 +1940,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = undefined;
+            var previous = void 0;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -1987,7 +1987,7 @@ var Const = require("../helpers/Const.js");
 var support_languages = ["1c", "actionscript", "apache", "applescript", "armasm", "asciidoc", "aspectj", "autohotkey", "autoit", "avrasm", "axapta", "bash", "brainfuck", "cal", "capnproto", "ceylon", "clojure-repl", "clojure", "cmake", "coffeescript", "cpp", "cs", "css", "d", "dart", "delphi", "diff", "django", "dns", "dockerfile", "dos", "dust", "elixir", "elm", "erb", "erlang-repl", "erlang", "fix", "fortran", "fsharp", "gcode", "gherkin", "glsl", "go", "gradle", "groovy", "haml", "handlebars", "haskell", "haxe", "http", "inform7", "ini", "java", "javascript", "json", "julia", "kotlin", "lasso", "less", "lisp", "livecodeserver", "livescript", "lua", "makefile", "markdown", "mathematica", "matlab", "mel", "mercury", "mizar", "mojolicious", "monkey", "nginx", "nimrod", "nix", "nsis", "objectivec", "ocaml", "openscad", "oxygene", "parser3", "perl", "pf", "php", "powershell", "processing", "profile", "prolog", "protobuf", "puppet", "python", "q", "r", "rib", "roboconf", "rsl", "ruby", "ruleslanguage", "rust", "scala", "scheme", "scilab", "scss", "smali", "smalltalk", "sml", "sql", "stata", "step21", "stylus", "swift", "tcl", "tex", "thrift", "tp", "twig", "typescript", "vala", "vbnet", "vbscript-html", "vbscript", "verilog", "vhdl", "vim", "x86asm", "xl", "xml", "xquery", "zephir"];
 
 function insertThumbnail(dom) {
-    $(".ui_sp_favicon_parent", dom).each(function (index, link) {
+    $(".chatwork-token-url", dom).each(function (index, link) {
         var dom = $(link);
         var image_link = getThumbnailLink(dom.attr("href"));
         if (image_link) {
@@ -2018,6 +2018,12 @@ function getThumbnailLink(link) {
     var fb_img_regex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
     if (link.match(fb_img_regex)) {
         return link;
+    }
+
+    var media_giphy_regex = /^https:\/\/media.giphy.com\/media\/(.*)\/giphy\.gif/i;
+    var giphy_code = link.match(media_giphy_regex);
+    if (giphy_code && giphy_code[1]) {
+        return "https://i.giphy.com/" + giphy_code[1] + ".gif";
     }
 
     var gyazo_regex = /^https?:\/\/gyazo.com\//i;
@@ -2243,7 +2249,7 @@ var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var notify_all = require("./NotifyAll.js");
 
-var cw_timer = undefined;
+var cw_timer = void 0;
 
 $(function () {
     var rebuild = false;

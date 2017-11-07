@@ -7,7 +7,7 @@ var chrome_storage_local = new ChromeStorageLocal();
 
 chrome.runtime.onInstalled.addListener(function () {
     chrome_storage_local.get(function (data) {
-        var version = undefined;
+        var version = void 0;
         if (data) {
             version = data["version"];
         }
