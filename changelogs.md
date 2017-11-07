@@ -1,5 +1,8 @@
 Chat++ Change Logs
 =================
+## 5.1.16
+* Fix thumbnails aren't displayed issue. Check [PR#63](https://github.com/wataridori/chatpp/pull/63)
+
 ## 5.1.15
 * Fix bug with Chat++ Emoticon size (due to Chatwork's codes changed)
 
