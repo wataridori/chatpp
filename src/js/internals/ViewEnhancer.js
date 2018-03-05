@@ -250,7 +250,7 @@ class ViewEnhancer {
             let temp = $("<div></div>");
             let label = LANGUAGE == "ja" ? "同じグループチャットを探す" : "Search for the same Group Chat";
             $(temp).html(panel);
-            $(".btnGroup ._profileTipButton", temp).first().append(`<div class="button searchSameRooms _showDescription" aria-label="${label}" data-uid="${b}"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></div>`);
+            $(".contactPanel__footerButtonContainer", temp).first().append(`<div class="button searchSameRooms _showDescription" aria-label="${label}" style="margin: 0 10px" data-uid="${b}"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></div>`);
             return $(temp).html();
         };
         $(document).on("click", ".searchSameRooms", (e) => {
@@ -264,9 +264,9 @@ class ViewEnhancer {
             let delete_button = "";
             if (result) {
                 delete_button = '<div class="searchResultTitle _messageSearchChatGroup">' +
-                    `Remove <strong>${username}</strong> from the Rooms where you are an Administrator!<br>Please be careful!<br>` +
-                    `<div id="_removeSameRoomsBtn" role="button" tabindex="2" class="button btnDanger _cwBN" data-uid="${uid}">Delete</div>` +
-                    "</div>";
+                    `Remove ${username} from the Rooms where you are an Administrator!<br>Please be careful!<br>` +
+                    `<p><div id="_removeSameRoomsBtn" role="button" tabindex="2" class="button btnDanger _cwBN" data-uid="${uid}">Delete</div>` +
+                    "</div></p>";
             }
             result = '<div class="searchResultListBox">' +
                 `<div class="searchResultTitle _messageSearchChatGroup"><strong><span id="_sameRoomsNumber">${same_rooms.length}</span> room(s) found!</strong></div>` +
