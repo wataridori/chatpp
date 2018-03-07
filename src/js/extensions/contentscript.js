@@ -14,7 +14,6 @@ init(true);
 
 function init(inject_script) {
     storage.get(Const.CHROME_SYNC_KEY, (info) => {
-        emo_info = info;
         if (!$.isEmptyObject(info)) {
             for (let key in info) {
                 let emo_data = info[key];
@@ -35,6 +34,7 @@ function init(inject_script) {
             info.thumbnail_status = false;
             info.emoticon_status = true;
         }
+        emo_info = info;
         localStorage.force_update_version = info.force_update_version;
         let features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
         features.forEach((feature) => {
@@ -172,8 +172,13 @@ function addInjectedScript() {
 }
 
 function preLoad() {
-    let text = "<li id=\"_chatppPreLoad\" style=\"display: inline-block\"><span id=\"chatppPreLoad\"></span></li>";
-    $("#_chatSendTool").append(text);
+    $("#_chatSendTool").append(
+        $("<li>", { id: "_chatppPreLoad", css: {
+            "display": "inline-block"
+        } }).append(
+            $("<span>", { id: "chatppPreLoad" })
+        )
+    );
     let chatpp_pre_load = $("#chatppPreLoad");
     let delay_time = Const.DELAY_TIME / 1000;
     let pre_load_interval = setInterval(() => {

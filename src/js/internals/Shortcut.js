@@ -59,9 +59,15 @@ class Shortcut {
             return;
         }
         $("#_chatSendTool").append(
-            "<li id=\"_chatppShortcutText\" role=\"button\" class=\" _showDescription\">" +
-            "<span id=\"chatppShortcutText\" class=\"emoticonText icoSizeSmall\"></span>" +
-            "</li>"
+            $("<li>", {
+                id: "_chatppShortcutText",
+                attr: {
+                    "role": "button"
+                },
+                class: "emoticonText icoSizeSmall"
+            }).append(
+                $("<span>", { id: "chatppPreLoad", class: "emoticonText icoSizeSmall" })
+            )
         );
         this.updateShortcutText();
         $("#chatppShortcutText").click(() => this.toggleShortcutStatus());
