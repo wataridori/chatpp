@@ -417,9 +417,12 @@ var Advertisement = function () {
             if ($("#chatppAdvertisement").length > 0) {
                 return;
             }
-            var text = "<li id='_chatppSponsored' role='button' class=' _showDescription' aria-label='Chat Plus Plus Information'>" + ("<span id=\"chatppAdvertisement\" class=\"icoSizeSmall\">" + this.getAdvertisementText() + "</span>") + "</li>";
-
-            $("#_chatSendTool").append(text);
+            $("#_chatSendTool").append($("<li>", { id: "_chatppSponsored", class: "_showDescription", css: {
+                    "display": "inline-block"
+                }, attr: {
+                    "role": "button",
+                    "aria-label": "Chat Plus Plus Information"
+                } }).append($("<span>", { id: "chatppPreLoad", class: "icoSizeSmall" })).append(this.getAdvertisementText()));
             setInterval(function () {
                 _this.changeRandomAdvertisement();
             }, ADVERTISEMENT_CHANGE_TIME);
@@ -492,16 +495,64 @@ var Emoticon = function () {
             if ($("#externalEmoticonsButton").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append("<li id='_externalEmoticonsButton' role='button' class=' _showDescription chatInput__element'>" + "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" + "</li>");
+            $("#_chatSendTool").append($("<li>", {
+                id: "_externalEmoticonsButton",
+                class: "_showDescription chatInput__element",
+                css: {
+                    "display": "inline-block"
+                },
+                attr: {
+                    "role": "button"
+                }
+            }).append($("<span>", { id: "externalEmoticonsButton", class: "icoFontActionMore icoSizeLarge" })));
             var emo_list_div = this.sorted_emoticons.map(function (emo) {
                 var encoded_text = common.htmlEncode(emo.key);
                 var title = encoded_text + " - " + emo.data_name + " - Chatpp";
                 var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
                 var style = "padding: 5px; cursor: pointer; border: 1px solid #fff; border-radius: 3px; transition: border 0.2s linear 0s;";
-                return "<li style=\"" + style + "\"><img style=\"width:100%; max-width:50px\" src=\"" + img_src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\"></li>";
+                var liElement = $("<li>", { css: style }).append($("<img>", {
+                    id: "example",
+                    css: {
+                        "width": "100%",
+                        "max-width": "50px"
+                    },
+                    src: img_src,
+                    title: title,
+                    alt: encoded_text
+                }));
+                return liElement;
             }).join("");
 
-            $("#_wrapper").append("<div id='_externalEmoticonList' class='emoticonList emoticonTooltip toolTip tooltip--white mainContetTooltip' style='opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;' role='tooltip'>" + "<div class='_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom' style='left: 129px;'></div>" + ("<ul id='_emoticonGallery' style='display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto'>" + emo_list_div + "</ul>") + "<div id=\"_externalEmotionDescription\" class=\"tooltipFooter\"></div>" + "</div>");
+            $("#_wrapper").append($("<div>", {
+                id: "_externalEmoticonList",
+                class: "emoticonList emoticonTooltip toolTip tooltip--white mainContetTooltip",
+                css: {
+                    "opacity": "1",
+                    "z-index": "2",
+                    "display": "none",
+                    "top": "480px",
+                    "left": "160px",
+                    "role": "tooltip"
+                }
+            }).append($("<div>", {
+                class: "_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom",
+                css: {
+                    "left": "129px"
+                }
+            }), $("<ul>", {
+                id: "_emoticonGallery",
+                css: {
+                    "display": "flex",
+                    "flex-wrap": "wrap",
+                    "justify-content": "center",
+                    "max-width": "350px",
+                    "max-height": "450px",
+                    "overflow": "auto"
+                }
+            }).append(emo_list_div), $("<div>", {
+                id: "_externalEmotionDescription",
+                class: "tooltipFooter"
+            })));
             var hint = _is_mac ? L.chatsend_shift_and_command_hint : L.chatsend_shift_and_ctrl_hint;
             var u = $("#_externalEmoticonList").cwToolTip({
                 open: function open() {
@@ -570,7 +621,16 @@ var Emoticon = function () {
                 return;
             }
             var emoticon_text = "E: " + (this.status ? "ON" : "OFF");
-            $("#_chatSendTool").append("<li id=\"_emoticons\" role=\"button\" class=\" _showDescription chatInput__element\">\n                <span id=\"emoticonText\" class=\"emoticonText icoSizeSmall\">" + emoticon_text + "</span>\n            </li>");
+            $("#_chatSendTool").append($("<li>", {
+                id: "_emoticons",
+                class: "_showDescription chatInput__element",
+                attr: {
+                    "role": "button"
+                }
+            }).append($("<span>", {
+                id: "emoticonText",
+                class: "emoticonText icoSizeSmall"
+            })));
             this.setEmoticonTextLabel();
             $("#emoticonText").click(function () {
                 return _this.toggleEmoticonsStatus();
@@ -603,7 +663,16 @@ var Emoticon = function () {
             }
             var failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
             var failed_data_text = "The following data could not be loaded: " + failed_data;
-            $("#_chatSendTool").append("<li id=\"_chatppErrors\" role=\"button\" class=\" _showDescription chatInput__element\">\n                <span id=\"chatppErrors\" class=\"emoticonText icoSizeSmall chatppErrorsText\">(ERROR)</span>\n            </li>");
+            $("#_chatSendTool").append($("<li>", {
+                id: "_chatppErrors",
+                attr: {
+                    "role": "button"
+                },
+                class: "_showDescription chatInput__element"
+            }).append($("<span>", {
+                id: "chatppPreLoad",
+                class: "emoticonText icoSizeSmall chatppErrorsText"
+            }).text("ERROR")));
             $("#_chatppErrors").attr("aria-label", failed_data_text);
         }
     }, {
@@ -1411,7 +1480,13 @@ var Mention = function () {
             if ($("#_chatppMentionText").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append("<li id='_chatppMentionText' role='button' class=' _showDescription'>" + "<span id='chatppMentionText' class='emoticonText icoSizeSmall'></span>" + "</li>");
+            $("#_chatSendTool").append($("<li>", {
+                id: "_chatppPreLoad",
+                attr: {
+                    "role": "button"
+                },
+                class: "_showDescription"
+            }).append($("<span>", { id: "chatppMentionText", class: "emoticonText icoSizeSmall" })));
             this.updateMentionText();
             $("#chatppMentionText").click(function () {
                 return _this3.toggleMentionStatus();
@@ -1546,10 +1621,44 @@ var RoomInformation = function () {
             if ($("#roomInfoIcon").length > 0) {
                 return;
             }
-            var room_info = "<li id=\"_roomInfo\" role=\"button\" class=\"_showDescription chatInput__element\" aria-label=\"Show room Information\" style=\"display: inline-block;\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></li>";
-            $("#_chatSendTool").append(room_info);
-            var room_info_list = "<div id=\"_roomInfoList\" class=\"roomInfo emoticonTooltip toolTip tooltip--white mainContetTooltip\" role=\"tooltip\">" + "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\"></div>" + "<span id=\"_roomInfoText\">" + "<div id=\"_roomInfoTextTotalMembers\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalMessages\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalFiles\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalTasks\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextMyTasks\" class=\"tooltipFooter\"></div>" + "</span>" + "</div>";
-            $("body").append(room_info_list);
+            $("#_chatSendTool").append($("<li>", {
+                id: "_roomInfo",
+                class: "_showDescription chatInput__element",
+                css: {
+                    "display": "inline-block"
+                }
+            }).append($("<span>", { class: "icoFontAdminInfoMenu icoSizeLarge" })));
+            $("body").append($("<div>", {
+                id: "_roomInfoList",
+                class: "roomInfo emoticonTooltip toolTip tooltip--white mainContetTooltip",
+                attr: {
+                    "role": "tooltip"
+                }
+            }).append($("<div>", {
+                class: "_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom"
+            }), $("<span>", {
+                id: "_roomInfoText"
+            }).append($("<div>", {
+                id: "_roomInfoTextTotalMembers",
+                class: "tooltipFooter"
+
+            }), $("<div>", {
+                id: "_roomInfoTextTotalMessages",
+                class: "tooltipFooter"
+
+            }), $("<div>", {
+                id: "_roomInfoTextTotalFiles",
+                class: "tooltipFooter"
+
+            }), $("<div>", {
+                id: "_roomInfoTextTotalTasks",
+                class: "tooltipFooter"
+
+            }), $("<div>", {
+                id: "_roomInfoTextMyTasks",
+                class: "tooltipFooter"
+
+            }))));
             $("#_roomInfo").click(function (e) {
                 _this.prepareRoomInfo();
                 var room_name = RM.getIcon() + " " + common.htmlEncode(RM.getName());
@@ -1657,7 +1766,13 @@ var Shortcut = function () {
             if ($("#_chatppShortcutText").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append("<li id=\"_chatppShortcutText\" role=\"button\" class=\" _showDescription\">" + "<span id=\"chatppShortcutText\" class=\"emoticonText icoSizeSmall\"></span>" + "</li>");
+            $("#_chatSendTool").append($("<li>", {
+                id: "_chatppShortcutText",
+                attr: {
+                    "role": "button"
+                },
+                class: "emoticonText icoSizeSmall"
+            }).append($("<span>", { id: "chatppPreLoad", class: "emoticonText icoSizeSmall" })));
             this.updateShortcutText();
             $("#chatppShortcutText").click(function () {
                 return _this.toggleShortcutStatus();

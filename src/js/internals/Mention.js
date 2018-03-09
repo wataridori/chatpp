@@ -700,9 +700,15 @@ class Mention {
             return;
         }
         $("#_chatSendTool").append(
-            "<li id='_chatppMentionText' role='button' class=' _showDescription'>" +
-            "<span id='chatppMentionText' class='emoticonText icoSizeSmall'></span>" +
-            "</li>"
+            $("<li>", {
+                id: "_chatppPreLoad",
+                attr: {
+                    "role": "button"
+                },
+                class: "_showDescription"
+            }).append(
+                $("<span>", { id: "chatppMentionText", class: "emoticonText icoSizeSmall" })
+            )
         );
         this.updateMentionText();
         $("#chatppMentionText").click(() => this.toggleMentionStatus());
