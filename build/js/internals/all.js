@@ -507,20 +507,29 @@ var Emoticon = function () {
             }).append($("<span>", { id: "externalEmoticonsButton", class: "icoFontActionMore icoSizeLarge" })));
             var emo_list_div = this.sorted_emoticons.map(function (emo) {
                 var encoded_text = common.htmlEncode(emo.key);
-                var title = encoded_text + " - " + emo.data_name + " - Chatpp";
+                var titleapp = encoded_text + " - " + emo.data_name + " - Chatpp";
                 var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
-                var style = "padding: 5px; cursor: pointer; border: 1px solid #fff; border-radius: 3px; transition: border 0.2s linear 0s;";
-                var liElement = $("<li>", { css: style }).append($("<img>", {
+                var liElement = $("<li>", {
+                    css: {
+                        "padding": "5px",
+                        "cursor": "pointer",
+                        "border": "1px solid #fff",
+                        "border-radius": "3px",
+                        "transition": "border 0.2s linear 0s"
+                    }
+                }).append($("<img>", {
                     id: "example",
                     css: {
                         "width": "100%",
                         "max-width": "50px"
                     },
-                    src: img_src,
-                    title: title,
-                    alt: encoded_text
+                    attr: {
+                        "src": img_src,
+                        "title": titleapp,
+                        "alt": encoded_text
+                    }
                 }));
-                return liElement;
+                return liElement.prop('outerHTML');
             }).join("");
 
             $("#_wrapper").append($("<div>", {
@@ -620,7 +629,7 @@ var Emoticon = function () {
             if ($("#emoticonText").length > 0) {
                 return;
             }
-            var emoticon_text = "E: " + (this.status ? "ON" : "OFF");
+            var emoticonText = "E: " + (this.status ? "ON" : "OFF");
             $("#_chatSendTool").append($("<li>", {
                 id: "_emoticons",
                 class: "_showDescription chatInput__element",
@@ -630,7 +639,7 @@ var Emoticon = function () {
             }).append($("<span>", {
                 id: "emoticonText",
                 class: "emoticonText icoSizeSmall"
-            })));
+            }).append(emoticonText)));
             this.setEmoticonTextLabel();
             $("#emoticonText").click(function () {
                 return _this.toggleEmoticonsStatus();
@@ -646,9 +655,9 @@ var Emoticon = function () {
     }, {
         key: "updateEmoticonText",
         value: function updateEmoticonText() {
-            var emoticon_text = "E: " + (this.status ? "ON" : "OFF");
+            var emoticonText = "E: " + (this.status ? "ON" : "OFF");
             var div = $("#emoticonText");
-            div.html(emoticon_text);
+            div.html(emoticonText);
             if (this.status) {
                 div.addClass("emoticonTextEnable");
             } else {
