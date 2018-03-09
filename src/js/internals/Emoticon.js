@@ -62,14 +62,14 @@ class Emoticon {
                         "width": "100%",
                         "max-width": "50px"
                     },
-                    arrt: {
+                    attr: {
                         "src": img_src,
                         "title": titleapp,
                         "alt": encoded_text
                     }
                 })
             );
-            return liElement
+            return liElement.prop("outerHTML");
         }).join("");
 
         $("#_wrapper").append(
