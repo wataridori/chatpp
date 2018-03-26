@@ -263,10 +263,10 @@ class ViewEnhancer {
             });
             let delete_button = "";
             if (result) {
-                delete_button = '<div class="searchResultTitle _messageSearchChatGroup">' +
-                    `Remove ${username} from the Rooms where you are an Administrator!<br>Please be careful!<br>` +
-                    `<p><div id="_removeSameRoomsBtn" role="button" tabindex="2" class="button btnDanger _cwBN" data-uid="${uid}">Delete</div>` +
-                    "</div></p>";
+                delete_button = '<div class="">' +
+                    `Remove <strong>${username}</strong> from the Rooms where you are an Administrator!<br>Please be careful!<br>` +
+                    `<div id="_removeSameRoomsBtn" role="button" tabindex="2" class="button btnDanger _cwBN" data-uid="${uid}">Delete</div>` +
+                    "</div>";
             }
             result = '<div class="searchResultListBox">' +
                 `<div class="searchResultTitle _messageSearchChatGroup"><strong><span id="_sameRoomsNumber">${same_rooms.length}</span> room(s) found!</strong></div>` +

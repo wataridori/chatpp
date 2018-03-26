@@ -5,19 +5,59 @@ class RoomInformation {
         if ($("#roomInfoIcon").length > 0) {
             return;
         }
-        let room_info = "<li id=\"_roomInfo\" role=\"button\" class=\"_showDescription chatInput__element\" aria-label=\"Show room Information\" style=\"display: inline-block;\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></li>";
-        $("#_chatSendTool").append(room_info);
-        let room_info_list = "<div id=\"_roomInfoList\" class=\"roomInfo emoticonTooltip toolTip tooltip--white mainContetTooltip\" role=\"tooltip\">" +
-            "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\"></div>" +
-            "<span id=\"_roomInfoText\">" +
-            "<div id=\"_roomInfoTextTotalMembers\" class=\"tooltipFooter\"></div>" +
-            "<div id=\"_roomInfoTextTotalMessages\" class=\"tooltipFooter\"></div>" +
-            "<div id=\"_roomInfoTextTotalFiles\" class=\"tooltipFooter\"></div>" +
-            "<div id=\"_roomInfoTextTotalTasks\" class=\"tooltipFooter\"></div>" +
-            "<div id=\"_roomInfoTextMyTasks\" class=\"tooltipFooter\"></div>" +
-            "</span>" +
-            "</div>";
-        $("body").append(room_info_list);
+        $("#_chatSendTool").append(
+            $("<li>", {
+                id: "_roomInfo",
+                class: "_showDescription chatInput__element",
+                css: {
+                    "display": "inline-block"
+                }
+            }).append(
+                $("<span>", { class: "icoFontAdminInfoMenu icoSizeLarge" })
+            )
+        );
+        $("body").append(
+            $("<div>", {
+                id: "_roomInfoList",
+                class: "roomInfo emoticonTooltip toolTip tooltip--white mainContetTooltip",
+                attr: {
+                    "role": "tooltip"
+                }
+            }).append(
+                $("<div>", {
+                    class: "_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom"
+                }),
+                $("<span>", {
+                    id: "_roomInfoText"
+                }).append(
+                    $("<div>", {
+                        id: "_roomInfoTextTotalMembers",
+                        class: "tooltipFooter"
+
+                    }),
+                    $("<div>", {
+                        id: "_roomInfoTextTotalMessages",
+                        class: "tooltipFooter"
+
+                    }),
+                    $("<div>", {
+                        id: "_roomInfoTextTotalFiles",
+                        class: "tooltipFooter"
+
+                    }),
+                    $("<div>", {
+                        id: "_roomInfoTextTotalTasks",
+                        class: "tooltipFooter"
+
+                    }),
+                    $("<div>", {
+                        id: "_roomInfoTextMyTasks",
+                        class: "tooltipFooter"
+
+                    }),
+                )
+            )
+        );
         $("#_roomInfo").click((e) => {
             this.prepareRoomInfo();
             let room_name = `${RM.getIcon()} ${common.htmlEncode(RM.getName())}`;
