@@ -1,6 +1,8 @@
 (function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
 "use strict";
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var common = require("../helpers/Common.js");
 var Const = require("../helpers/Const.js");
 var EmoStorage = require("../helpers/EmoStorage.js");
@@ -23,9 +25,11 @@ $(function () {
             emo_storage.setFeatureStatus(emo_info);
             for (var key in info) {
                 var emo_data = info[key];
-                var url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
-                if (url) {
-                    urls[emo_data.data_name] = url;
+                if (emo_data !== null && (typeof emo_data === "undefined" ? "undefined" : _typeof(emo_data)) === "object") {
+                    var url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
+                    if (url) {
+                        urls[emo_data.data_name] = url;
+                    }
                 }
             }
         }
@@ -143,6 +147,9 @@ function getPriority(data_name) {
     var max = 0;
     for (var key in emo_info) {
         var val = emo_info[key];
+        if (!val || (typeof val === "undefined" ? "undefined" : _typeof(val)) !== "object") {
+            continue;
+        }
         if (val.data_name === data_name) {
             return val.priority;
         }
@@ -322,7 +329,7 @@ function rearrangePriority(data) {
 function emoDataObjectToArray(data) {
     var data_array = [];
     $.each(data, function (key, emo) {
-        if (emo.priority !== undefined) {
+        if (emo && emo.priority !== undefined) {
             data_array[emo.priority] = emo;
         }
     });
@@ -771,7 +778,7 @@ var Common = function () {
             return {
                 "name": "Chat++ for Chatwork",
                 "short_name": "Chat++",
-                "version": "5.1.13",
+                "version": "5.1.18",
                 "option_page": "option.html"
             };
         }

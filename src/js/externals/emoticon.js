@@ -20,9 +20,11 @@ $(() => {
             emo_storage.setFeatureStatus(emo_info);
             for (let key in info) {
                 let emo_data = info[key];
-                let url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
-                if (url) {
-                    urls[emo_data.data_name] = url;
+                if (emo_data !== null && typeof emo_data === "object") {
+                    let url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
+                    if (url) {
+                        urls[emo_data.data_name] = url;
+                    }
                 }
             }
         }
@@ -147,6 +149,9 @@ function getPriority(data_name) {
     let max = 0;
     for (let key in emo_info) {
         let val = emo_info[key];
+        if (!val || typeof val !== "object") {
+            continue;
+        }
         if (val.data_name === data_name) {
             return val.priority;
         }
@@ -346,7 +351,7 @@ function rearrangePriority(data) {
 function emoDataObjectToArray(data) {
     let data_array = [];
     $.each(data, (key, emo) => {
-        if (emo.priority !== undefined) {
+        if (emo && emo.priority !== undefined) {
             data_array[emo.priority] = emo;
         }
     });
