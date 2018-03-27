@@ -64,9 +64,9 @@ class Shortcut {
                 attr: {
                     "role": "button"
                 },
-                class: "emoticonText icoSizeSmall"
+                class: "_showDescription"
             }).append(
-                $("<span>", { id: "chatppPreLoad", class: "emoticonText icoSizeSmall" })
+                $("<span>", { id: "chatppShortcutText", class: "emoticonText icoSizeSmall" })
             )
         );
         this.updateShortcutText();

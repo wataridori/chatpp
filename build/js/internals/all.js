@@ -529,7 +529,7 @@ var Emoticon = function () {
                         "alt": encoded_text
                     }
                 }));
-                return liElement.prop('outerHTML');
+                return liElement.prop("outerHTML");
             }).join("");
 
             $("#_wrapper").append($("<div>", {
@@ -1780,8 +1780,8 @@ var Shortcut = function () {
                 attr: {
                     "role": "button"
                 },
-                class: "emoticonText icoSizeSmall"
-            }).append($("<span>", { id: "chatppPreLoad", class: "emoticonText icoSizeSmall" })));
+                class: "_showDescription"
+            }).append($("<span>", { id: "chatppShortcutText", class: "emoticonText icoSizeSmall" })));
             this.updateShortcutText();
             $("#chatppShortcutText").click(function () {
                 return _this.toggleShortcutStatus();
