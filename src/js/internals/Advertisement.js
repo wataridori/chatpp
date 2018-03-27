@@ -5,11 +5,16 @@ class Advertisement {
         if ($("#chatppAdvertisement").length > 0) {
             return;
         }
-        let text = "<li id='_chatppSponsored' role='button' class=' _showDescription' aria-label='Chat Plus Plus Information'>" +
-            `<span id="chatppAdvertisement" class="icoSizeSmall">${this.getAdvertisementText()}</span>` +
-            "</li>";
-
-        $("#_chatSendTool").append(text);
+        $("#_chatSendTool").append(
+            $("<li>", { id: "_chatppSponsored", class: "_showDescription", css: {
+                "display": "inline-block"
+            }, attr:{
+                "role": "button",
+                "aria-label": "Chat Plus Plus Information"
+            } }).append(
+                $("<span>", { id: "chatppPreLoad", class: "icoSizeSmall" })
+            ).append(this.getAdvertisementText())
+        );
         setInterval(() => {
             this.changeRandomAdvertisement();
         }, ADVERTISEMENT_CHANGE_TIME);

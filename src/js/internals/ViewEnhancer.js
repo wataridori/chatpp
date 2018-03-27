@@ -136,12 +136,23 @@ let support_languages = [
 ];
 
 function insertThumbnail(dom) {
-    $(".ui_sp_favicon_parent", dom).each((index, link) => {
+    $(".chatwork-token-url", dom).each((index, link) => {
         let dom = $(link);
-        let imageLink = getThumbnailLink(dom.attr("href"));
-        if (imageLink) {
-            let img = `<div><img src="${imageLink}" alt="${imageLink}" style="max-width: 500px; max-height: 125px"></div>`;
+        let image_link = getThumbnailLink(dom.attr("href"));
+        if (image_link) {
+            let img = `<div><img src="${image_link}" alt="${image_link}" style="max-width: 500px; max-height: 125px"></div>`;
             dom.after(img);
+        }
+    });
+    return dom;
+}
+
+function insertChatppEmoticonClass(dom) {
+    $(".ui_emoticon", dom).each((index, image) => {
+        let image_dom = $(image);
+        let title = image_dom.attr("title");
+        if (title.indexOf("Chatpp") > 0) {
+            image_dom.addClass("chatpp_ui_emoticon");
         }
     });
     return dom;
@@ -156,6 +167,12 @@ function getThumbnailLink(link) {
     let fb_img_regex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
     if (link.match(fb_img_regex)) {
         return link;
+    }
+
+    let media_giphy_regex = /^https:\/\/media.giphy.com\/media\/(.*)\/giphy\.gif/i;
+    let giphy_code = link.match(media_giphy_regex);
+    if (giphy_code && giphy_code[1]) {
+        return `https://i.giphy.com/${giphy_code[1]}.gif`;
     }
 
     let gyazo_regex = /^https?:\/\/gyazo.com\//i;
@@ -233,7 +250,7 @@ class ViewEnhancer {
             let temp = $("<div></div>");
             let label = LANGUAGE == "ja" ? "同じグループチャットを探す" : "Search for the same Group Chat";
             $(temp).html(panel);
-            $(".btnGroup ._profileTipButton", temp).first().append(`<div class="button searchSameRooms _showDescription" aria-label="${label}" data-uid="${b}"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></div>`);
+            $(".contactPanel__footerButtonContainer", temp).first().append(`<div class="button searchSameRooms _showDescription" aria-label="${label}" style="margin: 0 10px" data-uid="${b}"><span class="icoFontAdminInfoMenu icoSizeLarge"></span></div>`);
             return $(temp).html();
         };
         $(document).on("click", ".searchSameRooms", (e) => {
@@ -246,7 +263,7 @@ class ViewEnhancer {
             });
             let delete_button = "";
             if (result) {
-                delete_button = '<div class="searchResultTitle _messageSearchChatGroup">' +
+                delete_button = '<div class="">' +
                     `Remove <strong>${username}</strong> from the Rooms where you are an Administrator!<br>Please be careful!<br>` +
                     `<div id="_removeSameRoomsBtn" role="button" tabindex="2" class="button btnDanger _cwBN" data-uid="${uid}">Delete</div>` +
                     "</div>";
@@ -313,11 +330,15 @@ class ViewEnhancer {
                 a.mn = true;
             }
             let message_panel = this.getMessagePanelOld(a, b);
-            if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
-                return message_panel;
-            }
             let temp = $("<div></div>");
             $(temp).html(message_panel);
+            if (common.getStatus("emoticon")) {
+                temp = insertChatppEmoticonClass(temp);
+            }
+
+            if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
+                return $(temp).html();
+            }
             if (common.getStatus("thumbnail")) {
                 temp = insertThumbnail(temp);
             }

@@ -71,11 +71,15 @@ class ChatworkFacade {
                 return false;
             }
             delete room.member_dat[user_id];
-            CW.post("gateway.php", {
-                cmd: "update_room",
-                room_id,
-                role: room.member_dat
-            });
+            let params = {
+                body_params: {
+                    cmd: "update_room",
+                    room_id,
+                    role: room.member_dat
+                },
+                query_params: {}
+            };
+            CW.post("gateway.php", params);
             return true;
         }
 

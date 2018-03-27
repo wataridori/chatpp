@@ -22,6 +22,7 @@ $(() => {
             if (emoticon.status) {
                 rebuild = true;
                 emoticon.setUp();
+                view_enhancer.updateChatworkView();
             }
 
             mention.setUp();
@@ -30,10 +31,6 @@ $(() => {
             NotificationDisabler.setUp();
             notify_all.setUp();
 
-            if (view_enhancer.isActive()) {
-                rebuild = true;
-                view_enhancer.updateChatworkView();
-            }
             view_enhancer.updateChatSendView();
             view_enhancer.updateGetContactPanelView();
 
@@ -50,4 +47,5 @@ function addStyle() {
     $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatpp_ui_emoticon{width: initial !important; height: initial !important};</style>").appendTo("head");
 }

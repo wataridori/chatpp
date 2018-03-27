@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -90,11 +90,15 @@ var ChatworkFacade = function () {
                     return false;
                 }
                 delete room.member_dat[user_id];
-                CW.post("gateway.php", {
-                    cmd: "update_room",
-                    room_id: room_id,
-                    role: room.member_dat
-                });
+                var params = {
+                    body_params: {
+                        cmd: "update_room",
+                        room_id: room_id,
+                        role: room.member_dat
+                    },
+                    query_params: {}
+                };
+                CW.post("gateway.php", params);
                 return true;
             }
 
@@ -422,9 +426,12 @@ var Advertisement = function () {
             if ($("#chatppAdvertisement").length > 0) {
                 return;
             }
-            var text = "<li id='_chatppSponsored' role='button' class=' _showDescription' aria-label='Chat Plus Plus Information'>" + ("<span id=\"chatppAdvertisement\" class=\"icoSizeSmall\">" + this.getAdvertisementText() + "</span>") + "</li>";
-
-            $("#_chatSendTool").append(text);
+            $("#_chatSendTool").append($("<li>", { id: "_chatppSponsored", class: "_showDescription", css: {
+                    "display": "inline-block"
+                }, attr: {
+                    "role": "button",
+                    "aria-label": "Chat Plus Plus Information"
+                } }).append($("<span>", { id: "chatppPreLoad", class: "icoSizeSmall" })).append(this.getAdvertisementText()));
             setInterval(function () {
                 _this.changeRandomAdvertisement();
             }, ADVERTISEMENT_CHANGE_TIME);
@@ -497,16 +504,73 @@ var Emoticon = function () {
             if ($("#externalEmoticonsButton").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append("<li id='_externalEmoticonsButton' role='button' class=' _showDescription chatInput__element'>" + "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" + "</li>");
+            $("#_chatSendTool").append($("<li>", {
+                id: "_externalEmoticonsButton",
+                class: "_showDescription chatInput__element",
+                css: {
+                    "display": "inline-block"
+                },
+                attr: {
+                    "role": "button"
+                }
+            }).append($("<span>", { id: "externalEmoticonsButton", class: "icoFontActionMore icoSizeLarge" })));
             var emo_list_div = this.sorted_emoticons.map(function (emo) {
                 var encoded_text = common.htmlEncode(emo.key);
-                var title = emo.data_name + " - " + encoded_text;
+                var titleapp = encoded_text + " - " + emo.data_name + " - Chatpp";
                 var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
-                var style = "padding: 5px; cursor: pointer; border: 1px solid #fff; border-radius: 3px; transition: border 0.2s linear 0s;";
-                return "<li style=\"" + style + "\"><img style=\"width:100%; max-width:50px\" src=\"" + img_src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\"></li>";
+                var liElement = $("<li>", {
+                    css: {
+                        "padding": "5px",
+                        "cursor": "pointer",
+                        "border": "1px solid #fff",
+                        "border-radius": "3px",
+                        "transition": "border 0.2s linear 0s"
+                    }
+                }).append($("<img>", {
+                    id: "example",
+                    css: {
+                        "width": "100%",
+                        "max-width": "50px"
+                    },
+                    attr: {
+                        "src": img_src,
+                        "title": titleapp,
+                        "alt": encoded_text
+                    }
+                }));
+                return liElement.prop("outerHTML");
             }).join("");
 
-            $("#_wrapper").append("<div id='_externalEmoticonList' class='emoticonList emoticonTooltip toolTip tooltip--white mainContetTooltip' style='opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;' role='tooltip'>" + "<div class='_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom' style='left: 129px;'></div>" + ("<ul id='_emoticonGallery' style='display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto'>" + emo_list_div + "</ul>") + "<div id=\"_externalEmotionDescription\" class=\"tooltipFooter\"></div>" + "</div>");
+            $("#_wrapper").append($("<div>", {
+                id: "_externalEmoticonList",
+                class: "emoticonList emoticonTooltip toolTip tooltip--white mainContetTooltip",
+                css: {
+                    "opacity": "1",
+                    "z-index": "2",
+                    "display": "none",
+                    "top": "480px",
+                    "left": "160px",
+                    "role": "tooltip"
+                }
+            }).append($("<div>", {
+                class: "_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom",
+                css: {
+                    "left": "129px"
+                }
+            }), $("<ul>", {
+                id: "_emoticonGallery",
+                css: {
+                    "display": "flex",
+                    "flex-wrap": "wrap",
+                    "justify-content": "center",
+                    "max-width": "350px",
+                    "max-height": "450px",
+                    "overflow": "auto"
+                }
+            }).append(emo_list_div), $("<div>", {
+                id: "_externalEmotionDescription",
+                class: "tooltipFooter"
+            })));
             var hint = _is_mac ? L.chatsend_shift_and_command_hint : L.chatsend_shift_and_ctrl_hint;
             var u = $("#_externalEmoticonList").cwToolTip({
                 open: function open() {
@@ -574,8 +638,17 @@ var Emoticon = function () {
             if ($("#emoticonText").length > 0) {
                 return;
             }
-            var emoticon_text = "E: " + (this.status ? "ON" : "OFF");
-            $("#_chatSendTool").append("<li id=\"_emoticons\" role=\"button\" class=\" _showDescription chatInput__element\">\n                <span id=\"emoticonText\" class=\"emoticonText icoSizeSmall\">" + emoticon_text + "</span>\n            </li>");
+            var emoticonText = "E: " + (this.status ? "ON" : "OFF");
+            $("#_chatSendTool").append($("<li>", {
+                id: "_emoticons",
+                class: "_showDescription chatInput__element",
+                attr: {
+                    "role": "button"
+                }
+            }).append($("<span>", {
+                id: "emoticonText",
+                class: "emoticonText icoSizeSmall"
+            }).append(emoticonText)));
             this.setEmoticonTextLabel();
             $("#emoticonText").click(function () {
                 return _this.toggleEmoticonsStatus();
@@ -591,9 +664,9 @@ var Emoticon = function () {
     }, {
         key: "updateEmoticonText",
         value: function updateEmoticonText() {
-            var emoticon_text = "E: " + (this.status ? "ON" : "OFF");
+            var emoticonText = "E: " + (this.status ? "ON" : "OFF");
             var div = $("#emoticonText");
-            div.html(emoticon_text);
+            div.html(emoticonText);
             if (this.status) {
                 div.addClass("emoticonTextEnable");
             } else {
@@ -608,7 +681,16 @@ var Emoticon = function () {
             }
             var failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
             var failed_data_text = "The following data could not be loaded: " + failed_data;
-            $("#_chatSendTool").append("<li id=\"_chatppErrors\" role=\"button\" class=\" _showDescription chatInput__element\">\n                <span id=\"chatppErrors\" class=\"emoticonText icoSizeSmall chatppErrorsText\">(ERROR)</span>\n            </li>");
+            $("#_chatSendTool").append($("<li>", {
+                id: "_chatppErrors",
+                attr: {
+                    "role": "button"
+                },
+                class: "_showDescription chatInput__element"
+            }).append($("<span>", {
+                id: "chatppPreLoad",
+                class: "emoticonText icoSizeSmall chatppErrorsText"
+            }).text("ERROR")));
             $("#_chatppErrors").attr("aria-label", failed_data_text);
         }
     }, {
@@ -626,7 +708,7 @@ var Emoticon = function () {
         value: function addEmo(emo) {
             for (var index = 0; index < emo.length; index++) {
                 var encoded_text = common.htmlEncode(emo[index].key);
-                var title = encoded_text + " - " + emo[index].data_name;
+                var title = encoded_text + " - " + emo[index].data_name + " - Chatpp";
                 var src = common.htmlEncode(common.getEmoUrl(emo[index].src));
                 // Check whether Chatworks use new Javascript Code
                 if (this.isNewMechanism()) {
@@ -722,16 +804,16 @@ var Mention = function () {
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
         this.suggestion_messages = {
-            one: { ja: "検索結果はありません", en: "No Matching Results" },
-            all: { ja: "すべてを選択します", en: "Select All Members" },
-            group: { ja: "空のグループ", en: "Empty Group" }
+            one: { ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093", en: "No Matching Results" },
+            all: { ja: "\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059", en: "Select All Members" },
+            group: { ja: "\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7", en: "Empty Group" }
         };
         this.random_user_messages = {
-            ja: "メンバーをランダムする",
+            ja: "\u30E1\u30F3\u30D0\u30FC\u3092\u30E9\u30F3\u30C0\u30E0\u3059\u308B",
             en: "Random a member"
         };
         this.no_admin_messages = {
-            ja: "アドミンが存在しません",
+            ja: "\u30A2\u30C9\u30DF\u30F3\u304C\u5B58\u5728\u3057\u307E\u305B\u3093",
             en: "There is no Admin in this Room"
         };
 
@@ -1416,7 +1498,13 @@ var Mention = function () {
             if ($("#_chatppMentionText").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append("<li id='_chatppMentionText' role='button' class=' _showDescription'>" + "<span id='chatppMentionText' class='emoticonText icoSizeSmall'></span>" + "</li>");
+            $("#_chatSendTool").append($("<li>", {
+                id: "_chatppPreLoad",
+                attr: {
+                    "role": "button"
+                },
+                class: "_showDescription"
+            }).append($("<span>", { id: "chatppMentionText", class: "emoticonText icoSizeSmall" })));
             this.updateMentionText();
             $("#chatppMentionText").click(function () {
                 return _this3.toggleMentionStatus();
@@ -1551,10 +1639,44 @@ var RoomInformation = function () {
             if ($("#roomInfoIcon").length > 0) {
                 return;
             }
-            var room_info = "<li id=\"_roomInfo\" role=\"button\" class=\"_showDescription chatInput__element\" aria-label=\"Show room Information\" style=\"display: inline-block;\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></li>";
-            $("#_chatSendTool").append(room_info);
-            var room_info_list = "<div id=\"_roomInfoList\" class=\"roomInfo emoticonTooltip toolTip tooltip--white mainContetTooltip\" role=\"tooltip\">" + "<div class=\"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom\"></div>" + "<span id=\"_roomInfoText\">" + "<div id=\"_roomInfoTextTotalMembers\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalMessages\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalFiles\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextTotalTasks\" class=\"tooltipFooter\"></div>" + "<div id=\"_roomInfoTextMyTasks\" class=\"tooltipFooter\"></div>" + "</span>" + "</div>";
-            $("body").append(room_info_list);
+            $("#_chatSendTool").append($("<li>", {
+                id: "_roomInfo",
+                class: "_showDescription chatInput__element",
+                css: {
+                    "display": "inline-block"
+                }
+            }).append($("<span>", { class: "icoFontAdminInfoMenu icoSizeLarge" })));
+            $("body").append($("<div>", {
+                id: "_roomInfoList",
+                class: "roomInfo emoticonTooltip toolTip tooltip--white mainContetTooltip",
+                attr: {
+                    "role": "tooltip"
+                }
+            }).append($("<div>", {
+                class: "_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom"
+            }), $("<span>", {
+                id: "_roomInfoText"
+            }).append($("<div>", {
+                id: "_roomInfoTextTotalMembers",
+                class: "tooltipFooter"
+
+            }), $("<div>", {
+                id: "_roomInfoTextTotalMessages",
+                class: "tooltipFooter"
+
+            }), $("<div>", {
+                id: "_roomInfoTextTotalFiles",
+                class: "tooltipFooter"
+
+            }), $("<div>", {
+                id: "_roomInfoTextTotalTasks",
+                class: "tooltipFooter"
+
+            }), $("<div>", {
+                id: "_roomInfoTextMyTasks",
+                class: "tooltipFooter"
+
+            }))));
             $("#_roomInfo").click(function (e) {
                 _this.prepareRoomInfo();
                 var room_name = RM.getIcon() + " " + common.htmlEncode(RM.getName());
@@ -1662,7 +1784,13 @@ var Shortcut = function () {
             if ($("#_chatppShortcutText").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append("<li id=\"_chatppShortcutText\" role=\"button\" class=\" _showDescription\">" + "<span id=\"chatppShortcutText\" class=\"emoticonText icoSizeSmall\"></span>" + "</li>");
+            $("#_chatSendTool").append($("<li>", {
+                id: "_chatppShortcutText",
+                attr: {
+                    "role": "button"
+                },
+                class: "_showDescription"
+            }).append($("<span>", { id: "chatppShortcutText", class: "emoticonText icoSizeSmall" })));
             this.updateShortcutText();
             $("#chatppShortcutText").click(function () {
                 return _this.toggleShortcutStatus();
@@ -1945,7 +2073,7 @@ var Shortcut = function () {
     }, {
         key: "nextRoom",
         value: function nextRoom(back) {
-            var previous = undefined;
+            var previous = void 0;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             for (var i = 0; i < sortedRooms.length; i++) {
@@ -1992,12 +2120,23 @@ var Const = require("../helpers/Const.js");
 var support_languages = ["1c", "actionscript", "apache", "applescript", "armasm", "asciidoc", "aspectj", "autohotkey", "autoit", "avrasm", "axapta", "bash", "brainfuck", "cal", "capnproto", "ceylon", "clojure-repl", "clojure", "cmake", "coffeescript", "cpp", "cs", "css", "d", "dart", "delphi", "diff", "django", "dns", "dockerfile", "dos", "dust", "elixir", "elm", "erb", "erlang-repl", "erlang", "fix", "fortran", "fsharp", "gcode", "gherkin", "glsl", "go", "gradle", "groovy", "haml", "handlebars", "haskell", "haxe", "http", "inform7", "ini", "java", "javascript", "json", "julia", "kotlin", "lasso", "less", "lisp", "livecodeserver", "livescript", "lua", "makefile", "markdown", "mathematica", "matlab", "mel", "mercury", "mizar", "mojolicious", "monkey", "nginx", "nimrod", "nix", "nsis", "objectivec", "ocaml", "openscad", "oxygene", "parser3", "perl", "pf", "php", "powershell", "processing", "profile", "prolog", "protobuf", "puppet", "python", "q", "r", "rib", "roboconf", "rsl", "ruby", "ruleslanguage", "rust", "scala", "scheme", "scilab", "scss", "smali", "smalltalk", "sml", "sql", "stata", "step21", "stylus", "swift", "tcl", "tex", "thrift", "tp", "twig", "typescript", "vala", "vbnet", "vbscript-html", "vbscript", "verilog", "vhdl", "vim", "x86asm", "xl", "xml", "xquery", "zephir"];
 
 function insertThumbnail(dom) {
-    $(".ui_sp_favicon_parent", dom).each(function (index, link) {
+    $(".chatwork-token-url", dom).each(function (index, link) {
         var dom = $(link);
-        var imageLink = getThumbnailLink(dom.attr("href"));
-        if (imageLink) {
-            var img = "<div><img src=\"" + imageLink + "\" alt=\"" + imageLink + "\" style=\"max-width: 500px; max-height: 125px\"></div>";
+        var image_link = getThumbnailLink(dom.attr("href"));
+        if (image_link) {
+            var img = "<div><img src=\"" + image_link + "\" alt=\"" + image_link + "\" style=\"max-width: 500px; max-height: 125px\"></div>";
             dom.after(img);
+        }
+    });
+    return dom;
+}
+
+function insertChatppEmoticonClass(dom) {
+    $(".ui_emoticon", dom).each(function (index, image) {
+        var image_dom = $(image);
+        var title = image_dom.attr("title");
+        if (title.indexOf("Chatpp") > 0) {
+            image_dom.addClass("chatpp_ui_emoticon");
         }
     });
     return dom;
@@ -2012,6 +2151,12 @@ function getThumbnailLink(link) {
     var fb_img_regex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
     if (link.match(fb_img_regex)) {
         return link;
+    }
+
+    var media_giphy_regex = /^https:\/\/media.giphy.com\/media\/(.*)\/giphy\.gif/i;
+    var giphy_code = link.match(media_giphy_regex);
+    if (giphy_code && giphy_code[1]) {
+        return "https://i.giphy.com/" + giphy_code[1] + ".gif";
     }
 
     var gyazo_regex = /^https?:\/\/gyazo.com\//i;
@@ -2094,7 +2239,7 @@ var ViewEnhancer = function () {
                 var temp = $("<div></div>");
                 var label = LANGUAGE == "ja" ? "同じグループチャットを探す" : "Search for the same Group Chat";
                 $(temp).html(panel);
-                $(".btnGroup ._profileTipButton", temp).first().append("<div class=\"button searchSameRooms _showDescription\" aria-label=\"" + label + "\" data-uid=\"" + b + "\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></div>");
+                $(".contactPanel__footerButtonContainer", temp).first().append("<div class=\"button searchSameRooms _showDescription\" aria-label=\"" + label + "\" style=\"margin: 0 10px\" data-uid=\"" + b + "\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></div>");
                 return $(temp).html();
             };
             $(document).on("click", ".searchSameRooms", function (e) {
@@ -2107,7 +2252,7 @@ var ViewEnhancer = function () {
                 });
                 var delete_button = "";
                 if (result) {
-                    delete_button = '<div class="searchResultTitle _messageSearchChatGroup">' + ("Remove <strong>" + username + "</strong> from the Rooms where you are an Administrator!<br>Please be careful!<br>") + ("<div id=\"_removeSameRoomsBtn\" role=\"button\" tabindex=\"2\" class=\"button btnDanger _cwBN\" data-uid=\"" + uid + "\">Delete</div>") + "</div>";
+                    delete_button = '<div class="">' + ("Remove <strong>" + username + "</strong> from the Rooms where you are an Administrator!<br>Please be careful!<br>") + ("<div id=\"_removeSameRoomsBtn\" role=\"button\" tabindex=\"2\" class=\"button btnDanger _cwBN\" data-uid=\"" + uid + "\">Delete</div>") + "</div>";
                 }
                 result = '<div class="searchResultListBox">' + ("<div class=\"searchResultTitle _messageSearchChatGroup\"><strong><span id=\"_sameRoomsNumber\">" + same_rooms.length + "</span> room(s) found!</strong></div>") + ("" + result + delete_button) + "</div>";
                 CW.view.alert(result, null, true);
@@ -2162,11 +2307,15 @@ var ViewEnhancer = function () {
                     a.mn = true;
                 }
                 var message_panel = this.getMessagePanelOld(a, b);
-                if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
-                    return message_panel;
-                }
                 var temp = $("<div></div>");
                 $(temp).html(message_panel);
+                if (common.getStatus("emoticon")) {
+                    temp = insertChatppEmoticonClass(temp);
+                }
+
+                if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
+                    return $(temp).html();
+                }
                 if (common.getStatus("thumbnail")) {
                     temp = insertThumbnail(temp);
                 }
@@ -2233,7 +2382,7 @@ var advertisement = require("./Advertisement.js");
 var NotificationDisabler = require("./NotificationDisabler.js");
 var notify_all = require("./NotifyAll.js");
 
-var cw_timer = undefined;
+var cw_timer = void 0;
 
 $(function () {
     var rebuild = false;
@@ -2248,6 +2397,7 @@ $(function () {
             if (emoticon.status) {
                 rebuild = true;
                 emoticon.setUp();
+                view_enhancer.updateChatworkView();
             }
 
             mention.setUp();
@@ -2256,10 +2406,6 @@ $(function () {
             NotificationDisabler.setUp();
             notify_all.setUp();
 
-            if (view_enhancer.isActive()) {
-                rebuild = true;
-                view_enhancer.updateChatworkView();
-            }
             view_enhancer.updateChatSendView();
             view_enhancer.updateGetContactPanelView();
 
@@ -2276,6 +2422,7 @@ function addStyle() {
     $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatpp_ui_emoticon{width: initial !important; height: initial !important};</style>").appendTo("head");
 }
 
 },{"./Advertisement.js":4,"./Emoticon.js":5,"./Mention.js":6,"./NotificationDisabler.js":7,"./NotifyAll.js":8,"./RoomInformation.js":9,"./Shortcut.js":10,"./ViewEnhancer.js":11}]},{},[12]);

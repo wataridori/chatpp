@@ -30,25 +30,85 @@ class Emoticon {
             return;
         }
         $("#_chatSendTool").append(
-            "<li id='_externalEmoticonsButton' role='button' class=' _showDescription chatInput__element'>" +
-            "<span id='externalEmoticonsButton' class='icoFontActionMore icoSizeLarge'></span>" +
-            "</li>"
+            $("<li>", {
+                id: "_externalEmoticonsButton",
+                class:"_showDescription chatInput__element",
+                css: {
+                    "display": "inline-block"
+                },
+                attr: {
+                    "role": "button"
+                }
+            }).append(
+                $("<span>", { id: "externalEmoticonsButton", class:"icoFontActionMore icoSizeLarge" })
+            )
         );
         let emo_list_div = this.sorted_emoticons.map((emo) => {
             let encoded_text = common.htmlEncode(emo.key);
-            let title = `${emo.data_name} - ${encoded_text}`;
+            let titleapp = `${encoded_text} - ${emo.data_name} - Chatpp`;
             let img_src = common.htmlEncode(common.getEmoUrl(emo.src));
-            let style = "padding: 5px; cursor: pointer; border: 1px solid #fff; border-radius: 3px; transition: border 0.2s linear 0s;"
-            return `<li style="${style}"><img style="width:100%; max-width:50px" src="${img_src}" title="${title}" alt="${encoded_text}"></li>`;
+            let liElement = $("<li>", {
+                css: {
+                    "padding": "5px",
+                    "cursor": "pointer",
+                    "border": "1px solid #fff",
+                    "border-radius": "3px",
+                    "transition": "border 0.2s linear 0s"
+                }
+            }).append(
+                $("<img>", {
+                    id:"example",
+                    css:{
+                        "width": "100%",
+                        "max-width": "50px"
+                    },
+                    attr: {
+                        "src": img_src,
+                        "title": titleapp,
+                        "alt": encoded_text
+                    }
+                })
+            );
+            return liElement.prop("outerHTML");
         }).join("");
 
         $("#_wrapper").append(
-            "<div id='_externalEmoticonList' class='emoticonList emoticonTooltip toolTip tooltip--white mainContetTooltip' style='opacity: 1; z-index: 2; display: none; top: 480px; left: 160px;' role='tooltip'>" +
-            "<div class='_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom' style='left: 129px;'></div>" +
-            `<ul id='_emoticonGallery' style='display: flex; flex-wrap: wrap; justify-content: center; max-width: 350px; max-height: 450px; overflow: auto'>${emo_list_div}</ul>` +
-            "<div id=\"_externalEmotionDescription\" class=\"tooltipFooter\"></div>" +
-            "</div>"
-        )
+            $("<div>", {
+                id: "_externalEmoticonList",
+                class: "emoticonList emoticonTooltip toolTip tooltip--white mainContetTooltip",
+                css: {
+                    "opacity": "1",
+                    "z-index": "2",
+                    "display": "none",
+                    "top": "480px",
+                    "left": "160px",
+                    "role": "tooltip"
+                }
+            }).append(
+                $("<div>", {
+                    class:"_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom",
+                    css: {
+                        "left" :"129px"
+                    }
+                }),
+                $("<ul>", {
+                    id:"_emoticonGallery",
+                    css: {
+                        "display": "flex",
+                        "flex-wrap": "wrap",
+                        "justify-content": "center",
+                        "max-width": "350px",
+                        "max-height": "450px",
+                        "overflow": "auto"
+                    }
+                }).append(emo_list_div),
+                $("<div>", {
+                    id: "_externalEmotionDescription",
+                    class:"tooltipFooter"
+                })
+
+            )
+        );
         let hint = _is_mac ? L.chatsend_shift_and_command_hint : L.chatsend_shift_and_ctrl_hint;
         let u = $("#_externalEmoticonList").cwToolTip({
             open: () => $("#_externalEmotionDescription").text(hint)
@@ -59,9 +119,9 @@ class Emoticon {
         }).on("mouseleave", "li", () => $("#_externalEmotionDescription").text(hint)
         ).on("click", "li", function() {
             CW.view.key.ctrl || CW.view.key.command ? (u.close(),
-                CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(),
-                CS.view.setChatText($(this).find("img").prop("alt"), !0),
-                CW.view.key.shift || u.close())
+            CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(),
+            CS.view.setChatText($(this).find("img").prop("alt"), !0),
+            CW.view.key.shift || u.close())
         })
         $("#externalEmoticonsButton").click((e) => {
             u.open($(e.currentTarget));
@@ -108,11 +168,20 @@ class Emoticon {
         if ($("#emoticonText").length > 0) {
             return;
         }
-        let emoticon_text = `E: ${this.status ? "ON" : "OFF"}`;
+        let emoticonText = `E: ${this.status ? "ON" : "OFF"}`;
         $("#_chatSendTool").append(
-            `<li id="_emoticons" role="button" class=" _showDescription chatInput__element">
-                <span id="emoticonText" class="emoticonText icoSizeSmall">${emoticon_text}</span>
-            </li>`
+            $("<li>", {
+                id: "_emoticons",
+                class: "_showDescription chatInput__element",
+                attr: {
+                    "role": "button"
+                }
+            }).append(
+                $("<span>", {
+                    id: "emoticonText",
+                    class: "emoticonText icoSizeSmall"
+                }).append(emoticonText)
+            )
         );
         this.setEmoticonTextLabel();
         $("#emoticonText").click(() => this.toggleEmoticonsStatus());
@@ -125,9 +194,9 @@ class Emoticon {
     }
 
     updateEmoticonText() {
-        let emoticon_text = `E: ${this.status ? "ON" : "OFF"}`;
+        let emoticonText = `E: ${this.status ? "ON" : "OFF"}`;
         let div = $("#emoticonText");
-        div.html(emoticon_text);
+        div.html(emoticonText);
         if (this.status) {
             div.addClass("emoticonTextEnable");
         } else {
@@ -142,9 +211,18 @@ class Emoticon {
         let failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
         let failed_data_text = `The following data could not be loaded: ${failed_data}`;
         $("#_chatSendTool").append(
-            `<li id="_chatppErrors" role="button" class=" _showDescription chatInput__element">
-                <span id="chatppErrors" class="emoticonText icoSizeSmall chatppErrorsText">(ERROR)</span>
-            </li>`
+            $("<li>", {
+                id: "_chatppErrors",
+                attr: {
+                    "role": "button"
+                },
+                class: "_showDescription chatInput__element"
+            }).append(
+                $("<span>", {
+                    id: "chatppPreLoad",
+                    class: "emoticonText icoSizeSmall chatppErrorsText"
+                }).text("ERROR")
+            )
         );
         $("#_chatppErrors").attr("aria-label", failed_data_text);
     }
@@ -161,7 +239,7 @@ class Emoticon {
     addEmo(emo) {
         for (let index = 0; index < emo.length; index++) {
             let encoded_text = common.htmlEncode(emo[index].key);
-            let title = `${encoded_text} - ${emo[index].data_name}`;
+            let title = `${encoded_text} - ${emo[index].data_name} - Chatpp`;
             let src = common.htmlEncode(common.getEmoUrl(emo[index].src));
             // Check whether Chatworks use new Javascript Code
             if (this.isNewMechanism()) {

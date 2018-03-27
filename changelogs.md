@@ -1,5 +1,22 @@
 Chat++ Change Logs
+
 =================
+
+## 5.1.18
+* Fix the problem with using innerHTML
+
+## 5.1.17
+* Fix problem with "Remove user from same rooms" feature
+
+## 5.1.16
+* Fix thumbnails aren't displayed issue. Check [PR#63](https://github.com/wataridori/chatpp/pull/63)
+
+## 5.1.15
+* Fix bug with Chat++ Emoticon size (due to Chatwork's codes changed)
+
+## 5.1.14
+* Fix bug can not delete a user from a room (due to Chatwork's codes changed)
+
 ## 5.1.13
 * Fix several bugs with Room Info button, Emoticon list button, Mention Suggestion popup style (due to Chatwork's codes changed)
 
