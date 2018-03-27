@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
 "use strict";
 
 var Const = require("../helpers/Const.js");
@@ -17,7 +17,6 @@ init(true);
 
 function init(inject_script) {
     storage.get(Const.CHROME_SYNC_KEY, function (info) {
-        emo_info = info;
         if (!$.isEmptyObject(info)) {
             for (var key in info) {
                 var emo_data = info[key];
@@ -38,6 +37,7 @@ function init(inject_script) {
             info.thumbnail_status = false;
             info.emoticon_status = true;
         }
+        emo_info = info;
         localStorage.force_update_version = info.force_update_version;
         var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
         features.forEach(function (feature) {
@@ -173,8 +173,9 @@ function addInjectedScript() {
 }
 
 function preLoad() {
-    var text = "<li id=\"_chatppPreLoad\" style=\"display: inline-block\"><span id=\"chatppPreLoad\"></span></li>";
-    $("#_chatSendTool").append(text);
+    $("#_chatSendTool").append($("<li>", { id: "_chatppPreLoad", css: {
+            "display": "inline-block"
+        } }).append($("<span>", { id: "chatppPreLoad" })));
     var chatpp_pre_load = $("#chatppPreLoad");
     var delay_time = Const.DELAY_TIME / 1000;
     var pre_load_interval = setInterval(function () {
