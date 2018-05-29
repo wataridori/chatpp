@@ -1,4 +1,8 @@
 Chat++ Change Logs
+=======
+## 5.1.19
+* Mix-gulp Laravel mix - Nguyen Huu Su
+
 ## 5.1.18
 * Fix the problem with using innerHTML
 
