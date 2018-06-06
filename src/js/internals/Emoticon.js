@@ -69,8 +69,56 @@ class Emoticon {
                     }
                 })
             );
+            
             return liElement.prop("outerHTML");
         }).join("");
+
+        let data = [];
+        this.sorted_emoticons.forEach((emo) => {
+            if (data.indexOf(emo.data_name) == -1) {
+                data.push(emo.data_name);
+            }  
+        });
+
+        let temp = [];
+        let arrayData= [];
+        let sorted_Emoticons = this.sorted_emoticons;
+        data.forEach((item) => {
+            temp = [];
+            sorted_Emoticons.map((emo) => {
+                let encoded_text = common.htmlEncode(emo.key);
+                let titleapp = `${encoded_text} - ${emo.data_name} - Chatpp`;
+                let img_src = common.htmlEncode(common.getEmoUrl(emo.src));
+                if (emo.data_name == item) {
+                    let liElement = $("<li>", {
+                        css: {
+                            "padding": "5px",
+                            "cursor": "pointer",
+                            "border": "1px solid #fff",
+                            "border-radius": "3px",
+                            "transition": "border 0.2s linear 0s"
+                        }
+                    }).append($("<img>", {
+                        id: "example",
+                        css: {
+                            "width": "100%",
+                            "max-width": "50px"
+                        },
+                        attr: {
+                            "src": img_src,
+                            "title": titleapp,
+                            "alt": encoded_text
+                        }
+                    }));
+                    temp.push(liElement);
+
+                    return liElement.prop("outerHTML");
+                }
+            }).join("");
+            arrayData.push(temp);
+        });
+
+        $("#_wrapper").append($("<style>").append("::-webkit-scrollbar {width:10px;height:10px} .w3-emotion {display:inline-block;text-align:center;width:80px;height:30px;border:1px solid #ccc;cursor:pointer;margin:0px 2px;border-radius:5px;font-size:10px}"));
 
         $("#_wrapper").append(
             $("<div>", {
@@ -82,7 +130,8 @@ class Emoticon {
                     "display": "none",
                     "top": "480px",
                     "left": "160px",
-                    "role": "tooltip"
+                    "role": "tooltip",
+                    "width": "350px"
                 }
             }).append(
                 $("<div>", {
@@ -92,21 +141,28 @@ class Emoticon {
                     }
                 }),
                 $("<ul>", {
-                    id:"_emoticonGallery",
+                    id:"_emoticonGalleryTab",
                     css: {
                         "display": "flex",
                         "flex-wrap": "wrap",
                         "justify-content": "center",
                         "max-width": "350px",
-                        "max-height": "450px",
+                        "height": "450px",
                         "overflow": "auto"
                     }
                 }).append(emo_list_div),
                 $("<div>", {
                     id: "_externalEmotionDescription",
                     class:"tooltipFooter"
+                }), $("<div>", {
+                    id: "tabEmotionBig",
+                    css: {
+                        "display": "flex",
+                        "overflow": "auto",
+                        "overflow-y": "scroll",
+                        "height": "42px"
+                    }
                 })
-
             )
         );
         let hint = _is_mac ? L.chatsend_shift_and_command_hint : L.chatsend_shift_and_ctrl_hint;
@@ -125,6 +181,34 @@ class Emoticon {
         })
         $("#externalEmoticonsButton").click((e) => {
             u.open($(e.currentTarget));
+        });
+
+        data.forEach((item, index) => {
+            $("#_externalEmoticonList #tabEmotionBig").append($("<button>", {
+                id: `tabEmotion${index}`,
+                class: "w3-bar-item w3-button w3-emotion"
+            }).append(item));
+        });
+
+        data.forEach((item, index) => {
+            $(`#tabEmotion${index}`).on("click", (event) => {
+                event.preventDefault();
+                $("#_emoticonGalleryTab li").remove();
+                $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[index]);
+            });
+        });
+
+        data.forEach((item, index) => {
+            $("#_externalEmoticonList #tabEmotionBig button").on("click", () => {
+                $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
+                $(this).css("background-color", "#eaeae8");
+            });
+
+            $(`#_externalEmoticonList #tabEmotionBig #tabEmotion${index}`).hover(() => {
+                $(this).attr("data-toggle", "tooltip");
+                $(this).attr("data-placement", "top");
+                $(this).attr("title", item);
+            });
         });
     }
 
