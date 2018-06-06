@@ -1,7 +1,11 @@
 Chat++ Change Logs
+
 =======
+## 5.1.20
+* Move to message with [toall] by using shortcut.
+
 ## 5.1.19
-* Mix-gulp Laravel mix - Nguyen Huu Su
+* Mix-gulp Laravel mix
 
 ## 5.1.18
 * Fix the problem with using innerHTML

@@ -288,12 +288,10 @@ class Shortcut {
 
     isMentionMessage(message) {
         let regex_reply = new RegExp(`\\[.* aid=${AC.myid} .*\\]`);
-        if (regex_reply.test(message.msg)) {
-            return true;
-        }
-
         let regex_to = new RegExp(`\\[To:${AC.myid}\\]`);
-        return regex_to.test(message.msg);
+        let regex_to_all = new RegExp("\\[toall\\]");
+        
+        return [regex_reply, regex_to, regex_to_all].some((r) => r.test(message.msg));
     }
 
     replyMessage(message) {
