@@ -1,5 +1,9 @@
 Chat++ Change Logs
 
+=======
+## 5.1.20
+* Move to message with [toall] by using shortcut.
+
 ## 5.1.19
 * Mix-gulp Laravel mix
 
