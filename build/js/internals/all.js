@@ -1,4 +1,4 @@
-(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -492,6 +492,8 @@ var Emoticon = function () {
     }, {
         key: "addExternalEmoList",
         value: function addExternalEmoList() {
+            var _this = this;
+
             if ($("#externalEmoticonsButton").length > 0) {
                 return;
             }
@@ -529,8 +531,56 @@ var Emoticon = function () {
                         "alt": encoded_text
                     }
                 }));
+
                 return liElement.prop("outerHTML");
             }).join("");
+
+            var data = [];
+            this.sorted_emoticons.forEach(function (emo) {
+                if (data.indexOf(emo.data_name) == -1) {
+                    data.push(emo.data_name);
+                }
+            });
+
+            var temp = [];
+            var arrayData = [];
+            var sorted_Emoticons = this.sorted_emoticons;
+            data.forEach(function (item) {
+                temp = [];
+                sorted_Emoticons.map(function (emo) {
+                    var encoded_text = common.htmlEncode(emo.key);
+                    var titleapp = encoded_text + " - " + emo.data_name + " - Chatpp";
+                    var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
+                    if (emo.data_name == item) {
+                        var liElement = $("<li>", {
+                            css: {
+                                "padding": "5px",
+                                "cursor": "pointer",
+                                "border": "1px solid #fff",
+                                "border-radius": "3px",
+                                "transition": "border 0.2s linear 0s"
+                            }
+                        }).append($("<img>", {
+                            id: "example",
+                            css: {
+                                "width": "100%",
+                                "max-width": "50px"
+                            },
+                            attr: {
+                                "src": img_src,
+                                "title": titleapp,
+                                "alt": encoded_text
+                            }
+                        }));
+                        temp.push(liElement);
+
+                        return liElement.prop("outerHTML");
+                    }
+                }).join("");
+                arrayData.push(temp);
+            });
+
+            $("#_wrapper").append($("<style>").append("::-webkit-scrollbar {width:10px;height:10px} .w3-emotion {display:inline-block;text-align:center;width:80px;height:30px;border:1px solid #ccc;cursor:pointer;margin:0px 2px;border-radius:5px;font-size:10px}"));
 
             $("#_wrapper").append($("<div>", {
                 id: "_externalEmoticonList",
@@ -541,7 +591,8 @@ var Emoticon = function () {
                     "display": "none",
                     "top": "480px",
                     "left": "160px",
-                    "role": "tooltip"
+                    "role": "tooltip",
+                    "width": "350px"
                 }
             }).append($("<div>", {
                 class: "_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom",
@@ -549,18 +600,26 @@ var Emoticon = function () {
                     "left": "129px"
                 }
             }), $("<ul>", {
-                id: "_emoticonGallery",
+                id: "_emoticonGalleryTab",
                 css: {
                     "display": "flex",
                     "flex-wrap": "wrap",
                     "justify-content": "center",
                     "max-width": "350px",
-                    "max-height": "450px",
+                    "height": "450px",
                     "overflow": "auto"
                 }
             }).append(emo_list_div), $("<div>", {
                 id: "_externalEmotionDescription",
                 class: "tooltipFooter"
+            }), $("<div>", {
+                id: "tabEmotionBig",
+                css: {
+                    "display": "flex",
+                    "overflow": "auto",
+                    "overflow-y": "scroll",
+                    "height": "42px"
+                }
             })));
             var hint = _is_mac ? L.chatsend_shift_and_command_hint : L.chatsend_shift_and_ctrl_hint;
             var u = $("#_externalEmoticonList").cwToolTip({
@@ -578,6 +637,34 @@ var Emoticon = function () {
             });
             $("#externalEmoticonsButton").click(function (e) {
                 u.open($(e.currentTarget));
+            });
+
+            data.forEach(function (item, index) {
+                $("#_externalEmoticonList #tabEmotionBig").append($("<button>", {
+                    id: "tabEmotion" + index,
+                    class: "w3-bar-item w3-button w3-emotion"
+                }).append(item));
+            });
+
+            data.forEach(function (item, index) {
+                $("#tabEmotion" + index).on("click", function (event) {
+                    event.preventDefault();
+                    $("#_emoticonGalleryTab li").remove();
+                    $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[index]);
+                });
+            });
+
+            data.forEach(function (item, index) {
+                $("#_externalEmoticonList #tabEmotionBig button").on("click", function () {
+                    $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
+                    $(_this).css("background-color", "#eaeae8");
+                });
+
+                $("#_externalEmoticonList #tabEmotionBig #tabEmotion" + index).hover(function () {
+                    $(_this).attr("data-toggle", "tooltip");
+                    $(_this).attr("data-placement", "top");
+                    $(_this).attr("title", item);
+                });
             });
         }
     }, {
@@ -624,7 +711,7 @@ var Emoticon = function () {
     }, {
         key: "addEmoticonText",
         value: function addEmoticonText() {
-            var _this = this;
+            var _this2 = this;
 
             if ($("#emoticonText").length > 0) {
                 return;
@@ -642,7 +729,7 @@ var Emoticon = function () {
             }).append(emoticonText)));
             this.setEmoticonTextLabel();
             $("#emoticonText").click(function () {
-                return _this.toggleEmoticonsStatus();
+                return _this2.toggleEmoticonsStatus();
             });
             this.addErrorText();
         }
@@ -2026,12 +2113,12 @@ var Shortcut = function () {
         key: "isMentionMessage",
         value: function isMentionMessage(message) {
             var regex_reply = new RegExp("\\[.* aid=" + AC.myid + " .*\\]");
-            if (regex_reply.test(message.msg)) {
-                return true;
-            }
-
             var regex_to = new RegExp("\\[To:" + AC.myid + "\\]");
-            return regex_to.test(message.msg);
+            var regex_to_all = new RegExp("\\[toall\\]");
+
+            return [regex_reply, regex_to, regex_to_all].some(function (r) {
+                return r.test(message.msg);
+            });
         }
     }, {
         key: "replyMessage",
