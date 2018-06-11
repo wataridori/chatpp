@@ -1,6 +1,9 @@
 Chat++ Change Logs
 
 =======
+## 5.1.21
+* Rearrange emoticons list into tabs base on Emoticon Data set.
+
 ## 5.1.20
 * Move to message with [toall] by using shortcut.
 
