@@ -580,7 +580,7 @@ var Emoticon = function () {
                 arrayData.push(temp);
             });
 
-            $("#_wrapper").append($("<style>").append("::-webkit-scrollbar {width:10px;height:10px} .w3-emotion {display:inline-block;text-align:center;width:80px;height:30px;border:1px solid #ccc;cursor:pointer;margin:0px 2px;border-radius:5px;font-size:10px}"));
+            $("#_wrapper").append($("<style>").append("::-webkit-scrollbar {width:10px;height:10px} .w3-emotion {display:inline-block;text-align:center;width:80px;height:30px;border:1px solid #ccc;cursor:pointer;margin:0px 2px;border-radius:5px;font-size:10px;background-color:white}"));
 
             $("#_wrapper").append($("<div>", {
                 id: "_externalEmoticonList",
@@ -655,15 +655,15 @@ var Emoticon = function () {
             });
 
             data.forEach(function (item, index) {
-                $("#_externalEmoticonList #tabEmotionBig button").on("click", function () {
+                $("#_externalEmoticonList #tabEmotionBig button").on("click", function (event) {
                     $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
-                    $(_this).css("background-color", "#eaeae8");
+                    $(event.currentTarget).css("background-color", "#eaeae8");
                 });
 
-                $("#_externalEmoticonList #tabEmotionBig #tabEmotion" + index).hover(function () {
-                    $(_this).attr("data-toggle", "tooltip");
-                    $(_this).attr("data-placement", "top");
-                    $(_this).attr("title", item);
+                $("#_externalEmoticonList #tabEmotionBig #tabEmotion" + index).hover(function (event) {
+                    $(event.currentTarget).attr("data-toggle", "tooltip");
+                    $(event.currentTarget).attr("data-placement", "top");
+                    $(event.currentTarget).attr("title", item);
                 });
             });
         }
