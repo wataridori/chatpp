@@ -492,6 +492,8 @@ var Emoticon = function () {
     }, {
         key: "addExternalEmoList",
         value: function addExternalEmoList() {
+            var _this = this;
+
             if ($("#externalEmoticonsButton").length > 0) {
                 return;
             }
@@ -709,7 +711,7 @@ var Emoticon = function () {
     }, {
         key: "addEmoticonText",
         value: function addEmoticonText() {
-            var _this = this;
+            var _this2 = this;
 
             if ($("#emoticonText").length > 0) {
                 return;
@@ -727,7 +729,7 @@ var Emoticon = function () {
             }).append(emoticonText)));
             this.setEmoticonTextLabel();
             $("#emoticonText").click(function () {
-                return _this.toggleEmoticonsStatus();
+                return _this2.toggleEmoticonsStatus();
             });
             this.addErrorText();
         }
