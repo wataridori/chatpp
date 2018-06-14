@@ -43,36 +43,7 @@ class Emoticon {
                 $("<span>", { id: "externalEmoticonsButton", class:"icoFontActionMore icoSizeLarge" })
             )
         );
-        let emo_list_div = this.sorted_emoticons.map((emo) => {
-            let encoded_text = common.htmlEncode(emo.key);
-            let titleapp = `${encoded_text} - ${emo.data_name} - Chatpp`;
-            let img_src = common.htmlEncode(common.getEmoUrl(emo.src));
-            let liElement = $("<li>", {
-                css: {
-                    "padding": "5px",
-                    "cursor": "pointer",
-                    "border": "1px solid #fff",
-                    "border-radius": "3px",
-                    "transition": "border 0.2s linear 0s"
-                }
-            }).append(
-                $("<img>", {
-                    id:"example",
-                    css:{
-                        "width": "100%",
-                        "max-width": "50px"
-                    },
-                    attr: {
-                        "src": img_src,
-                        "title": titleapp,
-                        "alt": encoded_text
-                    }
-                })
-            );
-            
-            return liElement.prop("outerHTML");
-        }).join("");
-
+        
         let data = [];
         this.sorted_emoticons.forEach((emo) => {
             if (data.indexOf(emo.data_name) == -1) {
@@ -150,7 +121,7 @@ class Emoticon {
                         "height": "450px",
                         "overflow": "auto"
                     }
-                }).append(emo_list_div),
+                }),
                 $("<div>", {
                     id: "_externalEmotionDescription",
                     class:"tooltipFooter"
@@ -188,6 +159,12 @@ class Emoticon {
                 id: `tabEmotion${index}`,
                 class: "w3-bar-item w3-button w3-emotion"
             }).append(item));
+        });
+
+        $("#externalEmoticonsButton").on("click", () => {
+            $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[0]);
+            $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
+            $("#tabEmotion0").css("background-color", "#eaeae8");
         });
 
         data.forEach((item, index) => {
