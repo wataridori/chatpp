@@ -549,10 +549,10 @@ class Mention {
                 break;
             case "toall":
                 if(this.insert_mode === "to"){
-                    replace_text = "TO ALL >>>";
+                    replace_text = "TO ALL >>> \n";
                 }
                 else{
-                    replace_text = "[toall]";
+                    replace_text = "[toall]\n";
                 }
                 break;
             default:
