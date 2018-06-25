@@ -37,9 +37,18 @@ class Mention {
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
         this.suggestion_messages = {
-            one: {ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093", en: "No Matching Results"},
-            all: {ja: "\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059", en: "Select All Members"},
-            group: {ja: "\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7", en: "Empty Group"}
+            one: {
+                ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093",
+                en: "No Matching Results"
+            },
+            all: {
+                ja: "\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059",
+                en: "Select All Members"
+            },
+            group: {
+                ja: "\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7",
+                en: "Empty Group"
+            }
         };
         this.random_user_messages = {
             ja: "\u30e1\u30f3\u30d0\u30fc\u3092\u30e9\u30f3\u30c0\u30e0\u3059\u308b",
@@ -80,9 +89,9 @@ class Mention {
             String.prototype.format = function () {
                 let args = arguments;
                 return this.replace(/{(\d+)}/g, (match, number) =>
-                    typeof args[number] != "undefined"
-                        ? args[number]
-                        : match
+                    typeof args[number] != "undefined" ?
+                        args[number] :
+                        match
                 );
             };
         }
@@ -318,14 +327,23 @@ class Mention {
         }
         if (rect.height - position.top < 90) {
             if (position.top < 108) {
-                $("#_chatTextArea").css({"overflow-y": "visible", "z-index": 2});
+                $("#_chatTextArea").css({
+                    "overflow-y": "visible",
+                    "z-index": 2
+                });
             }
             position.top -= 118;
         } else {
             position.top += parseInt(this.chat_text_jquery.css("font-size")) + 2
         }
-        $("#suggestion-container").parent().css({position: "relative"});
-        $("#suggestion-container").css({top: position.top, left: position.left, position: "absolute"});
+        $("#suggestion-container").parent().css({
+            position: "relative"
+        });
+        $("#suggestion-container").css({
+            top: position.top,
+            left: position.left,
+            position: "absolute"
+        });
         this.setCaretPosition(this.chat_text_element, current_pos);
     }
 
@@ -382,7 +400,10 @@ class Mention {
         }
         this.insert_type = "one";
         $("#suggestion-container").html("");
-        $("#_chatTextArea").css({"overflow-y": "scroll", "z-index": 0});
+        $("#_chatTextArea").css({
+            "overflow-y": "scroll",
+            "z-index": 0
+        });
         // restore setting to correct value
         if (this.cached_enter_action != ST.data.enter_action && this.cached_enter_action == "send") {
             ST.data.enter_action = this.cached_enter_action;
@@ -391,7 +412,7 @@ class Mention {
 
     // http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
     doGetCaretPosition(ctrl) {
-        let CaretPos = 0;   // IE Support
+        let CaretPos = 0; // IE Support
         if (document.selection) {
             ctrl.focus();
             let Sel = document.selection.createRange();
@@ -408,8 +429,7 @@ class Mention {
         if (ctrl.setSelectionRange) {
             ctrl.focus();
             ctrl.setSelectionRange(pos, pos);
-        }
-        else if (ctrl.createTextRange) {
+        } else if (ctrl.createTextRange) {
             let range = ctrl.createTextRange();
             range.collapse(true);
             range.moveEnd("character", pos);
@@ -461,14 +481,16 @@ class Mention {
                     return [];
                 }
             }
-
-
             if (typed_text == "me") {
                 this.insert_type = "me";
                 return [this.getMemberObject(AC.myid)];
             }
             if (typed_text == "all") {
                 this.insert_type = "all";
+                return [];
+            }
+            if (typed_text == "toall") {
+                this.insert_type = "toall";
                 return [];
             }
             this.insert_type = "one";
@@ -485,7 +507,7 @@ class Mention {
             this.insert_mode = "name";
             return this.getRawResultsAndSetType(typed_text.substring(1));
         }
-        if (typed_text.slice(0, 4) == INSERT_MODE_SYM.CC){
+        if (typed_text.slice(0, 4) == INSERT_MODE_SYM.CC) {
             this.insert_mode = "CC";
             return this.getRawResultsAndSetType(typed_text.substring(4));
         }
@@ -524,7 +546,14 @@ class Mention {
                 for (let i = 0; i < members.length; i++) {
                     replace_text += format_string.format(members[i].value, members[i].aid2name);
                 }
-
+                break;
+            case "toall":
+                if(this.insert_mode === "to"){
+                    replace_text = "TO ALL >>>";
+                }
+                else{
+                    replace_text = "[toall]";
+                }
                 break;
             default:
                 break;
@@ -612,7 +641,12 @@ class Mention {
                 break;
                 /* eslint-enable */
             case "all":
-                return `<ul><li class="suggested-name tooltipList__item" role="listitem">${this.suggestion_messages[this.insert_type][LANGUAGE]}</lia></ul>`;
+                return `<ul><li class="suggested-name tooltipList__item" role="listitem">${this.suggestion_messages[this.insert_type][LANGUAGE]}</li></ul>`;
+                /* eslint-disable no-unreachable */
+                break;
+                /* eslint-enable */ 
+            case "toall":
+                return '<ul><li class="suggested-name tooltipList__item" role="listitem">To All</li></ul>';
                 /* eslint-disable no-unreachable */
                 break;
                 /* eslint-enable */
@@ -707,7 +741,10 @@ class Mention {
                 },
                 class: "_showDescription"
             }).append(
-                $("<span>", { id: "chatppMentionText", class: "emoticonText icoSizeSmall" })
+                $("<span>", {
+                    id: "chatppMentionText",
+                    class: "emoticonText icoSizeSmall"
+                })
             )
         );
         this.updateMentionText();

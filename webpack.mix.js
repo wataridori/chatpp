@@ -1,6 +1,6 @@
 var mix = require('laravel-mix');
 
-mix.js([
+mix.combine([
         'src/js/libraries/bootstrap.min.js',
         'src/js/libraries/bootbox.min.js'
     ], 'build/js/externals/libs.js')
