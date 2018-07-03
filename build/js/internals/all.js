@@ -975,11 +975,40 @@ var Shortcut = function () {
             focus_chatbox: DOM_VK_SPACE,
             edit_image_upload: DOM_VK_E
         };
+
+        this.chat_text_jquery = $("#_chatText");
+        this.chat_text_element = document.getElementById("_chatText");
+        this.suggestion_messages = {
+            one: {
+                ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093",
+                en: "No Matching Results"
+            },
+            all: {
+                ja: "\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059",
+                en: "Select All Members"
+            },
+            group: {
+                ja: "\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7",
+                en: "Empty Group"
+            }
+        };
+        this.random_user_messages = {
+            ja: "\u30E1\u30F3\u30D0\u30FC\u3092\u30E9\u30F3\u30C0\u30E0\u3059\u308B",
+            en: "Random a member"
+        };
+        this.no_admin_messages = {
+            ja: "\u30A2\u30C9\u30DF\u30F3\u304C\u5B58\u5728\u3057\u307E\u305B\u3093",
+            en: "There is no Admin in this Room"
+        };
+
+        this.group_mention = [];
+
         this.room_shortcuts = {};
         if (localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]) {
             this.room_shortcuts = JSON.parse(localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]);
         }
         this.status = common.getStatus("shortcut");
+
     }
 
     _createClass(Shortcut, [{
@@ -1156,6 +1185,25 @@ var Shortcut = function () {
             }
         }
     }, {
+
+        key: "setSuggestionBoxPosition",
+        value: function setSuggestionBoxPosition() {
+            var rect = this.chat_text_element.getBoundingClientRect();
+            var current_pos = this.doGetCaretPosition(this.chat_text_element);
+            this.setCaretPosition(this.chat_text_element, this.actived_atmark_index + 1);
+            var position = Measurement.caretPos(this.chat_text_jquery);
+            position.top -= rect.top;
+            position.left -= rect.left;
+            if (rect.width - position.left < 236) {
+                position.left -= 236;
+            }
+            if (rect.height - position.top < 90) {
+                if (position.top < 108) {
+                    $("#_chatTextArea").css({
+                        "overflow-y": "visible",
+                        "z-index": 2
+                    });
+
         key: "triggerMoreAction",
         value: function triggerMoreAction() {
             var more_action = $("._message:hover").find("._cwABMoreTip");
@@ -1164,8 +1212,20 @@ var Shortcut = function () {
                 var delete_button = $("._cwABMoreListBox").find("[data-cwui-ab-type=\"action\"]");
                 if (this.isDomExists(delete_button)) {
                     delete_button.trigger("click");
+
                 }
             }
+
+            $("#suggestion-container").parent().css({
+                position: "relative"
+            });
+            $("#suggestion-container").css({
+                top: position.top,
+                left: position.left,
+                position: "absolute"
+            });
+            this.setCaretPosition(this.chat_text_element, current_pos);
+
         }
     }, {
         key: "selectRoom",
@@ -1178,9 +1238,37 @@ var Shortcut = function () {
             return dom.length > 0;
         }
     }, {
+
+        key: "cleanUp",
+        value: function cleanUp() {
+            this.is_displayed = false;
+            this.is_navigated = false;
+            this.current_index = 0;
+            this.selected_index = 0;
+            this.actived_atmark_index = -1;
+            this.insert_mode = "normal";
+            if (this.insert_type == "contact") {
+                this.member_objects = this.buildMemberListData(false);
+                this.fuse = new Fuse(this.member_objects, this.options);
+            }
+            if (this.insert_type == "group") {
+                this.selected_group_name = "";
+            }
+            this.insert_type = "one";
+            $("#suggestion-container").html("");
+            $("#_chatTextArea").css({
+                "overflow-y": "scroll",
+                "z-index": 0
+            });
+            // restore setting to correct value
+            if (this.cached_enter_action != ST.data.enter_action && this.cached_enter_action == "send") {
+                ST.data.enter_action = this.cached_enter_action;
+            }
+
         key: "getHoverMessageId",
         value: function getHoverMessageId() {
             return $("._message:hover").data("mid");
+
         }
     }, {
         key: "getPivotMessage",
@@ -1215,10 +1303,26 @@ var Shortcut = function () {
                     this.goToMessageInRoom(messages[i].id);
                     return true;
                 }
+
+                if (typed_text == "me") {
+                    this.insert_type = "me";
+                    return [this.getMemberObject(AC.myid)];
+                }
+                if (typed_text == "all") {
+                    this.insert_type = "all";
+                    return [];
+                }
+                if (typed_text == "toall") {
+                    this.insert_type = "toall";
+                    return [];
+                }
+                this.insert_type = "one";
+
             }
 
             if (!RM.timeline.has_old && messages.length == 0) {
                 return false;
+
             }
 
             RM.timeline.loadOld();
@@ -1257,6 +1361,35 @@ var Shortcut = function () {
             });
         }
     }, {
+
+        key: "getReplaceText",
+        value: function getReplaceText(format_string, target_name, cwid, members) {
+            if (!members) {
+                return null;
+            }
+            var replace_text = "";
+            switch (this.insert_type) {
+                case "me":
+                case "one":
+                case "contact":
+                    replace_text = format_string.format(cwid, target_name);
+                    break;
+                case "group":
+                case "all":
+                    for (var i = 0; i < members.length; i++) {
+                        replace_text += format_string.format(members[i].value, members[i].aid2name);
+                    }
+                    break;
+                case "toall":
+                    if (this.insert_mode === "to") {
+                        replace_text = "TO ALL >>>";
+                    } else {
+                        replace_text = "[toall]";
+                    }
+                    break;
+                default:
+                    break;
+
         key: "replyMessage",
         value: function replyMessage(message) {
             var data = RM.timeline.chat_id2chat_dat[message];
@@ -1266,6 +1399,7 @@ var Shortcut = function () {
                 /* eslint-disable no-useless-concat */
                 CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
                 /* eslint-enable */
+
             }
         }
     }, {
@@ -1301,8 +1435,140 @@ var Shortcut = function () {
                             return RL.selectRoom(sortedRooms[i + 1]);
                         }
                     }
+
+                    /* eslint-disable no-unreachable */
+                    break;
+                /* eslint-enable */
+                case "all":
+                    return "<ul><li class=\"suggested-name tooltipList__item\" role=\"listitem\">" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</li></ul>";
+                    /* eslint-disable no-unreachable */
+                    break;
+                /* eslint-enable */
+                case "toall":
+                    return '<ul><li class="suggested-name tooltipList__item" role="listitem">To All</li></ul>';
+                    /* eslint-disable no-unreachable */
+                    break;
+                /* eslint-enable */
+                default:
+                    /* eslint-disable no-unreachable */
+                    break;
+                /* eslint-enable */
+            }
+        }
+    }, {
+        key: "buildMemberListData",
+        value: function buildMemberListData(with_contact) {
+            if (!RM) return [];
+            var sorted_member_list = RM.getSortedMemberList();
+            var b = [];
+            if (with_contact) {
+                sorted_member_list = this.merge(sorted_member_list, AC.contact_list);
+            }
+            var sorted_members_length = sorted_member_list.length;
+            for (var index = 0; index < sorted_members_length; index++) {
+                var member = sorted_member_list[index];
+                if (member != AC.myid) {
+                    b.push(this.getMemberObject(member));
+                }
+            }
+            return b;
+        }
+    }, {
+        key: "updateAdminGroupData",
+        value: function updateAdminGroupData() {
+            this.group_mention.forEach(function (data) {
+                if (data.group_name === "admin") {
+                    data.group_members = chatwork.getRoomAdmins().join(",");
+                }
+            });
+        }
+    }, {
+        key: "getMemberObject",
+        value: function getMemberObject(member) {
+            var h = CW.is_business && ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(member) : AC.getNickName(member);
+            return {
+                value: member,
+                avatar: CW.getAvatarPanel(member, {
+                    clicktip: !1,
+                    size: "small"
+                }),
+                label: "<p class=\"autotrim\">" + common.htmlEncode(h) + "</p>",
+                aid2name: common.htmlEncode(h)
+            };
+        }
+    }, {
+        key: "buildGroupMemberListData",
+        value: function buildGroupMemberListData(group_name) {
+            if (group_name === "random") {
+                var member = chatwork.getRandomMemberInRoom();
+                return [this.getMemberObject(member)];
+            }
+            for (var i = 0; i < this.group_mention.length; i++) {
+                if (this.group_mention[i]["group_name"] == group_name) {
+                    var members = this.group_mention[i]["group_members"];
+                    if (!members) {
+                        return [];
+                    }
+                    members = members.split(",");
+                    var results = [];
+                    for (var j = 0; j < members.length; j++) {
+                        results.push(this.getMemberObject(members[j].trim()));
+                    }
+                    return results;
+                }
+            }
+            return [];
+        }
+    }, {
+        key: "ccMention",
+        value: function ccMention() {
+            CW.reg_cmp.push({
+                key: /\[CC\]<span class=\"chatTimeLineTo\">TO<\/span>/g,
+                rep: '<span class="chatTimeLineTo">CC</span>',
+                reptxt: "[CC]",
+                special: true
+            });
+        }
+    }, {
+        key: "addMentionText",
+        value: function addMentionText() {
+            var _this3 = this;
+
+            if ($("#_chatppMentionText").length > 0) {
+                return;
+            }
+            $("#_chatSendTool").append($("<li>", {
+                id: "_chatppPreLoad",
+                attr: {
+                    "role": "button"
+                },
+                class: "_showDescription"
+            }).append($("<span>", {
+                id: "chatppMentionText",
+                class: "emoticonText icoSizeSmall"
+            })));
+            this.updateMentionText();
+            $("#chatppMentionText").click(function () {
+                return _this3.toggleMentionStatus();
+            });
+        }
+    }, {
+        key: "updateMentionText",
+        value: function updateMentionText() {
+            var mention_text = "M: " + (this.status ? "ON" : "OFF");
+            var div = $("#chatppMentionText");
+            div.html(mention_text);
+            div.addClass("chatInput__element");
+            if (this.status) {
+                $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
+                div.addClass("emoticonTextEnable");
+            } else {
+                $("#_chatppMentionText").attr("aria-label", "Click to enable Mention Feature");
+                div.removeClass("emoticonTextEnable");
+
                 }
                 previous = sortedRooms[i];
+
             }
         }
     }, {

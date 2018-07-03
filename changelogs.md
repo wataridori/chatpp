@@ -3,6 +3,8 @@ Chat++ Change Logs
 
 ## 5.1.22
 * Fix bug: can not load some external libraries
+* Fix a problem with CSS style
+
 
 ## 5.1.21
 * Rearrange emoticons list into tabs base on Emoticon Data set.
