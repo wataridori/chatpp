@@ -243,7 +243,7 @@ class Mention {
             return false;
         });
 
-        this.addMentionText();
+        this.addTag();
         this.ccMention();
     }
 
@@ -594,6 +594,26 @@ class Mention {
         this.hideSuggestionBox();
     }
 
+    setSuggestedChatTag(entered_text, type) {
+        let old = this.chat_text_jquery.val();
+        let start_pos = this.doGetCaretPosition(this.chat_text_element) - entered_text.length;
+        let tag = "";
+        switch (type) {
+            case "info":
+                tag = "[info][/info]";
+                break;
+            case "title":
+                tag = "[title][/title]";
+                break;
+            default:
+                break;
+        }
+        let content = old.substring(0, start_pos) + tag + old.substring(start_pos + entered_text.length);
+        this.chat_text_jquery.val(content);
+        this.setCaretPosition(this.chat_text_element, start_pos + tag.length / 2);
+        this.hideSuggestionBox();
+    }
+
     buildList(members) {
         switch (this.insert_type) {
             case "me":
@@ -729,46 +749,39 @@ class Mention {
     }
 
 
-    addMentionText() {
-        if ($("#_chatppMentionText").length > 0) {
+    addTag() {
+        if ($("#_tag").length > 0) {
             return;
         }
         $("#_chatSendTool").append(
             $("<li>", {
-                id: "_chatppPreLoad",
-                attr: {
-                    "role": "button"
-                },
-                class: "_showDescription"
+                id: "_tag",
+                class: "_showDescription chatInput__element",
+                css: {
+                    "display": "inline-block"
+                }
             }).append(
                 $("<span>", {
                     id: "chatppMentionText",
                     class: "emoticonText icoSizeSmall"
                 })
+                $("<span>", { 
+                    id: "infoTag",
+                    class: "chatInput__iconContainer"
+                }).append("Info"),
+                $("<span>", { 
+                    id: "titleTag",
+                    class: "chatInput__iconContainer" }).append("Title")
             )
         );
-        this.updateMentionText();
-        $("#chatppMentionText").click(() => this.toggleMentionStatus());
-    }
 
-    updateMentionText() {
-        let mention_text = `M: ${this.status ? "ON" : "OFF"}`;
-        let div = $("#chatppMentionText");
-        div.html(mention_text);
-        div.addClass("chatInput__element");
-        if (this.status) {
-            $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
-            div.addClass("emoticonTextEnable");
-        } else {
-            $("#_chatppMentionText").attr("aria-label", "Click to enable Mention Feature");
-            div.removeClass("emoticonTextEnable");
-        }
-    }
+        $("#infoTag").click((e) => {
+            this.setSuggestedChatTag(this.getTypedText(), "info");
+        });
 
-    toggleMentionStatus() {
-        this.status = !this.status;
-        common.setStatus("mention", this.status);
-        this.updateMentionText();
+        $("#titleTag").click((e) => {
+            this.setSuggestedChatTag(this.getTypedText(), "title");
+        });
     }
 }
 
