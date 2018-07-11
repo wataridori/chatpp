@@ -243,7 +243,7 @@ class Mention {
             return false;
         });
 
-        this.addMentionText();
+        this.addTagButton();
         this.ccMention();
     }
 
@@ -588,6 +588,18 @@ class Mention {
         this.hideSuggestionBox();
     }
 
+    setSuggestedChatTag(type) {
+        let old = this.chat_text_jquery.val();
+        let start_pos = this.chat_text_jquery[0].selectionStart;
+        let end_pos = this.chat_text_jquery[0].selectionEnd;
+        let selectedString = old.substring(start_pos, end_pos);
+        let tag = `[${type}]${selectedString}[/${ type }]`;
+        let content = old.substring(0, start_pos) + tag + old.substring(end_pos, old.length);
+        this.chat_text_jquery.val(content);
+        this.setCaretPosition(this.chat_text_element, start_pos + 2 + type.length + selectedString.length);
+        this.hideSuggestionBox();
+    }
+
     buildList(members) {
         switch (this.insert_type) {
             case "me":
@@ -723,46 +735,72 @@ class Mention {
     }
 
 
-    addMentionText() {
-        if ($("#_chatppMentionText").length > 0) {
+    addTagButton() {
+        if ($("#_tag").length > 0) {
             return;
         }
         $("#_chatSendTool").append(
             $("<li>", {
-                id: "_chatppPreLoad",
+                id: "infoTag",
+                class: "_showDescription",
                 attr: {
                     "role": "button"
                 },
-                class: "_showDescription"
+                css: {
+                    "display": "inline-block", 
+                    "margin-left": 5 
+                }
             }).append(
-                $("<span>", {
-                    id: "chatppMentionText",
-                    class: "emoticonText icoSizeSmall"
-                })
+                $("<span>", { 
+                    class: "chatInput__emoticon chatInput__iconContainer"
+                }).append("<strong>[info]</strong>")
             )
         );
-        this.updateMentionText();
-        $("#chatppMentionText").click(() => this.toggleMentionStatus());
-    }
+        $("#_chatSendTool").append(
+            $("<li>", {
+                id: "titleTag",
+                class: "_showDescription",
+                attr: {
+                    "role": "button"
+                },
+                css: {
+                    "display": "inline-block"
+                }
+            }).append(
+                $("<span>", { 
+                    class: "chatInput__emoticon chatInput__iconContainer"
+                }).append("<strong>[title]</strong>")
+            )
+        );
+        $("#_chatSendTool").append(
+            $("<li>", {
+                id: "codeTag",
+                class: "_showDescription",
+                attr: {
+                    "role": "button"
+                },
+                css: {
+                    "display": "inline-block"
+                }
+            }).append(
+                $("<span>", { 
+                    class: "chatInput__emoticon chatInput__iconContainer"
+                }).append("<strong>[code]</strong>")
+            )
+        );
 
-    updateMentionText() {
-        let mention_text = `M: ${this.status ? "ON" : "OFF"}`;
-        let div = $("#chatppMentionText");
-        div.html(mention_text);
-        div.addClass("chatInput__element");
-        if (this.status) {
-            $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
-            div.addClass("emoticonTextEnable");
-        } else {
-            $("#_chatppMentionText").attr("aria-label", "Click to enable Mention Feature");
-            div.removeClass("emoticonTextEnable");
-        }
-    }
 
-    toggleMentionStatus() {
-        this.status = !this.status;
-        common.setStatus("mention", this.status);
-        this.updateMentionText();
+        $("#infoTag").click(() => {
+            this.setSuggestedChatTag("info");
+        });
+
+        $("#titleTag").click(() => {
+            this.setSuggestedChatTag("title");
+        });
+
+        $("#codeTag").click(() => {
+            this.setSuggestedChatTag("code");
+        });
     }
 }
 

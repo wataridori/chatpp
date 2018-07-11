@@ -21,8 +21,8 @@ class Emoticon {
             return a.key < b.key ? -1 : (a.key > b.key) ? 1 : 0;
         });
         this.addExternalEmoList();
-        this.addEmoticonText();
         this.addExternalEmo();
+        this.setEmoticonTextLabel();
     }
 
     addExternalEmoList() {
@@ -192,7 +192,6 @@ class Emoticon {
     addExternalEmo() {
         this.addEmo(this.emoticons);
         this.status = true;
-        this.updateEmoticonText();
     }
 
     isSpecialEmo(emo) {
@@ -200,101 +199,8 @@ class Emoticon {
         return special_emo.indexOf(emo) > -1;
     }
 
-    removeExternalEmo() {
-        let emoticons_list = this.isNewMechanism() ? emoticons.baseEmoticons : CW.reg_cmp;
-        for (let i = emoticons_list.length - 1; emoticons_list.length > 0; i--) {
-            let emo = emoticons_list[i];
-            if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
-                // Check whether Chatwork uses new Javascript Code
-                if (this.isNewMechanism()) {
-                    emoticons.baseEmoticons.splice(i, 1);
-                    delete emoticons.tagHash[emo.key];
-                } else {
-                    CW.reg_cmp.splice(i, 1);
-                }
-            } else {
-                if (!emo.special) {
-                    break;
-                }
-            }
-        }
-        if (this.isNewMechanism()) {
-            tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
-        }
-        this.status = false;
-        this.updateEmoticonText();
-    }
-
-    addEmoticonText() {
-        if ($("#emoticonText").length > 0) {
-            return;
-        }
-        let emoticonText = `E: ${this.status ? "ON" : "OFF"}`;
-        $("#_chatSendTool").append(
-            $("<li>", {
-                id: "_emoticons",
-                class: "_showDescription chatInput__element",
-                attr: {
-                    "role": "button"
-                }
-            }).append(
-                $("<span>", {
-                    id: "emoticonText",
-                    class: "emoticonText icoSizeSmall"
-                }).append(emoticonText)
-            )
-        );
-        this.setEmoticonTextLabel();
-        $("#emoticonText").click(() => this.toggleEmoticonsStatus());
-        this.addErrorText();
-    }
-
     setEmoticonTextLabel() {
-        $("#_emoticons").attr("aria-label", `Data: ${localStorage["emoticon_data_version"]}`);
         $("#_externalEmoticonsButton").attr("aria-label", "View Chat++ Emoticons");
-    }
-
-    updateEmoticonText() {
-        let emoticonText = `E: ${this.status ? "ON" : "OFF"}`;
-        let div = $("#emoticonText");
-        div.html(emoticonText);
-        if (this.status) {
-            div.addClass("emoticonTextEnable");
-        } else {
-            div.removeClass("emoticonTextEnable");
-        }
-    }
-
-    addErrorText() {
-        if (!localStorage["failed_data"] || $("#errorText").length > 0) {
-            return;
-        }
-        let failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
-        let failed_data_text = `The following data could not be loaded: ${failed_data}`;
-        $("#_chatSendTool").append(
-            $("<li>", {
-                id: "_chatppErrors",
-                attr: {
-                    "role": "button"
-                },
-                class: "_showDescription chatInput__element"
-            }).append(
-                $("<span>", {
-                    id: "chatppPreLoad",
-                    class: "emoticonText icoSizeSmall chatppErrorsText"
-                }).text("ERROR")
-            )
-        );
-        $("#_chatppErrors").attr("aria-label", failed_data_text);
-    }
-
-    toggleEmoticonsStatus() {
-        if (this.status) {
-            this.removeExternalEmo();
-        } else {
-            this.addExternalEmo();
-        }
-        RL.rooms[RM.id].build();
     }
 
     addEmo(emo) {

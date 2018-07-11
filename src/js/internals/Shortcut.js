@@ -49,53 +49,8 @@ class Shortcut {
 
     setUp() {
         if (this.status) {
-            this.addShortcutText();
             this.registerShortcut();
         }
-    }
-
-    addShortcutText() {
-        if ($("#_chatppShortcutText").length > 0) {
-            return;
-        }
-        $("#_chatSendTool").append(
-            $("<li>", {
-                id: "_chatppShortcutText",
-                attr: {
-                    "role": "button"
-                },
-                class: "_showDescription"
-            }).append(
-                $("<span>", { id: "chatppShortcutText", class: "emoticonText icoSizeSmall" })
-            )
-        );
-        this.updateShortcutText();
-        $("#chatppShortcutText").click(() => this.toggleShortcutStatus());
-    }
-
-    updateShortcutText() {
-        let shortcut_text = `S: ${this.status ? "ON" : "OFF"}`;
-        let div = $("#chatppShortcutText");
-        div.html(shortcut_text);
-        div.addClass("chatInput__element");
-        if (this.status) {
-            $("#_chatppShortcutText").attr("aria-label", "Click to disable Shortcut Feature");
-            div.addClass("emoticonTextEnable");
-        } else {
-            $("#_chatppShortcutText").attr("aria-label", "Click to enable Shortcut Feature");
-            div.removeClass("emoticonTextEnable");
-        }
-    }
-
-    toggleShortcutStatus() {
-        this.status = !this.status;
-        common.setStatus("shortcut", this.status);
-        if (this.status) {
-            this.registerShortcut()
-        } else {
-            this.removeRegisteredKeyboardShortcut();
-        }
-        this.updateShortcutText();
     }
 
     registerShortcut() {
@@ -188,14 +143,6 @@ class Shortcut {
 
     isScrollable() {
         return this.get(0).scrollHeight > this.height();
-    }
-
-    removeRegisteredKeyboardShortcut() {
-        for (let keyboard in this.shortcuts_default) {
-            if (this.shortcuts_default.hasOwnProperty(keyboard)) {
-                CW.view.registerKeyboardShortcut(this.shortcuts_default[keyboard], !1, !1, !1, !1, () => false);
-            }
-        }
     }
 
     triggerDefaultAction(action) {
