@@ -368,13 +368,8 @@ class Mention {
         });
 
         $(".suggested-name").mouseover((e) => {
-            $(e.currentTarget).siblings().css("background-color", "white");
-            $(e.currentTarget).css("background-color", "#D8F0F9");
-        });
-
-        $(".suggested-name").mouseout((e) => {
-            $(e.currentTarget).siblings().first().css("background-color", "#D8F0F9");
             $(e.currentTarget).css("background-color", "white");
+            $("#suggestion-container>ul li:first-child").css("background-color", "#D8F0F9");
         });
     }
 
@@ -548,10 +543,9 @@ class Mention {
                 }
                 break;
             case "toall":
-                if(this.insert_mode === "to"){
+                if (this.insert_mode === "to") {
                     replace_text = "TO ALL >>> \n";
-                }
-                else{
+                } else {
                     replace_text = "[toall]\n";
                 }
                 break;
@@ -644,7 +638,7 @@ class Mention {
                 return `<ul><li class="suggested-name tooltipList__item" role="listitem">${this.suggestion_messages[this.insert_type][LANGUAGE]}</li></ul>`;
                 /* eslint-disable no-unreachable */
                 break;
-                /* eslint-enable */ 
+                /* eslint-enable */
             case "toall":
                 return '<ul><li class="suggested-name tooltipList__item" role="listitem">To All</li></ul>';
                 /* eslint-disable no-unreachable */
