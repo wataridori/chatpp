@@ -745,6 +745,7 @@ var Mention = function () {
         this.text_before_dotdot = "";
         this.emo_name = "";
         this.emo_cursor_loca = 0;
+        this.list_all_emo = JSON.parse(localStorage[Const["LOCAL_STORAGE_DATA_KEY"]]);
         this.is_displayed = false;
         this.is_inserted = false;
         this.is_navigated = false;
@@ -1013,7 +1014,7 @@ var Mention = function () {
                     return;
                 }
 
-                if (e.which == 186) {
+                if (e.which == 186 && e.key === ":") {
                     _this.is_dotdot = true;
                 } else {
                     _this.text_before_dotdot = _this.chat_text_jquery.val();
@@ -1044,17 +1045,20 @@ var Mention = function () {
                     if (regex.test(str) && (e.which != 37 || e.which != 38 || e.which != 39 || e.which != 40)) {
                         _this.emo_name += e.key;
                     }
-                    var findEmo = $("#_externalEmoticonList").find("img[alt*=\"" + _this.emo_name + "\"]");
+                    var findEmo = $.grep(_this.list_all_emo, function (e) {
+                        var comp = e.key.toLowerCase();
+                        return comp.indexOf(_this.emo_name) > -1;
+                    });
                     var toAppend = "";
 
                     if (findEmo.length > 0) {
                         for (var i = 0; i < findEmo.length; i++) {
                             if (i == 0) {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + $(findEmo[i]).attr("alt") + "\" style=\"padding-bottom: 5px;border-bottom: 1px dashed #aaa; cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[i].key + "\" style=\"padding-bottom: 5px;border-bottom: 1px dashed #aaa; cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
                             } else {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + $(findEmo[i]).attr("alt") + "\" style=\"padding-bottom: 5px;border-bottom: 1px dashed #aaa; cursor: pointer; margin-top: 5px;\">";
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[i].key + "\" style=\"padding-bottom: 5px;border-bottom: 1px dashed #aaa; cursor: pointer; margin-top: 5px;\">";
                             }
-                            toAppend += $(findEmo[i])[0].outerHTML + " <b> " + $(findEmo[i]).attr("alt") + "</b></p>";
+                            toAppend += "<img id=\"example\" src=\"" + common.htmlEncode(common.getEmoUrl(findEmo[i].src)) + "\" title=\"" + findEmo[i].key + " - " + findEmo[i].data_name + " - Chatpp\" alt=\"" + findEmo[i].key + "\" style=\"width: 100%; max-width: 50px;\"> <b> " + findEmo[i].key + "</b></p>";
                         }
                         $("#suggestion-emotion-container").append(toAppend);
                     } else {
