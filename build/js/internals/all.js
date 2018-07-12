@@ -486,8 +486,8 @@ var Emoticon = function () {
                 return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
             });
             this.addExternalEmoList();
-            this.addEmoticonText();
             this.addExternalEmo();
+            this.setEmoticonTextLabel();
         }
     }, {
         key: "addExternalEmoList",
@@ -649,7 +649,6 @@ var Emoticon = function () {
         value: function addExternalEmo() {
             this.addEmo(this.emoticons);
             this.status = true;
-            this.updateEmoticonText();
         }
     }, {
         key: "isSpecialEmo",
@@ -658,105 +657,9 @@ var Emoticon = function () {
             return special_emo.indexOf(emo) > -1;
         }
     }, {
-        key: "removeExternalEmo",
-        value: function removeExternalEmo() {
-            var emoticons_list = this.isNewMechanism() ? emoticons.baseEmoticons : CW.reg_cmp;
-            for (var i = emoticons_list.length - 1; emoticons_list.length > 0; i--) {
-                var emo = emoticons_list[i];
-                if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
-                    // Check whether Chatwork uses new Javascript Code
-                    if (this.isNewMechanism()) {
-                        emoticons.baseEmoticons.splice(i, 1);
-                        delete emoticons.tagHash[emo.key];
-                    } else {
-                        CW.reg_cmp.splice(i, 1);
-                    }
-                } else {
-                    if (!emo.special) {
-                        break;
-                    }
-                }
-            }
-            if (this.isNewMechanism()) {
-                tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
-                    return emo.tag;
-                }));
-            }
-            this.status = false;
-            this.updateEmoticonText();
-        }
-    }, {
-        key: "addEmoticonText",
-        value: function addEmoticonText() {
-            var _this = this;
-
-            if ($("#emoticonText").length > 0) {
-                return;
-            }
-            var emoticonText = "E: " + (this.status ? "ON" : "OFF");
-            $("#_chatSendTool").append($("<li>", {
-                id: "_emoticons",
-                class: "_showDescription chatInput__element",
-                attr: {
-                    "role": "button"
-                }
-            }).append($("<span>", {
-                id: "emoticonText",
-                class: "emoticonText icoSizeSmall"
-            }).append(emoticonText)));
-            this.setEmoticonTextLabel();
-            $("#emoticonText").click(function () {
-                return _this.toggleEmoticonsStatus();
-            });
-            this.addErrorText();
-        }
-    }, {
         key: "setEmoticonTextLabel",
         value: function setEmoticonTextLabel() {
-            $("#_emoticons").attr("aria-label", "Data: " + localStorage["emoticon_data_version"]);
             $("#_externalEmoticonsButton").attr("aria-label", "View Chat++ Emoticons");
-        }
-    }, {
-        key: "updateEmoticonText",
-        value: function updateEmoticonText() {
-            var emoticonText = "E: " + (this.status ? "ON" : "OFF");
-            var div = $("#emoticonText");
-            div.html(emoticonText);
-            if (this.status) {
-                div.addClass("emoticonTextEnable");
-            } else {
-                div.removeClass("emoticonTextEnable");
-            }
-        }
-    }, {
-        key: "addErrorText",
-        value: function addErrorText() {
-            if (!localStorage["failed_data"] || $("#errorText").length > 0) {
-                return;
-            }
-            var failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
-            var failed_data_text = "The following data could not be loaded: " + failed_data;
-            $("#_chatSendTool").append($("<li>", {
-                id: "_chatppErrors",
-                attr: {
-                    "role": "button"
-                },
-                class: "_showDescription chatInput__element"
-            }).append($("<span>", {
-                id: "chatppPreLoad",
-                class: "emoticonText icoSizeSmall chatppErrorsText"
-            }).text("ERROR")));
-            $("#_chatppErrors").attr("aria-label", failed_data_text);
-        }
-    }, {
-        key: "toggleEmoticonsStatus",
-        value: function toggleEmoticonsStatus() {
-            if (this.status) {
-                this.removeExternalEmo();
-            } else {
-                this.addExternalEmo();
-            }
-            RL.rooms[RM.id].build();
         }
     }, {
         key: "addEmo",
@@ -838,6 +741,10 @@ var Mention = function () {
 
         this.status = common.getStatus("mention");
         this.start = /@/ig;
+        this.is_dotdot = false;
+        this.text_before_dotdot = "";
+        this.emo_name = "";
+        this.emo_cursor_loca = 0;
         this.is_displayed = false;
         this.is_inserted = false;
         this.is_navigated = false;
@@ -905,6 +812,21 @@ var Mention = function () {
             });
 
             $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
+            var html = "<div id='suggestion-emotion-container'></div>";
+            $("#_chatTextArea").append(html);
+            $("#suggestion-emotion-container").css({
+                "background": "#fff",
+                "position": "absolute",
+                "max-height": "200px",
+                "width": "200px",
+                "border": "1px solid #ababab",
+                "border-radius": "3px",
+                "padding": "4px 6px 4px 6px",
+                "box-shadow": "0px 3px 10px rgba(103, 103, 103, 0.57)",
+                "display": "none",
+                "overflow-y": "auto",
+                "z-index": "99"
+            });
             this.hideSuggestionBox();
             $("#_sendEnterActionArea").click(function () {
                 _this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
@@ -919,18 +841,29 @@ var Mention = function () {
                     });
                 };
             }
-
             // hide suggestion box when click in textarea or outside
             this.chat_text_jquery.click(function () {
                 return _this.hideSuggestionBox();
+            });
+
+            this.chat_text_jquery.click(function () {
+                return _this.hideSuggestionEmotionsBox();
             });
 
             $("#_roomListArea").click(function () {
                 return _this.hideSuggestionBox();
             });
 
+            $("#_roomListArea").click(function () {
+                return _this.hideSuggestionEmotionsBox();
+            });
+
             $("#_headerSearch").click(function () {
                 return _this.hideSuggestionBox();
+            });
+
+            $("#_headerSearch").click(function () {
+                return _this.hideSuggestionEmotionsBox();
             });
 
             // when user press ESC, we hide suggestion box
@@ -940,6 +873,7 @@ var Mention = function () {
                 }
                 if (e.which == 27) {
                     _this.hideSuggestionBox();
+                    _this.hideSuggestionEmotionsBox();
                 }
             });
 
@@ -954,6 +888,27 @@ var Mention = function () {
                 } else {
                     _this.current_index = 0;
                     _this.is_navigated = false;
+                }
+
+                if (e.which == 40 && _this.is_dotdot) {
+                    if (_this.emo_cursor_loca != $("#suggestion-emotion-container").find("p").length - 1) {
+                        _this.emo_cursor_loca += 1;
+                    }
+                    e.preventDefault();
+                }
+
+                if (e.which == 38 && _this.is_dotdot) {
+                    if (_this.emo_cursor_loca !== -1) {
+                        _this.emo_cursor_loca -= 1;
+                    }
+
+                    e.preventDefault();
+                }
+
+                if ((e.which == 13 || e.which == 9) && _this.is_dotdot) {
+                    $("#suggestion-emotion-container").find("p[data-emo-selected='true']").click();
+
+                    e.preventDefault();
                 }
 
                 if (e.which == 9 || e.which == 13) {
@@ -984,9 +939,26 @@ var Mention = function () {
                 }
             });
 
+            $("#suggestion-emotion-container").on("mouseenter", "p", function (e) {
+                $(e.currentTarget).attr("data-emo-selected", true);
+                $(e.currentTarget).css("background-color", "rgb(216, 240, 249)");
+            }).on("mouseleave", "p", function (e) {
+                $(e.currentTarget).removeAttr("data-emo-selected");
+                $(e.currentTarget).css("background-color", "#fff");
+            }).on("click", "p", function (e) {
+                var this_value = _this.chat_text_jquery.val().replace(":" + _this.emo_name, $(e.currentTarget).attr("data-emo") + " ");
+                $("#_chatText").val(this_value);
+                _this.hideSuggestionEmotionsBox();
+                $("#_chatText").focus();
+            });
+
             this.chat_text_jquery.keyup(function (e) {
                 if (!_this.status) {
                     return;
+                }
+
+                if (!_this.chat_text_jquery.val()) {
+                    _this.hideSuggestionEmotionsBox();
                 }
 
                 if (e.which == 9 || e.which == 13) {
@@ -1005,6 +977,117 @@ var Mention = function () {
                     _this.updateAdminGroupData();
                     _this.fuse = new Fuse(_this.member_objects, _this.options);
                     _this.current_RM = RM.id;
+                }
+
+                if (e.which == 40 && _this.is_dotdot) {
+                    var curentScroll = $("#suggestion-emotion-container").scrollTop();
+                    var scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
+                    $("#suggestion-emotion-container").scrollTop(scrollValue + curentScroll);
+                    var firstEleP = $("#suggestion-emotion-container").find("p");
+                    if ($(firstEleP[_this.emo_cursor_loca]).length > 0) {
+                        $(firstEleP[_this.emo_cursor_loca - 1]).mouseleave();
+                        $(firstEleP[_this.emo_cursor_loca]).mouseenter();
+                    }
+
+                    return;
+                }
+
+                if (e.which == 38 && _this.is_dotdot) {
+                    var _curentScroll = $("#suggestion-emotion-container").scrollTop();
+                    var _scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
+                    $("#suggestion-emotion-container").scrollTop(_curentScroll - _scrollValue);
+
+                    var _firstEleP = $("#suggestion-emotion-container").find("p");
+
+                    if (_this.emo_cursor_loca == -1) {
+                        $(_firstEleP).mouseleave();
+
+                        return;
+                    }
+
+                    if ($(_firstEleP[_this.emo_cursor_loca]).length > 0) {
+                        $(_firstEleP[_this.emo_cursor_loca + 1]).mouseleave();
+                        $(_firstEleP[_this.emo_cursor_loca]).mouseenter();
+                    }
+
+                    return;
+                }
+
+                if (e.which == 186) {
+                    _this.is_dotdot = true;
+                } else {
+                    _this.text_before_dotdot = _this.chat_text_jquery.val();
+                }
+
+                if (e.which == 8) {
+                    if (_this.emo_name.length > 0) {
+                        var arrChar = _this.emo_name.split("");
+                        arrChar.pop();
+                        _this.emo_name = arrChar.join("");
+                    } else {
+                        _this.hideSuggestionEmotionsBox();
+                    }
+                }
+
+                if (e.which == 32) {
+                    _this.hideSuggestionEmotionsBox();
+                }
+
+                if (_this.is_dotdot) {
+                    if (_this.emo_name.length > 0) {
+                        $("#suggestion-emotion-container").html("");
+                        $("#suggestion-emotion-container").fadeIn(0);
+                    }
+                    var regex = new RegExp("^[a-zA-Z0-9!@#$%^&]+$");
+                    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+
+                    if (regex.test(str) && (e.which != 37 || e.which != 38 || e.which != 39 || e.which != 40)) {
+                        _this.emo_name += e.key;
+                    }
+                    var findEmo = $("#_externalEmoticonList").find("img[alt*=\"" + _this.emo_name + "\"]");
+                    var toAppend = "";
+
+                    if (findEmo.length > 0) {
+                        for (var i = 0; i < findEmo.length; i++) {
+                            if (i == 0) {
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + $(findEmo[i]).attr("alt") + "\" style=\"padding-bottom: 5px;border-bottom: 1px dashed #aaa; cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
+                            } else {
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + $(findEmo[i]).attr("alt") + "\" style=\"padding-bottom: 5px;border-bottom: 1px dashed #aaa; cursor: pointer; margin-top: 5px;\">";
+                            }
+                            toAppend += $(findEmo[i])[0].outerHTML + " <b> " + $(findEmo[i]).attr("alt") + "</b></p>";
+                        }
+                        $("#suggestion-emotion-container").append(toAppend);
+                    } else {
+                        toAppend += "<p style='padding-bottom: 5px;border-bottom: 1px dashed #aaa; text-align: center;'>Not found anything!</p>";
+                        $("#suggestion-emotion-container").append(toAppend);
+                    }
+                    var rect = _this.chat_text_element.getBoundingClientRect();
+                    var position = Measurement.caretPos(_this.chat_text_jquery);
+                    position.left -= rect.left;
+                    var h = $("#suggestion-emotion-container").height();
+                    var t = -160 + (200 - h);
+                    if (position.top < 610) {
+                        t -= 50;
+                    } else if (position.top < 640) {
+                        t -= 30;
+                    } else if (position.top < 660) {
+                        t += -2;
+                    } else if (position.top < 680) {
+                        t += 7;
+                    } else {
+                        t += 60;
+                    }
+                    $("#_chatTextArea").css({
+                        "overflow-y": "visible",
+                        "z-index": 2
+                    });
+                    $("#suggestion-emotion-container").parent().css({
+                        position: "relative"
+                    });
+                    $("#suggestion-emotion-container").css({
+                        top: t,
+                        left: position.left + 5
+                    });
                 }
 
                 if (_this.findAtmark()) {
@@ -1072,7 +1155,7 @@ var Mention = function () {
                 return false;
             });
 
-            this.addMentionText();
+            this.addTagButton();
             this.ccMention();
         }
     }, {
@@ -1148,12 +1231,18 @@ var Mention = function () {
     }, {
         key: "setSuggestionBoxPosition",
         value: function setSuggestionBoxPosition() {
+            var element = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
             var rect = this.chat_text_element.getBoundingClientRect();
             var current_pos = this.doGetCaretPosition(this.chat_text_element);
-            this.setCaretPosition(this.chat_text_element, this.actived_atmark_index + 1);
+            if (!element) {
+                this.setCaretPosition(this.chat_text_element, this.actived_atmark_index + 1);
+            }
             var position = Measurement.caretPos(this.chat_text_jquery);
             position.top -= rect.top;
             position.left -= rect.left;
+            var selectorElement = element ? element : "#suggestion-container";
+
             if (rect.width - position.left < 236) {
                 position.left -= 236;
             }
@@ -1166,17 +1255,20 @@ var Mention = function () {
                 }
                 position.top -= 118;
             } else {
-                position.top += parseInt(this.chat_text_jquery.css("font-size")) + 2;
+                position.top += parseInt(this.chat_text_jquery.css("font-size")) + 5;
             }
-            $("#suggestion-container").parent().css({
+            $(selectorElement).parent().css({
                 position: "relative"
             });
-            $("#suggestion-container").css({
+
+            $(selectorElement).css({
                 top: position.top,
                 left: position.left,
                 position: "absolute"
             });
-            this.setCaretPosition(this.chat_text_element, current_pos);
+            if (!element) {
+                this.setCaretPosition(this.chat_text_element, current_pos);
+            }
         }
     }, {
         key: "showSuggestionBox",
@@ -1203,13 +1295,8 @@ var Mention = function () {
             });
 
             $(".suggested-name").mouseover(function (e) {
-                $(e.currentTarget).siblings().css("background-color", "white");
-                $(e.currentTarget).css("background-color", "#D8F0F9");
-            });
-
-            $(".suggested-name").mouseout(function (e) {
-                $(e.currentTarget).siblings().first().css("background-color", "#D8F0F9");
                 $(e.currentTarget).css("background-color", "white");
+                $("#suggestion-container>ul li:first-child").css("background-color", "#D8F0F9");
             });
         }
     }, {
@@ -1218,6 +1305,15 @@ var Mention = function () {
             $("#suggestion-container").html(content).hide();
             $("#suggestion-container").css("visibility", "hidden");
             this.cleanUp();
+        }
+    }, {
+        key: "hideSuggestionEmotionsBox",
+        value: function hideSuggestionEmotionsBox() {
+            this.is_dotdot = false;
+            this.emo_name = "";
+            this.emo_cursor_loca = 0;
+            $("#suggestion-emotion-container").fadeOut(0);
+            $("#suggestion-emotion-container").html("");
         }
     }, {
         key: "cleanUp",
@@ -1237,10 +1333,12 @@ var Mention = function () {
             }
             this.insert_type = "one";
             $("#suggestion-container").html("");
-            $("#_chatTextArea").css({
-                "overflow-y": "scroll",
-                "z-index": 0
-            });
+            if (!this.is_dotdot) {
+                $("#_chatTextArea").css({
+                    "overflow-y": "scroll",
+                    "z-index": 0
+                });
+            }
             // restore setting to correct value
             if (this.cached_enter_action != ST.data.enter_action && this.cached_enter_action == "send") {
                 ST.data.enter_action = this.cached_enter_action;
@@ -1443,6 +1541,19 @@ var Mention = function () {
             this.hideSuggestionBox();
         }
     }, {
+        key: "setSuggestedChatTag",
+        value: function setSuggestedChatTag(type) {
+            var old = this.chat_text_jquery.val();
+            var start_pos = this.chat_text_jquery[0].selectionStart;
+            var end_pos = this.chat_text_jquery[0].selectionEnd;
+            var selectedString = old.substring(start_pos, end_pos);
+            var tag = "[" + type + "]" + selectedString + "[/" + type + "]";
+            var content = old.substring(0, start_pos) + tag + old.substring(end_pos, old.length);
+            this.chat_text_jquery.val(content);
+            this.setCaretPosition(this.chat_text_element, start_pos + 2 + type.length + selectedString.length);
+            this.hideSuggestionBox();
+        }
+    }, {
         key: "buildList",
         value: function buildList(members) {
             switch (this.insert_type) {
@@ -1581,49 +1692,62 @@ var Mention = function () {
             });
         }
     }, {
-        key: "addMentionText",
-        value: function addMentionText() {
+        key: "addTagButton",
+        value: function addTagButton() {
             var _this3 = this;
 
-            if ($("#_chatppMentionText").length > 0) {
+            if ($("#_tag").length > 0) {
                 return;
             }
             $("#_chatSendTool").append($("<li>", {
-                id: "_chatppPreLoad",
+                id: "infoTag",
+                class: "_showDescription",
                 attr: {
                     "role": "button"
                 },
-                class: "_showDescription"
+                css: {
+                    "display": "inline-block",
+                    "margin-left": 5
+                }
             }).append($("<span>", {
-                id: "chatppMentionText",
-                class: "emoticonText icoSizeSmall"
-            })));
-            this.updateMentionText();
-            $("#chatppMentionText").click(function () {
-                return _this3.toggleMentionStatus();
+                class: "chatInput__emoticon chatInput__iconContainer"
+            }).append("<strong>[info]</strong>")));
+            $("#_chatSendTool").append($("<li>", {
+                id: "titleTag",
+                class: "_showDescription",
+                attr: {
+                    "role": "button"
+                },
+                css: {
+                    "display": "inline-block"
+                }
+            }).append($("<span>", {
+                class: "chatInput__emoticon chatInput__iconContainer"
+            }).append("<strong>[title]</strong>")));
+            $("#_chatSendTool").append($("<li>", {
+                id: "codeTag",
+                class: "_showDescription",
+                attr: {
+                    "role": "button"
+                },
+                css: {
+                    "display": "inline-block"
+                }
+            }).append($("<span>", {
+                class: "chatInput__emoticon chatInput__iconContainer"
+            }).append("<strong>[code]</strong>")));
+
+            $("#infoTag").click(function () {
+                _this3.setSuggestedChatTag("info");
             });
-        }
-    }, {
-        key: "updateMentionText",
-        value: function updateMentionText() {
-            var mention_text = "M: " + (this.status ? "ON" : "OFF");
-            var div = $("#chatppMentionText");
-            div.html(mention_text);
-            div.addClass("chatInput__element");
-            if (this.status) {
-                $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
-                div.addClass("emoticonTextEnable");
-            } else {
-                $("#_chatppMentionText").attr("aria-label", "Click to enable Mention Feature");
-                div.removeClass("emoticonTextEnable");
-            }
-        }
-    }, {
-        key: "toggleMentionStatus",
-        value: function toggleMentionStatus() {
-            this.status = !this.status;
-            common.setStatus("mention", this.status);
-            this.updateMentionText();
+
+            $("#titleTag").click(function () {
+                _this3.setSuggestedChatTag("title");
+            });
+
+            $("#codeTag").click(function () {
+                _this3.setSuggestedChatTag("code");
+            });
         }
     }]);
 
@@ -1865,82 +1989,34 @@ var Shortcut = function () {
         key: "setUp",
         value: function setUp() {
             if (this.status) {
-                this.addShortcutText();
                 this.registerShortcut();
             }
-        }
-    }, {
-        key: "addShortcutText",
-        value: function addShortcutText() {
-            var _this = this;
-
-            if ($("#_chatppShortcutText").length > 0) {
-                return;
-            }
-            $("#_chatSendTool").append($("<li>", {
-                id: "_chatppShortcutText",
-                attr: {
-                    "role": "button"
-                },
-                class: "_showDescription"
-            }).append($("<span>", { id: "chatppShortcutText", class: "emoticonText icoSizeSmall" })));
-            this.updateShortcutText();
-            $("#chatppShortcutText").click(function () {
-                return _this.toggleShortcutStatus();
-            });
-        }
-    }, {
-        key: "updateShortcutText",
-        value: function updateShortcutText() {
-            var shortcut_text = "S: " + (this.status ? "ON" : "OFF");
-            var div = $("#chatppShortcutText");
-            div.html(shortcut_text);
-            div.addClass("chatInput__element");
-            if (this.status) {
-                $("#_chatppShortcutText").attr("aria-label", "Click to disable Shortcut Feature");
-                div.addClass("emoticonTextEnable");
-            } else {
-                $("#_chatppShortcutText").attr("aria-label", "Click to enable Shortcut Feature");
-                div.removeClass("emoticonTextEnable");
-            }
-        }
-    }, {
-        key: "toggleShortcutStatus",
-        value: function toggleShortcutStatus() {
-            this.status = !this.status;
-            common.setStatus("shortcut", this.status);
-            if (this.status) {
-                this.registerShortcut();
-            } else {
-                this.removeRegisteredKeyboardShortcut();
-            }
-            this.updateShortcutText();
         }
     }, {
         key: "registerShortcut",
         value: function registerShortcut() {
-            var _this2 = this;
+            var _this = this;
 
             var shortcuts_default = this.shortcuts_default;
             CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function () {
-                var message_id = _this2.getHoverMessageId();
-                _this2.replyMessage(message_id);
+                var message_id = _this.getHoverMessageId();
+                _this.replyMessage(message_id);
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, function () {
-                _this2.triggerDefaultAction("quote");
+                _this.triggerDefaultAction("quote");
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.link, !1, !1, !1, !1, function () {
-                _this2.triggerDefaultAction("link");
+                _this.triggerDefaultAction("link");
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.edit, !1, !1, !1, !1, function () {
-                _this2.triggerDefaultAction("edit");
+                _this.triggerDefaultAction("edit");
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.task, !1, !1, !1, !1, function () {
-                _this2.triggerDefaultAction("task");
+                _this.triggerDefaultAction("task");
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.my_chat, !1, !1, !1, !1, function () {
@@ -1948,39 +2024,39 @@ var Shortcut = function () {
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.scroll, !1, !1, !1, !1, function () {
-                _this2.goToBottom();
+                _this.goToBottom();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.previous_mention, !1, !1, !1, !1, function () {
-                _this2.goToPreviousMention();
+                _this.goToPreviousMention();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, function () {
-                _this2.goToNexMention();
+                _this.goToNexMention();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.next_mention_room, !1, !1, !1, !1, function () {
-                _this2.nextUnreadRoom(true);
+                _this.nextUnreadRoom(true);
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.next_new_message_room, !1, !1, !1, !1, function () {
-                _this2.nextUnreadRoom();
+                _this.nextUnreadRoom();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.up_room, !1, !1, !1, !1, function () {
-                _this2.nextRoom(true);
+                _this.nextRoom(true);
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.down_room, !1, !1, !1, !1, function () {
-                _this2.nextRoom();
+                _this.nextRoom();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.first_room, !1, !1, !1, !1, function () {
-                _this2.firstRoom();
+                _this.firstRoom();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.first_nonstick_room, !1, !1, !1, !1, function () {
-                _this2.firstRoom(true);
+                _this.firstRoom(true);
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.focus_chatbox, !1, !1, !1, !1, function () {
@@ -1988,7 +2064,7 @@ var Shortcut = function () {
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.edit_image_upload, !1, !0, !1, !1, function () {
-                _this2.triggerDefaultAction("edit");
+                _this.triggerDefaultAction("edit");
                 var chat_text = $("#_chatText");
                 var text = chat_text.val();
                 var img = text.match(/(\[preview id=[0-9]* ht=[0-9]*\])/);
@@ -2001,7 +2077,7 @@ var Shortcut = function () {
             for (var i in this.room_shortcuts) {
                 if (this.room_shortcuts[i] && this.room_shortcuts.hasOwnProperty(i)) {
                     (function () {
-                        var room = _this2.room_shortcuts[i];
+                        var room = _this.room_shortcuts[i];
                         CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, function () {
                             RL.selectRoom(room);
                         });
@@ -2013,17 +2089,6 @@ var Shortcut = function () {
         key: "isScrollable",
         value: function isScrollable() {
             return this.get(0).scrollHeight > this.height();
-        }
-    }, {
-        key: "removeRegisteredKeyboardShortcut",
-        value: function removeRegisteredKeyboardShortcut() {
-            for (var keyboard in this.shortcuts_default) {
-                if (this.shortcuts_default.hasOwnProperty(keyboard)) {
-                    CW.view.registerKeyboardShortcut(this.shortcuts_default[keyboard], !1, !1, !1, !1, function () {
-                        return false;
-                    });
-                }
-            }
         }
     }, {
         key: "triggerDefaultAction",
