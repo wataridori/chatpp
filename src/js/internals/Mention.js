@@ -11,13 +11,15 @@ let INSERT_MODE_SYM = {
     "TO": "_",
     "CC": "_cc_"
 }
+let DETECT_COLON = 186;
+let KEY_COLON = ":";
 
 class Mention {
     constructor() {
         this.status = common.getStatus("mention");
         this.start = /@/ig;
-        this.is_dotdot = false;
-        this.text_before_dotdot = "";
+        this.is_colon = false;
+        this.count_colon = 0;
         this.emo_name = "";
         this.emo_cursor_loca = 0;
         this.list_all_emo = JSON.parse(localStorage[Const["LOCAL_STORAGE_DATA_KEY"]]);
@@ -152,14 +154,14 @@ class Mention {
                 this.is_navigated = false;
             }
 
-            if (e.which == 40 && this.is_dotdot) {
+            if (e.which == 40 && this.is_colon) {
                 if (this.emo_cursor_loca != $("#suggestion-emotion-container").find("p").length - 1) {
                     this.emo_cursor_loca += 1;
                 }
                 e.preventDefault();
             }
 
-            if (e.which == 38 && this.is_dotdot) {
+            if (e.which == 38 && this.is_colon) {
                 if (this.emo_cursor_loca !== -1) {
                     this.emo_cursor_loca -= 1;
                 }
@@ -167,7 +169,7 @@ class Mention {
                 e.preventDefault();
             }
             
-            if ((e.which == 13 || e.which == 9) && this.is_dotdot) {
+            if ((e.which == 13 || e.which == 9) && this.is_colon) {
                 $("#suggestion-emotion-container").find("p[data-emo-selected='true']").click();
                 
                 e.preventDefault();
@@ -200,6 +202,15 @@ class Mention {
                     }
                 }
             }
+
+            if (e.keyCode == DETECT_COLON && e.key === KEY_COLON) {
+                if (this.count_colon >= 1) {
+                    this.is_colon = true;
+                    this.count_colon = 0;
+                } else {
+                    this.count_colon += 1;
+                }
+            }
         });
 
         $("#suggestion-emotion-container").on("mouseenter", "p", (e) => {
@@ -209,11 +220,13 @@ class Mention {
             $(e.currentTarget).removeAttr("data-emo-selected");
             $(e.currentTarget).css("background-color", "#fff");
         }).on("click", "p", (e) => {
-            let this_value = this.chat_text_jquery.val().replace(`:${this.emo_name}`, `${$(e.currentTarget).attr("data-emo")} `);
+            let pos = this.chat_text_jquery.val().lastIndexOf(`::${this.emo_name}`);
+            let this_value = `${this.chat_text_jquery.val().substring(0, pos) + $(e.currentTarget).attr("data-emo")} `;
             $("#_chatText").val(this_value);
             this.hideSuggestionEmotionsBox();
             $("#_chatText").focus();
         });
+
 
         this.chat_text_jquery.keyup((e) => {
             if (!this.status) {
@@ -242,7 +255,7 @@ class Mention {
                 this.current_RM = RM.id;
             }  
 
-            if (e.which == 40 && this.is_dotdot) {
+            if (e.which == 40 && this.is_colon) {
                 let curentScroll = $("#suggestion-emotion-container").scrollTop();
                 let scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
                 $("#suggestion-emotion-container").scrollTop(scrollValue + curentScroll);
@@ -255,7 +268,7 @@ class Mention {
                 return;
             }
             
-            if (e.which == 38 && this.is_dotdot) {
+            if (e.which == 38 && this.is_colon) {
                 let curentScroll = $("#suggestion-emotion-container").scrollTop();
                 let scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
                 $("#suggestion-emotion-container").scrollTop(curentScroll - scrollValue);
@@ -276,12 +289,6 @@ class Mention {
                 return;
             }
 
-            if (e.which == 186 && e.key === ":") {
-                this.is_dotdot = true;
-            } else {
-                this.text_before_dotdot = this.chat_text_jquery.val();
-            }
-
             if (e.which == 8) {
                 if (this.emo_name.length > 0) {
                     let arrChar = this.emo_name.split("");
@@ -296,11 +303,10 @@ class Mention {
                 this.hideSuggestionEmotionsBox();
             }
 
-            if (this.is_dotdot) {
+            if (this.is_colon) {
                 if (this.emo_name.length > 0) {
                     $("#suggestion-emotion-container").html("");
                     $("#suggestion-emotion-container").fadeIn(0);
-                    
                 }
                 let regex = new RegExp("^[a-zA-Z0-9!@#$%^&]+$");
                 let str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
@@ -317,33 +323,21 @@ class Mention {
                 if(findEmo.length > 0){
                     for(let i = 0; i < findEmo.length; i++) {
                         if (i == 0) {
-                            toAppend += `<p class="suggestion-emo-list" data-emo-selected="true" data-emo="${findEmo[i].key}" style="padding-bottom: 5px;border-bottom: 1px dashed #aaa; cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);">`
+                            toAppend += `<p class="suggestion-emo-list" data-emo-selected="true" data-emo="${findEmo[i].key}" style="padding-bottom: 5px; cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);">`
                         } else {
-                            toAppend += `<p class="suggestion-emo-list" data-emo="${findEmo[i].key}" style="padding-bottom: 5px;border-bottom: 1px dashed #aaa; cursor: pointer; margin-top: 5px;">`;
+                            toAppend += `<p class="suggestion-emo-list" data-emo="${findEmo[i].key}" style="padding-bottom: 5px; cursor: pointer; margin-top: 5px;">`;
                         }
                         toAppend += `<img id="example" src="${common.htmlEncode(common.getEmoUrl(findEmo[i].src ))}" title="${findEmo[i].key} - ${findEmo[i].data_name} - Chatpp" alt="${findEmo[i].key}" style="width: 100%; max-width: 50px;"> <b> ${findEmo[i].key}</b></p>`;
                     }
                     $("#suggestion-emotion-container").append(toAppend);
                 } else {
-                    toAppend += "<p style='padding-bottom: 5px;border-bottom: 1px dashed #aaa; text-align: center;'>Not found anything!</p>";
-                    $("#suggestion-emotion-container").append(toAppend);
+                    $("#suggestion-emotion-container").html("");
+                    $("#suggestion-emotion-container").fadeOut(0);
                 }
                 let rect = this.chat_text_element.getBoundingClientRect();
                 let position = Measurement.caretPos(this.chat_text_jquery);
                 position.left -= rect.left;
-                let h = $("#suggestion-emotion-container").height();
-                let t = -160 + (200 - h);
-                if (position.top < 610) {
-                    t -= 50;
-                } else if (position.top < 640) {
-                    t -= 30;
-                } else if (position.top < 660) {
-                    t += -2;
-                } else if (position.top < 680) {
-                    t += 7;
-                } else {
-                    t += 60;
-                }
+                let bt = window.innerHeight - position.top;
                 $("#_chatTextArea").css({
                     "overflow-y": "visible",
                     "z-index": 2
@@ -352,7 +346,7 @@ class Mention {
                     position: "relative"
                 });
                 $("#suggestion-emotion-container").css({
-                    top: t,
+                    bottom: bt,
                     left: position.left + 5
                 });
             }
@@ -566,9 +560,11 @@ class Mention {
     }
 
     hideSuggestionEmotionsBox() {
-        this.is_dotdot = false;
+        this.is_colon = false;
         this.emo_name = "";
         this.emo_cursor_loca = 0;
+        this.count_colon = 0;
+        $("#suggestion-emotion-container").scrollTop(0);
         $("#suggestion-emotion-container").fadeOut(0);
         $("#suggestion-emotion-container").html("");
     }
@@ -589,7 +585,7 @@ class Mention {
         }
         this.insert_type = "one";
         $("#suggestion-container").html("");
-        if (!this.is_dotdot) {
+        if (!this.is_colon) {
             $("#_chatTextArea").css({
                 "overflow-y": "scroll",
                 "z-index": 0
