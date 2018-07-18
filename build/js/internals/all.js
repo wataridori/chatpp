@@ -462,17 +462,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var common = require("../helpers/Common.js");
 var Const = require("../helpers/Const.js");
 
+var DETECT_COLON = 186;
+var KEY_COLON = ":";
+
 var Emoticon = function () {
     function Emoticon() {
         _classCallCheck(this, Emoticon);
 
         this.status = common.getStatus("emoticon");
         this.emoticons = [];
+        this.is_colon = false;
+        this.count_colon = 0;
+        this.emo_name = "";
+        this.emo_cursor_loca = 0;
+        this.list_all_emo = JSON.parse(localStorage[Const["LOCAL_STORAGE_DATA_KEY"]]);
+        this.chat_text_jquery = $("#_chatText");
+        this.chat_text_element = document.getElementById("_chatText");
     }
 
     _createClass(Emoticon, [{
         key: "setUp",
         value: function setUp() {
+            var _this = this;
+
             if (!this.status) {
                 return;
             }
@@ -485,9 +497,194 @@ var Emoticon = function () {
                 }
                 return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
             });
+            var html = "<div id='suggestion-emotion-container'></div>";
+            $("#_chatTextArea").append(html);
+            $("#suggestion-emotion-container").css({
+                "background": "#fff",
+                "position": "absolute",
+                "max-height": "200px",
+                "width": "200px",
+                "border": "1px solid #ababab",
+                "border-radius": "3px",
+                "padding": "4px 6px 4px 6px",
+                "box-shadow": "0px 3px 10px rgba(103, 103, 103, 0.57)",
+                "display": "none",
+                "overflow-y": "auto",
+                "z-index": "99"
+            });
+
+            this.chat_text_jquery.click(function () {
+                return _this.hideSuggestionEmotionsBox();
+            });
+
+            $("#_roomListArea").click(function () {
+                return _this.hideSuggestionEmotionsBox();
+            });
+
+            $("#_headerSearch").click(function () {
+                return _this.hideSuggestionEmotionsBox();
+            });
             this.addExternalEmoList();
             this.addExternalEmo();
             this.setEmoticonTextLabel();
+
+            //event
+            $(document).keyup(function (e) {
+                if (!_this.status) {
+                    return;
+                }
+                if (e.which == 27) {
+                    _this.hideSuggestionEmotionsBox();
+                }
+            });
+
+            this.chat_text_jquery.keydown(function (e) {
+                if (e.which == 40 && _this.is_colon) {
+                    if (_this.emo_cursor_loca != $("#suggestion-emotion-container").find("p").length - 1) {
+                        _this.emo_cursor_loca += 1;
+                    }
+                    e.preventDefault();
+                }
+
+                if (e.which == 38 && _this.is_colon) {
+                    if (_this.emo_cursor_loca !== -1) {
+                        _this.emo_cursor_loca -= 1;
+                    }
+
+                    e.preventDefault();
+                }
+
+                if ((e.which == 13 || e.which == 9) && _this.is_colon) {
+                    $("#suggestion-emotion-container").find("p[data-emo-selected='true']").click();
+
+                    e.preventDefault();
+                }
+
+                if (e.keyCode == DETECT_COLON && e.key === KEY_COLON) {
+                    if (_this.count_colon >= 1) {
+                        _this.is_colon = true;
+                        _this.count_colon = 0;
+                    } else {
+                        _this.count_colon += 1;
+                    }
+                }
+            });
+
+            $("#suggestion-emotion-container").on("mouseenter", "p", function (e) {
+                $(e.currentTarget).attr("data-emo-selected", true);
+                $(e.currentTarget).css("background-color", "rgb(216, 240, 249)");
+            }).on("mouseleave", "p", function (e) {
+                $(e.currentTarget).removeAttr("data-emo-selected");
+                $(e.currentTarget).css("background-color", "#fff");
+            }).on("click", "p", function (e) {
+                var pos = _this.chat_text_jquery.val().lastIndexOf("::" + _this.emo_name);
+                var this_value = _this.chat_text_jquery.val().substring(0, pos) + $(e.currentTarget).attr("data-emo") + " ";
+                $("#_chatText").val(this_value);
+                _this.hideSuggestionEmotionsBox();
+                $("#_chatText").focus();
+            });
+
+            this.chat_text_jquery.keyup(function (e) {
+                if (!_this.chat_text_jquery.val()) {
+                    _this.hideSuggestionEmotionsBox();
+                }
+
+                if (e.which == 40 && _this.is_colon) {
+                    var curentScroll = $("#suggestion-emotion-container").scrollTop();
+                    var scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
+                    $("#suggestion-emotion-container").scrollTop(scrollValue + curentScroll);
+                    var firstEleP = $("#suggestion-emotion-container").find("p");
+                    if ($(firstEleP[_this.emo_cursor_loca]).length > 0) {
+                        $(firstEleP[_this.emo_cursor_loca - 1]).mouseleave();
+                        $(firstEleP[_this.emo_cursor_loca]).mouseenter();
+                    }
+
+                    return;
+                }
+
+                if (e.which == 38 && _this.is_colon) {
+                    var _curentScroll = $("#suggestion-emotion-container").scrollTop();
+                    var _scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
+                    $("#suggestion-emotion-container").scrollTop(_curentScroll - _scrollValue);
+
+                    var _firstEleP = $("#suggestion-emotion-container").find("p");
+
+                    if (_this.emo_cursor_loca == -1) {
+                        $(_firstEleP).mouseleave();
+
+                        return;
+                    }
+
+                    if ($(_firstEleP[_this.emo_cursor_loca]).length > 0) {
+                        $(_firstEleP[_this.emo_cursor_loca + 1]).mouseleave();
+                        $(_firstEleP[_this.emo_cursor_loca]).mouseenter();
+                    }
+
+                    return;
+                }
+
+                if (e.which == 8) {
+                    if (_this.emo_name.length > 0) {
+                        var arrChar = _this.emo_name.split("");
+                        arrChar.pop();
+                        _this.emo_name = arrChar.join("");
+                    } else {
+                        _this.hideSuggestionEmotionsBox();
+                    }
+                }
+
+                if (e.which == 32) {
+                    _this.hideSuggestionEmotionsBox();
+                }
+
+                if (_this.is_colon) {
+                    if (_this.emo_name.length > 0) {
+                        $("#suggestion-emotion-container").html("");
+                        $("#suggestion-emotion-container").fadeIn(0);
+                    }
+                    var regex = new RegExp("^[a-zA-Z0-9!@#$%^&]+$");
+                    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+
+                    if (regex.test(str) && (e.which != 37 || e.which != 38 || e.which != 39 || e.which != 40)) {
+                        _this.emo_name += e.key;
+                    }
+                    var findEmo = $.grep(_this.list_all_emo, function (e) {
+                        var comp = e.key.toLowerCase();
+                        return comp.indexOf(_this.emo_name) > -1;
+                    });
+                    var toAppend = "";
+
+                    if (findEmo.length > 0) {
+                        for (var i = 0; i < findEmo.length; i++) {
+                            if (i == 0) {
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[i].key + "\" style=\"padding-bottom: 5px; cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
+                            } else {
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[i].key + "\" style=\"padding-bottom: 5px; cursor: pointer; margin-top: 5px;\">";
+                            }
+                            toAppend += "<img id=\"example\" src=\"" + common.htmlEncode(common.getEmoUrl(findEmo[i].src)) + "\" title=\"" + findEmo[i].key + " - " + findEmo[i].data_name + " - Chatpp\" alt=\"" + findEmo[i].key + "\" style=\"width: 100%; max-width: 50px;\"> <b> " + findEmo[i].key + "</b></p>";
+                        }
+                        $("#suggestion-emotion-container").append(toAppend);
+                    } else {
+                        $("#suggestion-emotion-container").html("");
+                        $("#suggestion-emotion-container").fadeOut(0);
+                    }
+                    var rect = _this.chat_text_element.getBoundingClientRect();
+                    var position = Measurement.caretPos(_this.chat_text_jquery);
+                    position.left -= rect.left;
+                    var bt = window.innerHeight - position.top;
+                    $("#_chatTextArea").css({
+                        "overflow-y": "visible",
+                        "z-index": 2
+                    });
+                    $("#suggestion-emotion-container").parent().css({
+                        position: "relative"
+                    });
+                    $("#suggestion-emotion-container").css({
+                        bottom: bt,
+                        left: position.left + 5
+                    });
+                }
+            });
         }
     }, {
         key: "addExternalEmoList",
@@ -706,6 +903,17 @@ var Emoticon = function () {
         value: function isNewMechanism() {
             return typeof emoticons !== "undefined" && typeof tokenizer !== "undefined";
         }
+    }, {
+        key: "hideSuggestionEmotionsBox",
+        value: function hideSuggestionEmotionsBox() {
+            this.is_colon = false;
+            this.emo_name = "";
+            this.emo_cursor_loca = 0;
+            this.count_colon = 0;
+            $("#suggestion-emotion-container").scrollTop(0);
+            $("#suggestion-emotion-container").fadeOut(0);
+            $("#suggestion-emotion-container").html("");
+        }
     }]);
 
     return Emoticon;
@@ -734,6 +942,7 @@ var INSERT_MODE_SYM = {
     "TO": "_",
     "CC": "_cc_"
 };
+
 var DETECT_COLON = 186;
 var KEY_COLON = ":";
 
@@ -745,9 +954,6 @@ var Mention = function () {
         this.start = /@/ig;
         this.is_colon = false;
         this.count_colon = 0;
-        this.emo_name = "";
-        this.emo_cursor_loca = 0;
-        this.list_all_emo = JSON.parse(localStorage[Const["LOCAL_STORAGE_DATA_KEY"]]);
         this.is_displayed = false;
         this.is_inserted = false;
         this.is_navigated = false;
@@ -815,21 +1021,6 @@ var Mention = function () {
             });
 
             $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
-            var html = "<div id='suggestion-emotion-container'></div>";
-            $("#_chatTextArea").append(html);
-            $("#suggestion-emotion-container").css({
-                "background": "#fff",
-                "position": "absolute",
-                "max-height": "200px",
-                "width": "200px",
-                "border": "1px solid #ababab",
-                "border-radius": "3px",
-                "padding": "4px 6px 4px 6px",
-                "box-shadow": "0px 3px 10px rgba(103, 103, 103, 0.57)",
-                "display": "none",
-                "overflow-y": "auto",
-                "z-index": "99"
-            });
             this.hideSuggestionBox();
             $("#_sendEnterActionArea").click(function () {
                 _this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
@@ -849,24 +1040,12 @@ var Mention = function () {
                 return _this.hideSuggestionBox();
             });
 
-            this.chat_text_jquery.click(function () {
-                return _this.hideSuggestionEmotionsBox();
-            });
-
             $("#_roomListArea").click(function () {
                 return _this.hideSuggestionBox();
             });
 
-            $("#_roomListArea").click(function () {
-                return _this.hideSuggestionEmotionsBox();
-            });
-
             $("#_headerSearch").click(function () {
                 return _this.hideSuggestionBox();
-            });
-
-            $("#_headerSearch").click(function () {
-                return _this.hideSuggestionEmotionsBox();
             });
 
             // when user press ESC, we hide suggestion box
@@ -876,7 +1055,6 @@ var Mention = function () {
                 }
                 if (e.which == 27) {
                     _this.hideSuggestionBox();
-                    _this.hideSuggestionEmotionsBox();
                 }
             });
 
@@ -893,25 +1071,13 @@ var Mention = function () {
                     _this.is_navigated = false;
                 }
 
-                if (e.which == 40 && _this.is_colon) {
-                    if (_this.emo_cursor_loca != $("#suggestion-emotion-container").find("p").length - 1) {
-                        _this.emo_cursor_loca += 1;
+                if (e.keyCode == DETECT_COLON && e.key === KEY_COLON) {
+                    if (_this.count_colon >= 1) {
+                        _this.is_colon = true;
+                        _this.count_colon = 0;
+                    } else {
+                        _this.count_colon += 1;
                     }
-                    e.preventDefault();
-                }
-
-                if (e.which == 38 && _this.is_colon) {
-                    if (_this.emo_cursor_loca !== -1) {
-                        _this.emo_cursor_loca -= 1;
-                    }
-
-                    e.preventDefault();
-                }
-
-                if ((e.which == 13 || e.which == 9) && _this.is_colon) {
-                    $("#suggestion-emotion-container").find("p[data-emo-selected='true']").click();
-
-                    e.preventDefault();
                 }
 
                 if (e.which == 9 || e.which == 13) {
@@ -940,38 +1106,11 @@ var Mention = function () {
                         }
                     }
                 }
-
-                if (e.keyCode == DETECT_COLON && e.key === KEY_COLON) {
-                    if (_this.count_colon >= 1) {
-                        _this.is_colon = true;
-                        _this.count_colon = 0;
-                    } else {
-                        _this.count_colon += 1;
-                    }
-                }
-            });
-
-            $("#suggestion-emotion-container").on("mouseenter", "p", function (e) {
-                $(e.currentTarget).attr("data-emo-selected", true);
-                $(e.currentTarget).css("background-color", "rgb(216, 240, 249)");
-            }).on("mouseleave", "p", function (e) {
-                $(e.currentTarget).removeAttr("data-emo-selected");
-                $(e.currentTarget).css("background-color", "#fff");
-            }).on("click", "p", function (e) {
-                var pos = _this.chat_text_jquery.val().lastIndexOf("::" + _this.emo_name);
-                var this_value = _this.chat_text_jquery.val().substring(0, pos) + $(e.currentTarget).attr("data-emo") + " ";
-                $("#_chatText").val(this_value);
-                _this.hideSuggestionEmotionsBox();
-                $("#_chatText").focus();
             });
 
             this.chat_text_jquery.keyup(function (e) {
                 if (!_this.status) {
                     return;
-                }
-
-                if (!_this.chat_text_jquery.val()) {
-                    _this.hideSuggestionEmotionsBox();
                 }
 
                 if (e.which == 9 || e.which == 13) {
@@ -990,102 +1129,6 @@ var Mention = function () {
                     _this.updateAdminGroupData();
                     _this.fuse = new Fuse(_this.member_objects, _this.options);
                     _this.current_RM = RM.id;
-                }
-
-                if (e.which == 40 && _this.is_colon) {
-                    var curentScroll = $("#suggestion-emotion-container").scrollTop();
-                    var scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
-                    $("#suggestion-emotion-container").scrollTop(scrollValue + curentScroll);
-                    var firstEleP = $("#suggestion-emotion-container").find("p");
-                    if ($(firstEleP[_this.emo_cursor_loca]).length > 0) {
-                        $(firstEleP[_this.emo_cursor_loca - 1]).mouseleave();
-                        $(firstEleP[_this.emo_cursor_loca]).mouseenter();
-                    }
-
-                    return;
-                }
-
-                if (e.which == 38 && _this.is_colon) {
-                    var _curentScroll = $("#suggestion-emotion-container").scrollTop();
-                    var _scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
-                    $("#suggestion-emotion-container").scrollTop(_curentScroll - _scrollValue);
-
-                    var _firstEleP = $("#suggestion-emotion-container").find("p");
-
-                    if (_this.emo_cursor_loca == -1) {
-                        $(_firstEleP).mouseleave();
-
-                        return;
-                    }
-
-                    if ($(_firstEleP[_this.emo_cursor_loca]).length > 0) {
-                        $(_firstEleP[_this.emo_cursor_loca + 1]).mouseleave();
-                        $(_firstEleP[_this.emo_cursor_loca]).mouseenter();
-                    }
-
-                    return;
-                }
-
-                if (e.which == 8) {
-                    if (_this.emo_name.length > 0) {
-                        var arrChar = _this.emo_name.split("");
-                        arrChar.pop();
-                        _this.emo_name = arrChar.join("");
-                    } else {
-                        _this.hideSuggestionEmotionsBox();
-                    }
-                }
-
-                if (e.which == 32) {
-                    _this.hideSuggestionEmotionsBox();
-                }
-
-                if (_this.is_colon) {
-                    if (_this.emo_name.length > 0) {
-                        $("#suggestion-emotion-container").html("");
-                        $("#suggestion-emotion-container").fadeIn(0);
-                    }
-                    var regex = new RegExp("^[a-zA-Z0-9!@#$%^&]+$");
-                    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-
-                    if (regex.test(str) && (e.which != 37 || e.which != 38 || e.which != 39 || e.which != 40)) {
-                        _this.emo_name += e.key;
-                    }
-                    var findEmo = $.grep(_this.list_all_emo, function (e) {
-                        var comp = e.key.toLowerCase();
-                        return comp.indexOf(_this.emo_name) > -1;
-                    });
-                    var toAppend = "";
-
-                    if (findEmo.length > 0) {
-                        for (var i = 0; i < findEmo.length; i++) {
-                            if (i == 0) {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[i].key + "\" style=\"padding-bottom: 5px; cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
-                            } else {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[i].key + "\" style=\"padding-bottom: 5px; cursor: pointer; margin-top: 5px;\">";
-                            }
-                            toAppend += "<img id=\"example\" src=\"" + common.htmlEncode(common.getEmoUrl(findEmo[i].src)) + "\" title=\"" + findEmo[i].key + " - " + findEmo[i].data_name + " - Chatpp\" alt=\"" + findEmo[i].key + "\" style=\"width: 100%; max-width: 50px;\"> <b> " + findEmo[i].key + "</b></p>";
-                        }
-                        $("#suggestion-emotion-container").append(toAppend);
-                    } else {
-                        $("#suggestion-emotion-container").html("");
-                        $("#suggestion-emotion-container").fadeOut(0);
-                    }
-                    var rect = _this.chat_text_element.getBoundingClientRect();
-                    var position = Measurement.caretPos(_this.chat_text_jquery);
-                    position.left -= rect.left;
-                    var bt = window.innerHeight - position.top;
-                    $("#_chatTextArea").css({
-                        "overflow-y": "visible",
-                        "z-index": 2
-                    });
-                    $("#suggestion-emotion-container").parent().css({
-                        position: "relative"
-                    });
-                    $("#suggestion-emotion-container").css({
-                        bottom: bt,
-                        left: position.left + 5
-                    });
                 }
 
                 if (_this.findAtmark()) {
@@ -1229,17 +1272,12 @@ var Mention = function () {
     }, {
         key: "setSuggestionBoxPosition",
         value: function setSuggestionBoxPosition() {
-            var element = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
             var rect = this.chat_text_element.getBoundingClientRect();
             var current_pos = this.doGetCaretPosition(this.chat_text_element);
-            if (!element) {
-                this.setCaretPosition(this.chat_text_element, this.actived_atmark_index + 1);
-            }
+            this.setCaretPosition(this.chat_text_element, this.actived_atmark_index + 1);
             var position = Measurement.caretPos(this.chat_text_jquery);
             position.top -= rect.top;
             position.left -= rect.left;
-            var selectorElement = element ? element : "#suggestion-container";
 
             if (rect.width - position.left < 236) {
                 position.left -= 236;
@@ -1255,18 +1293,16 @@ var Mention = function () {
             } else {
                 position.top += parseInt(this.chat_text_jquery.css("font-size")) + 5;
             }
-            $(selectorElement).parent().css({
+            $("#suggestion-container").parent().css({
                 position: "relative"
             });
 
-            $(selectorElement).css({
+            $("#suggestion-container").css({
                 top: position.top,
                 left: position.left,
                 position: "absolute"
             });
-            if (!element) {
-                this.setCaretPosition(this.chat_text_element, current_pos);
-            }
+            this.setCaretPosition(this.chat_text_element, current_pos);
         }
     }, {
         key: "showSuggestionBox",
@@ -1303,17 +1339,6 @@ var Mention = function () {
             $("#suggestion-container").html(content).hide();
             $("#suggestion-container").css("visibility", "hidden");
             this.cleanUp();
-        }
-    }, {
-        key: "hideSuggestionEmotionsBox",
-        value: function hideSuggestionEmotionsBox() {
-            this.is_colon = false;
-            this.emo_name = "";
-            this.emo_cursor_loca = 0;
-            this.count_colon = 0;
-            $("#suggestion-emotion-container").scrollTop(0);
-            $("#suggestion-emotion-container").fadeOut(0);
-            $("#suggestion-emotion-container").html("");
         }
     }, {
         key: "cleanUp",
