@@ -11,6 +11,7 @@ let INSERT_MODE_SYM = {
     "TO": "_",
     "CC": "_cc_"
 }
+
 let DETECT_COLON = 186;
 let KEY_COLON = ":";
 
@@ -20,9 +21,6 @@ class Mention {
         this.start = /@/ig;
         this.is_colon = false;
         this.count_colon = 0;
-        this.emo_name = "";
-        this.emo_cursor_loca = 0;
-        this.list_all_emo = JSON.parse(localStorage[Const["LOCAL_STORAGE_DATA_KEY"]]);
         this.is_displayed = false;
         this.is_inserted = false;
         this.is_navigated = false;
@@ -86,21 +84,6 @@ class Mention {
         });
 
         $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
-        let html = "<div id='suggestion-emotion-container'></div>";
-        $("#_chatTextArea").append(html);
-        $("#suggestion-emotion-container").css({
-            "background": "#fff",
-            "position": "absolute",
-            "max-height": "200px",
-            "width": "200px",
-            "border": "1px solid #ababab",
-            "border-radius": "3px",
-            "padding": "4px 6px 4px 6px",
-            "box-shadow": "0px 3px 10px rgba(103, 103, 103, 0.57)",
-            "display": "none",
-            "overflow-y": "auto",
-            "z-index": "99"
-        });
         this.hideSuggestionBox();
         $("#_sendEnterActionArea").click(() => {
             this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
@@ -120,15 +103,9 @@ class Mention {
         // hide suggestion box when click in textarea or outside
         this.chat_text_jquery.click(() => this.hideSuggestionBox());
 
-        this.chat_text_jquery.click(() => this.hideSuggestionEmotionsBox());
-
         $("#_roomListArea").click(() => this.hideSuggestionBox());
 
-        $("#_roomListArea").click(() => this.hideSuggestionEmotionsBox());
-
         $("#_headerSearch").click(() => this.hideSuggestionBox());
-
-        $("#_headerSearch").click(() => this.hideSuggestionEmotionsBox());
 
         // when user press ESC, we hide suggestion box
         $(document).keyup((e) => {
@@ -137,7 +114,6 @@ class Mention {
             }
             if (e.which == 27) {
                 this.hideSuggestionBox();
-                this.hideSuggestionEmotionsBox();
             }
         });
 
@@ -154,27 +130,14 @@ class Mention {
                 this.is_navigated = false;
             }
 
-            if (e.which == 40 && this.is_colon) {
-                if (this.emo_cursor_loca != $("#suggestion-emotion-container").find("p").length - 1) {
-                    this.emo_cursor_loca += 1;
+            if (e.keyCode == DETECT_COLON && e.key === KEY_COLON) {
+                if (this.count_colon >= 1) {
+                    this.is_colon = true;
+                    this.count_colon = 0;
+                } else {
+                    this.count_colon += 1;
                 }
-                e.preventDefault();
             }
-
-            if (e.which == 38 && this.is_colon) {
-                if (this.emo_cursor_loca !== -1) {
-                    this.emo_cursor_loca -= 1;
-                }
-
-                e.preventDefault();
-            }
-            
-            if ((e.which == 13 || e.which == 9) && this.is_colon) {
-                $("#suggestion-emotion-container").find("p[data-emo-selected='true']").click();
-                
-                e.preventDefault();
-            }
-            
 
             if (e.which == 9 || e.which == 13) {
                 if ((this.insert_type == "all" || this.insert_type == "group") && this.is_displayed) {
@@ -202,39 +165,11 @@ class Mention {
                     }
                 }
             }
-
-            if (e.keyCode == DETECT_COLON && e.key === KEY_COLON) {
-                if (this.count_colon >= 1) {
-                    this.is_colon = true;
-                    this.count_colon = 0;
-                } else {
-                    this.count_colon += 1;
-                }
-            }
         });
-
-        $("#suggestion-emotion-container").on("mouseenter", "p", (e) => {
-            $(e.currentTarget).attr("data-emo-selected", true);
-            $(e.currentTarget).css("background-color", "rgb(216, 240, 249)");
-        }).on("mouseleave", "p", (e) => {
-            $(e.currentTarget).removeAttr("data-emo-selected");
-            $(e.currentTarget).css("background-color", "#fff");
-        }).on("click", "p", (e) => {
-            let pos = this.chat_text_jquery.val().lastIndexOf(`::${this.emo_name}`);
-            let this_value = `${this.chat_text_jquery.val().substring(0, pos) + $(e.currentTarget).attr("data-emo")} `;
-            $("#_chatText").val(this_value);
-            this.hideSuggestionEmotionsBox();
-            $("#_chatText").focus();
-        });
-
 
         this.chat_text_jquery.keyup((e) => {
             if (!this.status) {
                 return;
-            }
-
-            if (!this.chat_text_jquery.val()) {
-                this.hideSuggestionEmotionsBox();
             }
 
             if (e.which == 9 || e.which == 13) {
@@ -253,102 +188,6 @@ class Mention {
                 this.updateAdminGroupData();
                 this.fuse = new Fuse(this.member_objects, this.options);
                 this.current_RM = RM.id;
-            }  
-
-            if (e.which == 40 && this.is_colon) {
-                let curentScroll = $("#suggestion-emotion-container").scrollTop();
-                let scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
-                $("#suggestion-emotion-container").scrollTop(scrollValue + curentScroll);
-                let firstEleP = $("#suggestion-emotion-container").find("p");
-                if ($(firstEleP[this.emo_cursor_loca]).length > 0) {
-                    $(firstEleP[this.emo_cursor_loca-1]).mouseleave();
-                    $(firstEleP[this.emo_cursor_loca]).mouseenter();
-                }
-
-                return;
-            }
-            
-            if (e.which == 38 && this.is_colon) {
-                let curentScroll = $("#suggestion-emotion-container").scrollTop();
-                let scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
-                $("#suggestion-emotion-container").scrollTop(curentScroll - scrollValue);
-
-                let firstEleP = $("#suggestion-emotion-container").find("p");
-
-                if (this.emo_cursor_loca == -1) {
-                    $(firstEleP).mouseleave();
-
-                    return;
-                }
-
-                if ($(firstEleP[this.emo_cursor_loca]).length > 0) {
-                    $(firstEleP[this.emo_cursor_loca+1]).mouseleave();
-                    $(firstEleP[this.emo_cursor_loca]).mouseenter();
-                }
-
-                return;
-            }
-
-            if (e.which == 8) {
-                if (this.emo_name.length > 0) {
-                    let arrChar = this.emo_name.split("");
-                    arrChar.pop();
-                    this.emo_name = arrChar.join("");
-                } else {
-                    this.hideSuggestionEmotionsBox();
-                }
-            }
-
-            if (e.which == 32) {
-                this.hideSuggestionEmotionsBox();
-            }
-
-            if (this.is_colon) {
-                if (this.emo_name.length > 0) {
-                    $("#suggestion-emotion-container").html("");
-                    $("#suggestion-emotion-container").fadeIn(0);
-                }
-                let regex = new RegExp("^[a-zA-Z0-9!@#$%^&]+$");
-                let str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-
-                if(regex.test(str) && (e.which != 37 || e.which != 38 || e.which != 39 || e.which != 40)) {
-                    this.emo_name += e.key;
-                }
-                let findEmo = $.grep(this.list_all_emo, (e) => {
-                    let comp = e.key.toLowerCase();
-                    return comp.indexOf(this.emo_name) > -1;
-                });
-                let toAppend = "";
-                
-                if(findEmo.length > 0){
-                    for(let i = 0; i < findEmo.length; i++) {
-                        if (i == 0) {
-                            toAppend += `<p class="suggestion-emo-list" data-emo-selected="true" data-emo="${findEmo[i].key}" style="padding-bottom: 5px; cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);">`
-                        } else {
-                            toAppend += `<p class="suggestion-emo-list" data-emo="${findEmo[i].key}" style="padding-bottom: 5px; cursor: pointer; margin-top: 5px;">`;
-                        }
-                        toAppend += `<img id="example" src="${common.htmlEncode(common.getEmoUrl(findEmo[i].src ))}" title="${findEmo[i].key} - ${findEmo[i].data_name} - Chatpp" alt="${findEmo[i].key}" style="width: 100%; max-width: 50px;"> <b> ${findEmo[i].key}</b></p>`;
-                    }
-                    $("#suggestion-emotion-container").append(toAppend);
-                } else {
-                    $("#suggestion-emotion-container").html("");
-                    $("#suggestion-emotion-container").fadeOut(0);
-                }
-                let rect = this.chat_text_element.getBoundingClientRect();
-                let position = Measurement.caretPos(this.chat_text_jquery);
-                position.left -= rect.left;
-                let bt = window.innerHeight - position.top;
-                $("#_chatTextArea").css({
-                    "overflow-y": "visible",
-                    "z-index": 2
-                });
-                $("#suggestion-emotion-container").parent().css({
-                    position: "relative"
-                });
-                $("#suggestion-emotion-container").css({
-                    bottom: bt,
-                    left: position.left + 5
-                });
             }
 
             if (this.findAtmark()) {
@@ -488,16 +327,13 @@ class Mention {
         }
     }
 
-    setSuggestionBoxPosition(element = null) {
+    setSuggestionBoxPosition() {
         let rect = this.chat_text_element.getBoundingClientRect();
         let current_pos = this.doGetCaretPosition(this.chat_text_element);
-        if (!element) {
-            this.setCaretPosition(this.chat_text_element, this.actived_atmark_index + 1);
-        }
+        this.setCaretPosition(this.chat_text_element, this.actived_atmark_index + 1);
         let position = Measurement.caretPos(this.chat_text_jquery);
         position.top -= rect.top;
         position.left -= rect.left;
-        let selectorElement = element ? element : "#suggestion-container";
         
         if (rect.width - position.left < 236) {
             position.left -= 236;
@@ -513,18 +349,16 @@ class Mention {
         } else {
             position.top += parseInt(this.chat_text_jquery.css("font-size")) + 5;
         }
-        $(selectorElement).parent().css({
+        $("#suggestion-container").parent().css({
             position: "relative"
         });
 
-        $(selectorElement).css({
+        $("#suggestion-container").css({
             top: position.top,
             left: position.left,
             position: "absolute"
         });
-        if (!element) {
-            this.setCaretPosition(this.chat_text_element, current_pos);
-        }
+        this.setCaretPosition(this.chat_text_element, current_pos);
     }
 
     showSuggestionBox(content) {
@@ -557,16 +391,6 @@ class Mention {
         $("#suggestion-container").html(content).hide();
         $("#suggestion-container").css("visibility", "hidden");
         this.cleanUp();
-    }
-
-    hideSuggestionEmotionsBox() {
-        this.is_colon = false;
-        this.emo_name = "";
-        this.emo_cursor_loca = 0;
-        this.count_colon = 0;
-        $("#suggestion-emotion-container").scrollTop(0);
-        $("#suggestion-emotion-container").fadeOut(0);
-        $("#suggestion-emotion-container").html("");
     }
 
     cleanUp() {
