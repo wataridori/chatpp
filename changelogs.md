@@ -1,5 +1,11 @@
 Chat++ Change Logs
 
+## 5.2.0
+* Remove `E` (Emoticon), `S` (Shortcut), `M` (Mention) buttons in chatbox toolbar
+* Add `[info]`, `[title]` and `[code]` buttons in chatbox toolbar
+* Fix bug with mouse hover when mention suggestion displayed
+* Separate emoticons in to tabs in the Emoticon List popup
+* Add emoticons popup suggestion with `::` keyword
 
 ## 5.1.22
 * Fix bug: can not load some external libraries
