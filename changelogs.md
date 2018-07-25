@@ -1,5 +1,9 @@
 Chat++ Change Logs
 
+## 5.2.1
+* Fix bug can not select emoticon when using Vietnamese Unikey
+* Fix bug can not select emoticon at new line
+
 ## 5.2.0
 * Remove `E` (Emoticon), `S` (Shortcut), `M` (Mention) buttons in chatbox toolbar
 * Add `[info]`, `[title]` and `[code]` buttons in chatbox toolbar
