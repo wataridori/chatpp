@@ -12,15 +12,11 @@ let INSERT_MODE_SYM = {
     "CC": "_cc_"
 }
 
-let DETECT_COLON = 186;
-let KEY_COLON = ":";
-
 class Mention {
     constructor() {
         this.status = common.getStatus("mention");
         this.start = /@/ig;
         this.is_colon = false;
-        this.count_colon = 0;
         this.is_displayed = false;
         this.is_inserted = false;
         this.is_navigated = false;
@@ -130,13 +126,10 @@ class Mention {
                 this.is_navigated = false;
             }
 
-            if (e.keyCode == DETECT_COLON && e.key === KEY_COLON) {
-                if (this.count_colon >= 1) {
-                    this.is_colon = true;
-                    this.count_colon = 0;
-                } else {
-                    this.count_colon += 1;
-                }
+            if (this.getNearestColonIndex()) {
+                this.is_colon = true;
+            } else {
+                this.is_colon = false;
             }
 
             if (e.which == 9 || e.which == 13) {
@@ -277,6 +270,28 @@ class Mention {
             }
             pre_atmark_index = atmark_index;
             atmark_index = content.indexOf("@", atmark_index + 1);
+        } while (atmark_index != -1);
+
+        return pre_atmark_index;
+    }
+
+    getNearestColonIndex() {
+        let content = this.chat_text_jquery.val();
+        let atmarks = content.match(this.start);
+
+        if (!atmarks) {
+            return -1;
+        }
+
+        let caret_index = this.doGetCaretPosition(this.chat_text_element);
+        let atmark_index = content.indexOf("::");
+        let pre_atmark_index = -1;
+        do {
+            if (atmark_index >= caret_index) {
+                break;
+            }
+            pre_atmark_index = atmark_index;
+            atmark_index = content.indexOf("::", atmark_index + 1);
         } while (atmark_index != -1);
 
         return pre_atmark_index;

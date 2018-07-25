@@ -1,15 +1,14 @@
 let common = require("../helpers/Common.js");
 let Const = require("../helpers/Const.js");
 
-let DETECT_COLON = 186;
-let KEY_COLON = ":";
+let KEY_COLON = "::";
 
 class Emoticon {
     constructor() {
         this.status = common.getStatus("emoticon");
         this.emoticons = [];
+        this.start = /::/ig;
         this.is_colon = false;
-        this.count_colon = 0;
         this.emo_name = "";
         this.emo_cursor_loca = 0;
         this.list_all_emo = JSON.parse(localStorage[Const["LOCAL_STORAGE_DATA_KEY"]]);
@@ -81,20 +80,12 @@ class Emoticon {
                 e.preventDefault();
             }
             
+            
             if ((e.which == 13 || e.which == 9) && this.is_colon) {
                 $("#suggestion-emotion-container").find("p[data-emo-selected='true']").click();
                 
                 e.preventDefault();
-            }
-
-            if (e.keyCode == DETECT_COLON && e.key === KEY_COLON) {
-                if (this.count_colon >= 1) {
-                    this.is_colon = true;
-                    this.count_colon = 0;
-                } else {
-                    this.count_colon += 1;
-                }
-            }
+            }            
         });
 
         $("#suggestion-emotion-container").on("mouseenter", "p", (e) => {
@@ -105,7 +96,8 @@ class Emoticon {
             $(e.currentTarget).css("background-color", "#fff");
         }).on("click", "p", (e) => {
             let pos = this.chat_text_jquery.val().lastIndexOf(`::${this.emo_name}`);
-            let this_value = `${this.chat_text_jquery.val().substring(0, pos) + $(e.currentTarget).attr("data-emo")} `;
+            let end_pos = this.chat_text_jquery.val().slice(this.emo_name.length + pos + 2, this.chat_text_jquery.val().length);
+            let this_value = `${this.chat_text_jquery.val().substring(0, pos) + $(e.currentTarget).attr("data-emo")} ${end_pos}`;
             $("#_chatText").val(this_value);
             this.hideSuggestionEmotionsBox();
             $("#_chatText").focus();
@@ -114,6 +106,12 @@ class Emoticon {
         this.chat_text_jquery.keyup((e) => {
             if (!this.chat_text_jquery.val()) {
                 this.hideSuggestionEmotionsBox();
+            }
+
+            if (this.getNearestAtmarkIndex() != -1) {
+                this.is_colon = true;
+            } else {
+                this.is_colon = false;
             }
 
             if (e.which == 40 && this.is_colon) {
@@ -169,12 +167,23 @@ class Emoticon {
                     $("#suggestion-emotion-container").html("");
                     $("#suggestion-emotion-container").fadeIn(0);
                 }
-                let regex = new RegExp("^[a-zA-Z0-9!@#$%^&]+$");
-                let str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-
-                if(regex.test(str) && (e.which != 37 || e.which != 38 || e.which != 39 || e.which != 40)) {
-                    this.emo_name += e.key;
+                let lastColonIndex = this.chat_text_jquery.val().lastIndexOf(KEY_COLON);
+                let textAfterColon = this.chat_text_jquery.val().substr(lastColonIndex + 2);
+                let emoLastText = "";
+                if (textAfterColon.match(/\n/)) {
+                    emoLastText = textAfterColon.split(/\r|\n/);
+                } else {
+                    emoLastText = textAfterColon.split(" ");
                 }
+
+                if (emoLastText.length > 0) {
+                    if (e.which != 37 || e.which != 38 || e.which != 39 || e.which != 40) {
+                        this.emo_name = emoLastText[0];
+                    }
+                } else {
+                    this.hideSuggestionEmotionsBox();
+                }
+                
                 let findEmo = $.grep(this.list_all_emo, (e) => {
                     let comp = e.key.toLowerCase();
                     return comp.indexOf(this.emo_name) > -1;
@@ -184,9 +193,9 @@ class Emoticon {
                 if(findEmo.length > 0){
                     for(let i = 0; i < findEmo.length; i++) {
                         if (i == 0) {
-                            toAppend += `<p class="suggestion-emo-list" data-emo-selected="true" data-emo="${findEmo[i].key}" style="padding-bottom: 5px; cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);">`
+                            toAppend += `<p class="suggestion-emo-list" data-emo-selected="true" data-emo="${findEmo[i].key}" style="cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);">`
                         } else {
-                            toAppend += `<p class="suggestion-emo-list" data-emo="${findEmo[i].key}" style="padding-bottom: 5px; cursor: pointer; margin-top: 5px;">`;
+                            toAppend += `<p class="suggestion-emo-list" data-emo="${findEmo[i].key}" style="cursor: pointer; margin-top: 5px;">`;
                         }
                         toAppend += `<img id="example" src="${common.htmlEncode(common.getEmoUrl(findEmo[i].src ))}" title="${findEmo[i].key} - ${findEmo[i].data_name} - Chatpp" alt="${findEmo[i].key}" style="width: 100%; max-width: 50px;"> <b> ${findEmo[i].key}</b></p>`;
                     }
@@ -201,7 +210,7 @@ class Emoticon {
                 let bt = window.innerHeight - position.top;
                 $("#_chatTextArea").css({
                     "overflow-y": "visible",
-                    "z-index": 2
+                    "z-index": 0
                 });
                 $("#suggestion-emotion-container").parent().css({
                     position: "relative"
@@ -212,6 +221,42 @@ class Emoticon {
                 });
             }
         });
+    }
+
+    getNearestAtmarkIndex() {
+        let content = this.chat_text_jquery.val();
+        let atmarks = content.match(this.start);
+
+        if (!atmarks) {
+            return -1;
+        }
+
+        let caret_index = this.doGetCaretPosition(this.chat_text_element);
+        let atmark_index = content.indexOf(KEY_COLON);
+        let pre_atmark_index = -1;
+        do {
+            if (atmark_index >= caret_index) {
+                break;
+            }
+            pre_atmark_index = atmark_index;
+            atmark_index = content.indexOf(KEY_COLON, atmark_index + 1);
+        } while (atmark_index != -1);
+
+        return pre_atmark_index;
+    }
+
+    doGetCaretPosition(ctrl) {
+        let CaretPos = 0; // IE Support
+        if (document.selection) {
+            ctrl.focus();
+            let Sel = document.selection.createRange();
+            Sel.moveStart("character", -ctrl.value.length);
+            CaretPos = Sel.text.length;
+        }
+        // Firefox support
+        else if (ctrl.selectionStart || ctrl.selectionStart == "0")
+            CaretPos = ctrl.selectionStart;
+        return (CaretPos);
     }
 
     addExternalEmoList() {
@@ -437,7 +482,6 @@ class Emoticon {
         this.is_colon = false;
         this.emo_name = "";
         this.emo_cursor_loca = 0;
-        this.count_colon = 0;
         $("#suggestion-emotion-container").scrollTop(0);
         $("#suggestion-emotion-container").fadeOut(0);
         $("#suggestion-emotion-container").html("");

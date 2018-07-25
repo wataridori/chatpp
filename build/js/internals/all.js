@@ -1,77 +1,140 @@
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 19);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Const = __webpack_require__(1);
+var common = require("../helpers/Common.js");
+
+var ChatworkFacade = function () {
+    function ChatworkFacade() {
+        _classCallCheck(this, ChatworkFacade);
+    }
+
+    _createClass(ChatworkFacade, [{
+        key: "myId",
+        value: function myId() {
+            return AC.myid;
+        }
+    }, {
+        key: "getUserName",
+        value: function getUserName(user_id) {
+            return AC.getDefaultNickName(user_id);
+        }
+    }, {
+        key: "currentRoom",
+        value: function currentRoom() {
+            return RM.id;
+        }
+    }, {
+        key: "getRoomAdmins",
+        value: function getRoomAdmins() {
+            var members = this.getRoomMembers();
+            var admins = [];
+            for (var id in members) {
+                if (members[id] === "admin") {
+                    admins.push(id);
+                }
+            }
+            return admins;
+        }
+    }, {
+        key: "isAdmin",
+        value: function isAdmin(user) {
+            var members = this.getRoomMembers();
+            user = user || this.myId();
+            return members[user] === "admin";
+        }
+    }, {
+        key: "getRoomMembers",
+        value: function getRoomMembers() {
+            return RM.member_dat;
+        }
+    }, {
+        key: "getRoomMembersCount",
+        value: function getRoomMembersCount() {
+            return RM.sorted_member_list.length;
+        }
+    }, {
+        key: "getRoomMembersArray",
+        value: function getRoomMembersArray() {
+            var members = this.getRoomMembers();
+            return Object.keys(members);
+        }
+    }, {
+        key: "getRandomMemberInRoom",
+        value: function getRandomMemberInRoom() {
+            var members = this.getRoomMembersArray();
+            return common.random(members);
+        }
+    }, {
+        key: "searchRoomsByPerson",
+        value: function searchRoomsByPerson(user_id) {
+            var rooms = RL.rooms;
+            var same_rooms = [];
+            for (var room_id in rooms) {
+                var room = rooms[room_id];
+                if (room._name && room.member_dat && room.member_dat.hasOwnProperty(user_id)) {
+                    same_rooms.push(room);
+                }
+            }
+            return same_rooms;
+        }
+    }, {
+        key: "removeMemberFromRoom",
+        value: function removeMemberFromRoom(user_id, room_id) {
+            var room = RL.rooms[room_id];
+            if (room.type === "group" && room.member_dat.hasOwnProperty(user_id) && room.member_dat[this.myId()] === "admin") {
+                if (!window.confirm("Are you sure to delete this user from " + room.getName() + " ?")) {
+                    return false;
+                }
+                delete room.member_dat[user_id];
+                var params = {
+                    body_params: {
+                        cmd: "update_room",
+                        room_id: room_id,
+                        role: room.member_dat
+                    },
+                    query_params: {}
+                };
+                CW.post("gateway.php", params);
+                return true;
+            }
+
+            return false;
+        }
+    }, {
+        key: "getChatText",
+        value: function getChatText() {
+            return $("#_chatText").val();
+        }
+    }, {
+        key: "clearChatText",
+        value: function clearChatText() {
+            CS.view.setChatText("");
+        }
+    }, {
+        key: "checkNotifyAllCondition",
+        value: function checkNotifyAllCondition() {
+            return common.checkDevVersionInternal() || this.getRoomMembersCount() > 100 && this.isAdmin();
+        }
+    }]);
+
+    return ChatworkFacade;
+}();
+
+var chatwork = new ChatworkFacade();
+module.exports = chatwork;
+
+},{"../helpers/Common.js":2}],2:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Const = require("./Const.js");
 
 var Common = function () {
     function Common() {
@@ -303,9 +366,8 @@ var Common = function () {
 var common = new Common();
 module.exports = common;
 
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
+},{"./Const.js":3}],3:[function(require,module,exports){
+"use strict";
 
 var Const = {
     LOCAL_STORAGE_DATA_KEY: "YACEP_EMO_DATA",
@@ -333,228 +395,74 @@ var Const = {
 
 module.exports = Const;
 
-/***/ }),
-/* 2 */,
-/* 3 */,
-/* 4 */,
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
+},{}],4:[function(require,module,exports){
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var common = __webpack_require__(0);
+var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
 
-var ChatworkFacade = function () {
-    function ChatworkFacade() {
-        _classCallCheck(this, ChatworkFacade);
+var Advertisement = function () {
+    function Advertisement() {
+        _classCallCheck(this, Advertisement);
     }
 
-    _createClass(ChatworkFacade, [{
-        key: "myId",
-        value: function myId() {
-            return AC.myid;
-        }
-    }, {
-        key: "getUserName",
-        value: function getUserName(user_id) {
-            return AC.getDefaultNickName(user_id);
-        }
-    }, {
-        key: "currentRoom",
-        value: function currentRoom() {
-            return RM.id;
-        }
-    }, {
-        key: "getRoomAdmins",
-        value: function getRoomAdmins() {
-            var members = this.getRoomMembers();
-            var admins = [];
-            for (var id in members) {
-                if (members[id] === "admin") {
-                    admins.push(id);
-                }
-            }
-            return admins;
-        }
-    }, {
-        key: "isAdmin",
-        value: function isAdmin(user) {
-            var members = this.getRoomMembers();
-            user = user || this.myId();
-            return members[user] === "admin";
-        }
-    }, {
-        key: "getRoomMembers",
-        value: function getRoomMembers() {
-            return RM.member_dat;
-        }
-    }, {
-        key: "getRoomMembersCount",
-        value: function getRoomMembersCount() {
-            return RM.sorted_member_list.length;
-        }
-    }, {
-        key: "getRoomMembersArray",
-        value: function getRoomMembersArray() {
-            var members = this.getRoomMembers();
-            return Object.keys(members);
-        }
-    }, {
-        key: "getRandomMemberInRoom",
-        value: function getRandomMemberInRoom() {
-            var members = this.getRoomMembersArray();
-            return common.random(members);
-        }
-    }, {
-        key: "searchRoomsByPerson",
-        value: function searchRoomsByPerson(user_id) {
-            var rooms = RL.rooms;
-            var same_rooms = [];
-            for (var room_id in rooms) {
-                var room = rooms[room_id];
-                if (room._name && room.member_dat && room.member_dat.hasOwnProperty(user_id)) {
-                    same_rooms.push(room);
-                }
-            }
-            return same_rooms;
-        }
-    }, {
-        key: "removeMemberFromRoom",
-        value: function removeMemberFromRoom(user_id, room_id) {
-            var room = RL.rooms[room_id];
-            if (room.type === "group" && room.member_dat.hasOwnProperty(user_id) && room.member_dat[this.myId()] === "admin") {
-                if (!window.confirm("Are you sure to delete this user from " + room.getName() + " ?")) {
-                    return false;
-                }
-                delete room.member_dat[user_id];
-                var params = {
-                    body_params: {
-                        cmd: "update_room",
-                        room_id: room_id,
-                        role: room.member_dat
-                    },
-                    query_params: {}
-                };
-                CW.post("gateway.php", params);
-                return true;
-            }
+    _createClass(Advertisement, [{
+        key: "setUp",
+        value: function setUp() {
+            var _this = this;
 
-            return false;
+            if ($("#chatppAdvertisement").length > 0) {
+                return;
+            }
+            $("#_chatSendTool").append($("<li>", { id: "_chatppSponsored", class: "_showDescription", css: {
+                    "display": "inline-block"
+                }, attr: {
+                    "role": "button",
+                    "aria-label": "Chat Plus Plus Information"
+                } }).append($("<span>", { id: "chatppPreLoad", class: "icoSizeSmall" })).append(this.getAdvertisementText()));
+            setInterval(function () {
+                _this.changeRandomAdvertisement();
+            }, ADVERTISEMENT_CHANGE_TIME);
         }
     }, {
-        key: "getChatText",
-        value: function getChatText() {
-            return $("#_chatText").val();
+        key: "changeRandomAdvertisement",
+        value: function changeRandomAdvertisement() {
+            var text = this.getAdvertisementText();
+            $("#chatppAdvertisement").html(text);
         }
     }, {
-        key: "clearChatText",
-        value: function clearChatText() {
-            CS.view.setChatText("");
-        }
-    }, {
-        key: "checkNotifyAllCondition",
-        value: function checkNotifyAllCondition() {
-            return common.checkDevVersionInternal() || this.getRoomMembersCount() > 100 && this.isAdmin();
+        key: "getAdvertisementText",
+        value: function getAdvertisementText() {
+            if (localStorage["chatpp_advertisement"] !== undefined && localStorage["chatpp_advertisement"]) {
+                var ads = JSON.parse(localStorage["chatpp_advertisement"]);
+                if (ads.length > 0) {
+                    return ads[Math.floor(Math.random() * ads.length)];
+                }
+            }
+            return "Advertisement Here!";
         }
     }]);
 
-    return ChatworkFacade;
+    return Advertisement;
 }();
 
-var chatwork = new ChatworkFacade();
-module.exports = chatwork;
+var advertisement = new Advertisement();
+module.exports = advertisement;
 
-/***/ }),
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */,
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */,
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(20);
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var emoticon = __webpack_require__(21);
-var shortcut = __webpack_require__(22);
-var mention = __webpack_require__(23);
-var room_information = __webpack_require__(24);
-var view_enhancer = __webpack_require__(25);
-var advertisement = __webpack_require__(26);
-var NotificationDisabler = __webpack_require__(27);
-var notify_all = __webpack_require__(28);
-
-var cw_timer = void 0;
-
-$(function () {
-    var rebuild = false;
-    cw_timer = setInterval(function () {
-        if (typeof CW !== "undefined" && typeof RM !== "undefined") {
-            window.clearInterval(cw_timer);
-            $("#_chatppPreLoad").remove();
-            addStyle();
-
-            room_information.setUp();
-
-            if (emoticon.status) {
-                rebuild = true;
-                emoticon.setUp();
-                view_enhancer.updateChatworkView();
-            }
-
-            mention.setUp();
-            shortcut.setUp();
-            advertisement.setUp();
-            NotificationDisabler.setUp();
-            notify_all.setUp();
-
-            view_enhancer.updateChatSendView();
-            view_enhancer.updateGetContactPanelView();
-
-            if (rebuild) {
-                RL.rooms[RM.id].build();
-            }
-        }
-    }, 100);
-});
-
-function addStyle() {
-    $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .chatpp_ui_emoticon{width: initial !important; height: initial !important};</style>").appendTo("head");
-}
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
+},{}],5:[function(require,module,exports){
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var common = __webpack_require__(0);
-var Const = __webpack_require__(1);
+var common = require("../helpers/Common.js");
+var Const = require("../helpers/Const.js");
 
-var DETECT_COLON = 186;
-var KEY_COLON = ":";
+var KEY_COLON = "::";
 
 var Emoticon = function () {
     function Emoticon() {
@@ -562,8 +470,8 @@ var Emoticon = function () {
 
         this.status = common.getStatus("emoticon");
         this.emoticons = [];
+        this.start = /::/ig;
         this.is_colon = false;
-        this.count_colon = 0;
         this.emo_name = "";
         this.emo_cursor_loca = 0;
         this.list_all_emo = JSON.parse(localStorage[Const["LOCAL_STORAGE_DATA_KEY"]]);
@@ -650,15 +558,6 @@ var Emoticon = function () {
 
                     e.preventDefault();
                 }
-
-                if (e.keyCode == DETECT_COLON && e.key === KEY_COLON) {
-                    if (_this.count_colon >= 1) {
-                        _this.is_colon = true;
-                        _this.count_colon = 0;
-                    } else {
-                        _this.count_colon += 1;
-                    }
-                }
             });
 
             $("#suggestion-emotion-container").on("mouseenter", "p", function (e) {
@@ -669,7 +568,8 @@ var Emoticon = function () {
                 $(e.currentTarget).css("background-color", "#fff");
             }).on("click", "p", function (e) {
                 var pos = _this.chat_text_jquery.val().lastIndexOf("::" + _this.emo_name);
-                var this_value = _this.chat_text_jquery.val().substring(0, pos) + $(e.currentTarget).attr("data-emo") + " ";
+                var end_pos = _this.chat_text_jquery.val().slice(_this.emo_name.length + pos + 2, _this.chat_text_jquery.val().length);
+                var this_value = _this.chat_text_jquery.val().substring(0, pos) + $(e.currentTarget).attr("data-emo") + " " + end_pos;
                 $("#_chatText").val(this_value);
                 _this.hideSuggestionEmotionsBox();
                 $("#_chatText").focus();
@@ -678,6 +578,12 @@ var Emoticon = function () {
             this.chat_text_jquery.keyup(function (e) {
                 if (!_this.chat_text_jquery.val()) {
                     _this.hideSuggestionEmotionsBox();
+                }
+
+                if (_this.getNearestAtmarkIndex() != -1) {
+                    _this.is_colon = true;
+                } else {
+                    _this.is_colon = false;
                 }
 
                 if (e.which == 40 && _this.is_colon) {
@@ -733,12 +639,23 @@ var Emoticon = function () {
                         $("#suggestion-emotion-container").html("");
                         $("#suggestion-emotion-container").fadeIn(0);
                     }
-                    var regex = new RegExp("^[a-zA-Z0-9!@#$%^&]+$");
-                    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-
-                    if (regex.test(str) && (e.which != 37 || e.which != 38 || e.which != 39 || e.which != 40)) {
-                        _this.emo_name += e.key;
+                    var lastColonIndex = _this.chat_text_jquery.val().lastIndexOf(KEY_COLON);
+                    var textAfterColon = _this.chat_text_jquery.val().substr(lastColonIndex + 2);
+                    var emoLastText = "";
+                    if (textAfterColon.match(/\n/)) {
+                        emoLastText = textAfterColon.split(/\r|\n/);
+                    } else {
+                        emoLastText = textAfterColon.split(" ");
                     }
+
+                    if (emoLastText.length > 0) {
+                        if (e.which != 37 || e.which != 38 || e.which != 39 || e.which != 40) {
+                            _this.emo_name = emoLastText[0];
+                        }
+                    } else {
+                        _this.hideSuggestionEmotionsBox();
+                    }
+
                     var findEmo = $.grep(_this.list_all_emo, function (e) {
                         var comp = e.key.toLowerCase();
                         return comp.indexOf(_this.emo_name) > -1;
@@ -748,9 +665,9 @@ var Emoticon = function () {
                     if (findEmo.length > 0) {
                         for (var i = 0; i < findEmo.length; i++) {
                             if (i == 0) {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[i].key + "\" style=\"padding-bottom: 5px; cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[i].key + "\" style=\"cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
                             } else {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[i].key + "\" style=\"padding-bottom: 5px; cursor: pointer; margin-top: 5px;\">";
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[i].key + "\" style=\"cursor: pointer; margin-top: 5px;\">";
                             }
                             toAppend += "<img id=\"example\" src=\"" + common.htmlEncode(common.getEmoUrl(findEmo[i].src)) + "\" title=\"" + findEmo[i].key + " - " + findEmo[i].data_name + " - Chatpp\" alt=\"" + findEmo[i].key + "\" style=\"width: 100%; max-width: 50px;\"> <b> " + findEmo[i].key + "</b></p>";
                         }
@@ -765,7 +682,7 @@ var Emoticon = function () {
                     var bt = window.innerHeight - position.top;
                     $("#_chatTextArea").css({
                         "overflow-y": "visible",
-                        "z-index": 2
+                        "z-index": 0
                     });
                     $("#suggestion-emotion-container").parent().css({
                         position: "relative"
@@ -776,6 +693,43 @@ var Emoticon = function () {
                     });
                 }
             });
+        }
+    }, {
+        key: "getNearestAtmarkIndex",
+        value: function getNearestAtmarkIndex() {
+            var content = this.chat_text_jquery.val();
+            var atmarks = content.match(this.start);
+
+            if (!atmarks) {
+                return -1;
+            }
+
+            var caret_index = this.doGetCaretPosition(this.chat_text_element);
+            var atmark_index = content.indexOf(KEY_COLON);
+            var pre_atmark_index = -1;
+            do {
+                if (atmark_index >= caret_index) {
+                    break;
+                }
+                pre_atmark_index = atmark_index;
+                atmark_index = content.indexOf(KEY_COLON, atmark_index + 1);
+            } while (atmark_index != -1);
+
+            return pre_atmark_index;
+        }
+    }, {
+        key: "doGetCaretPosition",
+        value: function doGetCaretPosition(ctrl) {
+            var CaretPos = 0; // IE Support
+            if (document.selection) {
+                ctrl.focus();
+                var Sel = document.selection.createRange();
+                Sel.moveStart("character", -ctrl.value.length);
+                CaretPos = Sel.text.length;
+            }
+            // Firefox support
+            else if (ctrl.selectionStart || ctrl.selectionStart == "0") CaretPos = ctrl.selectionStart;
+            return CaretPos;
         }
     }, {
         key: "addExternalEmoList",
@@ -1000,7 +954,6 @@ var Emoticon = function () {
             this.is_colon = false;
             this.emo_name = "";
             this.emo_cursor_loca = 0;
-            this.count_colon = 0;
             $("#suggestion-emotion-container").scrollTop(0);
             $("#suggestion-emotion-container").fadeOut(0);
             $("#suggestion-emotion-container").html("");
@@ -1013,355 +966,16 @@ var Emoticon = function () {
 var emoticon = new Emoticon();
 module.exports = emoticon;
 
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
+},{"../helpers/Common.js":2,"../helpers/Const.js":3}],6:[function(require,module,exports){
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Const = __webpack_require__(1);
-var common = __webpack_require__(0);
-
-var DOM_VK_SPACE = 32,
-    DOM_VK_0 = 48,
-    DOM_VK_A = 65,
-    DOM_VK_B = 66,
-    DOM_VK_E = 69,
-    DOM_VK_J = 74,
-    DOM_VK_K = 75,
-    DOM_VK_L = 76,
-    DOM_VK_M = 77,
-    DOM_VK_N = 78,
-    DOM_VK_Q = 81,
-    DOM_VK_R = 82,
-    DOM_VK_S = 83,
-    DOM_VK_T = 84,
-    DOM_VK_V = 86,
-    DOM_VK_X = 88,
-    DOM_VK_Z = 90;
-
-var Shortcut = function () {
-    function Shortcut() {
-        _classCallCheck(this, Shortcut);
-
-        this.shortcuts_default = {
-            reply: DOM_VK_R,
-            quote: DOM_VK_Q,
-            link: DOM_VK_L,
-            edit: DOM_VK_E,
-            task: DOM_VK_T,
-            my_chat: DOM_VK_A,
-            scroll: DOM_VK_S,
-            previous_mention: DOM_VK_K,
-            next_mention: DOM_VK_J,
-            next_mention_room: DOM_VK_M,
-            next_new_message_room: DOM_VK_N,
-            down_room: DOM_VK_V,
-            up_room: DOM_VK_B,
-            first_room: DOM_VK_Z,
-            first_nonstick_room: DOM_VK_X,
-            focus_chatbox: DOM_VK_SPACE,
-            edit_image_upload: DOM_VK_E
-        };
-        this.room_shortcuts = {};
-        if (localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]) {
-            this.room_shortcuts = JSON.parse(localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]);
-        }
-        this.status = common.getStatus("shortcut");
-    }
-
-    _createClass(Shortcut, [{
-        key: "setUp",
-        value: function setUp() {
-            if (this.status) {
-                this.registerShortcut();
-            }
-        }
-    }, {
-        key: "registerShortcut",
-        value: function registerShortcut() {
-            var _this = this;
-
-            var shortcuts_default = this.shortcuts_default;
-            CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function () {
-                var message_id = _this.getHoverMessageId();
-                _this.replyMessage(message_id);
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, function () {
-                _this.triggerDefaultAction("quote");
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.link, !1, !1, !1, !1, function () {
-                _this.triggerDefaultAction("link");
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.edit, !1, !1, !1, !1, function () {
-                _this.triggerDefaultAction("edit");
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.task, !1, !1, !1, !1, function () {
-                _this.triggerDefaultAction("task");
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.my_chat, !1, !1, !1, !1, function () {
-                RL.selectRoom(AC.getRoomId(AC.myid));
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.scroll, !1, !1, !1, !1, function () {
-                _this.goToBottom();
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.previous_mention, !1, !1, !1, !1, function () {
-                _this.goToPreviousMention();
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, function () {
-                _this.goToNexMention();
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.next_mention_room, !1, !1, !1, !1, function () {
-                _this.nextUnreadRoom(true);
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.next_new_message_room, !1, !1, !1, !1, function () {
-                _this.nextUnreadRoom();
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.up_room, !1, !1, !1, !1, function () {
-                _this.nextRoom(true);
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.down_room, !1, !1, !1, !1, function () {
-                _this.nextRoom();
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.first_room, !1, !1, !1, !1, function () {
-                _this.firstRoom();
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.first_nonstick_room, !1, !1, !1, !1, function () {
-                _this.firstRoom(true);
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.focus_chatbox, !1, !1, !1, !1, function () {
-                $("#_chatText").focus();
-            });
-
-            CW.view.registerKeyboardShortcut(shortcuts_default.edit_image_upload, !1, !0, !1, !1, function () {
-                _this.triggerDefaultAction("edit");
-                var chat_text = $("#_chatText");
-                var text = chat_text.val();
-                var img = text.match(/(\[preview id=[0-9]* ht=[0-9]*\])/);
-                if (img && img[0]) {
-                    text = text.replace(/\[info\].*\[\/info\]/, img[0]);
-                    chat_text.val(text);
-                }
-            });
-
-            for (var i in this.room_shortcuts) {
-                if (this.room_shortcuts[i] && this.room_shortcuts.hasOwnProperty(i)) {
-                    (function () {
-                        var room = _this.room_shortcuts[i];
-                        CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, function () {
-                            RL.selectRoom(room);
-                        });
-                    })();
-                }
-            }
-        }
-    }, {
-        key: "isScrollable",
-        value: function isScrollable() {
-            return this.get(0).scrollHeight > this.height();
-        }
-    }, {
-        key: "triggerDefaultAction",
-        value: function triggerDefaultAction(action) {
-            var me = $("._message:hover");
-            var reply = me.find("[data-cwui-ab-type='" + action + "']");
-            if (this.isDomExists(reply)) {
-                reply.trigger("click");
-            }
-        }
-    }, {
-        key: "triggerMoreAction",
-        value: function triggerMoreAction() {
-            var more_action = $("._message:hover").find("._cwABMoreTip");
-            if (this.isDomExists(more_action)) {
-                more_action.trigger("click");
-                var delete_button = $("._cwABMoreListBox").find("[data-cwui-ab-type=\"action\"]");
-                if (this.isDomExists(delete_button)) {
-                    delete_button.trigger("click");
-                }
-            }
-        }
-    }, {
-        key: "selectRoom",
-        value: function selectRoom(room) {
-            RL.selectRoom(room);
-        }
-    }, {
-        key: "isDomExists",
-        value: function isDomExists(dom) {
-            return dom.length > 0;
-        }
-    }, {
-        key: "getHoverMessageId",
-        value: function getHoverMessageId() {
-            return $("._message:hover").data("mid");
-        }
-    }, {
-        key: "getPivotMessage",
-        value: function getPivotMessage() {
-            return this.getHoverMessageId() || $("#_timeLine ._messageSelected").data("mid");
-        }
-    }, {
-        key: "getMessagePosition",
-        value: function getMessagePosition(id) {
-            var messages = RM.timeline.chat_list;
-            for (var i = messages.length - 1; i >= 0; i--) {
-                if (messages[i].id == id) {
-                    return i;
-                }
-            }
-
-            return -1;
-        }
-    }, {
-        key: "goToBottom",
-        value: function goToBottom() {
-            this.goToMessageInRoom(RM.timeline.getLastChatId());
-        }
-    }, {
-        key: "goToPreviousMention",
-        value: function goToPreviousMention() {
-            var current = this.getPivotMessage();
-            var position = this.getMessagePosition(current);
-            var messages = RM.timeline.chat_list;
-            for (var i = position - 1; i >= 0; i--) {
-                if (this.isMentionMessage(messages[i])) {
-                    this.goToMessageInRoom(messages[i].id);
-                    return true;
-                }
-            }
-
-            if (!RM.timeline.has_old && messages.length == 0) {
-                return false;
-            }
-
-            RM.timeline.loadOld();
-        }
-    }, {
-        key: "goToNexMention",
-        value: function goToNexMention() {
-            var current = this.getPivotMessage();
-            var position = this.getMessagePosition(current);
-            var messages = RM.timeline.chat_list;
-            for (var i = position + 1; i > 0 && i < messages.length; i++) {
-                if (this.isMentionMessage(messages[i])) {
-                    this.goToMessageInRoom(messages[i].id);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }, {
-        key: "goToMessageInRoom",
-        value: function goToMessageInRoom(message_id) {
-            RL.selectRoom(RM.id, message_id, {
-                smoothScroll: true
-            });
-        }
-    }, {
-        key: "isMentionMessage",
-        value: function isMentionMessage(message) {
-            var regex_reply = new RegExp("\\[.* aid=" + AC.myid + " .*\\]");
-            var regex_to = new RegExp("\\[To:" + AC.myid + "\\]");
-            var regex_to_all = new RegExp("\\[toall\\]");
-
-            return [regex_reply, regex_to, regex_to_all].some(function (r) {
-                return r.test(message.msg);
-            });
-        }
-    }, {
-        key: "replyMessage",
-        value: function replyMessage(message) {
-            var data = RM.timeline.chat_id2chat_dat[message];
-            if (data) {
-                $("#_chatText").focus();
-                var name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
-                /* eslint-disable no-useless-concat */
-                CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
-                /* eslint-enable */
-            }
-        }
-    }, {
-        key: "nextUnreadRoom",
-        value: function nextUnreadRoom(check_mention) {
-            var current_room = RM.id;
-            var sortedRooms = RL.getSortedRoomList();
-            var rooms = RL.rooms;
-            for (var i = 0; i < sortedRooms.length; i++) {
-                if (sortedRooms[i] && sortedRooms[i] !== current_room) {
-                    var room = rooms[sortedRooms[i]];
-                    var check = check_mention ? room.getMentionNum() : room.getUnreadNum();
-                    if (check) {
-                        return RL.selectRoom(room.id);
-                    }
-                }
-            }
-        }
-    }, {
-        key: "nextRoom",
-        value: function nextRoom(back) {
-            var previous = void 0;
-            var current_room = RM.id;
-            var sortedRooms = RL.getSortedRoomList();
-            for (var i = 0; i < sortedRooms.length; i++) {
-                if (sortedRooms[i] === current_room) {
-                    if (back) {
-                        if (previous) {
-                            return RL.selectRoom(previous);
-                        }
-                    } else {
-                        if (sortedRooms[i + 1]) {
-                            return RL.selectRoom(sortedRooms[i + 1]);
-                        }
-                    }
-                }
-                previous = sortedRooms[i];
-            }
-        }
-    }, {
-        key: "firstRoom",
-        value: function firstRoom(nonstick) {
-            var sortedRooms = RL.getSortedRoomList();
-            var room_index = nonstick ? RL.getStickyRoomNum() : 0;
-            return RL.selectRoom(sortedRooms[room_index]);
-        }
-    }]);
-
-    return Shortcut;
-}();
-
-var shortcut = new Shortcut();
-module.exports = shortcut;
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var common = __webpack_require__(0);
-var Const = __webpack_require__(1);
-var chatwork = __webpack_require__(5);
+var common = require("../helpers/Common.js");
+var Const = require("../helpers/Const.js");
+var chatwork = require("../helpers/ChatworkFacade.js");
 
 var DISPLAY_NUMS = 3;
 var MAX_PATTERN_LENGTH = 20;
@@ -1373,9 +987,6 @@ var INSERT_MODE_SYM = {
     "CC": "_cc_"
 };
 
-var DETECT_COLON = 186;
-var KEY_COLON = ":";
-
 var Mention = function () {
     function Mention() {
         _classCallCheck(this, Mention);
@@ -1383,7 +994,6 @@ var Mention = function () {
         this.status = common.getStatus("mention");
         this.start = /@/ig;
         this.is_colon = false;
-        this.count_colon = 0;
         this.is_displayed = false;
         this.is_inserted = false;
         this.is_navigated = false;
@@ -1501,13 +1111,10 @@ var Mention = function () {
                     _this.is_navigated = false;
                 }
 
-                if (e.keyCode == DETECT_COLON && e.key === KEY_COLON) {
-                    if (_this.count_colon >= 1) {
-                        _this.is_colon = true;
-                        _this.count_colon = 0;
-                    } else {
-                        _this.count_colon += 1;
-                    }
+                if (_this.getNearestColonIndex()) {
+                    _this.is_colon = true;
+                } else {
+                    _this.is_colon = false;
                 }
 
                 if (e.which == 9 || e.which == 13) {
@@ -1648,6 +1255,29 @@ var Mention = function () {
                 }
                 pre_atmark_index = atmark_index;
                 atmark_index = content.indexOf("@", atmark_index + 1);
+            } while (atmark_index != -1);
+
+            return pre_atmark_index;
+        }
+    }, {
+        key: "getNearestColonIndex",
+        value: function getNearestColonIndex() {
+            var content = this.chat_text_jquery.val();
+            var atmarks = content.match(this.start);
+
+            if (!atmarks) {
+                return -1;
+            }
+
+            var caret_index = this.doGetCaretPosition(this.chat_text_element);
+            var atmark_index = content.indexOf("::");
+            var pre_atmark_index = -1;
+            do {
+                if (atmark_index >= caret_index) {
+                    break;
+                }
+                pre_atmark_index = atmark_index;
+                atmark_index = content.indexOf("::", atmark_index + 1);
             } while (atmark_index != -1);
 
             return pre_atmark_index;
@@ -2212,15 +1842,91 @@ var Mention = function () {
 var mention = new Mention();
 module.exports = mention;
 
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
+},{"../helpers/ChatworkFacade.js":1,"../helpers/Common.js":2,"../helpers/Const.js":3}],7:[function(require,module,exports){
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var common = __webpack_require__(0);
+var NotificationDisabler = function () {
+    function NotificationDisabler() {
+        _classCallCheck(this, NotificationDisabler);
+    }
+
+    _createClass(NotificationDisabler, null, [{
+        key: "setUp",
+        value: function setUp() {
+            var disabledNotifyRooms = null;
+
+            if (localStorage["CHATPP_DISABLE_NOTIFY_ROOM"] !== "" && localStorage["CHATPP_DISABLE_NOTIFY_ROOM"] !== "undefined" && localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]) {
+                disabledNotifyRooms = JSON.parse(localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]);
+            }
+
+            if (disabledNotifyRooms) {
+                CW.popupOld = CW.popup;
+                /* eslint-disable no-unused-vars */
+                var b = null,
+                    d = null,
+                    e = window.navigator.userAgent.toLowerCase().indexOf("chrome") != -1;
+                /* eslint-enable */
+                CW.popup = function wrapper(icon, title, body, room_id) {
+                    if (disabledNotifyRooms.indexOf(room_id.toString()) == -1) {
+                        CW.popupOld(icon, title, body, room_id);
+                    }
+                };
+            }
+        }
+    }]);
+
+    return NotificationDisabler;
+}();
+
+module.exports = NotificationDisabler;
+
+},{}],8:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var NotifyAll = function () {
+    function NotifyAll() {
+        _classCallCheck(this, NotifyAll);
+    }
+
+    _createClass(NotifyAll, [{
+        key: "setUp",
+        value: function setUp() {
+            this.registerRegex();
+        }
+    }, {
+        key: "registerRegex",
+        value: function registerRegex() {
+            CW.reg_cmp.push({
+                key: /TO ALL &gt;&gt;&gt;/g,
+                rep: "<span class=\"chatTimeLineTo\">TO ALL</span>",
+                reptxt: "TO ALL",
+                special: true
+            });
+        }
+    }]);
+
+    return NotifyAll;
+}();
+
+var notify_all = new NotifyAll();
+module.exports = notify_all;
+
+},{}],9:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var common = require("../helpers/Common.js");
 
 var RoomInformation = function () {
     function RoomInformation() {
@@ -2306,17 +2012,353 @@ var RoomInformation = function () {
 var room_information = new RoomInformation();
 module.exports = room_information;
 
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
+},{"../helpers/Common.js":2}],10:[function(require,module,exports){
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var common = __webpack_require__(0);
-var chatwork = __webpack_require__(5);
-var Const = __webpack_require__(1);
+var Const = require("../helpers/Const.js");
+var common = require("../helpers/Common.js");
+
+var DOM_VK_SPACE = 32,
+    DOM_VK_0 = 48,
+    DOM_VK_A = 65,
+    DOM_VK_B = 66,
+    DOM_VK_E = 69,
+    DOM_VK_J = 74,
+    DOM_VK_K = 75,
+    DOM_VK_L = 76,
+    DOM_VK_M = 77,
+    DOM_VK_N = 78,
+    DOM_VK_Q = 81,
+    DOM_VK_R = 82,
+    DOM_VK_S = 83,
+    DOM_VK_T = 84,
+    DOM_VK_V = 86,
+    DOM_VK_X = 88,
+    DOM_VK_Z = 90;
+
+var Shortcut = function () {
+    function Shortcut() {
+        _classCallCheck(this, Shortcut);
+
+        this.shortcuts_default = {
+            reply: DOM_VK_R,
+            quote: DOM_VK_Q,
+            link: DOM_VK_L,
+            edit: DOM_VK_E,
+            task: DOM_VK_T,
+            my_chat: DOM_VK_A,
+            scroll: DOM_VK_S,
+            previous_mention: DOM_VK_K,
+            next_mention: DOM_VK_J,
+            next_mention_room: DOM_VK_M,
+            next_new_message_room: DOM_VK_N,
+            down_room: DOM_VK_V,
+            up_room: DOM_VK_B,
+            first_room: DOM_VK_Z,
+            first_nonstick_room: DOM_VK_X,
+            focus_chatbox: DOM_VK_SPACE,
+            edit_image_upload: DOM_VK_E
+        };
+        this.room_shortcuts = {};
+        if (localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]) {
+            this.room_shortcuts = JSON.parse(localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]);
+        }
+        this.status = common.getStatus("shortcut");
+    }
+
+    _createClass(Shortcut, [{
+        key: "setUp",
+        value: function setUp() {
+            if (this.status) {
+                this.registerShortcut();
+            }
+        }
+    }, {
+        key: "registerShortcut",
+        value: function registerShortcut() {
+            var _this = this;
+
+            var shortcuts_default = this.shortcuts_default;
+            CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function () {
+                var message_id = _this.getHoverMessageId();
+                _this.replyMessage(message_id);
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, function () {
+                _this.triggerDefaultAction("quote");
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.link, !1, !1, !1, !1, function () {
+                _this.triggerDefaultAction("link");
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.edit, !1, !1, !1, !1, function () {
+                _this.triggerDefaultAction("edit");
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.task, !1, !1, !1, !1, function () {
+                _this.triggerDefaultAction("task");
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.my_chat, !1, !1, !1, !1, function () {
+                RL.selectRoom(AC.getRoomId(AC.myid));
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.scroll, !1, !1, !1, !1, function () {
+                _this.goToBottom();
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.previous_mention, !1, !1, !1, !1, function () {
+                _this.goToPreviousMention();
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, function () {
+                _this.goToNexMention();
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.next_mention_room, !1, !1, !1, !1, function () {
+                _this.nextUnreadRoom(true);
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.next_new_message_room, !1, !1, !1, !1, function () {
+                _this.nextUnreadRoom();
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.up_room, !1, !1, !1, !1, function () {
+                _this.nextRoom(true);
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.down_room, !1, !1, !1, !1, function () {
+                _this.nextRoom();
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.first_room, !1, !1, !1, !1, function () {
+                _this.firstRoom();
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.first_nonstick_room, !1, !1, !1, !1, function () {
+                _this.firstRoom(true);
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.focus_chatbox, !1, !1, !1, !1, function () {
+                $("#_chatText").focus();
+            });
+
+            CW.view.registerKeyboardShortcut(shortcuts_default.edit_image_upload, !1, !0, !1, !1, function () {
+                _this.triggerDefaultAction("edit");
+                var chat_text = $("#_chatText");
+                var text = chat_text.val();
+                var img = text.match(/(\[preview id=[0-9]* ht=[0-9]*\])/);
+                if (img && img[0]) {
+                    text = text.replace(/\[info\].*\[\/info\]/, img[0]);
+                    chat_text.val(text);
+                }
+            });
+
+            for (var i in this.room_shortcuts) {
+                if (this.room_shortcuts[i] && this.room_shortcuts.hasOwnProperty(i)) {
+                    (function () {
+                        var room = _this.room_shortcuts[i];
+                        CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, function () {
+                            RL.selectRoom(room);
+                        });
+                    })();
+                }
+            }
+        }
+    }, {
+        key: "isScrollable",
+        value: function isScrollable() {
+            return this.get(0).scrollHeight > this.height();
+        }
+    }, {
+        key: "triggerDefaultAction",
+        value: function triggerDefaultAction(action) {
+            var me = $("._message:hover");
+            var reply = me.find("[data-cwui-ab-type='" + action + "']");
+            if (this.isDomExists(reply)) {
+                reply.trigger("click");
+            }
+        }
+    }, {
+        key: "triggerMoreAction",
+        value: function triggerMoreAction() {
+            var more_action = $("._message:hover").find("._cwABMoreTip");
+            if (this.isDomExists(more_action)) {
+                more_action.trigger("click");
+                var delete_button = $("._cwABMoreListBox").find("[data-cwui-ab-type=\"action\"]");
+                if (this.isDomExists(delete_button)) {
+                    delete_button.trigger("click");
+                }
+            }
+        }
+    }, {
+        key: "selectRoom",
+        value: function selectRoom(room) {
+            RL.selectRoom(room);
+        }
+    }, {
+        key: "isDomExists",
+        value: function isDomExists(dom) {
+            return dom.length > 0;
+        }
+    }, {
+        key: "getHoverMessageId",
+        value: function getHoverMessageId() {
+            return $("._message:hover").data("mid");
+        }
+    }, {
+        key: "getPivotMessage",
+        value: function getPivotMessage() {
+            return this.getHoverMessageId() || $("#_timeLine ._messageSelected").data("mid");
+        }
+    }, {
+        key: "getMessagePosition",
+        value: function getMessagePosition(id) {
+            var messages = RM.timeline.chat_list;
+            for (var i = messages.length - 1; i >= 0; i--) {
+                if (messages[i].id == id) {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+    }, {
+        key: "goToBottom",
+        value: function goToBottom() {
+            this.goToMessageInRoom(RM.timeline.getLastChatId());
+        }
+    }, {
+        key: "goToPreviousMention",
+        value: function goToPreviousMention() {
+            var current = this.getPivotMessage();
+            var position = this.getMessagePosition(current);
+            var messages = RM.timeline.chat_list;
+            for (var i = position - 1; i >= 0; i--) {
+                if (this.isMentionMessage(messages[i])) {
+                    this.goToMessageInRoom(messages[i].id);
+                    return true;
+                }
+            }
+
+            if (!RM.timeline.has_old && messages.length == 0) {
+                return false;
+            }
+
+            RM.timeline.loadOld();
+        }
+    }, {
+        key: "goToNexMention",
+        value: function goToNexMention() {
+            var current = this.getPivotMessage();
+            var position = this.getMessagePosition(current);
+            var messages = RM.timeline.chat_list;
+            for (var i = position + 1; i > 0 && i < messages.length; i++) {
+                if (this.isMentionMessage(messages[i])) {
+                    this.goToMessageInRoom(messages[i].id);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }, {
+        key: "goToMessageInRoom",
+        value: function goToMessageInRoom(message_id) {
+            RL.selectRoom(RM.id, message_id, {
+                smoothScroll: true
+            });
+        }
+    }, {
+        key: "isMentionMessage",
+        value: function isMentionMessage(message) {
+            var regex_reply = new RegExp("\\[.* aid=" + AC.myid + " .*\\]");
+            var regex_to = new RegExp("\\[To:" + AC.myid + "\\]");
+            var regex_to_all = new RegExp("\\[toall\\]");
+
+            return [regex_reply, regex_to, regex_to_all].some(function (r) {
+                return r.test(message.msg);
+            });
+        }
+    }, {
+        key: "replyMessage",
+        value: function replyMessage(message) {
+            var data = RM.timeline.chat_id2chat_dat[message];
+            if (data) {
+                $("#_chatText").focus();
+                var name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
+                /* eslint-disable no-useless-concat */
+                CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
+                /* eslint-enable */
+            }
+        }
+    }, {
+        key: "nextUnreadRoom",
+        value: function nextUnreadRoom(check_mention) {
+            var current_room = RM.id;
+            var sortedRooms = RL.getSortedRoomList();
+            var rooms = RL.rooms;
+            for (var i = 0; i < sortedRooms.length; i++) {
+                if (sortedRooms[i] && sortedRooms[i] !== current_room) {
+                    var room = rooms[sortedRooms[i]];
+                    var check = check_mention ? room.getMentionNum() : room.getUnreadNum();
+                    if (check) {
+                        return RL.selectRoom(room.id);
+                    }
+                }
+            }
+        }
+    }, {
+        key: "nextRoom",
+        value: function nextRoom(back) {
+            var previous = void 0;
+            var current_room = RM.id;
+            var sortedRooms = RL.getSortedRoomList();
+            for (var i = 0; i < sortedRooms.length; i++) {
+                if (sortedRooms[i] === current_room) {
+                    if (back) {
+                        if (previous) {
+                            return RL.selectRoom(previous);
+                        }
+                    } else {
+                        if (sortedRooms[i + 1]) {
+                            return RL.selectRoom(sortedRooms[i + 1]);
+                        }
+                    }
+                }
+                previous = sortedRooms[i];
+            }
+        }
+    }, {
+        key: "firstRoom",
+        value: function firstRoom(nonstick) {
+            var sortedRooms = RL.getSortedRoomList();
+            var room_index = nonstick ? RL.getStickyRoomNum() : 0;
+            return RL.selectRoom(sortedRooms[room_index]);
+        }
+    }]);
+
+    return Shortcut;
+}();
+
+var shortcut = new Shortcut();
+module.exports = shortcut;
+
+},{"../helpers/Common.js":2,"../helpers/Const.js":3}],11:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var common = require("../helpers/Common.js");
+var chatwork = require("../helpers/ChatworkFacade.js");
+var Const = require("../helpers/Const.js");
 
 var support_languages = ["1c", "actionscript", "apache", "applescript", "armasm", "asciidoc", "aspectj", "autohotkey", "autoit", "avrasm", "axapta", "bash", "brainfuck", "cal", "capnproto", "ceylon", "clojure-repl", "clojure", "cmake", "coffeescript", "cpp", "cs", "css", "d", "dart", "delphi", "diff", "django", "dns", "dockerfile", "dos", "dust", "elixir", "elm", "erb", "erlang-repl", "erlang", "fix", "fortran", "fsharp", "gcode", "gherkin", "glsl", "go", "gradle", "groovy", "haml", "handlebars", "haskell", "haxe", "http", "inform7", "ini", "java", "javascript", "json", "julia", "kotlin", "lasso", "less", "lisp", "livecodeserver", "livescript", "lua", "makefile", "markdown", "mathematica", "matlab", "mel", "mercury", "mizar", "mojolicious", "monkey", "nginx", "nimrod", "nix", "nsis", "objectivec", "ocaml", "openscad", "oxygene", "parser3", "perl", "pf", "php", "powershell", "processing", "profile", "prolog", "protobuf", "puppet", "python", "q", "r", "rib", "roboconf", "rsl", "ruby", "ruleslanguage", "rust", "scala", "scheme", "scilab", "scss", "smali", "smalltalk", "sml", "sql", "stata", "step21", "stylus", "swift", "tcl", "tex", "thrift", "tp", "twig", "typescript", "vala", "vbnet", "vbscript-html", "vbscript", "verilog", "vhdl", "vim", "x86asm", "xl", "xml", "xquery", "zephir"];
 
@@ -2571,142 +2613,59 @@ var ViewEnhancer = function () {
 var view_enhancer = new ViewEnhancer();
 module.exports = view_enhancer;
 
-/***/ }),
-/* 26 */
-/***/ (function(module, exports) {
+},{"../helpers/ChatworkFacade.js":1,"../helpers/Common.js":2,"../helpers/Const.js":3}],12:[function(require,module,exports){
+"use strict";
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var emoticon = require("./Emoticon.js");
+var shortcut = require("./Shortcut.js");
+var mention = require("./Mention.js");
+var room_information = require("./RoomInformation.js");
+var view_enhancer = require("./ViewEnhancer.js");
+var advertisement = require("./Advertisement.js");
+var NotificationDisabler = require("./NotificationDisabler.js");
+var notify_all = require("./NotifyAll.js");
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var cw_timer = void 0;
 
-var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
+$(function () {
+    var rebuild = false;
+    cw_timer = setInterval(function () {
+        if (typeof CW !== "undefined" && typeof RM !== "undefined") {
+            window.clearInterval(cw_timer);
+            $("#_chatppPreLoad").remove();
+            addStyle();
 
-var Advertisement = function () {
-    function Advertisement() {
-        _classCallCheck(this, Advertisement);
-    }
+            room_information.setUp();
 
-    _createClass(Advertisement, [{
-        key: "setUp",
-        value: function setUp() {
-            var _this = this;
-
-            if ($("#chatppAdvertisement").length > 0) {
-                return;
-            }
-            $("#_chatSendTool").append($("<li>", { id: "_chatppSponsored", class: "_showDescription", css: {
-                    "display": "inline-block"
-                }, attr: {
-                    "role": "button",
-                    "aria-label": "Chat Plus Plus Information"
-                } }).append($("<span>", { id: "chatppPreLoad", class: "icoSizeSmall" })).append(this.getAdvertisementText()));
-            setInterval(function () {
-                _this.changeRandomAdvertisement();
-            }, ADVERTISEMENT_CHANGE_TIME);
-        }
-    }, {
-        key: "changeRandomAdvertisement",
-        value: function changeRandomAdvertisement() {
-            var text = this.getAdvertisementText();
-            $("#chatppAdvertisement").html(text);
-        }
-    }, {
-        key: "getAdvertisementText",
-        value: function getAdvertisementText() {
-            if (localStorage["chatpp_advertisement"] !== undefined && localStorage["chatpp_advertisement"]) {
-                var ads = JSON.parse(localStorage["chatpp_advertisement"]);
-                if (ads.length > 0) {
-                    return ads[Math.floor(Math.random() * ads.length)];
-                }
-            }
-            return "Advertisement Here!";
-        }
-    }]);
-
-    return Advertisement;
-}();
-
-var advertisement = new Advertisement();
-module.exports = advertisement;
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports) {
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var NotificationDisabler = function () {
-    function NotificationDisabler() {
-        _classCallCheck(this, NotificationDisabler);
-    }
-
-    _createClass(NotificationDisabler, null, [{
-        key: "setUp",
-        value: function setUp() {
-            var disabledNotifyRooms = null;
-
-            if (localStorage["CHATPP_DISABLE_NOTIFY_ROOM"] !== "" && localStorage["CHATPP_DISABLE_NOTIFY_ROOM"] !== "undefined" && localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]) {
-                disabledNotifyRooms = JSON.parse(localStorage["CHATPP_DISABLE_NOTIFY_ROOM"]);
+            if (emoticon.status) {
+                rebuild = true;
+                emoticon.setUp();
+                view_enhancer.updateChatworkView();
             }
 
-            if (disabledNotifyRooms) {
-                CW.popupOld = CW.popup;
-                /* eslint-disable no-unused-vars */
-                var b = null,
-                    d = null,
-                    e = window.navigator.userAgent.toLowerCase().indexOf("chrome") != -1;
-                /* eslint-enable */
-                CW.popup = function wrapper(icon, title, body, room_id) {
-                    if (disabledNotifyRooms.indexOf(room_id.toString()) == -1) {
-                        CW.popupOld(icon, title, body, room_id);
-                    }
-                };
+            mention.setUp();
+            shortcut.setUp();
+            advertisement.setUp();
+            NotificationDisabler.setUp();
+            notify_all.setUp();
+
+            view_enhancer.updateChatSendView();
+            view_enhancer.updateGetContactPanelView();
+
+            if (rebuild) {
+                RL.rooms[RM.id].build();
             }
         }
-    }]);
+    }, 100);
+});
 
-    return NotificationDisabler;
-}();
+function addStyle() {
+    $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatpp_ui_emoticon{width: initial !important; height: initial !important};</style>").appendTo("head");
+}
 
-module.exports = NotificationDisabler;
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports) {
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var NotifyAll = function () {
-    function NotifyAll() {
-        _classCallCheck(this, NotifyAll);
-    }
-
-    _createClass(NotifyAll, [{
-        key: "setUp",
-        value: function setUp() {
-            this.registerRegex();
-        }
-    }, {
-        key: "registerRegex",
-        value: function registerRegex() {
-            CW.reg_cmp.push({
-                key: /TO ALL &gt;&gt;&gt;/g,
-                rep: "<span class=\"chatTimeLineTo\">TO ALL</span>",
-                reptxt: "TO ALL",
-                special: true
-            });
-        }
-    }]);
-
-    return NotifyAll;
-}();
-
-var notify_all = new NotifyAll();
-module.exports = notify_all;
-
-/***/ })
-/******/ ]);
+},{"./Advertisement.js":4,"./Emoticon.js":5,"./Mention.js":6,"./NotificationDisabler.js":7,"./NotifyAll.js":8,"./RoomInformation.js":9,"./Shortcut.js":10,"./ViewEnhancer.js":11}]},{},[12]);
