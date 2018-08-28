@@ -1,4 +1,4 @@
-(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -471,17 +471,28 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var common = require("../helpers/Common.js");
 var Const = require("../helpers/Const.js");
 
+var KEY_COLON = "::";
+
 var Emoticon = function () {
     function Emoticon() {
         _classCallCheck(this, Emoticon);
 
         this.status = common.getStatus("emoticon");
         this.emoticons = [];
+        this.start = /::/ig;
+        this.is_colon = false;
+        this.emo_name = "";
+        this.emo_cursor_loca = 0;
+        this.list_all_emo = JSON.parse(localStorage[Const["LOCAL_STORAGE_DATA_KEY"]]);
+        this.chat_text_jquery = $("#_chatText");
+        this.chat_text_element = document.getElementById("_chatText");
     }
 
     _createClass(Emoticon, [{
         key: "setUp",
         value: function setUp() {
+            var _this = this;
+
             if (!this.status) {
                 return;
             }
@@ -494,9 +505,240 @@ var Emoticon = function () {
                 }
                 return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
             });
+            var html = "<div id='suggestion-emotion-container'></div>";
+            $("#_chatTextArea").append(html);
+            $("#suggestion-emotion-container").css({
+                "background": "#fff",
+                "position": "absolute",
+                "max-height": "200px",
+                "width": "200px",
+                "border": "1px solid #ababab",
+                "border-radius": "3px",
+                "padding": "4px 6px 4px 6px",
+                "box-shadow": "0px 3px 10px rgba(103, 103, 103, 0.57)",
+                "display": "none",
+                "overflow-y": "auto",
+                "z-index": "99"
+            });
+
+            this.chat_text_jquery.click(function () {
+                return _this.hideSuggestionEmotionsBox();
+            });
+
+            $("#_roomListArea").click(function () {
+                return _this.hideSuggestionEmotionsBox();
+            });
+
+            $("#_headerSearch").click(function () {
+                return _this.hideSuggestionEmotionsBox();
+            });
             this.addExternalEmoList();
-            this.addEmoticonText();
             this.addExternalEmo();
+            this.setEmoticonTextLabel();
+
+            //event
+            $(document).keyup(function (e) {
+                if (!_this.status) {
+                    return;
+                }
+                if (e.which == 27) {
+                    _this.hideSuggestionEmotionsBox();
+                }
+            });
+
+            this.chat_text_jquery.keydown(function (e) {
+                if (e.which == 40 && _this.is_colon) {
+                    if (_this.emo_cursor_loca != $("#suggestion-emotion-container").find("p").length - 1) {
+                        _this.emo_cursor_loca += 1;
+                    }
+                    e.preventDefault();
+                }
+
+                if (e.which == 38 && _this.is_colon) {
+                    if (_this.emo_cursor_loca !== -1) {
+                        _this.emo_cursor_loca -= 1;
+                    }
+
+                    e.preventDefault();
+                }
+
+                if ((e.which == 13 || e.which == 9) && _this.is_colon) {
+                    $("#suggestion-emotion-container").find("p[data-emo-selected='true']").click();
+
+                    e.preventDefault();
+                }
+            });
+
+            $("#suggestion-emotion-container").on("mouseenter", "p", function (e) {
+                $(e.currentTarget).attr("data-emo-selected", true);
+                $(e.currentTarget).css("background-color", "rgb(216, 240, 249)");
+            }).on("mouseleave", "p", function (e) {
+                $(e.currentTarget).removeAttr("data-emo-selected");
+                $(e.currentTarget).css("background-color", "#fff");
+            }).on("click", "p", function (e) {
+                var pos = _this.chat_text_jquery.val().lastIndexOf("::" + _this.emo_name);
+                var end_pos = _this.chat_text_jquery.val().slice(_this.emo_name.length + pos + 2, _this.chat_text_jquery.val().length);
+                var this_value = _this.chat_text_jquery.val().substring(0, pos) + $(e.currentTarget).attr("data-emo") + " " + end_pos;
+                $("#_chatText").val(this_value);
+                _this.hideSuggestionEmotionsBox();
+                $("#_chatText").focus();
+            });
+
+            this.chat_text_jquery.keyup(function (e) {
+                if (!_this.chat_text_jquery.val()) {
+                    _this.hideSuggestionEmotionsBox();
+                }
+
+                if (_this.getNearestAtmarkIndex() != -1) {
+                    _this.is_colon = true;
+                } else {
+                    _this.is_colon = false;
+                }
+
+                if (e.which == 40 && _this.is_colon) {
+                    var curentScroll = $("#suggestion-emotion-container").scrollTop();
+                    var scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
+                    $("#suggestion-emotion-container").scrollTop(scrollValue + curentScroll);
+                    var firstEleP = $("#suggestion-emotion-container").find("p");
+                    if ($(firstEleP[_this.emo_cursor_loca]).length > 0) {
+                        $(firstEleP[_this.emo_cursor_loca - 1]).mouseleave();
+                        $(firstEleP[_this.emo_cursor_loca]).mouseenter();
+                    }
+
+                    return;
+                }
+
+                if (e.which == 38 && _this.is_colon) {
+                    var _curentScroll = $("#suggestion-emotion-container").scrollTop();
+                    var _scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
+                    $("#suggestion-emotion-container").scrollTop(_curentScroll - _scrollValue);
+
+                    var _firstEleP = $("#suggestion-emotion-container").find("p");
+
+                    if (_this.emo_cursor_loca == -1) {
+                        $(_firstEleP).mouseleave();
+
+                        return;
+                    }
+
+                    if ($(_firstEleP[_this.emo_cursor_loca]).length > 0) {
+                        $(_firstEleP[_this.emo_cursor_loca + 1]).mouseleave();
+                        $(_firstEleP[_this.emo_cursor_loca]).mouseenter();
+                    }
+
+                    return;
+                }
+
+                if (e.which == 8) {
+                    if (_this.emo_name.length > 0) {
+                        var arrChar = _this.emo_name.split("");
+                        arrChar.pop();
+                        _this.emo_name = arrChar.join("");
+                    } else {
+                        _this.hideSuggestionEmotionsBox();
+                    }
+                }
+
+                if (e.which == 32) {
+                    _this.hideSuggestionEmotionsBox();
+                }
+
+                if (_this.is_colon) {
+                    if (_this.emo_name.length > 0) {
+                        $("#suggestion-emotion-container").html("");
+                        $("#suggestion-emotion-container").fadeIn(0);
+                    }
+                    var lastColonIndex = _this.chat_text_jquery.val().lastIndexOf(KEY_COLON);
+                    var textAfterColon = _this.chat_text_jquery.val().substr(lastColonIndex + 2);
+                    var emoLastText = "";
+                    if (textAfterColon.match(/\n/)) {
+                        emoLastText = textAfterColon.split(/\r|\n/);
+                    } else {
+                        emoLastText = textAfterColon.split(" ");
+                    }
+
+                    if (emoLastText.length > 0) {
+                        if (e.which != 37 || e.which != 38 || e.which != 39 || e.which != 40) {
+                            _this.emo_name = emoLastText[0];
+                        }
+                    } else {
+                        _this.hideSuggestionEmotionsBox();
+                    }
+
+                    var findEmo = $.grep(_this.list_all_emo, function (e) {
+                        var comp = e.key.toLowerCase();
+                        return comp.indexOf(_this.emo_name) > -1;
+                    });
+                    var toAppend = "";
+
+                    if (findEmo.length > 0) {
+                        for (var i = 0; i < findEmo.length; i++) {
+                            if (i == 0) {
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[i].key + "\" style=\"cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
+                            } else {
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[i].key + "\" style=\"cursor: pointer; margin-top: 5px;\">";
+                            }
+                            toAppend += "<img id=\"example\" src=\"" + common.htmlEncode(common.getEmoUrl(findEmo[i].src)) + "\" title=\"" + findEmo[i].key + " - " + findEmo[i].data_name + " - Chatpp\" alt=\"" + findEmo[i].key + "\" style=\"width: 100%; max-width: 50px;\"> <b> " + findEmo[i].key + "</b></p>";
+                        }
+                        $("#suggestion-emotion-container").append(toAppend);
+                    } else {
+                        $("#suggestion-emotion-container").html("");
+                        $("#suggestion-emotion-container").fadeOut(0);
+                    }
+                    var rect = _this.chat_text_element.getBoundingClientRect();
+                    var position = Measurement.caretPos(_this.chat_text_jquery);
+                    position.left -= rect.left;
+                    var bt = window.innerHeight - position.top;
+                    $("#_chatTextArea").css({
+                        "overflow-y": "visible",
+                        "z-index": 0
+                    });
+                    $("#suggestion-emotion-container").parent().css({
+                        position: "relative"
+                    });
+                    $("#suggestion-emotion-container").css({
+                        bottom: bt,
+                        left: position.left + 5
+                    });
+                }
+            });
+        }
+    }, {
+        key: "getNearestAtmarkIndex",
+        value: function getNearestAtmarkIndex() {
+            var content = this.chat_text_jquery.val();
+            var atmarks = content.match(this.start);
+
+            if (!atmarks) {
+                return -1;
+            }
+
+            var caret_index = this.doGetCaretPosition(this.chat_text_element);
+            var atmark_index = content.indexOf(KEY_COLON);
+            var pre_atmark_index = -1;
+            do {
+                if (atmark_index >= caret_index) {
+                    break;
+                }
+                pre_atmark_index = atmark_index;
+                atmark_index = content.indexOf(KEY_COLON, atmark_index + 1);
+            } while (atmark_index != -1);
+
+            return pre_atmark_index;
+        }
+    }, {
+        key: "doGetCaretPosition",
+        value: function doGetCaretPosition(ctrl) {
+            var CaretPos = 0; // IE Support
+            if (document.selection) {
+                ctrl.focus();
+                var Sel = document.selection.createRange();
+                Sel.moveStart("character", -ctrl.value.length);
+                CaretPos = Sel.text.length;
+            }
+            // Firefox support
+            else if (ctrl.selectionStart || ctrl.selectionStart == "0") CaretPos = ctrl.selectionStart;
+            return CaretPos;
         }
     }, {
         key: "addExternalEmoList",
@@ -514,32 +756,53 @@ var Emoticon = function () {
                     "role": "button"
                 }
             }).append($("<span>", { id: "externalEmoticonsButton", class: "icoFontActionMore icoSizeLarge" })));
-            var emo_list_div = this.sorted_emoticons.map(function (emo) {
-                var encoded_text = common.htmlEncode(emo.key);
-                var titleapp = encoded_text + " - " + emo.data_name + " - Chatpp";
-                var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
-                var liElement = $("<li>", {
-                    css: {
-                        "padding": "5px",
-                        "cursor": "pointer",
-                        "border": "1px solid #fff",
-                        "border-radius": "3px",
-                        "transition": "border 0.2s linear 0s"
+
+            var data = [];
+            this.sorted_emoticons.forEach(function (emo) {
+                if (data.indexOf(emo.data_name) == -1) {
+                    data.push(emo.data_name);
+                }
+            });
+
+            var temp = [];
+            var arrayData = [];
+            var sorted_Emoticons = this.sorted_emoticons;
+            data.forEach(function (item) {
+                temp = [];
+                sorted_Emoticons.map(function (emo) {
+                    var encoded_text = common.htmlEncode(emo.key);
+                    var titleapp = encoded_text + " - " + emo.data_name + " - Chatpp";
+                    var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
+                    if (emo.data_name == item) {
+                        var liElement = $("<li>", {
+                            css: {
+                                "padding": "5px",
+                                "cursor": "pointer",
+                                "border": "1px solid #fff",
+                                "border-radius": "3px",
+                                "transition": "border 0.2s linear 0s"
+                            }
+                        }).append($("<img>", {
+                            id: "example",
+                            css: {
+                                "width": "100%",
+                                "max-width": "50px"
+                            },
+                            attr: {
+                                "src": img_src,
+                                "title": titleapp,
+                                "alt": encoded_text
+                            }
+                        }));
+                        temp.push(liElement);
+
+                        return liElement.prop("outerHTML");
                     }
-                }).append($("<img>", {
-                    id: "example",
-                    css: {
-                        "width": "100%",
-                        "max-width": "50px"
-                    },
-                    attr: {
-                        "src": img_src,
-                        "title": titleapp,
-                        "alt": encoded_text
-                    }
-                }));
-                return liElement.prop("outerHTML");
-            }).join("");
+                }).join("");
+                arrayData.push(temp);
+            });
+
+            $("#_wrapper").append($("<style>").append("::-webkit-scrollbar {width:10px;height:10px} .w3-emotion {display:inline-block;text-align:center;min-width:80px;height:30px;border:1px solid #ccc;cursor:pointer;margin:0px 2px;border-radius:5px;font-size:10px;background-color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}"));
 
             $("#_wrapper").append($("<div>", {
                 id: "_externalEmoticonList",
@@ -550,7 +813,8 @@ var Emoticon = function () {
                     "display": "none",
                     "top": "480px",
                     "left": "160px",
-                    "role": "tooltip"
+                    "role": "tooltip",
+                    "width": "350px"
                 }
             }).append($("<div>", {
                 class: "_cwTTTriangle toolTipTriangle toolTipTriangleWhiteBottom",
@@ -558,18 +822,26 @@ var Emoticon = function () {
                     "left": "129px"
                 }
             }), $("<ul>", {
-                id: "_emoticonGallery",
+                id: "_emoticonGalleryTab",
                 css: {
                     "display": "flex",
                     "flex-wrap": "wrap",
                     "justify-content": "center",
                     "max-width": "350px",
-                    "max-height": "450px",
+                    "height": "450px",
                     "overflow": "auto"
                 }
-            }).append(emo_list_div), $("<div>", {
+            }), $("<div>", {
                 id: "_externalEmotionDescription",
                 class: "tooltipFooter"
+            }), $("<div>", {
+                id: "tabEmotionBig",
+                css: {
+                    "display": "flex",
+                    "overflow": "auto",
+                    "overflow-y": "scroll",
+                    "height": "42px"
+                }
             })));
             var hint = _is_mac ? L.chatsend_shift_and_command_hint : L.chatsend_shift_and_ctrl_hint;
             var u = $("#_externalEmoticonList").cwToolTip({
@@ -588,13 +860,46 @@ var Emoticon = function () {
             $("#externalEmoticonsButton").click(function (e) {
                 u.open($(e.currentTarget));
             });
+
+            data.forEach(function (item, index) {
+                $("#_externalEmoticonList #tabEmotionBig").append($("<button>", {
+                    id: "tabEmotion" + index,
+                    class: "w3-bar-item w3-button w3-emotion"
+                }).append(item));
+            });
+
+            $("#externalEmoticonsButton").on("click", function () {
+                $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[0]);
+                $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
+                $("#tabEmotion0").css("background-color", "#eaeae8");
+            });
+
+            data.forEach(function (item, index) {
+                $("#tabEmotion" + index).on("click", function (event) {
+                    event.preventDefault();
+                    $("#_emoticonGalleryTab li").remove();
+                    $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[index]);
+                });
+            });
+
+            data.forEach(function (item, index) {
+                $("#_externalEmoticonList #tabEmotionBig button").on("click", function (event) {
+                    $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
+                    $(event.currentTarget).css("background-color", "#eaeae8");
+                });
+
+                $("#_externalEmoticonList #tabEmotionBig #tabEmotion" + index).hover(function (event) {
+                    $(event.currentTarget).attr("data-toggle", "tooltip");
+                    $(event.currentTarget).attr("data-placement", "top");
+                    $(event.currentTarget).attr("title", item);
+                });
+            });
         }
     }, {
         key: "addExternalEmo",
         value: function addExternalEmo() {
             this.addEmo(this.emoticons);
             this.status = true;
-            this.updateEmoticonText();
         }
     }, {
         key: "isSpecialEmo",
@@ -603,105 +908,9 @@ var Emoticon = function () {
             return special_emo.indexOf(emo) > -1;
         }
     }, {
-        key: "removeExternalEmo",
-        value: function removeExternalEmo() {
-            var emoticons_list = this.isNewMechanism() ? emoticons.baseEmoticons : CW.reg_cmp;
-            for (var i = emoticons_list.length - 1; emoticons_list.length > 0; i--) {
-                var emo = emoticons_list[i];
-                if (!$.isEmptyObject(emo) && emo.external !== undefined && emo.external === true) {
-                    // Check whether Chatwork uses new Javascript Code
-                    if (this.isNewMechanism()) {
-                        emoticons.baseEmoticons.splice(i, 1);
-                        delete emoticons.tagHash[emo.key];
-                    } else {
-                        CW.reg_cmp.splice(i, 1);
-                    }
-                } else {
-                    if (!emo.special) {
-                        break;
-                    }
-                }
-            }
-            if (this.isNewMechanism()) {
-                tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
-                    return emo.tag;
-                }));
-            }
-            this.status = false;
-            this.updateEmoticonText();
-        }
-    }, {
-        key: "addEmoticonText",
-        value: function addEmoticonText() {
-            var _this = this;
-
-            if ($("#emoticonText").length > 0) {
-                return;
-            }
-            var emoticonText = "E: " + (this.status ? "ON" : "OFF");
-            $("#_chatSendTool").append($("<li>", {
-                id: "_emoticons",
-                class: "_showDescription chatInput__element",
-                attr: {
-                    "role": "button"
-                }
-            }).append($("<span>", {
-                id: "emoticonText",
-                class: "emoticonText icoSizeSmall"
-            }).append(emoticonText)));
-            this.setEmoticonTextLabel();
-            $("#emoticonText").click(function () {
-                return _this.toggleEmoticonsStatus();
-            });
-            this.addErrorText();
-        }
-    }, {
         key: "setEmoticonTextLabel",
         value: function setEmoticonTextLabel() {
-            $("#_emoticons").attr("aria-label", "Data: " + localStorage["emoticon_data_version"]);
             $("#_externalEmoticonsButton").attr("aria-label", "View Chat++ Emoticons");
-        }
-    }, {
-        key: "updateEmoticonText",
-        value: function updateEmoticonText() {
-            var emoticonText = "E: " + (this.status ? "ON" : "OFF");
-            var div = $("#emoticonText");
-            div.html(emoticonText);
-            if (this.status) {
-                div.addClass("emoticonTextEnable");
-            } else {
-                div.removeClass("emoticonTextEnable");
-            }
-        }
-    }, {
-        key: "addErrorText",
-        value: function addErrorText() {
-            if (!localStorage["failed_data"] || $("#errorText").length > 0) {
-                return;
-            }
-            var failed_data = JSON.parse(localStorage["failed_data"]).join(", ");
-            var failed_data_text = "The following data could not be loaded: " + failed_data;
-            $("#_chatSendTool").append($("<li>", {
-                id: "_chatppErrors",
-                attr: {
-                    "role": "button"
-                },
-                class: "_showDescription chatInput__element"
-            }).append($("<span>", {
-                id: "chatppPreLoad",
-                class: "emoticonText icoSizeSmall chatppErrorsText"
-            }).text("ERROR")));
-            $("#_chatppErrors").attr("aria-label", failed_data_text);
-        }
-    }, {
-        key: "toggleEmoticonsStatus",
-        value: function toggleEmoticonsStatus() {
-            if (this.status) {
-                this.removeExternalEmo();
-            } else {
-                this.addExternalEmo();
-            }
-            RL.rooms[RM.id].build();
         }
     }, {
         key: "addEmo",
@@ -748,6 +957,16 @@ var Emoticon = function () {
         value: function isNewMechanism() {
             return typeof emoticons !== "undefined" && typeof tokenizer !== "undefined";
         }
+    }, {
+        key: "hideSuggestionEmotionsBox",
+        value: function hideSuggestionEmotionsBox() {
+            this.is_colon = false;
+            this.emo_name = "";
+            this.emo_cursor_loca = 0;
+            $("#suggestion-emotion-container").scrollTop(0);
+            $("#suggestion-emotion-container").fadeOut(0);
+            $("#suggestion-emotion-container").html("");
+        }
     }]);
 
     return Emoticon;
@@ -783,6 +1002,7 @@ var Mention = function () {
 
         this.status = common.getStatus("mention");
         this.start = /@/ig;
+        this.is_colon = false;
         this.is_displayed = false;
         this.is_inserted = false;
         this.is_navigated = false;
@@ -804,9 +1024,18 @@ var Mention = function () {
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
         this.suggestion_messages = {
-            one: { ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093", en: "No Matching Results" },
-            all: { ja: "\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059", en: "Select All Members" },
-            group: { ja: "\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7", en: "Empty Group" }
+            one: {
+                ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093",
+                en: "No Matching Results"
+            },
+            all: {
+                ja: "\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059",
+                en: "Select All Members"
+            },
+            group: {
+                ja: "\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7",
+                en: "Empty Group"
+            }
         };
         this.random_user_messages = {
             ja: "\u30E1\u30F3\u30D0\u30FC\u3092\u30E9\u30F3\u30C0\u30E0\u3059\u308B",
@@ -855,7 +1084,6 @@ var Mention = function () {
                     });
                 };
             }
-
             // hide suggestion box when click in textarea or outside
             this.chat_text_jquery.click(function () {
                 return _this.hideSuggestionBox();
@@ -890,6 +1118,12 @@ var Mention = function () {
                 } else {
                     _this.current_index = 0;
                     _this.is_navigated = false;
+                }
+
+                if (_this.getNearestColonIndex()) {
+                    _this.is_colon = true;
+                } else {
+                    _this.is_colon = false;
                 }
 
                 if (e.which == 9 || e.which == 13) {
@@ -1008,7 +1242,7 @@ var Mention = function () {
                 return false;
             });
 
-            this.addMentionText();
+            this.addTagButton();
             this.ccMention();
         }
     }, {
@@ -1030,6 +1264,29 @@ var Mention = function () {
                 }
                 pre_atmark_index = atmark_index;
                 atmark_index = content.indexOf("@", atmark_index + 1);
+            } while (atmark_index != -1);
+
+            return pre_atmark_index;
+        }
+    }, {
+        key: "getNearestColonIndex",
+        value: function getNearestColonIndex() {
+            var content = this.chat_text_jquery.val();
+            var atmarks = content.match(this.start);
+
+            if (!atmarks) {
+                return -1;
+            }
+
+            var caret_index = this.doGetCaretPosition(this.chat_text_element);
+            var atmark_index = content.indexOf("::");
+            var pre_atmark_index = -1;
+            do {
+                if (atmark_index >= caret_index) {
+                    break;
+                }
+                pre_atmark_index = atmark_index;
+                atmark_index = content.indexOf("::", atmark_index + 1);
             } while (atmark_index != -1);
 
             return pre_atmark_index;
@@ -1090,19 +1347,30 @@ var Mention = function () {
             var position = Measurement.caretPos(this.chat_text_jquery);
             position.top -= rect.top;
             position.left -= rect.left;
+
             if (rect.width - position.left < 236) {
                 position.left -= 236;
             }
             if (rect.height - position.top < 90) {
                 if (position.top < 108) {
-                    $("#_chatTextArea").css({ "overflow-y": "visible", "z-index": 2 });
+                    $("#_chatTextArea").css({
+                        "overflow-y": "visible",
+                        "z-index": 2
+                    });
                 }
                 position.top -= 118;
             } else {
-                position.top += parseInt(this.chat_text_jquery.css("font-size")) + 2;
+                position.top += parseInt(this.chat_text_jquery.css("font-size")) + 5;
             }
-            $("#suggestion-container").parent().css({ position: "relative" });
-            $("#suggestion-container").css({ top: position.top, left: position.left, position: "absolute" });
+            $("#suggestion-container").parent().css({
+                position: "relative"
+            });
+
+            $("#suggestion-container").css({
+                top: position.top,
+                left: position.left,
+                position: "absolute"
+            });
             this.setCaretPosition(this.chat_text_element, current_pos);
         }
     }, {
@@ -1130,13 +1398,8 @@ var Mention = function () {
             });
 
             $(".suggested-name").mouseover(function (e) {
-                $(e.currentTarget).siblings().css("background-color", "white");
-                $(e.currentTarget).css("background-color", "#D8F0F9");
-            });
-
-            $(".suggested-name").mouseout(function (e) {
-                $(e.currentTarget).siblings().first().css("background-color", "#D8F0F9");
                 $(e.currentTarget).css("background-color", "white");
+                $("#suggestion-container>ul li:first-child").css("background-color", "#D8F0F9");
             });
         }
     }, {
@@ -1164,7 +1427,12 @@ var Mention = function () {
             }
             this.insert_type = "one";
             $("#suggestion-container").html("");
-            $("#_chatTextArea").css({ "overflow-y": "scroll", "z-index": 0 });
+            if (!this.is_colon) {
+                $("#_chatTextArea").css({
+                    "overflow-y": "scroll",
+                    "z-index": 0
+                });
+            }
             // restore setting to correct value
             if (this.cached_enter_action != ST.data.enter_action && this.cached_enter_action == "send") {
                 ST.data.enter_action = this.cached_enter_action;
@@ -1250,13 +1518,16 @@ var Mention = function () {
                         return [];
                     }
                 }
-
                 if (typed_text == "me") {
                     this.insert_type = "me";
                     return [this.getMemberObject(AC.myid)];
                 }
                 if (typed_text == "all") {
                     this.insert_type = "all";
+                    return [];
+                }
+                if (typed_text == "toall") {
+                    this.insert_type = "toall";
                     return [];
                 }
                 this.insert_type = "one";
@@ -1316,7 +1587,13 @@ var Mention = function () {
                     for (var i = 0; i < members.length; i++) {
                         replace_text += format_string.format(members[i].value, members[i].aid2name);
                     }
-
+                    break;
+                case "toall":
+                    if (this.insert_mode === "to") {
+                        replace_text = "TO ALL >>> \n";
+                    } else {
+                        replace_text = "[toall]\n";
+                    }
                     break;
                 default:
                     break;
@@ -1355,6 +1632,19 @@ var Mention = function () {
             var content = old.substring(0, start_pos) + replace_text + old.substring(start_pos + entered_text.length);
             this.chat_text_jquery.val(content);
             this.setCaretPosition(this.chat_text_element, start_pos + replace_text.length);
+            this.hideSuggestionBox();
+        }
+    }, {
+        key: "setSuggestedChatTag",
+        value: function setSuggestedChatTag(type) {
+            var old = this.chat_text_jquery.val();
+            var start_pos = this.chat_text_jquery[0].selectionStart;
+            var end_pos = this.chat_text_jquery[0].selectionEnd;
+            var selectedString = old.substring(start_pos, end_pos);
+            var tag = "[" + type + "]" + selectedString + "[/" + type + "]";
+            var content = old.substring(0, start_pos) + tag + old.substring(end_pos, old.length);
+            this.chat_text_jquery.val(content);
+            this.setCaretPosition(this.chat_text_element, start_pos + 2 + type.length + selectedString.length);
             this.hideSuggestionBox();
         }
     }, {
@@ -1406,7 +1696,12 @@ var Mention = function () {
                     break;
                 /* eslint-enable */
                 case "all":
-                    return "<ul><li class=\"suggested-name tooltipList__item\" role=\"listitem\">" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</lia></ul>";
+                    return "<ul><li class=\"suggested-name tooltipList__item\" role=\"listitem\">" + this.suggestion_messages[this.insert_type][LANGUAGE] + "</li></ul>";
+                    /* eslint-disable no-unreachable */
+                    break;
+                /* eslint-enable */
+                case "toall":
+                    return '<ul><li class="suggested-name tooltipList__item" role="listitem">To All</li></ul>';
                     /* eslint-disable no-unreachable */
                     break;
                 /* eslint-enable */
@@ -1491,46 +1786,62 @@ var Mention = function () {
             });
         }
     }, {
-        key: "addMentionText",
-        value: function addMentionText() {
+        key: "addTagButton",
+        value: function addTagButton() {
             var _this3 = this;
 
-            if ($("#_chatppMentionText").length > 0) {
+            if ($("#_tag").length > 0) {
                 return;
             }
             $("#_chatSendTool").append($("<li>", {
-                id: "_chatppPreLoad",
+                id: "infoTag",
+                class: "_showDescription",
                 attr: {
                     "role": "button"
                 },
-                class: "_showDescription"
-            }).append($("<span>", { id: "chatppMentionText", class: "emoticonText icoSizeSmall" })));
-            this.updateMentionText();
-            $("#chatppMentionText").click(function () {
-                return _this3.toggleMentionStatus();
+                css: {
+                    "display": "inline-block",
+                    "margin-left": 5
+                }
+            }).append($("<span>", {
+                class: "chatInput__emoticon chatInput__iconContainer"
+            }).append("<strong>[info]</strong>")));
+            $("#_chatSendTool").append($("<li>", {
+                id: "titleTag",
+                class: "_showDescription",
+                attr: {
+                    "role": "button"
+                },
+                css: {
+                    "display": "inline-block"
+                }
+            }).append($("<span>", {
+                class: "chatInput__emoticon chatInput__iconContainer"
+            }).append("<strong>[title]</strong>")));
+            $("#_chatSendTool").append($("<li>", {
+                id: "codeTag",
+                class: "_showDescription",
+                attr: {
+                    "role": "button"
+                },
+                css: {
+                    "display": "inline-block"
+                }
+            }).append($("<span>", {
+                class: "chatInput__emoticon chatInput__iconContainer"
+            }).append("<strong>[code]</strong>")));
+
+            $("#infoTag").click(function () {
+                _this3.setSuggestedChatTag("info");
             });
-        }
-    }, {
-        key: "updateMentionText",
-        value: function updateMentionText() {
-            var mention_text = "M: " + (this.status ? "ON" : "OFF");
-            var div = $("#chatppMentionText");
-            div.html(mention_text);
-            div.addClass("chatInput__element");
-            if (this.status) {
-                $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
-                div.addClass("emoticonTextEnable");
-            } else {
-                $("#_chatppMentionText").attr("aria-label", "Click to enable Mention Feature");
-                div.removeClass("emoticonTextEnable");
-            }
-        }
-    }, {
-        key: "toggleMentionStatus",
-        value: function toggleMentionStatus() {
-            this.status = !this.status;
-            common.setStatus("mention", this.status);
-            this.updateMentionText();
+
+            $("#titleTag").click(function () {
+                _this3.setSuggestedChatTag("title");
+            });
+
+            $("#codeTag").click(function () {
+                _this3.setSuggestedChatTag("code");
+            });
         }
     }]);
 
@@ -1772,82 +2083,34 @@ var Shortcut = function () {
         key: "setUp",
         value: function setUp() {
             if (this.status) {
-                this.addShortcutText();
                 this.registerShortcut();
             }
-        }
-    }, {
-        key: "addShortcutText",
-        value: function addShortcutText() {
-            var _this = this;
-
-            if ($("#_chatppShortcutText").length > 0) {
-                return;
-            }
-            $("#_chatSendTool").append($("<li>", {
-                id: "_chatppShortcutText",
-                attr: {
-                    "role": "button"
-                },
-                class: "_showDescription"
-            }).append($("<span>", { id: "chatppShortcutText", class: "emoticonText icoSizeSmall" })));
-            this.updateShortcutText();
-            $("#chatppShortcutText").click(function () {
-                return _this.toggleShortcutStatus();
-            });
-        }
-    }, {
-        key: "updateShortcutText",
-        value: function updateShortcutText() {
-            var shortcut_text = "S: " + (this.status ? "ON" : "OFF");
-            var div = $("#chatppShortcutText");
-            div.html(shortcut_text);
-            div.addClass("chatInput__element");
-            if (this.status) {
-                $("#_chatppShortcutText").attr("aria-label", "Click to disable Shortcut Feature");
-                div.addClass("emoticonTextEnable");
-            } else {
-                $("#_chatppShortcutText").attr("aria-label", "Click to enable Shortcut Feature");
-                div.removeClass("emoticonTextEnable");
-            }
-        }
-    }, {
-        key: "toggleShortcutStatus",
-        value: function toggleShortcutStatus() {
-            this.status = !this.status;
-            common.setStatus("shortcut", this.status);
-            if (this.status) {
-                this.registerShortcut();
-            } else {
-                this.removeRegisteredKeyboardShortcut();
-            }
-            this.updateShortcutText();
         }
     }, {
         key: "registerShortcut",
         value: function registerShortcut() {
-            var _this2 = this;
+            var _this = this;
 
             var shortcuts_default = this.shortcuts_default;
             CW.view.registerKeyboardShortcut(shortcuts_default.reply, !1, !1, !1, !1, function () {
-                var message_id = _this2.getHoverMessageId();
-                _this2.replyMessage(message_id);
+                var message_id = _this.getHoverMessageId();
+                _this.replyMessage(message_id);
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, function () {
-                _this2.triggerDefaultAction("quote");
+                _this.triggerDefaultAction("quote");
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.link, !1, !1, !1, !1, function () {
-                _this2.triggerDefaultAction("link");
+                _this.triggerDefaultAction("link");
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.edit, !1, !1, !1, !1, function () {
-                _this2.triggerDefaultAction("edit");
+                _this.triggerDefaultAction("edit");
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.task, !1, !1, !1, !1, function () {
-                _this2.triggerDefaultAction("task");
+                _this.triggerDefaultAction("task");
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.my_chat, !1, !1, !1, !1, function () {
@@ -1855,39 +2118,39 @@ var Shortcut = function () {
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.scroll, !1, !1, !1, !1, function () {
-                _this2.goToBottom();
+                _this.goToBottom();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.previous_mention, !1, !1, !1, !1, function () {
-                _this2.goToPreviousMention();
+                _this.goToPreviousMention();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.next_mention, !1, !1, !1, !1, function () {
-                _this2.goToNexMention();
+                _this.goToNexMention();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.next_mention_room, !1, !1, !1, !1, function () {
-                _this2.nextUnreadRoom(true);
+                _this.nextUnreadRoom(true);
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.next_new_message_room, !1, !1, !1, !1, function () {
-                _this2.nextUnreadRoom();
+                _this.nextUnreadRoom();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.up_room, !1, !1, !1, !1, function () {
-                _this2.nextRoom(true);
+                _this.nextRoom(true);
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.down_room, !1, !1, !1, !1, function () {
-                _this2.nextRoom();
+                _this.nextRoom();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.first_room, !1, !1, !1, !1, function () {
-                _this2.firstRoom();
+                _this.firstRoom();
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.first_nonstick_room, !1, !1, !1, !1, function () {
-                _this2.firstRoom(true);
+                _this.firstRoom(true);
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.focus_chatbox, !1, !1, !1, !1, function () {
@@ -1895,7 +2158,7 @@ var Shortcut = function () {
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.edit_image_upload, !1, !0, !1, !1, function () {
-                _this2.triggerDefaultAction("edit");
+                _this.triggerDefaultAction("edit");
                 var chat_text = $("#_chatText");
                 var text = chat_text.val();
                 var img = text.match(/(\[preview id=[0-9]* ht=[0-9]*\])/);
@@ -1908,7 +2171,7 @@ var Shortcut = function () {
             for (var i in this.room_shortcuts) {
                 if (this.room_shortcuts[i] && this.room_shortcuts.hasOwnProperty(i)) {
                     (function () {
-                        var room = _this2.room_shortcuts[i];
+                        var room = _this.room_shortcuts[i];
                         CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, function () {
                             RL.selectRoom(room);
                         });
@@ -1920,17 +2183,6 @@ var Shortcut = function () {
         key: "isScrollable",
         value: function isScrollable() {
             return this.get(0).scrollHeight > this.height();
-        }
-    }, {
-        key: "removeRegisteredKeyboardShortcut",
-        value: function removeRegisteredKeyboardShortcut() {
-            for (var keyboard in this.shortcuts_default) {
-                if (this.shortcuts_default.hasOwnProperty(keyboard)) {
-                    CW.view.registerKeyboardShortcut(this.shortcuts_default[keyboard], !1, !1, !1, !1, function () {
-                        return false;
-                    });
-                }
-            }
         }
     }, {
         key: "triggerDefaultAction",
@@ -2035,12 +2287,12 @@ var Shortcut = function () {
         key: "isMentionMessage",
         value: function isMentionMessage(message) {
             var regex_reply = new RegExp("\\[.* aid=" + AC.myid + " .*\\]");
-            if (regex_reply.test(message.msg)) {
-                return true;
-            }
-
             var regex_to = new RegExp("\\[To:" + AC.myid + "\\]");
-            return regex_to.test(message.msg);
+            var regex_to_all = new RegExp("\\[toall\\]");
+
+            return [regex_reply, regex_to, regex_to_all].some(function (r) {
+                return r.test(message.msg);
+            });
         }
     }, {
         key: "replyMessage",

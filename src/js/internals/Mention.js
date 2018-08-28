@@ -16,6 +16,7 @@ class Mention {
     constructor() {
         this.status = common.getStatus("mention");
         this.start = /@/ig;
+        this.is_colon = false;
         this.is_displayed = false;
         this.is_inserted = false;
         this.is_navigated = false;
@@ -37,9 +38,18 @@ class Mention {
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
         this.suggestion_messages = {
-            one: {ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093", en: "No Matching Results"},
-            all: {ja: "\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059", en: "Select All Members"},
-            group: {ja: "\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7", en: "Empty Group"}
+            one: {
+                ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093",
+                en: "No Matching Results"
+            },
+            all: {
+                ja: "\u3059\u3079\u3066\u3092\u9078\u629E\u3057\u307E\u3059",
+                en: "Select All Members"
+            },
+            group: {
+                ja: "\u7A7A\u306E\u30B0\u30EB\u30FC\u30D7",
+                en: "Empty Group"
+            }
         };
         this.random_user_messages = {
             ja: "\u30e1\u30f3\u30d0\u30fc\u3092\u30e9\u30f3\u30c0\u30e0\u3059\u308b",
@@ -80,13 +90,12 @@ class Mention {
             String.prototype.format = function () {
                 let args = arguments;
                 return this.replace(/{(\d+)}/g, (match, number) =>
-                    typeof args[number] != "undefined"
-                        ? args[number]
-                        : match
+                    typeof args[number] != "undefined" ?
+                        args[number] :
+                        match
                 );
             };
         }
-
         // hide suggestion box when click in textarea or outside
         this.chat_text_jquery.click(() => this.hideSuggestionBox());
 
@@ -115,6 +124,12 @@ class Mention {
             } else {
                 this.current_index = 0;
                 this.is_navigated = false;
+            }
+
+            if (this.getNearestColonIndex()) {
+                this.is_colon = true;
+            } else {
+                this.is_colon = false;
             }
 
             if (e.which == 9 || e.which == 13) {
@@ -167,7 +182,6 @@ class Mention {
                 this.fuse = new Fuse(this.member_objects, this.options);
                 this.current_RM = RM.id;
             }
-
 
             if (this.findAtmark()) {
                 if (this.is_displayed && this.getNearestAtmarkIndex() != -1 && this.getNearestAtmarkIndex() != this.actived_atmark_index) {
@@ -227,6 +241,7 @@ class Mention {
                     this.hideSuggestionBox();
                     this.holdCaretPosition(e);
                 }
+                
             } else {
                 this.hideSuggestionBox();
             }
@@ -234,7 +249,7 @@ class Mention {
             return false;
         });
 
-        this.addMentionText();
+        this.addTagButton();
         this.ccMention();
     }
 
@@ -255,6 +270,28 @@ class Mention {
             }
             pre_atmark_index = atmark_index;
             atmark_index = content.indexOf("@", atmark_index + 1);
+        } while (atmark_index != -1);
+
+        return pre_atmark_index;
+    }
+
+    getNearestColonIndex() {
+        let content = this.chat_text_jquery.val();
+        let atmarks = content.match(this.start);
+
+        if (!atmarks) {
+            return -1;
+        }
+
+        let caret_index = this.doGetCaretPosition(this.chat_text_element);
+        let atmark_index = content.indexOf("::");
+        let pre_atmark_index = -1;
+        do {
+            if (atmark_index >= caret_index) {
+                break;
+            }
+            pre_atmark_index = atmark_index;
+            atmark_index = content.indexOf("::", atmark_index + 1);
         } while (atmark_index != -1);
 
         return pre_atmark_index;
@@ -285,7 +322,6 @@ class Mention {
                 }
             }
 
-
             return true;
         } else {
             // There is no @ symbol
@@ -313,19 +349,30 @@ class Mention {
         let position = Measurement.caretPos(this.chat_text_jquery);
         position.top -= rect.top;
         position.left -= rect.left;
+        
         if (rect.width - position.left < 236) {
             position.left -= 236;
         }
         if (rect.height - position.top < 90) {
             if (position.top < 108) {
-                $("#_chatTextArea").css({"overflow-y": "visible", "z-index": 2});
+                $("#_chatTextArea").css({
+                    "overflow-y": "visible",
+                    "z-index": 2
+                });
             }
             position.top -= 118;
         } else {
-            position.top += parseInt(this.chat_text_jquery.css("font-size")) + 2
+            position.top += parseInt(this.chat_text_jquery.css("font-size")) + 5;
         }
-        $("#suggestion-container").parent().css({position: "relative"});
-        $("#suggestion-container").css({top: position.top, left: position.left, position: "absolute"});
+        $("#suggestion-container").parent().css({
+            position: "relative"
+        });
+
+        $("#suggestion-container").css({
+            top: position.top,
+            left: position.left,
+            position: "absolute"
+        });
         this.setCaretPosition(this.chat_text_element, current_pos);
     }
 
@@ -350,13 +397,8 @@ class Mention {
         });
 
         $(".suggested-name").mouseover((e) => {
-            $(e.currentTarget).siblings().css("background-color", "white");
-            $(e.currentTarget).css("background-color", "#D8F0F9");
-        });
-
-        $(".suggested-name").mouseout((e) => {
-            $(e.currentTarget).siblings().first().css("background-color", "#D8F0F9");
             $(e.currentTarget).css("background-color", "white");
+            $("#suggestion-container>ul li:first-child").css("background-color", "#D8F0F9");
         });
     }
 
@@ -382,7 +424,12 @@ class Mention {
         }
         this.insert_type = "one";
         $("#suggestion-container").html("");
-        $("#_chatTextArea").css({"overflow-y": "scroll", "z-index": 0});
+        if (!this.is_colon) {
+            $("#_chatTextArea").css({
+                "overflow-y": "scroll",
+                "z-index": 0
+            });
+        }
         // restore setting to correct value
         if (this.cached_enter_action != ST.data.enter_action && this.cached_enter_action == "send") {
             ST.data.enter_action = this.cached_enter_action;
@@ -391,7 +438,7 @@ class Mention {
 
     // http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
     doGetCaretPosition(ctrl) {
-        let CaretPos = 0;   // IE Support
+        let CaretPos = 0; // IE Support
         if (document.selection) {
             ctrl.focus();
             let Sel = document.selection.createRange();
@@ -408,8 +455,7 @@ class Mention {
         if (ctrl.setSelectionRange) {
             ctrl.focus();
             ctrl.setSelectionRange(pos, pos);
-        }
-        else if (ctrl.createTextRange) {
+        } else if (ctrl.createTextRange) {
             let range = ctrl.createTextRange();
             range.collapse(true);
             range.moveEnd("character", pos);
@@ -461,14 +507,16 @@ class Mention {
                     return [];
                 }
             }
-
-
             if (typed_text == "me") {
                 this.insert_type = "me";
                 return [this.getMemberObject(AC.myid)];
             }
             if (typed_text == "all") {
                 this.insert_type = "all";
+                return [];
+            }
+            if (typed_text == "toall") {
+                this.insert_type = "toall";
                 return [];
             }
             this.insert_type = "one";
@@ -485,7 +533,7 @@ class Mention {
             this.insert_mode = "name";
             return this.getRawResultsAndSetType(typed_text.substring(1));
         }
-        if (typed_text.slice(0, 4) == INSERT_MODE_SYM.CC){
+        if (typed_text.slice(0, 4) == INSERT_MODE_SYM.CC) {
             this.insert_mode = "CC";
             return this.getRawResultsAndSetType(typed_text.substring(4));
         }
@@ -524,7 +572,13 @@ class Mention {
                 for (let i = 0; i < members.length; i++) {
                     replace_text += format_string.format(members[i].value, members[i].aid2name);
                 }
-
+                break;
+            case "toall":
+                if (this.insert_mode === "to") {
+                    replace_text = "TO ALL >>> \n";
+                } else {
+                    replace_text = "[toall]\n";
+                }
                 break;
             default:
                 break;
@@ -562,6 +616,18 @@ class Mention {
         let content = old.substring(0, start_pos) + replace_text + old.substring(start_pos + entered_text.length);
         this.chat_text_jquery.val(content);
         this.setCaretPosition(this.chat_text_element, start_pos + replace_text.length);
+        this.hideSuggestionBox();
+    }
+
+    setSuggestedChatTag(type) {
+        let old = this.chat_text_jquery.val();
+        let start_pos = this.chat_text_jquery[0].selectionStart;
+        let end_pos = this.chat_text_jquery[0].selectionEnd;
+        let selectedString = old.substring(start_pos, end_pos);
+        let tag = `[${type}]${selectedString}[/${ type }]`;
+        let content = old.substring(0, start_pos) + tag + old.substring(end_pos, old.length);
+        this.chat_text_jquery.val(content);
+        this.setCaretPosition(this.chat_text_element, start_pos + 2 + type.length + selectedString.length);
         this.hideSuggestionBox();
     }
 
@@ -612,7 +678,12 @@ class Mention {
                 break;
                 /* eslint-enable */
             case "all":
-                return `<ul><li class="suggested-name tooltipList__item" role="listitem">${this.suggestion_messages[this.insert_type][LANGUAGE]}</lia></ul>`;
+                return `<ul><li class="suggested-name tooltipList__item" role="listitem">${this.suggestion_messages[this.insert_type][LANGUAGE]}</li></ul>`;
+                /* eslint-disable no-unreachable */
+                break;
+                /* eslint-enable */
+            case "toall":
+                return '<ul><li class="suggested-name tooltipList__item" role="listitem">To All</li></ul>';
                 /* eslint-disable no-unreachable */
                 break;
                 /* eslint-enable */
@@ -695,43 +766,72 @@ class Mention {
     }
 
 
-    addMentionText() {
-        if ($("#_chatppMentionText").length > 0) {
+    addTagButton() {
+        if ($("#_tag").length > 0) {
             return;
         }
         $("#_chatSendTool").append(
             $("<li>", {
-                id: "_chatppPreLoad",
+                id: "infoTag",
+                class: "_showDescription",
                 attr: {
                     "role": "button"
                 },
-                class: "_showDescription"
+                css: {
+                    "display": "inline-block", 
+                    "margin-left": 5 
+                }
             }).append(
-                $("<span>", { id: "chatppMentionText", class: "emoticonText icoSizeSmall" })
+                $("<span>", { 
+                    class: "chatInput__emoticon chatInput__iconContainer"
+                }).append("<strong>[info]</strong>")
             )
         );
-        this.updateMentionText();
-        $("#chatppMentionText").click(() => this.toggleMentionStatus());
-    }
+        $("#_chatSendTool").append(
+            $("<li>", {
+                id: "titleTag",
+                class: "_showDescription",
+                attr: {
+                    "role": "button"
+                },
+                css: {
+                    "display": "inline-block"
+                }
+            }).append(
+                $("<span>", { 
+                    class: "chatInput__emoticon chatInput__iconContainer"
+                }).append("<strong>[title]</strong>")
+            )
+        );
+        $("#_chatSendTool").append(
+            $("<li>", {
+                id: "codeTag",
+                class: "_showDescription",
+                attr: {
+                    "role": "button"
+                },
+                css: {
+                    "display": "inline-block"
+                }
+            }).append(
+                $("<span>", { 
+                    class: "chatInput__emoticon chatInput__iconContainer"
+                }).append("<strong>[code]</strong>")
+            )
+        );
 
-    updateMentionText() {
-        let mention_text = `M: ${this.status ? "ON" : "OFF"}`;
-        let div = $("#chatppMentionText");
-        div.html(mention_text);
-        div.addClass("chatInput__element");
-        if (this.status) {
-            $("#_chatppMentionText").attr("aria-label", "Click to disable Mention Feature");
-            div.addClass("emoticonTextEnable");
-        } else {
-            $("#_chatppMentionText").attr("aria-label", "Click to enable Mention Feature");
-            div.removeClass("emoticonTextEnable");
-        }
-    }
 
-    toggleMentionStatus() {
-        this.status = !this.status;
-        common.setStatus("mention", this.status);
-        this.updateMentionText();
+        $("#infoTag").click(() => {
+            this.setSuggestedChatTag("info");
+        });
+
+        $("#titleTag").click(() => {
+            this.setSuggestedChatTag("title");
+        });
+
+        $("#codeTag").click(() => {
+            this.setSuggestedChatTag("code");
+        });
     }
 }
 

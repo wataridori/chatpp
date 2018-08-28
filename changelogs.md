@@ -1,6 +1,28 @@
 Chat++ Change Logs
 
-=================
+## 5.2.1
+* Fix bug can not select emoticon when using Vietnamese Unikey
+* Fix bug can not select emoticon at new line
+
+## 5.2.0
+* Remove `E` (Emoticon), `S` (Shortcut), `M` (Mention) buttons in chatbox toolbar
+* Add `[info]`, `[title]` and `[code]` buttons in chatbox toolbar
+* Fix bug with mouse hover when mention suggestion displayed
+* Separate emoticons in to tabs in the Emoticon List popup
+* Add emoticons popup suggestion with `::` keyword
+
+## 5.1.22
+* Fix bug: can not load some external libraries
+* Fix a problem with CSS style
+
+## 5.1.21
+* Rearrange emoticons list into tabs base on Emoticon Data set.
+
+## 5.1.20
+* Move to message with [toall] by using shortcut.
+
+## 5.1.19
+* Mix-gulp Laravel mix
 
 ## 5.1.18
 * Fix the problem with using innerHTML

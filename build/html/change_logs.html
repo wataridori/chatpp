@@ -8,7 +8,37 @@
 <body>
 <div class="container">
     <h1>Chat++ Change Logs</h1>
-    <hr>
+    <h2>5.2.1</h2>
+    <ul>
+        <li>Fix bug can not select emoticon when using Vietnamese Unikey</li>
+        <li>Fix bug can not select emoticon at new line</li>
+    </ul>
+    <h2>5.2.0</h2>
+    <ul>
+        <li>Remove <strong>E</strong> (Emoticon), <strong>S</strong> (Shortcut), <strong>M</strong> (Mention) buttons in chatbox toolbar</li>
+        <li>Add <strong>[info]</strong>, <strong>[title]</strong> and <strong>[code]</strong> buttons in chatbox toolbar</li>
+        <li>Fix bug with mouse hover when mention suggestion displayed</li>
+        <li>Separate emoticons in to tabs in the Emoticon List popup</li>
+        <li>Add emoticons popup suggestion with <code>::</code> keyword</li>
+    </ul>
+
+    <h2>5.1.22</h2>
+    <ul>
+        <li>Fix bug: can not load some external libraries.</li>
+        <li>Fix a problem with CSS style.</li>
+    </ul>
+    <h2>5.1.21</h2>
+    <ul>
+        <li>Rearrange emoticons list into tabs base on Emoticon Data set.</li>
+    </ul>
+    <h2>5.1.20</h2>
+    <ul>
+        <li>Move to message with [toall] by using shortcut.</li>
+    </ul>
+    <h2>5.1.19</h2>
+    <ul>
+        <li>Mix-gulp Laravel mix</li>
+    </ul>
     <h2>5.1.18</h2>
     <ul>
         <li>Fix the problem with using innerHTML</li>
@@ -92,7 +122,9 @@
             a message that mentions all people in the room will be created, then automatically deleted.<br>
             It's only used to gain notification from Chatwork. Your real message will be sent later.<br>
             This feature is expected to be used in the room that has too many people so the normal way to mention all can make browser freeze.<br>
-            You can make TO ALL message without notification by <strong>starting</strong> your message with <code>TO ALL >>></code><br>
+            You can make TO ALL message without notification by <strong>starting</strong> your message with <code>TO ALL 
+          
+          </code><br>
             For example:
             <pre>
                 <code>
