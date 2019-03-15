@@ -67,8 +67,8 @@ $(() => {
             getData(Const.DEFAULT_DATA_URL, reload);
         } else {
             let url = $("#data-url").val();
-            if (!common.validateUrl(url)) {
-                bootbox.alert("Invalid URL! Make sure your inputted URL is correct, and start with https!");
+            if (!common.validateDropboxUrl(url)) {
+                bootbox.alert("Invalid URL! Make sure your inputted URL is correct, and a Dropbox link!");
             } else {
                 bootbox.dialog({
                     message: `The data from <a href="${url}">${url}</a> may contain undesirable emoticons and we will not be responsible for it` ,

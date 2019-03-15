@@ -145,6 +145,20 @@ class Common {
         return regexp.test(url);
     }
 
+    validateDropboxUrl(url) {
+        if (this.validateUrl(url)) {
+            return false;
+        }
+        let supported_urls = ["https://dl.dropboxusercontent.com/", "https://www.dropbox.com/"];
+        for (let supported_url of supported_urls) {
+            if (url.startsWith(supported_url)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     isPage(page_name) {
         return $("#page-name").data("page-name") === page_name;
     }

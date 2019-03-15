@@ -78,43 +78,59 @@ function getData(info, inject_script) {
     let failed = false;
     localStorage.removeItem("failed_data");
     $.each(urls, (data_name, url) => {
-        $.getJSON(url)
-            .done((data) => {
+        let query = getUrlQuery(url);
+        if (!query) {
+            return false;
+        }
+        chrome.runtime.sendMessage({contentScriptQuery: "fetchEmoticonsData", query, data_name}, (data) => {
+            if (data.success) {
                 if (typeof(data.data_version) !== "undefined" && typeof(data.emoticons) !== "undefined") {
                     data.data_url = urls[data.data_name];
                     let priority = (emo_info[data.data_name] && emo_info[data.data_name].priority) ? emo_info[data.data_name].priority : 0;
                     emo_storage.pushData(data, priority);
                     pushEmoticons(data.emoticons, priority, data.data_name);
                 }
-            }).fail(() => {
+            } else {
                 failed = true;
-                delete emo_info[data_name];
-                pushFailedData(data_name);
-            }).always(() => {
-                if (++loaded_count === emo_count) {
-                    if (!failed) {
-                        emo_storage.syncData();
-                    }
-                    let chrome_storage_local = new ChromeStorageLocal();
-                    chrome_storage_local.get((local_data) => {
-                        let version_name = "";
-                        if (!$.isEmptyObject(local_data)) {
-                            version_name = local_data["version_name"];
-                        }
-                        // let current_time = (new Date).toLocaleString();
-                        // console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
-                        localStorage[Const.LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
-                        localStorage["chatpp_version_name"] = version_name;
-                        localStorage["emoticon_data_version"] = parseDataName(emo_info);
-                        if (inject_script !== undefined && inject_script) {
-                            addInjectedScript();
-                        } else {
-                            // runFunction("reloadEmoticions()");
-                        }
-                    });
+                delete emo_info[data.data_name];
+                pushFailedData(data.data_name);
+            }
+
+            if (++loaded_count === emo_count) {
+                if (!failed) {
+                    emo_storage.syncData();
                 }
-            });
+                let chrome_storage_local = new ChromeStorageLocal();
+                chrome_storage_local.get((local_data) => {
+                    let version_name = "";
+                    if (!$.isEmptyObject(local_data)) {
+                        version_name = local_data["version_name"];
+                    }
+                    // let current_time = (new Date).toLocaleString();
+                    // console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
+                    localStorage[Const.LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
+                    localStorage["chatpp_version_name"] = version_name;
+                    localStorage["emoticon_data_version"] = parseDataName(emo_info);
+                    if (inject_script !== undefined && inject_script) {
+                        addInjectedScript();
+                    } else {
+                        // runFunction("reloadEmoticions()");
+                    }
+                });
+            }
+        });
     });
+}
+
+function getUrlQuery(url) {
+    let supported_urls = ["https://dl.dropboxusercontent.com/", "https://www.dropbox.com/"];
+    for (let supported_url of supported_urls) {
+        if (url.startsWith(supported_url)) {
+            return url.substring(supported_url.length);
+        }
+    }
+
+    return false;
 }
 
 function pushFailedData(data_name) {
@@ -207,10 +223,9 @@ function injectCssFile(file_name) {
 }
 
 function loadAdvertisement() {
-    $.getJSON(Const.ADVERTISEMENT_URL)
-        .done((data) => {
-            if (!$.isEmptyObject(data)) {
-                localStorage["chatpp_advertisement"] = JSON.stringify(data);
-            }
-        });
+    chrome.runtime.sendMessage({contentScriptQuery: "fetchAdvertisementData"}, (data) => {
+        if (!$.isEmptyObject(data)) {
+            localStorage["chatpp_advertisement"] = JSON.stringify(data);
+        }
+    });
 }

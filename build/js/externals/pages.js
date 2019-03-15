@@ -1,9 +1,528 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-"use strict";
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "/";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports) {
 
-var common = require("../helpers/Common.js");
-var Const = require("../helpers/Const.js");
-var EmoStorage = require("../helpers/EmoStorage.js");
+var Const = {
+    LOCAL_STORAGE_DATA_KEY: "YACEP_EMO_DATA",
+    LOCAL_STORAGE_INFO_KEY: "YACEP_EMO_INFO",
+    LOCAL_STORAGE_GROUP_MENTION: "CHATPP_GROUP_MENTION",
+    LOCAL_STORAGE_ROOM_SHORTCUT: "CHATPP_ROOM_SHORTCUT",
+    LOCAL_STORAGE_DISABLE_NOTIFY_ROOM: "CHATPP_DISABLE_NOTIFY_ROOM",
+    CHROME_LOCAL_KEY: "CHATPP_CHROME_LOCAL_DATA",
+    CHROME_SYNC_KEY: "CHATPP_CHROME_SYNC_DATA",
+    CHROME_SYNC_GROUP_KEY: "CHATPP_CHROME_SYNC_GROUP",
+    CHROME_SYNC_ROOM_KEY: "CHATPP_CHROME_SYNC_ROOM",
+    CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY: "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM",
+    DEFAULT_DATA_URL: "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1",
+    ADVERTISEMENT_URL: "https://dl.dropboxusercontent.com/s/jsmceot0pqi8lpk/chatppad.json?dl=1",
+    VERSION_CHROME: "VERSION_CHROME",
+    VERSION_FIREFOX: "VERSION_FIREFOX",
+    VERSION_NAME_DEV: "dev",
+    VERSION_NAME_RELEASE: "final",
+    DEFAULT_IMG_HOST: "https://chatpp.thangtd.com/",
+    DELAY_TIME: 6000,
+    FORCE_TURN_OFF_THUMBNAIL: 1,
+    ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
+    TO_ALL_MARK: "TO ALL >>>"
+};
+
+module.exports = Const;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Const = __webpack_require__(0);
+
+var Common = function () {
+    function Common() {
+        _classCallCheck(this, Common);
+
+        this.version = Const.VERSION_CHROME;
+        this.app_detail = this.getAppDetail();
+        this.official_emoticons_data = {
+            Default: {
+                name: "Default",
+                link: "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1",
+                description: "The default Emoticons data of Chat++"
+            },
+            Vietnamese: {
+                name: "Vietnamese",
+                link: "https://dl.dropboxusercontent.com/s/2b085bilbno4ri1/vietnamese.json?dl=1",
+                description: "Yet another data for people who want to use Vietnamese Emoticons"
+            },
+            Japanese: {
+                name: "Japanese",
+                link: "https://dl.dropboxusercontent.com/s/fdq05pwwtsccrn6/japanese.json?dl=1",
+                description: "Yet another data for people who want to use Japanese Emoticons"
+            },
+            Skype: {
+                name: "Skype",
+                link: "https://dl.dropboxusercontent.com/s/8ew2mdh0v2vcad8/skype.json?dl=1",
+                description: "Skype Original Emoticons"
+            }
+        };
+    }
+
+    _createClass(Common, [{
+        key: "isChromeVersion",
+        value: function isChromeVersion() {
+            return this.version === Const.VERSION_CHROME;
+        }
+    }, {
+        key: "isFirefoxVersion",
+        value: function isFirefoxVersion() {
+            return this.version === Const.VERSION_FIREFOX;
+        }
+    }, {
+        key: "isDevVersion",
+        value: function isDevVersion() {
+            var app_name = this.app_detail.name;
+            return app_name.indexOf(Const.VERSION_NAME_DEV, app_name.length - Const.VERSION_NAME_DEV.length) !== -1;
+        }
+    }, {
+        key: "checkDevVersionInternal",
+        value: function checkDevVersionInternal() {
+            return localStorage["chatpp_version_name"] === Const.VERSION_NAME_DEV;
+        }
+    }, {
+        key: "getStorage",
+        value: function getStorage(local) {
+            if (!local && this.isChromeVersion()) {
+                return chrome.storage.sync;
+            }
+
+            return chrome.storage.local;
+        }
+    }, {
+        key: "sync",
+        value: function sync(key, data, callback) {
+            var sync = {};
+            sync[key] = data;
+            var storage = this.getStorage();
+            storage.set(sync, function () {
+                if (callback) {
+                    callback();
+                }
+            });
+        }
+    }, {
+        key: "getEmoticonDataUrl",
+        value: function getEmoticonDataUrl(data_name, default_url) {
+            if (data_name && this.official_emoticons_data[data_name]) {
+                default_url = this.official_emoticons_data[data_name]["link"];
+            }
+
+            return default_url ? default_url.replace("http://i.imgur.com/", "https://i.imgur.com/") : null;
+        }
+    }, {
+        key: "getObjectLength",
+        value: function getObjectLength(object) {
+            return Object.keys(object).length;
+        }
+    }, {
+        key: "htmlEncode",
+        value: function htmlEncode(value) {
+            return $("<div/>").text(value).html();
+        }
+    }, {
+        key: "getEmoUrl",
+        value: function getEmoUrl(img) {
+            var url = Const.DEFAULT_IMG_HOST + "img/emoticons/" + img;
+            if (img.indexOf("https://") == 0 || img.indexOf("http://") == 0) {
+                url = img;
+            }
+            return this.htmlEncode(url);
+        }
+    }, {
+        key: "parseRoomId",
+        value: function parseRoomId(text) {
+            var room = text.match(/\d+/g);
+            if (!room || room.length == 0) {
+                return null;
+            }
+            room = room[0];
+            var regex = /^[0-9]{6,10}$/g;
+            if (regex.test(room)) {
+                return room;
+            }
+            return null;
+        }
+    }, {
+        key: "reload",
+        value: function reload() {
+            location.reload();
+        }
+    }, {
+        key: "getAppDetail",
+        value: function getAppDetail() {
+            return chrome.app.getDetails();
+        }
+    }, {
+        key: "getAppVersion",
+        value: function getAppVersion() {
+            return this.app_detail.version;
+        }
+    }, {
+        key: "getAppVersionName",
+        value: function getAppVersionName() {
+            if (this.isDevVersion()) {
+                return Const.VERSION_NAME_DEV;
+            }
+
+            return Const.VERSION_NAME_RELEASE;
+        }
+    }, {
+        key: "getAppFullName",
+        value: function getAppFullName() {
+            var version_name = this.getAppVersionName();
+
+            return this.app_detail.short_name + " " + this.app_detail.version + " " + version_name;
+        }
+    }, {
+        key: "openNewUrl",
+        value: function openNewUrl(url) {
+            chrome.tabs.create({ url: url });
+        }
+    }, {
+        key: "getExtensionPageUrl",
+        value: function getExtensionPageUrl(url) {
+            return chrome.extension.getURL(url);
+        }
+    }, {
+        key: "openNewExtensionPageUrl",
+        value: function openNewExtensionPageUrl(url) {
+            this.openNewUrl(this.getExtensionPageUrl(url));
+        }
+    }, {
+        key: "validateUrl",
+        value: function validateUrl(url) {
+            var regexp = /(https):\/\/(\w+:?\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            return regexp.test(url);
+        }
+    }, {
+        key: "validateDropboxUrl",
+        value: function validateDropboxUrl(url) {
+            if (this.validateUrl(url)) {
+                return false;
+            }
+            var supported_urls = ["https://dl.dropboxusercontent.com/", "https://www.dropbox.com/"];
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = supported_urls[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    supported_url = _step.value;
+
+                    if (url.startsWith(supported_url)) {
+                        return true;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            return false;
+        }
+    }, {
+        key: "isPage",
+        value: function isPage(page_name) {
+            return $("#page-name").data("page-name") === page_name;
+        }
+    }, {
+        key: "setPageTitle",
+        value: function setPageTitle() {
+            $("#chatpp_name").html(this.getAppFullName());
+        }
+    }, {
+        key: "setStatus",
+        value: function setStatus(key, value) {
+            if (key.indexOf("_status") === -1) {
+                key = key + "_status";
+            }
+            localStorage[key] = !!value;
+        }
+    }, {
+        key: "getStatus",
+        value: function getStatus(key) {
+            if (key.indexOf("_status") === -1) {
+                key = key + "_status";
+            }
+            return localStorage[key] === "true" || localStorage[key] === true;
+        }
+    }, {
+        key: "regexEscape",
+        value: function regexEscape(string) {
+            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+        }
+    }, {
+        key: "generateEmoticonRegex",
+        value: function generateEmoticonRegex(text, regex) {
+            regex = regex || this.htmlEncode(this.regexEscape(text));
+            return new RegExp(regex, "g");
+        }
+    }, {
+        key: "random",
+        value: function random(items) {
+            if (!items.length) {
+                return null;
+            }
+
+            return items[Math.floor(Math.random() * items.length)];
+        }
+    }, {
+        key: "randomString",
+        value: function randomString(n) {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for (var i = 0; i < n; i++) {
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }return text;
+        }
+    }]);
+
+    return Common;
+}();
+
+var common = new Common();
+module.exports = common;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var common = __webpack_require__(1);
+
+var Storage = function () {
+    function Storage(local) {
+        _classCallCheck(this, Storage);
+
+        this.storage = common.getStorage(local);
+    }
+
+    _createClass(Storage, [{
+        key: "get",
+        value: function get(key, callback) {
+            this.storage.get(key, function (info) {
+                info = info ? info[key] : undefined;
+                callback(info);
+            });
+        }
+    }, {
+        key: "set",
+        value: function set(key, data, callback) {
+            var sync = {};
+            sync[key] = data;
+            this.storage.set(sync, function () {
+                if (callback) {
+                    callback();
+                }
+            });
+        }
+    }, {
+        key: "setData",
+        value: function setData(data, callback) {
+            this.storage.set(data, function () {
+                if (callback) {
+                    callback();
+                }
+            });
+        }
+    }]);
+
+    return Storage;
+}();
+
+module.exports = Storage;
+
+/***/ }),
+/* 3 */,
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var common = __webpack_require__(1);
+var Storage = __webpack_require__(2);
+var Const = __webpack_require__(0);
+
+var EmoStorage = function (_Storage) {
+    _inherits(EmoStorage, _Storage);
+
+    function EmoStorage() {
+        _classCallCheck(this, EmoStorage);
+
+        var _this = _possibleConstructorReturn(this, (EmoStorage.__proto__ || Object.getPrototypeOf(EmoStorage)).call(this));
+
+        _this.data = {};
+        _this.data_count = 0;
+        return _this;
+    }
+
+    _createClass(EmoStorage, [{
+        key: "getDataCount",
+        value: function getDataCount() {
+            return common.getObjectLength(this.data);
+        }
+    }, {
+        key: "setFeatureStatus",
+        value: function setFeatureStatus(emo_info) {
+            var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
+            for (var i in features) {
+                var feature_name = features[i] + "_status";
+                this.data[feature_name] = emo_info[feature_name] === undefined ? true : emo_info[feature_name];
+            }
+            this.data.force_update_version = emo_info.force_update_version;
+        }
+    }, {
+        key: "pushData",
+        value: function pushData(inputted_data, inputted_priority) {
+            var priority = inputted_priority !== undefined ? inputted_priority : inputted_data.priority;
+            if (this.data[inputted_data.data_name] === undefined) {
+                this.data_count++;
+            }
+            this.data[inputted_data.data_name] = {
+                priority: priority,
+                data_name: inputted_data.data_name,
+                data_url: inputted_data.data_url,
+                data_changelog: inputted_data.data_changelog,
+                data_version: inputted_data.data_version,
+                date_sync: new Date().toLocaleString()
+            };
+        }
+    }, {
+        key: "removeData",
+        value: function removeData(data_name) {
+            if (this.data[data_name] !== undefined) {
+                delete this.data[data_name];
+            }
+        }
+    }, {
+        key: "syncData",
+        value: function syncData(callback) {
+            this.set(Const.CHROME_SYNC_KEY, this.data, callback);
+        }
+    }]);
+
+    return EmoStorage;
+}(Storage);
+
+module.exports = EmoStorage;
+
+/***/ }),
+/* 5 */,
+/* 6 */,
+/* 7 */,
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(9);
+__webpack_require__(10);
+__webpack_require__(11);
+__webpack_require__(12);
+__webpack_require__(13);
+module.exports = __webpack_require__(14);
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var common = __webpack_require__(1);
+var Const = __webpack_require__(0);
+var EmoStorage = __webpack_require__(4);
 var emo_storage = new EmoStorage();
 var emoticons = [];
 var emo_info = {};
@@ -69,8 +588,8 @@ $(function () {
             getData(Const.DEFAULT_DATA_URL, reload);
         } else {
             var url = $("#data-url").val();
-            if (!common.validateUrl(url)) {
-                bootbox.alert("Invalid URL! Make sure your inputted URL is correct, and start with https!");
+            if (!common.validateDropboxUrl(url)) {
+                bootbox.alert("Invalid URL! Make sure your inputted URL is correct, and a Dropbox link!");
             } else {
                 bootbox.dialog({
                     message: "The data from <a href=\"" + url + "\">" + url + "</a> may contain undesirable emoticons and we will not be responsible for it",
@@ -341,12 +860,167 @@ function createATag(url) {
     }).prop("outerHTML");
 }
 
-},{"../helpers/Common.js":7,"../helpers/Const.js":8,"../helpers/EmoStorage.js":9}],2:[function(require,module,exports){
-"use strict";
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
 
-var Const = require("../helpers/Const.js");
-var common = require("../helpers/Common.js");
-var Storage = require("../helpers/Storage.js");
+var common = __webpack_require__(1);
+
+$(function () {
+    if (!common.isPage("shortcut")) {
+        return;
+    }
+    common.setPageTitle();
+});
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Const = __webpack_require__(0);
+var common = __webpack_require__(1);
+var Storage = __webpack_require__(2);
+
+var storage = new Storage();
+var disabled_notify_rooms = [];
+
+$(function () {
+    if (!common.isPage("notification")) {
+        return;
+    }
+    common.setPageTitle();
+
+    storage.get(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, function (data) {
+        if (!$.isEmptyObject(data)) {
+            disabled_notify_rooms = data;
+            loadData();
+        }
+    });
+
+    $("#save-btn").click(function () {
+        var rooms = $("textarea").val().split(",");
+        disabled_notify_rooms = [];
+        $.each(rooms, function (index, room) {
+            var room_id = common.parseRoomId(room);
+            if (room_id) {
+                disabled_notify_rooms.push(room_id);
+            }
+        });
+        storage.set(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, disabled_notify_rooms, common.reload);
+    });
+});
+
+function loadData() {
+    $("textarea").val(disabled_notify_rooms.join());
+}
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Const = __webpack_require__(0);
+var common = __webpack_require__(1);
+var Storage = __webpack_require__(2);
+
+var storage = new Storage();
+
+var rooms = [];
+
+$(function () {
+    if (!common.isPage("room")) {
+        return;
+    }
+    common.setPageTitle();
+
+    storage.get(Const.CHROME_SYNC_ROOM_KEY, function (data) {
+        if (!$.isEmptyObject(data)) {
+            rooms = data;
+            loadData();
+        }
+    });
+
+    $("#save-btn").click(function () {
+        $("input").each(function (index, element) {
+            var number = $(element).data("btn");
+            var value = $(element).val();
+            rooms[number] = common.parseRoomId(value);
+        });
+        storage.set(Const.CHROME_SYNC_ROOM_KEY, rooms, common.reload);
+    });
+});
+
+function loadData() {
+    for (var i in rooms) {
+        if (rooms[i]) {
+            $("[data-btn='" + i + "']").val(rooms[i]);
+        }
+    }
+}
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Const = __webpack_require__(0);
+var common = __webpack_require__(1);
+var Storage = __webpack_require__(2);
+
+var storage = new Storage();
+var stored_data = {};
+
+$(function () {
+    if (!common.isPage("setting")) {
+        return;
+    }
+    common.setPageTitle();
+
+    storage.get(Const.CHROME_SYNC_KEY, function (data) {
+        stored_data[Const.CHROME_SYNC_KEY] = data;
+        if ($.isEmptyObject(data)) {
+            common.openNewExtensionPageUrl(common.app_detail.options_page);
+        } else {
+            updateViewData(data);
+            $("[id$=-status-btn]").click(function (e) {
+                var status = true;
+                var id = $(e.currentTarget).attr("id");
+                var id_parts = id.split("-");
+                var feature_name = id_parts[0];
+                if ($(e.currentTarget).html() === "Disable") {
+                    status = false;
+                }
+                stored_data[Const.CHROME_SYNC_KEY][feature_name + "_status"] = status;
+                storage.setData(stored_data, function () {
+                    loadStatus(feature_name, status);
+                });
+            });
+        }
+    });
+});
+
+function loadStatus(name, value) {
+    if (value !== undefined && value === false) {
+        $("#" + name + "-status").removeClass().addClass("text-danger").html("DISABLED");
+        $("#" + name + "-status-btn").removeClass().addClass("btn btn-success btn-xs").html("Enable");
+    } else {
+        $("#" + name + "-status").removeClass().addClass("text-success").html("ENABLED");
+        $("#" + name + "-status-btn").removeClass().addClass("btn btn-danger btn-xs").html("Disable");
+    }
+}
+
+function updateViewData(data) {
+    var features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
+    for (var i in features) {
+        loadStatus(features[i], data[features[i] + "_status"]);
+    }
+}
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Const = __webpack_require__(0);
+var common = __webpack_require__(1);
+var Storage = __webpack_require__(2);
 
 var storage = new Storage();
 
@@ -483,551 +1157,5 @@ function syncData(callback) {
     storage.set(Const.CHROME_SYNC_GROUP_KEY, groups, callback);
 }
 
-},{"../helpers/Common.js":7,"../helpers/Const.js":8,"../helpers/Storage.js":10}],3:[function(require,module,exports){
-"use strict";
-
-var Const = require("../helpers/Const.js");
-var common = require("../helpers/Common.js");
-var Storage = require("../helpers/Storage.js");
-
-var storage = new Storage();
-var disabled_notify_rooms = [];
-
-$(function () {
-    if (!common.isPage("notification")) {
-        return;
-    }
-    common.setPageTitle();
-
-    storage.get(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, function (data) {
-        if (!$.isEmptyObject(data)) {
-            disabled_notify_rooms = data;
-            loadData();
-        }
-    });
-
-    $("#save-btn").click(function () {
-        var rooms = $("textarea").val().split(",");
-        disabled_notify_rooms = [];
-        $.each(rooms, function (index, room) {
-            var room_id = common.parseRoomId(room);
-            if (room_id) {
-                disabled_notify_rooms.push(room_id);
-            }
-        });
-        storage.set(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, disabled_notify_rooms, common.reload);
-    });
-});
-
-function loadData() {
-    $("textarea").val(disabled_notify_rooms.join());
-}
-
-},{"../helpers/Common.js":7,"../helpers/Const.js":8,"../helpers/Storage.js":10}],4:[function(require,module,exports){
-"use strict";
-
-var Const = require("../helpers/Const.js");
-var common = require("../helpers/Common.js");
-var Storage = require("../helpers/Storage.js");
-
-var storage = new Storage();
-
-var rooms = [];
-
-$(function () {
-    if (!common.isPage("room")) {
-        return;
-    }
-    common.setPageTitle();
-
-    storage.get(Const.CHROME_SYNC_ROOM_KEY, function (data) {
-        if (!$.isEmptyObject(data)) {
-            rooms = data;
-            loadData();
-        }
-    });
-
-    $("#save-btn").click(function () {
-        $("input").each(function (index, element) {
-            var number = $(element).data("btn");
-            var value = $(element).val();
-            rooms[number] = common.parseRoomId(value);
-        });
-        storage.set(Const.CHROME_SYNC_ROOM_KEY, rooms, common.reload);
-    });
-});
-
-function loadData() {
-    for (var i in rooms) {
-        if (rooms[i]) {
-            $("[data-btn='" + i + "']").val(rooms[i]);
-        }
-    }
-}
-
-},{"../helpers/Common.js":7,"../helpers/Const.js":8,"../helpers/Storage.js":10}],5:[function(require,module,exports){
-"use strict";
-
-var Const = require("../helpers/Const.js");
-var common = require("../helpers/Common.js");
-var Storage = require("../helpers/Storage.js");
-
-var storage = new Storage();
-var stored_data = {};
-
-$(function () {
-    if (!common.isPage("setting")) {
-        return;
-    }
-    common.setPageTitle();
-
-    storage.get(Const.CHROME_SYNC_KEY, function (data) {
-        stored_data[Const.CHROME_SYNC_KEY] = data;
-        if ($.isEmptyObject(data)) {
-            common.openNewExtensionPageUrl(common.app_detail.options_page);
-        } else {
-            updateViewData(data);
-            $("[id$=-status-btn]").click(function (e) {
-                var status = true;
-                var id = $(e.currentTarget).attr("id");
-                var id_parts = id.split("-");
-                var feature_name = id_parts[0];
-                if ($(e.currentTarget).html() === "Disable") {
-                    status = false;
-                }
-                stored_data[Const.CHROME_SYNC_KEY][feature_name + "_status"] = status;
-                storage.setData(stored_data, function () {
-                    loadStatus(feature_name, status);
-                });
-            });
-        }
-    });
-});
-
-function loadStatus(name, value) {
-    if (value !== undefined && value === false) {
-        $("#" + name + "-status").removeClass().addClass("text-danger").html("DISABLED");
-        $("#" + name + "-status-btn").removeClass().addClass("btn btn-success btn-xs").html("Enable");
-    } else {
-        $("#" + name + "-status").removeClass().addClass("text-success").html("ENABLED");
-        $("#" + name + "-status-btn").removeClass().addClass("btn btn-danger btn-xs").html("Disable");
-    }
-}
-
-function updateViewData(data) {
-    var features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
-    for (var i in features) {
-        loadStatus(features[i], data[features[i] + "_status"]);
-    }
-}
-
-},{"../helpers/Common.js":7,"../helpers/Const.js":8,"../helpers/Storage.js":10}],6:[function(require,module,exports){
-"use strict";
-
-var common = require("../helpers/Common.js");
-
-$(function () {
-    if (!common.isPage("shortcut")) {
-        return;
-    }
-    common.setPageTitle();
-});
-
-},{"../helpers/Common.js":7}],7:[function(require,module,exports){
-"use strict";
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Const = require("./Const.js");
-
-var Common = function () {
-    function Common() {
-        _classCallCheck(this, Common);
-
-        this.version = Const.VERSION_CHROME;
-        this.app_detail = this.getAppDetail();
-        this.official_emoticons_data = {
-            Default: {
-                name: "Default",
-                link: "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1",
-                description: "The default Emoticons data of Chat++"
-            },
-            Vietnamese: {
-                name: "Vietnamese",
-                link: "https://dl.dropboxusercontent.com/s/2b085bilbno4ri1/vietnamese.json?dl=1",
-                description: "Yet another data for people who want to use Vietnamese Emoticons"
-            },
-            Japanese: {
-                name: "Japanese",
-                link: "https://dl.dropboxusercontent.com/s/fdq05pwwtsccrn6/japanese.json?dl=1",
-                description: "Yet another data for people who want to use Japanese Emoticons"
-            },
-            Skype: {
-                name: "Skype",
-                link: "https://dl.dropboxusercontent.com/s/8ew2mdh0v2vcad8/skype.json?dl=1",
-                description: "Skype Original Emoticons"
-            }
-        };
-    }
-
-    _createClass(Common, [{
-        key: "isChromeVersion",
-        value: function isChromeVersion() {
-            return this.version === Const.VERSION_CHROME;
-        }
-    }, {
-        key: "isFirefoxVersion",
-        value: function isFirefoxVersion() {
-            return this.version === Const.VERSION_FIREFOX;
-        }
-    }, {
-        key: "isDevVersion",
-        value: function isDevVersion() {
-            var app_name = this.app_detail.name;
-            return app_name.indexOf(Const.VERSION_NAME_DEV, app_name.length - Const.VERSION_NAME_DEV.length) !== -1;
-        }
-    }, {
-        key: "checkDevVersionInternal",
-        value: function checkDevVersionInternal() {
-            return localStorage["chatpp_version_name"] === Const.VERSION_NAME_DEV;
-        }
-    }, {
-        key: "getStorage",
-        value: function getStorage(local) {
-            if (!local && this.isChromeVersion()) {
-                return chrome.storage.sync;
-            }
-
-            return chrome.storage.local;
-        }
-    }, {
-        key: "sync",
-        value: function sync(key, data, callback) {
-            var sync = {};
-            sync[key] = data;
-            var storage = this.getStorage();
-            storage.set(sync, function () {
-                if (callback) {
-                    callback();
-                }
-            });
-        }
-    }, {
-        key: "getEmoticonDataUrl",
-        value: function getEmoticonDataUrl(data_name, default_url) {
-            if (data_name && this.official_emoticons_data[data_name]) {
-                default_url = this.official_emoticons_data[data_name]["link"];
-            }
-
-            return default_url ? default_url.replace("http://i.imgur.com/", "https://i.imgur.com/") : null;
-        }
-    }, {
-        key: "getObjectLength",
-        value: function getObjectLength(object) {
-            return Object.keys(object).length;
-        }
-    }, {
-        key: "htmlEncode",
-        value: function htmlEncode(value) {
-            return $("<div/>").text(value).html();
-        }
-    }, {
-        key: "getEmoUrl",
-        value: function getEmoUrl(img) {
-            var url = Const.DEFAULT_IMG_HOST + "img/emoticons/" + img;
-            if (img.indexOf("https://") == 0 || img.indexOf("http://") == 0) {
-                url = img;
-            }
-            return this.htmlEncode(url);
-        }
-    }, {
-        key: "parseRoomId",
-        value: function parseRoomId(text) {
-            var room = text.match(/\d+/g);
-            if (!room || room.length == 0) {
-                return null;
-            }
-            room = room[0];
-            var regex = /^[0-9]{6,10}$/g;
-            if (regex.test(room)) {
-                return room;
-            }
-            return null;
-        }
-    }, {
-        key: "reload",
-        value: function reload() {
-            location.reload();
-        }
-    }, {
-        key: "getAppDetail",
-        value: function getAppDetail() {
-            return chrome.app.getDetails();
-        }
-    }, {
-        key: "getAppVersion",
-        value: function getAppVersion() {
-            return this.app_detail.version;
-        }
-    }, {
-        key: "getAppVersionName",
-        value: function getAppVersionName() {
-            if (this.isDevVersion()) {
-                return Const.VERSION_NAME_DEV;
-            }
-
-            return Const.VERSION_NAME_RELEASE;
-        }
-    }, {
-        key: "getAppFullName",
-        value: function getAppFullName() {
-            var version_name = this.getAppVersionName();
-
-            return this.app_detail.short_name + " " + this.app_detail.version + " " + version_name;
-        }
-    }, {
-        key: "openNewUrl",
-        value: function openNewUrl(url) {
-            chrome.tabs.create({ url: url });
-        }
-    }, {
-        key: "getExtensionPageUrl",
-        value: function getExtensionPageUrl(url) {
-            return chrome.extension.getURL(url);
-        }
-    }, {
-        key: "openNewExtensionPageUrl",
-        value: function openNewExtensionPageUrl(url) {
-            this.openNewUrl(this.getExtensionPageUrl(url));
-        }
-    }, {
-        key: "validateUrl",
-        value: function validateUrl(url) {
-            var regexp = /(https):\/\/(\w+:?\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-            return regexp.test(url);
-        }
-    }, {
-        key: "isPage",
-        value: function isPage(page_name) {
-            return $("#page-name").data("page-name") === page_name;
-        }
-    }, {
-        key: "setPageTitle",
-        value: function setPageTitle() {
-            $("#chatpp_name").html(this.getAppFullName());
-        }
-    }, {
-        key: "setStatus",
-        value: function setStatus(key, value) {
-            if (key.indexOf("_status") === -1) {
-                key = key + "_status";
-            }
-            localStorage[key] = !!value;
-        }
-    }, {
-        key: "getStatus",
-        value: function getStatus(key) {
-            if (key.indexOf("_status") === -1) {
-                key = key + "_status";
-            }
-            return localStorage[key] === "true" || localStorage[key] === true;
-        }
-    }, {
-        key: "regexEscape",
-        value: function regexEscape(string) {
-            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
-        }
-    }, {
-        key: "generateEmoticonRegex",
-        value: function generateEmoticonRegex(text, regex) {
-            regex = regex || this.htmlEncode(this.regexEscape(text));
-            return new RegExp(regex, "g");
-        }
-    }, {
-        key: "random",
-        value: function random(items) {
-            if (!items.length) {
-                return null;
-            }
-
-            return items[Math.floor(Math.random() * items.length)];
-        }
-    }, {
-        key: "randomString",
-        value: function randomString(n) {
-            var text = "";
-            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-            for (var i = 0; i < n; i++) {
-                text += possible.charAt(Math.floor(Math.random() * possible.length));
-            }return text;
-        }
-    }]);
-
-    return Common;
-}();
-
-var common = new Common();
-module.exports = common;
-
-},{"./Const.js":8}],8:[function(require,module,exports){
-"use strict";
-
-var Const = {
-    LOCAL_STORAGE_DATA_KEY: "YACEP_EMO_DATA",
-    LOCAL_STORAGE_INFO_KEY: "YACEP_EMO_INFO",
-    LOCAL_STORAGE_GROUP_MENTION: "CHATPP_GROUP_MENTION",
-    LOCAL_STORAGE_ROOM_SHORTCUT: "CHATPP_ROOM_SHORTCUT",
-    LOCAL_STORAGE_DISABLE_NOTIFY_ROOM: "CHATPP_DISABLE_NOTIFY_ROOM",
-    CHROME_LOCAL_KEY: "CHATPP_CHROME_LOCAL_DATA",
-    CHROME_SYNC_KEY: "CHATPP_CHROME_SYNC_DATA",
-    CHROME_SYNC_GROUP_KEY: "CHATPP_CHROME_SYNC_GROUP",
-    CHROME_SYNC_ROOM_KEY: "CHATPP_CHROME_SYNC_ROOM",
-    CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY: "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM",
-    DEFAULT_DATA_URL: "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1",
-    ADVERTISEMENT_URL: "https://dl.dropboxusercontent.com/s/jsmceot0pqi8lpk/chatppad.json?dl=1",
-    VERSION_CHROME: "VERSION_CHROME",
-    VERSION_FIREFOX: "VERSION_FIREFOX",
-    VERSION_NAME_DEV: "dev",
-    VERSION_NAME_RELEASE: "final",
-    DEFAULT_IMG_HOST: "https://chatpp.thangtd.com/",
-    DELAY_TIME: 6000,
-    FORCE_TURN_OFF_THUMBNAIL: 1,
-    ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL >>>"
-};
-
-module.exports = Const;
-
-},{}],9:[function(require,module,exports){
-"use strict";
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var common = require("./Common.js");
-var Storage = require("./Storage.js");
-var Const = require("./Const.js");
-
-var EmoStorage = function (_Storage) {
-    _inherits(EmoStorage, _Storage);
-
-    function EmoStorage() {
-        _classCallCheck(this, EmoStorage);
-
-        var _this = _possibleConstructorReturn(this, (EmoStorage.__proto__ || Object.getPrototypeOf(EmoStorage)).call(this));
-
-        _this.data = {};
-        _this.data_count = 0;
-        return _this;
-    }
-
-    _createClass(EmoStorage, [{
-        key: "getDataCount",
-        value: function getDataCount() {
-            return common.getObjectLength(this.data);
-        }
-    }, {
-        key: "setFeatureStatus",
-        value: function setFeatureStatus(emo_info) {
-            var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
-            for (var i in features) {
-                var feature_name = features[i] + "_status";
-                this.data[feature_name] = emo_info[feature_name] === undefined ? true : emo_info[feature_name];
-            }
-            this.data.force_update_version = emo_info.force_update_version;
-        }
-    }, {
-        key: "pushData",
-        value: function pushData(inputted_data, inputted_priority) {
-            var priority = inputted_priority !== undefined ? inputted_priority : inputted_data.priority;
-            if (this.data[inputted_data.data_name] === undefined) {
-                this.data_count++;
-            }
-            this.data[inputted_data.data_name] = {
-                priority: priority,
-                data_name: inputted_data.data_name,
-                data_url: inputted_data.data_url,
-                data_changelog: inputted_data.data_changelog,
-                data_version: inputted_data.data_version,
-                date_sync: new Date().toLocaleString()
-            };
-        }
-    }, {
-        key: "removeData",
-        value: function removeData(data_name) {
-            if (this.data[data_name] !== undefined) {
-                delete this.data[data_name];
-            }
-        }
-    }, {
-        key: "syncData",
-        value: function syncData(callback) {
-            this.set(Const.CHROME_SYNC_KEY, this.data, callback);
-        }
-    }]);
-
-    return EmoStorage;
-}(Storage);
-
-module.exports = EmoStorage;
-
-},{"./Common.js":7,"./Const.js":8,"./Storage.js":10}],10:[function(require,module,exports){
-"use strict";
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var common = require("./Common.js");
-
-var Storage = function () {
-    function Storage(local) {
-        _classCallCheck(this, Storage);
-
-        this.storage = common.getStorage(local);
-    }
-
-    _createClass(Storage, [{
-        key: "get",
-        value: function get(key, callback) {
-            this.storage.get(key, function (info) {
-                info = info ? info[key] : undefined;
-                callback(info);
-            });
-        }
-    }, {
-        key: "set",
-        value: function set(key, data, callback) {
-            var sync = {};
-            sync[key] = data;
-            this.storage.set(sync, function () {
-                if (callback) {
-                    callback();
-                }
-            });
-        }
-    }, {
-        key: "setData",
-        value: function setData(data, callback) {
-            this.storage.set(data, function () {
-                if (callback) {
-                    callback();
-                }
-            });
-        }
-    }]);
-
-    return Storage;
-}();
-
-module.exports = Storage;
-
-},{"./Common.js":7}]},{},[1,6,3,4,5,2]);
+/***/ })
+/******/ ]);

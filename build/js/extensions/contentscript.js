@@ -1,264 +1,107 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-"use strict";
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "/";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports) {
 
-var Const = require("../helpers/Const.js");
-var common = require("../helpers/Common.js");
-var Storage = require("../helpers/Storage.js");
-var EmoStorage = require("../helpers/EmoStorage.js");
-var ChromeStorageLocal = require("../helpers/ChromeStorageLocal.js");
+var Const = {
+    LOCAL_STORAGE_DATA_KEY: "YACEP_EMO_DATA",
+    LOCAL_STORAGE_INFO_KEY: "YACEP_EMO_INFO",
+    LOCAL_STORAGE_GROUP_MENTION: "CHATPP_GROUP_MENTION",
+    LOCAL_STORAGE_ROOM_SHORTCUT: "CHATPP_ROOM_SHORTCUT",
+    LOCAL_STORAGE_DISABLE_NOTIFY_ROOM: "CHATPP_DISABLE_NOTIFY_ROOM",
+    CHROME_LOCAL_KEY: "CHATPP_CHROME_LOCAL_DATA",
+    CHROME_SYNC_KEY: "CHATPP_CHROME_SYNC_DATA",
+    CHROME_SYNC_GROUP_KEY: "CHATPP_CHROME_SYNC_GROUP",
+    CHROME_SYNC_ROOM_KEY: "CHATPP_CHROME_SYNC_ROOM",
+    CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY: "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM",
+    DEFAULT_DATA_URL: "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1",
+    ADVERTISEMENT_URL: "https://dl.dropboxusercontent.com/s/jsmceot0pqi8lpk/chatppad.json?dl=1",
+    VERSION_CHROME: "VERSION_CHROME",
+    VERSION_FIREFOX: "VERSION_FIREFOX",
+    VERSION_NAME_DEV: "dev",
+    VERSION_NAME_RELEASE: "final",
+    DEFAULT_IMG_HOST: "https://chatpp.thangtd.com/",
+    DELAY_TIME: 6000,
+    FORCE_TURN_OFF_THUMBNAIL: 1,
+    ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
+    TO_ALL_MARK: "TO ALL >>>"
+};
 
-var storage = new Storage();
-var emo_storage = new EmoStorage();
-var emoticons = [];
-var emo_info = {};
-var urls = {};
+module.exports = Const;
 
-init(true);
-
-function init(inject_script) {
-    storage.get(Const.CHROME_SYNC_KEY, function (info) {
-        if (!$.isEmptyObject(info)) {
-            for (var key in info) {
-                var emo_data = info[key];
-                var url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
-                if (url) {
-                    urls[emo_data.data_name] = url;
-                }
-            }
-        }
-        if ($.isEmptyObject(urls)) {
-            urls["Default"] = Const.DEFAULT_DATA_URL;
-        }
-        if (info === undefined) {
-            info = {};
-        }
-        if (!info.force_update_version || info.force_update_version < Const.FORCE_TURN_OFF_THUMBNAIL) {
-            info.force_update_version = Const.FORCE_TURN_OFF_THUMBNAIL;
-            info.thumbnail_status = false;
-            info.emoticon_status = true;
-        }
-        emo_info = info;
-        localStorage.force_update_version = info.force_update_version;
-        var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
-        features.forEach(function (feature) {
-            var feature_name = feature + "_status";
-            info[feature_name] = info[feature_name] === undefined ? true : info[feature_name];
-            common.setStatus(feature, info[feature_name]);
-        });
-        emo_storage.setFeatureStatus(info);
-        if (info.emoticon_status == false) {
-            addInjectedScript();
-        } else {
-            getData(info, inject_script);
-        }
-    });
-
-    localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = [];
-    storage.get(Const.CHROME_SYNC_GROUP_KEY, function (data) {
-        if (!$.isEmptyObject(data)) {
-            localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = JSON.stringify(data);
-        }
-    });
-
-    localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = [];
-    storage.get(Const.CHROME_SYNC_ROOM_KEY, function (data) {
-        if (!$.isEmptyObject(data)) {
-            localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = JSON.stringify(data);
-        }
-    });
-
-    localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = [];
-    storage.get(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, function (data) {
-        if (!$.isEmptyObject(data)) {
-            localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = JSON.stringify(data);
-        }
-    });
-}
-
-function getData(info, inject_script) {
-    var loaded_count = 0;
-    var emo_count = common.getObjectLength(urls);
-    var failed = false;
-    localStorage.removeItem("failed_data");
-    $.each(urls, function (data_name, url) {
-        $.getJSON(url).done(function (data) {
-            if (typeof data.data_version !== "undefined" && typeof data.emoticons !== "undefined") {
-                data.data_url = urls[data.data_name];
-                var priority = emo_info[data.data_name] && emo_info[data.data_name].priority ? emo_info[data.data_name].priority : 0;
-                emo_storage.pushData(data, priority);
-                pushEmoticons(data.emoticons, priority, data.data_name);
-            }
-        }).fail(function () {
-            failed = true;
-            delete emo_info[data_name];
-            pushFailedData(data_name);
-        }).always(function () {
-            if (++loaded_count === emo_count) {
-                if (!failed) {
-                    emo_storage.syncData();
-                }
-                var chrome_storage_local = new ChromeStorageLocal();
-                chrome_storage_local.get(function (local_data) {
-                    var version_name = "";
-                    if (!$.isEmptyObject(local_data)) {
-                        version_name = local_data["version_name"];
-                    }
-                    // let current_time = (new Date).toLocaleString();
-                    // console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
-                    localStorage[Const.LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
-                    localStorage["chatpp_version_name"] = version_name;
-                    localStorage["emoticon_data_version"] = parseDataName(emo_info);
-                    if (inject_script !== undefined && inject_script) {
-                        addInjectedScript();
-                    } else {
-                        // runFunction("reloadEmoticions()");
-                    }
-                });
-            }
-        });
-    });
-}
-
-function pushFailedData(data_name) {
-    var data = localStorage["failed_data"] ? JSON.parse(localStorage["failed_data"]) : [];
-    data.push(data_name);
-    localStorage["failed_data"] = JSON.stringify(data);
-}
-
-function parseDataName(data) {
-    if (data.data_name !== undefined && data.data_version !== undefined) {
-        return data.data_name + "_" + data.data_version;
-    }
-    var data_name = "";
-    for (var key in data) {
-        if (data[key].data_name !== undefined) {
-            data_name += data[key].data_name + "_" + data[key].data_version + "  ";
-        }
-    }
-    return data_name;
-}
-
-function pushEmoticons(emos, priority, data_name) {
-    for (var i = 0; i < emos.length; i++) {
-        var repeated = false;
-        emos[i].priority = priority;
-        emos[i].data_name = data_name;
-        for (var j = 0; j < emoticons.length; j++) {
-            if (emoticons[j].key === emos[i].key) {
-                if (emoticons[j].src !== emos[i].src && emoticons[j].priority < emos[i].priority) {
-                    emoticons[j] = emos[i];
-                }
-                repeated = true;
-                break;
-            }
-        }
-        if (!repeated) {
-            emoticons.push(emos[i]);
-        }
-    }
-}
-
-function addInjectedScript() {
-    loadAdvertisement();
-    preLoad();
-    injectJsFile("libraries/caretposition.js");
-    injectJsFile("libraries/fuse.min.js");
-    injectJsFile("libraries/highlight.min.js");
-    injectCssFile("highlight.min.css");
-    setTimeout(function () {
-        injectJsFile("internals/all.js");
-    }, Const.DELAY_TIME);
-
-    setInterval(loadAdvertisement, Const.ADVERTISEMENT_LOAD_TIMEOUT);
-}
-
-function preLoad() {
-    $("#_chatSendTool").append($("<li>", { id: "_chatppPreLoad", css: {
-            "display": "inline-block"
-        } }).append($("<span>", { id: "chatppPreLoad" })));
-    var chatpp_pre_load = $("#chatppPreLoad");
-    var delay_time = Const.DELAY_TIME / 1000;
-    var pre_load_interval = setInterval(function () {
-        if (--delay_time <= 0) {
-            $("#_chatppPreLoad").remove();
-            window.clearInterval(pre_load_interval);
-        }
-        var text = "Chat++ will be loaded in about " + delay_time + " second" + (delay_time > 1 ? "s" : "");
-        chatpp_pre_load.html(text);
-    }, 1000);
-}
-
-function injectJsFile(file_name) {
-    var script = document.createElement("script");
-    script.src = common.getExtensionPageUrl("js/" + file_name);
-    document.documentElement.appendChild(script);
-}
-
-function injectCssFile(file_name) {
-    var css_link = $("<link>", {
-        rel: "stylesheet",
-        type: "text/css",
-        href: common.getExtensionPageUrl("css/" + file_name)
-    });
-    css_link.appendTo("head");
-}
-
-function loadAdvertisement() {
-    $.getJSON(Const.ADVERTISEMENT_URL).done(function (data) {
-        if (!$.isEmptyObject(data)) {
-            localStorage["chatpp_advertisement"] = JSON.stringify(data);
-        }
-    });
-}
-
-},{"../helpers/ChromeStorageLocal.js":2,"../helpers/Common.js":3,"../helpers/Const.js":4,"../helpers/EmoStorage.js":5,"../helpers/Storage.js":6}],2:[function(require,module,exports){
-"use strict";
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Storage = require("./Storage.js");
-var Const = require("./Const.js");
-
-var ChromeStorageLocal = function () {
-    function ChromeStorageLocal() {
-        _classCallCheck(this, ChromeStorageLocal);
-
-        this.storage = new Storage(true);
-        this.key = Const.CHROME_LOCAL_KEY;
-    }
-
-    _createClass(ChromeStorageLocal, [{
-        key: "get",
-        value: function get(callback) {
-            this.storage.get(this.key, callback);
-        }
-    }, {
-        key: "set",
-        value: function set(data, callback) {
-            this.set(this.key, data, callback);
-        }
-    }, {
-        key: "setData",
-        value: function setData(data, callback) {
-            this.storage.setData(data, callback);
-        }
-    }]);
-
-    return ChromeStorageLocal;
-}();
-
-module.exports = ChromeStorageLocal;
-
-},{"./Const.js":4,"./Storage.js":6}],3:[function(require,module,exports){
-"use strict";
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Const = require("./Const.js");
+var Const = __webpack_require__(0);
 
 var Common = function () {
     function Common() {
@@ -427,6 +270,42 @@ var Common = function () {
             return regexp.test(url);
         }
     }, {
+        key: "validateDropboxUrl",
+        value: function validateDropboxUrl(url) {
+            if (this.validateUrl(url)) {
+                return false;
+            }
+            var supported_urls = ["https://dl.dropboxusercontent.com/", "https://www.dropbox.com/"];
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = supported_urls[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    supported_url = _step.value;
+
+                    if (url.startsWith(supported_url)) {
+                        return true;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            return false;
+        }
+    }, {
         key: "isPage",
         value: function isPage(page_name) {
             return $("#page-name").data("page-name") === page_name;
@@ -490,37 +369,102 @@ var Common = function () {
 var common = new Common();
 module.exports = common;
 
-},{"./Const.js":4}],4:[function(require,module,exports){
-"use strict";
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
 
-var Const = {
-    LOCAL_STORAGE_DATA_KEY: "YACEP_EMO_DATA",
-    LOCAL_STORAGE_INFO_KEY: "YACEP_EMO_INFO",
-    LOCAL_STORAGE_GROUP_MENTION: "CHATPP_GROUP_MENTION",
-    LOCAL_STORAGE_ROOM_SHORTCUT: "CHATPP_ROOM_SHORTCUT",
-    LOCAL_STORAGE_DISABLE_NOTIFY_ROOM: "CHATPP_DISABLE_NOTIFY_ROOM",
-    CHROME_LOCAL_KEY: "CHATPP_CHROME_LOCAL_DATA",
-    CHROME_SYNC_KEY: "CHATPP_CHROME_SYNC_DATA",
-    CHROME_SYNC_GROUP_KEY: "CHATPP_CHROME_SYNC_GROUP",
-    CHROME_SYNC_ROOM_KEY: "CHATPP_CHROME_SYNC_ROOM",
-    CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY: "CHATPP_CHROME_SYNC_DISABLE_NOTIFY_ROOM",
-    DEFAULT_DATA_URL: "https://dl.dropboxusercontent.com/s/lmxis68cfh4v1ho/default.json?dl=1",
-    ADVERTISEMENT_URL: "https://dl.dropboxusercontent.com/s/jsmceot0pqi8lpk/chatppad.json?dl=1",
-    VERSION_CHROME: "VERSION_CHROME",
-    VERSION_FIREFOX: "VERSION_FIREFOX",
-    VERSION_NAME_DEV: "dev",
-    VERSION_NAME_RELEASE: "final",
-    DEFAULT_IMG_HOST: "https://chatpp.thangtd.com/",
-    DELAY_TIME: 6000,
-    FORCE_TURN_OFF_THUMBNAIL: 1,
-    ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL >>>"
-};
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-module.exports = Const;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-},{}],5:[function(require,module,exports){
-"use strict";
+var common = __webpack_require__(1);
+
+var Storage = function () {
+    function Storage(local) {
+        _classCallCheck(this, Storage);
+
+        this.storage = common.getStorage(local);
+    }
+
+    _createClass(Storage, [{
+        key: "get",
+        value: function get(key, callback) {
+            this.storage.get(key, function (info) {
+                info = info ? info[key] : undefined;
+                callback(info);
+            });
+        }
+    }, {
+        key: "set",
+        value: function set(key, data, callback) {
+            var sync = {};
+            sync[key] = data;
+            this.storage.set(sync, function () {
+                if (callback) {
+                    callback();
+                }
+            });
+        }
+    }, {
+        key: "setData",
+        value: function setData(data, callback) {
+            this.storage.set(data, function () {
+                if (callback) {
+                    callback();
+                }
+            });
+        }
+    }]);
+
+    return Storage;
+}();
+
+module.exports = Storage;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Storage = __webpack_require__(2);
+var Const = __webpack_require__(0);
+
+var ChromeStorageLocal = function () {
+    function ChromeStorageLocal() {
+        _classCallCheck(this, ChromeStorageLocal);
+
+        this.storage = new Storage(true);
+        this.key = Const.CHROME_LOCAL_KEY;
+    }
+
+    _createClass(ChromeStorageLocal, [{
+        key: "get",
+        value: function get(callback) {
+            this.storage.get(this.key, callback);
+        }
+    }, {
+        key: "set",
+        value: function set(data, callback) {
+            this.set(this.key, data, callback);
+        }
+    }, {
+        key: "setData",
+        value: function setData(data, callback) {
+            this.storage.setData(data, callback);
+        }
+    }]);
+
+    return ChromeStorageLocal;
+}();
+
+module.exports = ChromeStorageLocal;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -530,9 +474,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var common = require("./Common.js");
-var Storage = require("./Storage.js");
-var Const = require("./Const.js");
+var common = __webpack_require__(1);
+var Storage = __webpack_require__(2);
+var Const = __webpack_require__(0);
 
 var EmoStorage = function (_Storage) {
     _inherits(EmoStorage, _Storage);
@@ -597,55 +541,274 @@ var EmoStorage = function (_Storage) {
 
 module.exports = EmoStorage;
 
-},{"./Common.js":3,"./Const.js":4,"./Storage.js":6}],6:[function(require,module,exports){
-"use strict";
+/***/ }),
+/* 5 */,
+/* 6 */,
+/* 7 */,
+/* 8 */,
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */,
+/* 13 */,
+/* 14 */,
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+module.exports = __webpack_require__(16);
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var common = require("./Common.js");
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
 
-var Storage = function () {
-    function Storage(local) {
-        _classCallCheck(this, Storage);
+var Const = __webpack_require__(0);
+var common = __webpack_require__(1);
+var Storage = __webpack_require__(2);
+var EmoStorage = __webpack_require__(4);
+var ChromeStorageLocal = __webpack_require__(3);
 
-        this.storage = common.getStorage(local);
+var storage = new Storage();
+var emo_storage = new EmoStorage();
+var emoticons = [];
+var emo_info = {};
+var urls = {};
+
+init(true);
+
+function init(inject_script) {
+    storage.get(Const.CHROME_SYNC_KEY, function (info) {
+        if (!$.isEmptyObject(info)) {
+            for (var key in info) {
+                var emo_data = info[key];
+                var url = common.getEmoticonDataUrl(emo_data.data_name, emo_data.data_url);
+                if (url) {
+                    urls[emo_data.data_name] = url;
+                }
+            }
+        }
+        if ($.isEmptyObject(urls)) {
+            urls["Default"] = Const.DEFAULT_DATA_URL;
+        }
+        if (info === undefined) {
+            info = {};
+        }
+        if (!info.force_update_version || info.force_update_version < Const.FORCE_TURN_OFF_THUMBNAIL) {
+            info.force_update_version = Const.FORCE_TURN_OFF_THUMBNAIL;
+            info.thumbnail_status = false;
+            info.emoticon_status = true;
+        }
+        emo_info = info;
+        localStorage.force_update_version = info.force_update_version;
+        var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
+        features.forEach(function (feature) {
+            var feature_name = feature + "_status";
+            info[feature_name] = info[feature_name] === undefined ? true : info[feature_name];
+            common.setStatus(feature, info[feature_name]);
+        });
+        emo_storage.setFeatureStatus(info);
+        if (info.emoticon_status == false) {
+            addInjectedScript();
+        } else {
+            getData(info, inject_script);
+        }
+    });
+
+    localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = [];
+    storage.get(Const.CHROME_SYNC_GROUP_KEY, function (data) {
+        if (!$.isEmptyObject(data)) {
+            localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = JSON.stringify(data);
+        }
+    });
+
+    localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = [];
+    storage.get(Const.CHROME_SYNC_ROOM_KEY, function (data) {
+        if (!$.isEmptyObject(data)) {
+            localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT] = JSON.stringify(data);
+        }
+    });
+
+    localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = [];
+    storage.get(Const.CHROME_SYNC_DISABLE_NOTIFY_ROOM_KEY, function (data) {
+        if (!$.isEmptyObject(data)) {
+            localStorage[Const.LOCAL_STORAGE_DISABLE_NOTIFY_ROOM] = JSON.stringify(data);
+        }
+    });
+}
+
+function getData(info, inject_script) {
+    var loaded_count = 0;
+    var emo_count = common.getObjectLength(urls);
+    var failed = false;
+    localStorage.removeItem("failed_data");
+    $.each(urls, function (data_name, url) {
+        var query = getUrlQuery(url);
+        if (!query) {
+            return false;
+        }
+        chrome.runtime.sendMessage({ contentScriptQuery: "fetchEmoticonsData", query: query, data_name: data_name }, function (data) {
+            if (data.success) {
+                if (typeof data.data_version !== "undefined" && typeof data.emoticons !== "undefined") {
+                    data.data_url = urls[data.data_name];
+                    var priority = emo_info[data.data_name] && emo_info[data.data_name].priority ? emo_info[data.data_name].priority : 0;
+                    emo_storage.pushData(data, priority);
+                    pushEmoticons(data.emoticons, priority, data.data_name);
+                }
+            } else {
+                failed = true;
+                delete emo_info[data.data_name];
+                pushFailedData(data.data_name);
+            }
+
+            if (++loaded_count === emo_count) {
+                if (!failed) {
+                    emo_storage.syncData();
+                }
+                var chrome_storage_local = new ChromeStorageLocal();
+                chrome_storage_local.get(function (local_data) {
+                    var version_name = "";
+                    if (!$.isEmptyObject(local_data)) {
+                        version_name = local_data["version_name"];
+                    }
+                    // let current_time = (new Date).toLocaleString();
+                    // console.log("You are using Chat++!. Date sync: " + current_time + ". Version: " + version_name);
+                    localStorage[Const.LOCAL_STORAGE_DATA_KEY] = JSON.stringify(emoticons);
+                    localStorage["chatpp_version_name"] = version_name;
+                    localStorage["emoticon_data_version"] = parseDataName(emo_info);
+                    if (inject_script !== undefined && inject_script) {
+                        addInjectedScript();
+                    } else {
+                        // runFunction("reloadEmoticions()");
+                    }
+                });
+            }
+        });
+    });
+}
+
+function getUrlQuery(url) {
+    var supported_urls = ["https://dl.dropboxusercontent.com/", "https://www.dropbox.com/"];
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+        for (var _iterator = supported_urls[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            supported_url = _step.value;
+
+            if (url.startsWith(supported_url)) {
+                return url.substring(supported_url.length);
+            }
+        }
+    } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+    } finally {
+        try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+            }
+        } finally {
+            if (_didIteratorError) {
+                throw _iteratorError;
+            }
+        }
     }
 
-    _createClass(Storage, [{
-        key: "get",
-        value: function get(key, callback) {
-            this.storage.get(key, function (info) {
-                info = info ? info[key] : undefined;
-                callback(info);
-            });
+    return false;
+}
+
+function pushFailedData(data_name) {
+    var data = localStorage["failed_data"] ? JSON.parse(localStorage["failed_data"]) : [];
+    data.push(data_name);
+    localStorage["failed_data"] = JSON.stringify(data);
+}
+
+function parseDataName(data) {
+    if (data.data_name !== undefined && data.data_version !== undefined) {
+        return data.data_name + "_" + data.data_version;
+    }
+    var data_name = "";
+    for (var key in data) {
+        if (data[key].data_name !== undefined) {
+            data_name += data[key].data_name + "_" + data[key].data_version + "  ";
         }
-    }, {
-        key: "set",
-        value: function set(key, data, callback) {
-            var sync = {};
-            sync[key] = data;
-            this.storage.set(sync, function () {
-                if (callback) {
-                    callback();
+    }
+    return data_name;
+}
+
+function pushEmoticons(emos, priority, data_name) {
+    for (var i = 0; i < emos.length; i++) {
+        var repeated = false;
+        emos[i].priority = priority;
+        emos[i].data_name = data_name;
+        for (var j = 0; j < emoticons.length; j++) {
+            if (emoticons[j].key === emos[i].key) {
+                if (emoticons[j].src !== emos[i].src && emoticons[j].priority < emos[i].priority) {
+                    emoticons[j] = emos[i];
                 }
-            });
+                repeated = true;
+                break;
+            }
         }
-    }, {
-        key: "setData",
-        value: function setData(data, callback) {
-            this.storage.set(data, function () {
-                if (callback) {
-                    callback();
-                }
-            });
+        if (!repeated) {
+            emoticons.push(emos[i]);
         }
-    }]);
+    }
+}
 
-    return Storage;
-}();
+function addInjectedScript() {
+    loadAdvertisement();
+    preLoad();
+    injectJsFile("libraries/caretposition.js");
+    injectJsFile("libraries/fuse.min.js");
+    injectJsFile("libraries/highlight.min.js");
+    injectCssFile("highlight.min.css");
+    setTimeout(function () {
+        injectJsFile("internals/all.js");
+    }, Const.DELAY_TIME);
 
-module.exports = Storage;
+    setInterval(loadAdvertisement, Const.ADVERTISEMENT_LOAD_TIMEOUT);
+}
 
-},{"./Common.js":3}]},{},[1]);
+function preLoad() {
+    $("#_chatSendTool").append($("<li>", { id: "_chatppPreLoad", css: {
+            "display": "inline-block"
+        } }).append($("<span>", { id: "chatppPreLoad" })));
+    var chatpp_pre_load = $("#chatppPreLoad");
+    var delay_time = Const.DELAY_TIME / 1000;
+    var pre_load_interval = setInterval(function () {
+        if (--delay_time <= 0) {
+            $("#_chatppPreLoad").remove();
+            window.clearInterval(pre_load_interval);
+        }
+        var text = "Chat++ will be loaded in about " + delay_time + " second" + (delay_time > 1 ? "s" : "");
+        chatpp_pre_load.html(text);
+    }, 1000);
+}
+
+function injectJsFile(file_name) {
+    var script = document.createElement("script");
+    script.src = common.getExtensionPageUrl("js/" + file_name);
+    document.documentElement.appendChild(script);
+}
+
+function injectCssFile(file_name) {
+    var css_link = $("<link>", {
+        rel: "stylesheet",
+        type: "text/css",
+        href: common.getExtensionPageUrl("css/" + file_name)
+    });
+    css_link.appendTo("head");
+}
+
+function loadAdvertisement() {
+    chrome.runtime.sendMessage({ contentScriptQuery: "fetchAdvertisementData" }, function (data) {
+        if (!$.isEmptyObject(data)) {
+            localStorage["chatpp_advertisement"] = JSON.stringify(data);
+        }
+    });
+}
+
+/***/ })
+/******/ ]);
