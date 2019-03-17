@@ -1,5 +1,9 @@
 Chat++ Change Logs
 
+## 5.3.0
+* As from Chrome 73, [Chrome removed the ability to make cross-origin requests in content scripts](https://www.chromium.org/Home/chromium-security/extension-content-script-fetches). Chat Plus Plus had to make changes to fetch emoticons data.
+* Chat Plus Plus now only supports Emoticon Links from Dropbox. All other links will not be accepted.
+
 ## 5.2.1
 * Fix bug can not select emoticon when using Vietnamese Unikey
 * Fix bug can not select emoticon at new line
