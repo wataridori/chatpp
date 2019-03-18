@@ -272,7 +272,7 @@ var Common = function () {
     }, {
         key: "validateDropboxUrl",
         value: function validateDropboxUrl(url) {
-            if (this.validateUrl(url)) {
+            if (!this.validateUrl(url)) {
                 return false;
             }
             var supported_urls = ["https://dl.dropboxusercontent.com/", "https://www.dropbox.com/"];
@@ -282,7 +282,7 @@ var Common = function () {
 
             try {
                 for (var _iterator = supported_urls[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    supported_url = _step.value;
+                    var supported_url = _step.value;
 
                     if (url.startsWith(supported_url)) {
                         return true;
@@ -694,7 +694,7 @@ function getUrlQuery(url) {
 
     try {
         for (var _iterator = supported_urls[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            supported_url = _step.value;
+            var supported_url = _step.value;
 
             if (url.startsWith(supported_url)) {
                 return url.substring(supported_url.length);

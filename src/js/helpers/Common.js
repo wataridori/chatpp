@@ -146,7 +146,7 @@ class Common {
     }
 
     validateDropboxUrl(url) {
-        if (this.validateUrl(url)) {
+        if (!this.validateUrl(url)) {
             return false;
         }
         let supported_urls = ["https://dl.dropboxusercontent.com/", "https://www.dropbox.com/"];

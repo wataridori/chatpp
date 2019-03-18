@@ -1,5 +1,8 @@
 Chat++ Change Logs
 
+## 5.3.1
+* Fix bug that can not add new Emoticon link
+
 ## 5.3.0
 * As from Chrome 73, [Chrome removed the ability to make cross-origin requests in content scripts](https://www.chromium.org/Home/chromium-security/extension-content-script-fetches). Chat Plus Plus had to make changes to fetch emoticons data.
 * Chat Plus Plus now only supports Emoticon Links from Dropbox. All other links will not be accepted.
