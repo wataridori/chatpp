@@ -3,4 +3,6 @@ node_js:
   - "9"
   - "10"
 before_script:
-  - npm install -g eslint babel-eslint estraverse estraverse-fb
+  - npm i -g npm
+  - npm upgrade --global yarn
+  - npm install -g eslint babel-eslint estraverse estraverse-fb eslint-scope

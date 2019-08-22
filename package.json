@@ -34,7 +34,7 @@
     "production": "NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
   "devDependencies": {
-    "babel-eslint": "^6.0.0",
+    "babel-eslint": "^7.2.3",
     "laravel-elixir-browserify-official": "^0.1.3"
   }
 }

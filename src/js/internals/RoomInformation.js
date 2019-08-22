@@ -54,7 +54,7 @@ class RoomInformation {
                         id: "_roomInfoTextMyTasks",
                         class: "tooltipFooter"
 
-                    }),
+                    })
                 )
             )
         );

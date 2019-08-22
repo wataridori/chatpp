@@ -276,21 +276,34 @@ function createDataTableText(emo_data) {
     $("#table-data > tbody").html("");
     let table_text = "";
     let first = true;
+    let last = false;
+    const total_emo = emo_data.length;
     $.each(emo_data.slice().reverse(), (key, data) => {
         if (data.data_name !== undefined && data.data_url !== undefined) {
+            last = checkLastEmotion(key, total_emo);
             let disabled = first ? "disabled" : "";
+            let disabled_move_down = last ? "disabled" : "";
             first = false;
             table_text += "<tr>";
             table_text += `<td class='text-center'>${data.data_name}</td>`;
             table_text += `<td class='text-center'>${data.data_version}</td>`;
             table_text += `<td class='text-center'>${createATag(data.data_url)}</td>`;
             table_text += "<td class='text-center'>" +
+                `<button class='btn btn-primary btn-sm btn-data-move-down ${disabled_move_down}' data-priority='${data.priority}' id='btn-move-down${data.data_name}'> Move Down </button>` +
                 `<button class='btn btn-primary btn-sm btn-data-move-up ${disabled}' data-priority='${data.priority}' id='btn-move-up${data.data_name}'> Move Up </button>` +
                 `<button class='btn btn-warning btn-sm btn-data-remove' data-name='${data.data_name}' id='btn-${data.data_name}'> Remove </button></td>`;
             table_text += "</tr>";
         }
     });
     $("#table-data").find("tbody").append(table_text);
+}
+
+function checkLastEmotion(key, total_emo) {
+    if (key == (total_emo - 1)) {
+        return true;
+    }
+
+    return false;
 }
 
 function fillDataTable() {
@@ -319,6 +332,20 @@ function fillDataTable() {
                 emo_info_array[up] = emo_info_array[priority];
                 emo_info_array[priority] = temp;
                 emo_info_array[up].priority = up;
+                emo_info_array[priority].priority = priority;
+            }
+            createDataTableText(emo_info_array);
+        }
+
+        if (button.hasClass("btn-data-move-down")) {
+            let priority = button.data("priority");
+            let temp;
+            let down = priority - 1;
+            if (emo_info_array[down]) {
+                temp = emo_info_array[down];
+                emo_info_array[down] = emo_info_array[priority];
+                emo_info_array[priority] = temp;
+                emo_info_array[down].priority = down;
                 emo_info_array[priority].priority = priority;
             }
             createDataTableText(emo_info_array);
