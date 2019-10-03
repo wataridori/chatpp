@@ -1,5 +1,9 @@
 Chat++ Change Logs
 
+## 5.4.0
+* Chatwork updated their codes, with many big changes to the Frontend. Therefore, many features of Chat++ broke. This big update fix the problem with Emoticon feature, and add a temporarily solution for the Mention feature
+* There may be some minor feature which are not working. There will be some other paths for them later
+
 ## 5.3.1
 * Fix bug that can not add new Emoticon link
 
