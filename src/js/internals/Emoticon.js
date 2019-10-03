@@ -50,7 +50,7 @@ class Emoticon {
         $("#_roomListArea").click(() => this.hideSuggestionEmotionsBox());
 
         $("#_headerSearch").click(() => this.hideSuggestionEmotionsBox());
-        this.addExternalEmoList();
+        this.addExternalEmoList(true);
         this.addExternalEmo();
         this.setEmoticonTextLabel();
 
@@ -259,7 +259,7 @@ class Emoticon {
         return (CaretPos);
     }
 
-    addExternalEmoList() {
+    addExternalEmoList(bind_event) {
         if ($("#externalEmoticonsButton").length > 0) {
             return;
         }
@@ -374,18 +374,12 @@ class Emoticon {
         let u = $("#_externalEmoticonList").cwToolTip({
             open: () => $("#_externalEmotionDescription").text(hint)
         });
-        $("#_externalEmoticonList").on("mouseenter", "li", (e) => {
-            let a = $(e.currentTarget).find("img");
-            $("#_externalEmotionDescription").text(a.attr("title"))
-        }).on("mouseleave", "li", () => $("#_externalEmotionDescription").text(hint)
-        ).on("click", "li", function() {
-            CW.view.key.ctrl || CW.view.key.command ? (u.close(),
-            CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(),
-            CS.view.setChatText($(this).find("img").prop("alt"), !0),
-            CW.view.key.shift || u.close())
-        })
+
         $("#externalEmoticonsButton").click((e) => {
             u.open($(e.currentTarget));
+            $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[0]);
+            $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
+            $("#tabEmotion0").css("background-color", "#eaeae8");
         });
 
         data.forEach((item, index) => {
@@ -393,12 +387,6 @@ class Emoticon {
                 id: `tabEmotion${index}`,
                 class: "w3-bar-item w3-button w3-emotion"
             }).append(item));
-        });
-
-        $("#externalEmoticonsButton").on("click", () => {
-            $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[0]);
-            $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
-            $("#tabEmotion0").css("background-color", "#eaeae8");
         });
 
         data.forEach((item, index) => {
@@ -421,6 +409,20 @@ class Emoticon {
                 $(event.currentTarget).attr("title", item);
             });
         });
+
+        if (!bind_event) {
+            return;
+        }
+        $("#_externalEmoticonList").on("mouseenter", "li", (e) => {
+            let a = $(e.currentTarget).find("img");
+            $("#_externalEmotionDescription").text(a.attr("title"))
+        }).on("mouseleave", "li", () => $("#_externalEmotionDescription").text(hint)
+        ).on("click", "li", function() {
+            CW.view.key.ctrl || CW.view.key.command ? (u.close(),
+            CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(),
+            CS.view.setChatText($(this).find("img").prop("alt"), !0),
+            CW.view.key.shift || u.close())
+        })
     }
 
     addExternalEmo() {

@@ -60,11 +60,12 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 17);
+/******/ 	return __webpack_require__(__webpack_require__.s = 21);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ 0:
 /***/ (function(module, exports) {
 
 var Const = {
@@ -94,7 +95,8 @@ var Const = {
 module.exports = Const;
 
 /***/ }),
-/* 1 */
+
+/***/ 1:
 /***/ (function(module, exports, __webpack_require__) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -370,7 +372,8 @@ var common = new Common();
 module.exports = common;
 
 /***/ }),
-/* 2 */
+
+/***/ 2:
 /***/ (function(module, exports, __webpack_require__) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -422,68 +425,16 @@ var Storage = function () {
 module.exports = Storage;
 
 /***/ }),
-/* 3 */
+
+/***/ 21:
 /***/ (function(module, exports, __webpack_require__) {
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Storage = __webpack_require__(2);
-var Const = __webpack_require__(0);
-
-var ChromeStorageLocal = function () {
-    function ChromeStorageLocal() {
-        _classCallCheck(this, ChromeStorageLocal);
-
-        this.storage = new Storage(true);
-        this.key = Const.CHROME_LOCAL_KEY;
-    }
-
-    _createClass(ChromeStorageLocal, [{
-        key: "get",
-        value: function get(callback) {
-            this.storage.get(this.key, callback);
-        }
-    }, {
-        key: "set",
-        value: function set(data, callback) {
-            this.set(this.key, data, callback);
-        }
-    }, {
-        key: "setData",
-        value: function setData(data, callback) {
-            this.storage.setData(data, callback);
-        }
-    }]);
-
-    return ChromeStorageLocal;
-}();
-
-module.exports = ChromeStorageLocal;
-
-/***/ }),
-/* 4 */,
-/* 5 */,
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */,
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */,
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(18);
+module.exports = __webpack_require__(22);
 
 
 /***/ }),
-/* 18 */
+
+/***/ 22:
 /***/ (function(module, exports, __webpack_require__) {
 
 var common = __webpack_require__(1);
@@ -543,5 +494,48 @@ function getJSON(url, callback) {
     xhr.send();
 }
 
+/***/ }),
+
+/***/ 3:
+/***/ (function(module, exports, __webpack_require__) {
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Storage = __webpack_require__(2);
+var Const = __webpack_require__(0);
+
+var ChromeStorageLocal = function () {
+    function ChromeStorageLocal() {
+        _classCallCheck(this, ChromeStorageLocal);
+
+        this.storage = new Storage(true);
+        this.key = Const.CHROME_LOCAL_KEY;
+    }
+
+    _createClass(ChromeStorageLocal, [{
+        key: "get",
+        value: function get(callback) {
+            this.storage.get(this.key, callback);
+        }
+    }, {
+        key: "set",
+        value: function set(data, callback) {
+            this.set(this.key, data, callback);
+        }
+    }, {
+        key: "setData",
+        value: function setData(data, callback) {
+            this.storage.setData(data, callback);
+        }
+    }]);
+
+    return ChromeStorageLocal;
+}();
+
+module.exports = ChromeStorageLocal;
+
 /***/ })
-/******/ ]);
+
+/******/ });

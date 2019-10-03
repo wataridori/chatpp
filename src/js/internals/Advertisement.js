@@ -2,7 +2,7 @@ let ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
 
 class Advertisement {
     setUp() {
-        if ($("#chatppAdvertisement").length > 0) {
+        if ($("#_chatppSponsored").length > 0) {
             return;
         }
         $("#_chatSendTool").append(

@@ -2,7 +2,7 @@ let common = require("../helpers/Common.js");
 
 class RoomInformation {
     setUp() {
-        if ($("#roomInfoIcon").length > 0) {
+        if ($("#_roomInfo").length > 0) {
             return;
         }
         $("#_chatSendTool").append(

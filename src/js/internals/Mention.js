@@ -35,8 +35,6 @@ class Mention {
             keys: ["aid2name"],
             maxPatternLength: MAX_PATTERN_LENGTH
         };
-        this.chat_text_jquery = $("#_chatText");
-        this.chat_text_element = document.getElementById("_chatText");
         this.suggestion_messages = {
             one: {
                 ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093",
@@ -61,12 +59,6 @@ class Mention {
         }
 
         this.group_mention = [];
-    }
-
-    setUp() {
-        if (!this.status) {
-            return;
-        }
         if (localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]) {
             this.group_mention = JSON.parse(localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]);
         }
@@ -79,11 +71,6 @@ class Mention {
             "group_members": chatwork.getRoomAdmins().join(",")
         });
 
-        $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
-        this.hideSuggestionBox();
-        $("#_sendEnterActionArea").click(() => {
-            this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
-        });
         // http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
         // First, checks if it isn't implemented yet.
         if (!String.prototype.format) {
@@ -96,8 +83,6 @@ class Mention {
                 );
             };
         }
-        // hide suggestion box when click in textarea or outside
-        this.chat_text_jquery.click(() => this.hideSuggestionBox());
 
         $("#_roomListArea").click(() => this.hideSuggestionBox());
 
@@ -112,12 +97,28 @@ class Mention {
                 this.hideSuggestionBox();
             }
         });
+    }
+
+    setUp() {
+        if (!this.status || this.isTagAdded()) {
+            return;
+        }
+        this.chat_text_jquery = $("#_chatText");
+        this.chat_text_element = document.getElementById("_chatText");
+
+        $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
+        this.hideSuggestionBox();
+        $("#_sendEnterActionArea").click(() => {
+            this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
+        });
+        
+        // hide suggestion box when click in textarea or outside
+        this.chat_text_jquery.click(() => this.hideSuggestionBox());
 
         this.chat_text_jquery.keydown((e) => {
             if (!this.status) {
                 return;
             }
-
             if ((e.which == 38 || e.which == 40 || e.which == 9 || e.which == 13) && this.is_displayed) {
                 this.is_navigated = true;
                 this.holdCaretPosition(e);
@@ -765,15 +766,19 @@ class Mention {
 
     }
 
+    isTagAdded() {
+        return $("._chatppbutton").length > 0 ? true : false;
+    }
 
     addTagButton() {
-        if ($("#_tag").length > 0) {
+        if ($("#_tag").length > 0 || this.isTagAdded()) {
             return;
         }
+
         $("#_chatSendTool").append(
             $("<li>", {
                 id: "infoTag",
-                class: "_showDescription",
+                class: "_showDescription _chatppbutton",
                 attr: {
                     "role": "button"
                 },
@@ -790,7 +795,7 @@ class Mention {
         $("#_chatSendTool").append(
             $("<li>", {
                 id: "titleTag",
-                class: "_showDescription",
+                class: "_showDescription _chatppbutton",
                 attr: {
                     "role": "button"
                 },
@@ -806,7 +811,7 @@ class Mention {
         $("#_chatSendTool").append(
             $("<li>", {
                 id: "codeTag",
-                class: "_showDescription",
+                class: "_showDescription _chatppbutton",
                 attr: {
                     "role": "button"
                 },
