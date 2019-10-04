@@ -561,10 +561,14 @@ $(function () {
             RoomView.prototype.buildOld = RoomView.prototype.build;
             RoomView.prototype.build = function (a) {
                 this.buildOld(a);
-                setTimeout(function () {
-                    room_information.setUp();
-                    mention.setUp();
-                }, 100);
+                if (window.chatpp_id != RM.id) {
+                    window.chatpp_id = RM.id;
+                    setTimeout(function () {
+                        room_information.setUp();
+                        mention.setUp();
+                        console.log("Setup Finished");
+                    }, 100);
+                }
             };
 
             if (rebuild) {
