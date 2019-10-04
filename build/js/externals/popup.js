@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -465,18 +465,14 @@ module.exports = ChromeStorageLocal;
 /***/ }),
 /* 4 */,
 /* 5 */,
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(11);
+module.exports = __webpack_require__(7);
 
 
 /***/ }),
-/* 11 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var common = __webpack_require__(1);
@@ -534,7 +530,7 @@ function loadChatppEmoData() {
 }
 
 function updateViewData(data) {
-    var features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
+    var features = ["emoticon", "mention", "shortcut"];
     for (var i in features) {
         loadStatus(features[i], data[features[i] + "_status"]);
     }

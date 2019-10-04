@@ -50,7 +50,8 @@ class Emoticon {
         $("#_roomListArea").click(() => this.hideSuggestionEmotionsBox());
 
         $("#_headerSearch").click(() => this.hideSuggestionEmotionsBox());
-        this.addExternalEmoList(true);
+        // Temporarily remove the emoticon suggestion list
+        // this.addExternalEmoList(true);
         this.addExternalEmo();
         this.setEmoticonTextLabel();
 

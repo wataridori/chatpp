@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 12);
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -505,23 +505,19 @@ module.exports = EmoStorage;
 /* 5 */,
 /* 6 */,
 /* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
+__webpack_require__(9);
+__webpack_require__(10);
+__webpack_require__(11);
+__webpack_require__(12);
 __webpack_require__(13);
-__webpack_require__(14);
-__webpack_require__(15);
-__webpack_require__(16);
-__webpack_require__(17);
-module.exports = __webpack_require__(18);
+module.exports = __webpack_require__(14);
 
 
 /***/ }),
-/* 13 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var common = __webpack_require__(1);
@@ -865,7 +861,7 @@ function createATag(url) {
 }
 
 /***/ }),
-/* 14 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var common = __webpack_require__(1);
@@ -878,7 +874,7 @@ $(function () {
 });
 
 /***/ }),
-/* 15 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Const = __webpack_require__(0);
@@ -919,7 +915,7 @@ function loadData() {
 }
 
 /***/ }),
-/* 16 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Const = __webpack_require__(0);
@@ -962,7 +958,7 @@ function loadData() {
 }
 
 /***/ }),
-/* 17 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Const = __webpack_require__(0);
@@ -1012,14 +1008,14 @@ function loadStatus(name, value) {
 }
 
 function updateViewData(data) {
-    var features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
+    var features = ["emoticon", "mention", "shortcut"];
     for (var i in features) {
         loadStatus(features[i], data[features[i] + "_status"]);
     }
 }
 
 /***/ }),
-/* 18 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Const = __webpack_require__(0);
