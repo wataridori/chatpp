@@ -1,5 +1,16 @@
 Chat++ Change Logs
 
+## 5.4.0
+* Chatwork updated their codes, with many big changes to the Frontend. Therefore, many features of Chat++ broke. This big update fix the problem with Emoticon feature, and add a temporarily solution for the Mention feature
+* There may be some minor feature which are not working. There will be some other paths for them later
+
+## 5.3.1
+* Fix bug that can not add new Emoticon link
+
+## 5.3.0
+* As from Chrome 73, [Chrome removed the ability to make cross-origin requests in content scripts](https://www.chromium.org/Home/chromium-security/extension-content-script-fetches). Chat Plus Plus had to make changes to fetch emoticons data.
+* Chat Plus Plus now only supports Emoticon Links from Dropbox. All other links will not be accepted.
+
 ## 5.2.1
 * Fix bug can not select emoticon when using Vietnamese Unikey
 * Fix bug can not select emoticon at new line

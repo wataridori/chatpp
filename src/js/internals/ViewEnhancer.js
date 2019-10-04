@@ -1,6 +1,10 @@
 let common = require("../helpers/Common.js");
 let chatwork = require("../helpers/ChatworkFacade.js");
 let Const = require("../helpers/Const.js");
+let mention = require("./Mention.js");
+let room_information = require("./RoomInformation.js");
+let advertisement = require("./Advertisement.js");
+let emoticon = require("./Emoticon.js");
 
 let support_languages = [
     "1c",
@@ -142,17 +146,6 @@ function insertThumbnail(dom) {
         if (image_link) {
             let img = `<div><img src="${image_link}" alt="${image_link}" style="max-width: 500px; max-height: 125px"></div>`;
             dom.after(img);
-        }
-    });
-    return dom;
-}
-
-function insertChatppEmoticonClass(dom) {
-    $(".ui_emoticon", dom).each((index, image) => {
-        let image_dom = $(image);
-        let title = image_dom.attr("title");
-        if (title.indexOf("Chatpp") > 0) {
-            image_dom.addClass("chatpp_ui_emoticon");
         }
     });
     return dom;
@@ -332,9 +325,6 @@ class ViewEnhancer {
             let message_panel = this.getMessagePanelOld(a, b);
             let temp = $("<div></div>");
             $(temp).html(message_panel);
-            if (common.getStatus("emoticon")) {
-                temp = insertChatppEmoticonClass(temp);
-            }
 
             if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
                 return $(temp).html();
@@ -377,12 +367,21 @@ class ViewEnhancer {
                 temp = insertThumbnail(temp);
                 return temp.html();
             };
+        }
 
-            RoomView.prototype.buildOld = RoomView.prototype.build;
-            RoomView.prototype.build = function(a) {
-                this.buildOld(a);
+        RoomView.prototype.buildOld = RoomView.prototype.build;
+        RoomView.prototype.build = function(a) {
+            this.buildOld(a);
+            if (common.getStatus("thumbnail_status")) {
                 insertThumbnail($("#_subRoomDescription"));
             }
+
+            setTimeout(() => {
+                emoticon.addExternalEmoList(false);
+                room_information.setUp();
+                advertisement.setUp();
+                mention.setUp();
+            }, 500);
         }
     }
 }

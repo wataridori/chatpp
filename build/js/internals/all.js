@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 19);
+/******/ 	return __webpack_require__(__webpack_require__.s = 20);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -202,7 +202,7 @@ var Common = function () {
             return {
                 "name": "Chat++ for Chatwork",
                 "short_name": "Chat++",
-                "version": "5.2.1",
+                "version": "5.4.0",
                 "option_page": "option.html"
             };
         }
@@ -247,6 +247,42 @@ var Common = function () {
         value: function validateUrl(url) {
             var regexp = /(https):\/\/(\w+:?\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return regexp.test(url);
+        }
+    }, {
+        key: "validateDropboxUrl",
+        value: function validateDropboxUrl(url) {
+            if (!this.validateUrl(url)) {
+                return false;
+            }
+            var supported_urls = ["https://dl.dropboxusercontent.com/", "https://www.dropbox.com/"];
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = supported_urls[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var supported_url = _step.value;
+
+                    if (url.startsWith(supported_url)) {
+                        return true;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            return false;
         }
     }, {
         key: "isPage",
@@ -353,213 +389,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var common = __webpack_require__(0);
-
-var ChatworkFacade = function () {
-    function ChatworkFacade() {
-        _classCallCheck(this, ChatworkFacade);
-    }
-
-    _createClass(ChatworkFacade, [{
-        key: "myId",
-        value: function myId() {
-            return AC.myid;
-        }
-    }, {
-        key: "getUserName",
-        value: function getUserName(user_id) {
-            return AC.getDefaultNickName(user_id);
-        }
-    }, {
-        key: "currentRoom",
-        value: function currentRoom() {
-            return RM.id;
-        }
-    }, {
-        key: "getRoomAdmins",
-        value: function getRoomAdmins() {
-            var members = this.getRoomMembers();
-            var admins = [];
-            for (var id in members) {
-                if (members[id] === "admin") {
-                    admins.push(id);
-                }
-            }
-            return admins;
-        }
-    }, {
-        key: "isAdmin",
-        value: function isAdmin(user) {
-            var members = this.getRoomMembers();
-            user = user || this.myId();
-            return members[user] === "admin";
-        }
-    }, {
-        key: "getRoomMembers",
-        value: function getRoomMembers() {
-            return RM.member_dat;
-        }
-    }, {
-        key: "getRoomMembersCount",
-        value: function getRoomMembersCount() {
-            return RM.sorted_member_list.length;
-        }
-    }, {
-        key: "getRoomMembersArray",
-        value: function getRoomMembersArray() {
-            var members = this.getRoomMembers();
-            return Object.keys(members);
-        }
-    }, {
-        key: "getRandomMemberInRoom",
-        value: function getRandomMemberInRoom() {
-            var members = this.getRoomMembersArray();
-            return common.random(members);
-        }
-    }, {
-        key: "searchRoomsByPerson",
-        value: function searchRoomsByPerson(user_id) {
-            var rooms = RL.rooms;
-            var same_rooms = [];
-            for (var room_id in rooms) {
-                var room = rooms[room_id];
-                if (room._name && room.member_dat && room.member_dat.hasOwnProperty(user_id)) {
-                    same_rooms.push(room);
-                }
-            }
-            return same_rooms;
-        }
-    }, {
-        key: "removeMemberFromRoom",
-        value: function removeMemberFromRoom(user_id, room_id) {
-            var room = RL.rooms[room_id];
-            if (room.type === "group" && room.member_dat.hasOwnProperty(user_id) && room.member_dat[this.myId()] === "admin") {
-                if (!window.confirm("Are you sure to delete this user from " + room.getName() + " ?")) {
-                    return false;
-                }
-                delete room.member_dat[user_id];
-                var params = {
-                    body_params: {
-                        cmd: "update_room",
-                        room_id: room_id,
-                        role: room.member_dat
-                    },
-                    query_params: {}
-                };
-                CW.post("gateway.php", params);
-                return true;
-            }
-
-            return false;
-        }
-    }, {
-        key: "getChatText",
-        value: function getChatText() {
-            return $("#_chatText").val();
-        }
-    }, {
-        key: "clearChatText",
-        value: function clearChatText() {
-            CS.view.setChatText("");
-        }
-    }, {
-        key: "checkNotifyAllCondition",
-        value: function checkNotifyAllCondition() {
-            return common.checkDevVersionInternal() || this.getRoomMembersCount() > 100 && this.isAdmin();
-        }
-    }]);
-
-    return ChatworkFacade;
-}();
-
-var chatwork = new ChatworkFacade();
-module.exports = chatwork;
-
-/***/ }),
-/* 5 */,
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */,
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */,
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(20);
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var emoticon = __webpack_require__(21);
-var shortcut = __webpack_require__(22);
-var mention = __webpack_require__(23);
-var room_information = __webpack_require__(24);
-var view_enhancer = __webpack_require__(25);
-var advertisement = __webpack_require__(26);
-var NotificationDisabler = __webpack_require__(27);
-var notify_all = __webpack_require__(28);
-
-var cw_timer = void 0;
-
-$(function () {
-    var rebuild = false;
-    cw_timer = setInterval(function () {
-        if (typeof CW !== "undefined" && typeof RM !== "undefined") {
-            window.clearInterval(cw_timer);
-            $("#_chatppPreLoad").remove();
-            addStyle();
-
-            room_information.setUp();
-
-            if (emoticon.status) {
-                rebuild = true;
-                emoticon.setUp();
-                view_enhancer.updateChatworkView();
-            }
-
-            mention.setUp();
-            shortcut.setUp();
-            advertisement.setUp();
-            NotificationDisabler.setUp();
-            notify_all.setUp();
-
-            view_enhancer.updateChatSendView();
-            view_enhancer.updateGetContactPanelView();
-
-            if (rebuild) {
-                RL.rooms[RM.id].build();
-            }
-        }
-    }, 100);
-});
-
-function addStyle() {
-    $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .chatpp_ui_emoticon{width: initial !important; height: initial !important};</style>").appendTo("head");
-}
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var common = __webpack_require__(0);
 var Const = __webpack_require__(1);
 
 var KEY_COLON = "::";
@@ -623,7 +452,7 @@ var Emoticon = function () {
             $("#_headerSearch").click(function () {
                 return _this.hideSuggestionEmotionsBox();
             });
-            this.addExternalEmoList();
+            this.addExternalEmoList(true);
             this.addExternalEmo();
             this.setEmoticonTextLabel();
 
@@ -833,7 +662,7 @@ var Emoticon = function () {
         }
     }, {
         key: "addExternalEmoList",
-        value: function addExternalEmoList() {
+        value: function addExternalEmoList(bind_event) {
             if ($("#externalEmoticonsButton").length > 0) {
                 return;
             }
@@ -940,16 +769,12 @@ var Emoticon = function () {
                     return $("#_externalEmotionDescription").text(hint);
                 }
             });
-            $("#_externalEmoticonList").on("mouseenter", "li", function (e) {
-                var a = $(e.currentTarget).find("img");
-                $("#_externalEmotionDescription").text(a.attr("title"));
-            }).on("mouseleave", "li", function () {
-                return $("#_externalEmotionDescription").text(hint);
-            }).on("click", "li", function () {
-                CW.view.key.ctrl || CW.view.key.command ? (u.close(), CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(), CS.view.setChatText($(this).find("img").prop("alt"), !0), CW.view.key.shift || u.close());
-            });
+
             $("#externalEmoticonsButton").click(function (e) {
                 u.open($(e.currentTarget));
+                $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[0]);
+                $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
+                $("#tabEmotion0").css("background-color", "#eaeae8");
             });
 
             data.forEach(function (item, index) {
@@ -957,12 +782,6 @@ var Emoticon = function () {
                     id: "tabEmotion" + index,
                     class: "w3-bar-item w3-button w3-emotion"
                 }).append(item));
-            });
-
-            $("#externalEmoticonsButton").on("click", function () {
-                $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[0]);
-                $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
-                $("#tabEmotion0").css("background-color", "#eaeae8");
             });
 
             data.forEach(function (item, index) {
@@ -984,6 +803,18 @@ var Emoticon = function () {
                     $(event.currentTarget).attr("data-placement", "top");
                     $(event.currentTarget).attr("title", item);
                 });
+            });
+
+            if (!bind_event) {
+                return;
+            }
+            $("#_externalEmoticonList").on("mouseenter", "li", function (e) {
+                var a = $(e.currentTarget).find("img");
+                $("#_externalEmotionDescription").text(a.attr("title"));
+            }).on("mouseleave", "li", function () {
+                return $("#_externalEmotionDescription").text(hint);
+            }).on("click", "li", function () {
+                CW.view.key.ctrl || CW.view.key.command ? (u.close(), CS.view.sendMessage($(this).find("img").prop("alt"), !0)) : ($("_chatText").focus(), CS.view.setChatText($(this).find("img").prop("alt"), !0), CW.view.key.shift || u.close());
             });
         }
     }, {
@@ -1065,6 +896,205 @@ var Emoticon = function () {
 
 var emoticon = new Emoticon();
 module.exports = emoticon;
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var common = __webpack_require__(0);
+
+var ChatworkFacade = function () {
+    function ChatworkFacade() {
+        _classCallCheck(this, ChatworkFacade);
+    }
+
+    _createClass(ChatworkFacade, [{
+        key: "myId",
+        value: function myId() {
+            return AC.myid;
+        }
+    }, {
+        key: "getUserName",
+        value: function getUserName(user_id) {
+            return AC.getDefaultNickName(user_id);
+        }
+    }, {
+        key: "currentRoom",
+        value: function currentRoom() {
+            return RM.id;
+        }
+    }, {
+        key: "getRoomAdmins",
+        value: function getRoomAdmins() {
+            var members = this.getRoomMembers();
+            var admins = [];
+            for (var id in members) {
+                if (members[id] === "admin") {
+                    admins.push(id);
+                }
+            }
+            return admins;
+        }
+    }, {
+        key: "isAdmin",
+        value: function isAdmin(user) {
+            var members = this.getRoomMembers();
+            user = user || this.myId();
+            return members[user] === "admin";
+        }
+    }, {
+        key: "getRoomMembers",
+        value: function getRoomMembers() {
+            return RM.member_dat;
+        }
+    }, {
+        key: "getRoomMembersCount",
+        value: function getRoomMembersCount() {
+            return RM.sorted_member_list.length;
+        }
+    }, {
+        key: "getRoomMembersArray",
+        value: function getRoomMembersArray() {
+            var members = this.getRoomMembers();
+            return Object.keys(members);
+        }
+    }, {
+        key: "getRandomMemberInRoom",
+        value: function getRandomMemberInRoom() {
+            var members = this.getRoomMembersArray();
+            return common.random(members);
+        }
+    }, {
+        key: "searchRoomsByPerson",
+        value: function searchRoomsByPerson(user_id) {
+            var rooms = RL.rooms;
+            var same_rooms = [];
+            for (var room_id in rooms) {
+                var room = rooms[room_id];
+                if (room._name && room.member_dat && room.member_dat.hasOwnProperty(user_id)) {
+                    same_rooms.push(room);
+                }
+            }
+            return same_rooms;
+        }
+    }, {
+        key: "removeMemberFromRoom",
+        value: function removeMemberFromRoom(user_id, room_id) {
+            var room = RL.rooms[room_id];
+            if (room.type === "group" && room.member_dat.hasOwnProperty(user_id) && room.member_dat[this.myId()] === "admin") {
+                if (!window.confirm("Are you sure to delete this user from " + room.getName() + " ?")) {
+                    return false;
+                }
+                delete room.member_dat[user_id];
+                var params = {
+                    body_params: {
+                        cmd: "update_room",
+                        room_id: room_id,
+                        role: room.member_dat
+                    },
+                    query_params: {}
+                };
+                CW.post("gateway.php", params);
+                return true;
+            }
+
+            return false;
+        }
+    }, {
+        key: "getChatText",
+        value: function getChatText() {
+            return $("#_chatText").val();
+        }
+    }, {
+        key: "clearChatText",
+        value: function clearChatText() {
+            CS.view.setChatText("");
+        }
+    }, {
+        key: "checkNotifyAllCondition",
+        value: function checkNotifyAllCondition() {
+            return common.checkDevVersionInternal() || this.getRoomMembersCount() > 100 && this.isAdmin();
+        }
+    }]);
+
+    return ChatworkFacade;
+}();
+
+var chatwork = new ChatworkFacade();
+module.exports = chatwork;
+
+/***/ }),
+/* 6 */,
+/* 7 */,
+/* 8 */,
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */,
+/* 13 */,
+/* 14 */,
+/* 15 */,
+/* 16 */,
+/* 17 */,
+/* 18 */,
+/* 19 */,
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(21);
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var emoticon = __webpack_require__(4);
+var shortcut = __webpack_require__(22);
+var view_enhancer = __webpack_require__(23);
+var NotificationDisabler = __webpack_require__(27);
+var notify_all = __webpack_require__(28);
+
+var cw_timer = void 0;
+
+$(function () {
+    var rebuild = false;
+    cw_timer = setInterval(function () {
+        if (typeof CW !== "undefined" && typeof RM !== "undefined") {
+            window.clearInterval(cw_timer);
+            $("#_chatppPreLoad").remove();
+            addStyle();
+
+            if (emoticon.status) {
+                rebuild = true;
+                emoticon.setUp();
+                view_enhancer.updateChatworkView();
+            }
+            shortcut.setUp();
+            NotificationDisabler.setUp();
+            notify_all.setUp();
+
+            view_enhancer.updateChatSendView();
+            view_enhancer.updateGetContactPanelView();
+
+            if (rebuild) {
+                RL.rooms[RM.id].build();
+            }
+        }
+    }, 100);
+});
+
+function addStyle() {
+    $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> img.ui_emoticon:not([src^='https://assets.chatwork']) {width: auto !important;height: auto !important;}</style>").appendTo("head");
+}
 
 /***/ }),
 /* 22 */
@@ -1413,8 +1443,272 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var common = __webpack_require__(0);
+var chatwork = __webpack_require__(5);
 var Const = __webpack_require__(1);
-var chatwork = __webpack_require__(4);
+var mention = __webpack_require__(24);
+var room_information = __webpack_require__(25);
+var advertisement = __webpack_require__(26);
+var emoticon = __webpack_require__(4);
+
+var support_languages = ["1c", "actionscript", "apache", "applescript", "armasm", "asciidoc", "aspectj", "autohotkey", "autoit", "avrasm", "axapta", "bash", "brainfuck", "cal", "capnproto", "ceylon", "clojure-repl", "clojure", "cmake", "coffeescript", "cpp", "cs", "css", "d", "dart", "delphi", "diff", "django", "dns", "dockerfile", "dos", "dust", "elixir", "elm", "erb", "erlang-repl", "erlang", "fix", "fortran", "fsharp", "gcode", "gherkin", "glsl", "go", "gradle", "groovy", "haml", "handlebars", "haskell", "haxe", "http", "inform7", "ini", "java", "javascript", "json", "julia", "kotlin", "lasso", "less", "lisp", "livecodeserver", "livescript", "lua", "makefile", "markdown", "mathematica", "matlab", "mel", "mercury", "mizar", "mojolicious", "monkey", "nginx", "nimrod", "nix", "nsis", "objectivec", "ocaml", "openscad", "oxygene", "parser3", "perl", "pf", "php", "powershell", "processing", "profile", "prolog", "protobuf", "puppet", "python", "q", "r", "rib", "roboconf", "rsl", "ruby", "ruleslanguage", "rust", "scala", "scheme", "scilab", "scss", "smali", "smalltalk", "sml", "sql", "stata", "step21", "stylus", "swift", "tcl", "tex", "thrift", "tp", "twig", "typescript", "vala", "vbnet", "vbscript-html", "vbscript", "verilog", "vhdl", "vim", "x86asm", "xl", "xml", "xquery", "zephir"];
+
+function insertThumbnail(dom) {
+    $(".chatwork-token-url", dom).each(function (index, link) {
+        var dom = $(link);
+        var image_link = getThumbnailLink(dom.attr("href"));
+        if (image_link) {
+            var img = "<div><img src=\"" + image_link + "\" alt=\"" + image_link + "\" style=\"max-width: 500px; max-height: 125px\"></div>";
+            dom.after(img);
+        }
+    });
+    return dom;
+}
+
+function getThumbnailLink(link) {
+    var img_regex = /\.(png|jpg|gif|jpeg)$/i;
+    if (link.match(img_regex)) {
+        return link;
+    }
+
+    var fb_img_regex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
+    if (link.match(fb_img_regex)) {
+        return link;
+    }
+
+    var media_giphy_regex = /^https:\/\/media.giphy.com\/media\/(.*)\/giphy\.gif/i;
+    var giphy_code = link.match(media_giphy_regex);
+    if (giphy_code && giphy_code[1]) {
+        return "https://i.giphy.com/" + giphy_code[1] + ".gif";
+    }
+
+    var gyazo_regex = /^https?:\/\/gyazo.com\//i;
+    if (link.match(gyazo_regex)) {
+        return link + ".png";
+    }
+
+    return false;
+}
+
+function getHighLightLanguage(language) {
+    for (var i in support_languages) {
+        if (support_languages[i] === language.toLowerCase()) {
+            return support_languages[i];
+        }
+    }
+
+    return null;
+}
+
+function getHighlightOption(text) {
+    var highlight_options = {
+        language: null,
+        nowrap: false,
+        has_valid_options: false
+    };
+    var valid_options = ["nowrap"];
+    var options = text.split("\n", 1)[0];
+    if (!options) {
+        return highlight_options;
+    }
+
+    options = options.split(" ");
+    for (var i in options) {
+        if (!options[i]) {
+            continue;
+        }
+        if (valid_options.indexOf(options[i]) > -1) {
+            highlight_options[options[i]] = true;
+            continue;
+        }
+        var language = getHighLightLanguage(options[i]);
+        if (language) {
+            highlight_options.language = language;
+            continue;
+        }
+        return {
+            language: null,
+            nowrap: false,
+            has_valid_options: false
+        };
+    }
+    highlight_options.has_valid_options = true;
+    return highlight_options;
+}
+
+var ViewEnhancer = function () {
+    function ViewEnhancer() {
+        _classCallCheck(this, ViewEnhancer);
+
+        this.thumbnail_status = common.getStatus("thumbnail");
+        this.highlight_status = common.getStatus("highlight");
+        this.to_all_status = true;
+    }
+
+    _createClass(ViewEnhancer, [{
+        key: "isActive",
+        value: function isActive() {
+            return this.to_all_status || this.thumbnail_status || this.highlight_status;
+        }
+    }, {
+        key: "updateGetContactPanelView",
+        value: function updateGetContactPanelView() {
+            AC.view.getContactPanelOld = AC.view.getContactPanel;
+            AC.view.getContactPanel = function (b, d) {
+                var panel = AC.view.getContactPanelOld(b, d);
+                if (b == chatwork.myId()) {
+                    return panel;
+                }
+                var temp = $("<div></div>");
+                var label = LANGUAGE == "ja" ? "同じグループチャットを探す" : "Search for the same Group Chat";
+                $(temp).html(panel);
+                $(".contactPanel__footerButtonContainer", temp).first().append("<div class=\"button searchSameRooms _showDescription\" aria-label=\"" + label + "\" style=\"margin: 0 10px\" data-uid=\"" + b + "\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></div>");
+                return $(temp).html();
+            };
+            $(document).on("click", ".searchSameRooms", function (e) {
+                var uid = $(e.currentTarget).data("uid");
+                var username = chatwork.getUserName(uid);
+                var same_rooms = chatwork.searchRoomsByPerson(uid);
+                var result = "";
+                same_rooms.forEach(function (room) {
+                    result += "<a href=\"https://www.chatwork.com/#!rid" + room.id + "\"><div class=\"searchResultTitle _messageSearchChatGroup sameRoomInfo\" data-rid=\"" + room.id + "\"><div>" + room.getIcon() + " " + room.getName() + "</div></div></a>";
+                });
+                var delete_button = "";
+                if (result) {
+                    delete_button = '<div class="">' + ("Remove <strong>" + username + "</strong> from the Rooms where you are an Administrator!<br>Please be careful!<br>") + ("<div id=\"_removeSameRoomsBtn\" role=\"button\" tabindex=\"2\" class=\"button btnDanger _cwBN\" data-uid=\"" + uid + "\">Delete</div>") + "</div>";
+                }
+                result = '<div class="searchResultListBox">' + ("<div class=\"searchResultTitle _messageSearchChatGroup\"><strong><span id=\"_sameRoomsNumber\">" + same_rooms.length + "</span> room(s) found!</strong></div>") + ("" + result + delete_button) + "</div>";
+                CW.view.alert(result, null, true);
+            });
+            $(document).on("click", "#_removeSameRoomsBtn", function (e) {
+                var uid = $(e.currentTarget).data("uid");
+                var username = chatwork.getUserName(uid);
+                CW.confirm("Are you sure to delete " + username + " from the rooms that you are an Administrator?", function () {
+                    var same_rooms = chatwork.searchRoomsByPerson(uid);
+                    var result = "";
+                    same_rooms.forEach(function (room) {
+                        if (chatwork.removeMemberFromRoom(uid, room.id)) {
+                            $(".sameRoomInfo[data-rid=\"" + room.id + "\"]").hide();
+                            var sameRoomNumberElement = $("#_sameRoomsNumber");
+                            sameRoomNumberElement.html(sameRoomNumberElement.html() - 1);
+                            result += "<a href=\"https://www.chatwork.com/#!rid" + room.id + "\"><div class=\"searchResultTitle _messageSearchChatGroup sameRoomInfo\" data-rid=\"" + room.id + "\"><div>" + room.getIcon() + " " + room.getName() + "</div></div></a>";
+                        }
+                    });
+                    if (result) {
+                        result = '<div class="searchResultListBox">' + ("<div class=\"searchResultTitle _messageSearchChatGroup\"><strong>" + username + "</strong> has been removed from the following room(s)!</div>") + ("" + result) + "</div>";
+                        CW.view.alert(result, null, true);
+                    }
+                });
+            });
+        }
+    }, {
+        key: "updateChatSendView",
+        value: function updateChatSendView() {
+            CS.view.chatTextKeyUpOld = CS.view.chatTextKeyUp;
+            CS.view.chatTextKeyUp = function (b) {
+                var up_key = b.keyCode;
+                var d = $("#_chatText");
+                (function () {
+                    /* eslint-disable no-undef */
+                    if (!(up_key !== 13 || press_key !== 13)) {
+                        /* eslint-enable */
+                        var a = d.val(),
+                            _b = d.prop("selectionStart"),
+                            e = d.prop("selectionEnd");
+                        _b === e && (e = a.substr(0, _b), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```$/, "$1[code]\n$2\n[/code]") : e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[code]\n$2\n[/code]\n"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```$/, "$1[title]$2[/title]") : e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[title]$2[/title]"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```$/, "$1[info]$2[/info]") : e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[info]$2[/info]\n"), a = a.substr(_b), d.val(e + a), d.prop("selectionStart", e.length), d.prop("selectionEnd", e.length));
+                    }
+                })();
+                return CS.view.chatTextKeyUpOld(b);
+            };
+        }
+    }, {
+        key: "updateChatworkView",
+        value: function updateChatworkView() {
+            TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
+            TimeLineView.prototype.getMessagePanel = function (a, b) {
+                if (a.msg.indexOf(Const.TO_ALL_MARK) === 0) {
+                    a.mn = true;
+                }
+                var message_panel = this.getMessagePanelOld(a, b);
+                var temp = $("<div></div>");
+                $(temp).html(message_panel);
+
+                if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
+                    return $(temp).html();
+                }
+                if (common.getStatus("thumbnail")) {
+                    temp = insertThumbnail(temp);
+                }
+                if (common.getStatus("highlight")) {
+                    $("pre code", temp).each(function (i, block) {
+                        var block_text = $(block).html();
+                        var options = getHighlightOption(block_text);
+                        if (options.has_valid_options) {
+                            var first_line = block_text.split("\n", 1)[0];
+                            /* eslint-disable prefer-template */
+                            block_text = block_text.replace(first_line + "\n", "");
+                            /* eslint-enable */
+                            $(block).html(block_text);
+                        }
+                        if (options.language) {
+                            $(block).addClass(options.language);
+                        }
+                        if (!options.nowrap) {
+                            $(block).css({ "word-wrap": "break-word", "white-space": "pre-wrap" });
+                        }
+                        hljs.highlightBlock(block);
+                    });
+                }
+                return $(temp).html();
+            };
+
+            if (common.getStatus("thumbnail_status")) {
+                TK.view.getTaskPanelOld = TK.view.getTaskPanel;
+                TK.view.getTaskPanel = function (b, d) {
+                    var task_panel = this.getTaskPanelOld(b, d);
+                    if ($(task_panel).is("div")) {
+                        return task_panel;
+                    }
+                    var temp = $("<span></span>");
+                    temp.html(task_panel);
+                    temp = insertThumbnail(temp);
+                    return temp.html();
+                };
+            }
+
+            RoomView.prototype.buildOld = RoomView.prototype.build;
+            RoomView.prototype.build = function (a) {
+                this.buildOld(a);
+                if (common.getStatus("thumbnail_status")) {
+                    insertThumbnail($("#_subRoomDescription"));
+                }
+
+                setTimeout(function () {
+                    emoticon.addExternalEmoList(false);
+                    room_information.setUp();
+                    advertisement.setUp();
+                    mention.setUp();
+                }, 500);
+            };
+        }
+    }]);
+
+    return ViewEnhancer;
+}();
+
+var view_enhancer = new ViewEnhancer();
+module.exports = view_enhancer;
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var common = __webpack_require__(0);
+var Const = __webpack_require__(1);
+var chatwork = __webpack_require__(5);
 
 var DISPLAY_NUMS = 3;
 var MAX_PATTERN_LENGTH = 20;
@@ -1428,6 +1722,8 @@ var INSERT_MODE_SYM = {
 
 var Mention = function () {
     function Mention() {
+        var _this = this;
+
         _classCallCheck(this, Mention);
 
         this.status = common.getStatus("mention");
@@ -1451,8 +1747,6 @@ var Mention = function () {
             keys: ["aid2name"],
             maxPatternLength: MAX_PATTERN_LENGTH
         };
-        this.chat_text_jquery = $("#_chatText");
-        this.chat_text_element = document.getElementById("_chatText");
         this.suggestion_messages = {
             one: {
                 ja: "\u691C\u7D22\u7D50\u679C\u306F\u3042\u308A\u307E\u305B\u3093",
@@ -1477,115 +1771,118 @@ var Mention = function () {
         };
 
         this.group_mention = [];
+        if (localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]) {
+            this.group_mention = JSON.parse(localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]);
+        }
+        this.group_mention.push({
+            "group_name": "random",
+            "group_members": ""
+        });
+        this.group_mention.push({
+            "group_name": "admin",
+            "group_members": chatwork.getRoomAdmins().join(",")
+        });
+
+        // http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
+        // First, checks if it isn't implemented yet.
+        if (!String.prototype.format) {
+            String.prototype.format = function () {
+                var args = arguments;
+                return this.replace(/{(\d+)}/g, function (match, number) {
+                    return typeof args[number] != "undefined" ? args[number] : match;
+                });
+            };
+        }
+
+        $("#_roomListArea").click(function () {
+            return _this.hideSuggestionBox();
+        });
+
+        $("#_headerSearch").click(function () {
+            return _this.hideSuggestionBox();
+        });
+
+        // when user press ESC, we hide suggestion box
+        $(document).keyup(function (e) {
+            if (!_this.status) {
+                return;
+            }
+            if (e.which == 27) {
+                _this.hideSuggestionBox();
+            }
+        });
     }
 
     _createClass(Mention, [{
         key: "setUp",
         value: function setUp() {
-            var _this = this;
+            var _this2 = this;
 
-            if (!this.status) {
+            if (!this.status || this.isTagAdded()) {
                 return;
             }
-            if (localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]) {
-                this.group_mention = JSON.parse(localStorage[Const.LOCAL_STORAGE_GROUP_MENTION]);
-            }
-            this.group_mention.push({
-                "group_name": "random",
-                "group_members": ""
-            });
-            this.group_mention.push({
-                "group_name": "admin",
-                "group_members": chatwork.getRoomAdmins().join(",")
-            });
+            this.chat_text_jquery = $("#_chatText");
+            this.chat_text_element = document.getElementById("_chatText");
 
             $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
             this.hideSuggestionBox();
             $("#_sendEnterActionArea").click(function () {
-                _this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
+                _this2.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
             });
-            // http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
-            // First, checks if it isn't implemented yet.
-            if (!String.prototype.format) {
-                String.prototype.format = function () {
-                    var args = arguments;
-                    return this.replace(/{(\d+)}/g, function (match, number) {
-                        return typeof args[number] != "undefined" ? args[number] : match;
-                    });
-                };
-            }
+
             // hide suggestion box when click in textarea or outside
             this.chat_text_jquery.click(function () {
-                return _this.hideSuggestionBox();
-            });
-
-            $("#_roomListArea").click(function () {
-                return _this.hideSuggestionBox();
-            });
-
-            $("#_headerSearch").click(function () {
-                return _this.hideSuggestionBox();
-            });
-
-            // when user press ESC, we hide suggestion box
-            $(document).keyup(function (e) {
-                if (!_this.status) {
-                    return;
-                }
-                if (e.which == 27) {
-                    _this.hideSuggestionBox();
-                }
+                return _this2.hideSuggestionBox();
             });
 
             this.chat_text_jquery.keydown(function (e) {
-                if (!_this.status) {
+                if (!_this2.status) {
                     return;
                 }
-
-                if ((e.which == 38 || e.which == 40 || e.which == 9 || e.which == 13) && _this.is_displayed) {
-                    _this.is_navigated = true;
-                    _this.holdCaretPosition(e);
+                if ((e.which == 38 || e.which == 40 || e.which == 9 || e.which == 13) && _this2.is_displayed) {
+                    _this2.is_navigated = true;
+                    _this2.holdCaretPosition(e);
                 } else {
-                    _this.current_index = 0;
-                    _this.is_navigated = false;
+                    _this2.current_index = 0;
+                    _this2.is_navigated = false;
                 }
 
-                if (_this.getNearestColonIndex()) {
-                    _this.is_colon = true;
+                if (_this2.getNearestColonIndex()) {
+                    _this2.is_colon = true;
                 } else {
-                    _this.is_colon = false;
+                    _this2.is_colon = false;
                 }
 
                 if (e.which == 9 || e.which == 13) {
-                    if ((_this.insert_type == "all" || _this.insert_type == "group") && _this.is_displayed) {
-                        _this.setSuggestedChatText(_this.getTypedText(), null, null);
+                    if ((_this2.insert_type == "all" || _this2.insert_type == "group") && _this2.is_displayed) {
+                        _this2.setSuggestedChatText(_this2.getTypedText(), null, null);
                         // dirty hack to prevent message to be sent
-                        if (_this.cached_enter_action == "send") {
+                        if (_this2.cached_enter_action == "send") {
                             ST.data.enter_action = "br";
                         }
                         e.preventDefault();
                     } else {
                         if ($(".suggested-name").first().length) {
-                            if (_this.is_navigated) {
-                                $(".suggested-name").eq(_this.selected_index).click();
+                            if (_this2.is_navigated) {
+                                $(".suggested-name").eq(_this2.selected_index).click();
                             } else {
                                 $(".suggested-name").first().click();
                             }
                             // dirty hack to prevent message to be sent
-                            if (_this.cached_enter_action == "send") {
+                            if (_this2.cached_enter_action == "send") {
                                 ST.data.enter_action = "br";
                             }
                             e.preventDefault();
                         } else {
                             // there's no thing after @ symbol
-                            _this.hideSuggestionBox();
+                            _this2.hideSuggestionBox();
                         }
                     }
                 }
             });
 
             this.chat_text_jquery.keyup(function (e) {
-                if (!_this.status) {
+                if (!_this2.status) {
                     return;
                 }
 
@@ -1593,80 +1890,80 @@ var Mention = function () {
                     return;
                 }
 
-                if ((e.which == 38 || e.which == 40) && _this.is_displayed) {
-                    _this.is_navigated = true;
-                    _this.holdCaretPosition(e);
+                if ((e.which == 38 || e.which == 40) && _this2.is_displayed) {
+                    _this2.is_navigated = true;
+                    _this2.holdCaretPosition(e);
                 } else {
-                    _this.is_navigated = false;
+                    _this2.is_navigated = false;
                 }
 
-                if (_this.current_RM != RM.id) {
-                    _this.member_objects = _this.buildMemberListData(false);
-                    _this.updateAdminGroupData();
-                    _this.fuse = new Fuse(_this.member_objects, _this.options);
-                    _this.current_RM = RM.id;
+                if (_this2.current_RM != RM.id) {
+                    _this2.member_objects = _this2.buildMemberListData(false);
+                    _this2.updateAdminGroupData();
+                    _this2.fuse = new Fuse(_this2.member_objects, _this2.options);
+                    _this2.current_RM = RM.id;
                 }
 
-                if (_this.findAtmark()) {
-                    if (_this.is_displayed && _this.getNearestAtmarkIndex() != -1 && _this.getNearestAtmarkIndex() != _this.actived_atmark_index) {
-                        _this.hideSuggestionBox();
+                if (_this2.findAtmark()) {
+                    if (_this2.is_displayed && _this2.getNearestAtmarkIndex() != -1 && _this2.getNearestAtmarkIndex() != _this2.actived_atmark_index) {
+                        _this2.hideSuggestionBox();
                     }
 
-                    if (!_this.is_displayed) {
-                        if (!_this.isTriggerKeyCode(e.which)) {
+                    if (!_this2.is_displayed) {
+                        if (!_this2.isTriggerKeyCode(e.which)) {
                             return;
                         }
-                        if (_this.getNearestAtmarkIndex() != -1) {
-                            _this.actived_atmark_index = _this.getNearestAtmarkIndex();
+                        if (_this2.getNearestAtmarkIndex() != -1) {
+                            _this2.actived_atmark_index = _this2.getNearestAtmarkIndex();
                         }
-                        _this.setSuggestionBoxPosition();
-                        _this.showSuggestionBox(_this.buildList(_this.filterDisplayResults(_this.member_objects)));
-                        _this.is_displayed = true;
+                        _this2.setSuggestionBoxPosition();
+                        _this2.showSuggestionBox(_this2.buildList(_this2.filterDisplayResults(_this2.member_objects)));
+                        _this2.is_displayed = true;
                     }
 
-                    var typed_text = _this.getTypedText();
+                    var typed_text = _this2.getTypedText();
                     if (typed_text.length) {
                         if (typed_text.charAt(1) == "#") {
-                            if (_this.insert_type != "contact") {
-                                _this.member_objects = _this.buildMemberListData(true);
-                                _this.fuse = new Fuse(_this.member_objects, _this.options);
-                                _this.insert_type = "contact";
+                            if (_this2.insert_type != "contact") {
+                                _this2.member_objects = _this2.buildMemberListData(true);
+                                _this2.fuse = new Fuse(_this2.member_objects, _this2.options);
+                                _this2.insert_type = "contact";
                             }
                             typed_text = typed_text.substring(1);
                         }
-                        var raw_results = _this.getRawResultsAndSetMode(typed_text.substring(1));
+                        var raw_results = _this2.getRawResultsAndSetMode(typed_text.substring(1));
 
                         if (e.which == 38) {
-                            _this.current_index -= 1;
+                            _this2.current_index -= 1;
                         }
                         if (e.which == 40) {
-                            _this.current_index += 1;
+                            _this2.current_index += 1;
                         }
-                        var filtered_results = _this.filterDisplayResults(raw_results);
+                        var filtered_results = _this2.filterDisplayResults(raw_results);
 
-                        if (e.which == 38 && _this.is_outbound_of_list) {
-                            _this.selected_index -= 1;
-                            if (_this.selected_index < 0) {
-                                _this.selected_index = 0;
+                        if (e.which == 38 && _this2.is_outbound_of_list) {
+                            _this2.selected_index -= 1;
+                            if (_this2.selected_index < 0) {
+                                _this2.selected_index = 0;
                             }
                         }
-                        if (e.which == 40 && _this.current_index > raw_results.length - filtered_results.length) {
-                            _this.selected_index += 1;
-                            if (_this.selected_index >= Math.min(DISPLAY_NUMS, filtered_results.length)) {
-                                _this.selected_index = Math.min(DISPLAY_NUMS, filtered_results.length) - 1;
+                        if (e.which == 40 && _this2.current_index > raw_results.length - filtered_results.length) {
+                            _this2.selected_index += 1;
+                            if (_this2.selected_index >= Math.min(DISPLAY_NUMS, filtered_results.length)) {
+                                _this2.selected_index = Math.min(DISPLAY_NUMS, filtered_results.length) - 1;
                             }
                         }
 
-                        _this.showSuggestionBox(_this.buildList(filtered_results));
+                        _this2.showSuggestionBox(_this2.buildList(filtered_results));
                     }
 
                     if (e.which == 27) {
                         // when user press ESC, we hide suggestion box
-                        _this.hideSuggestionBox();
-                        _this.holdCaretPosition(e);
+                        _this2.hideSuggestionBox();
+                        _this2.holdCaretPosition(e);
                     }
                 } else {
-                    _this.hideSuggestionBox();
+                    _this2.hideSuggestionBox();
                 }
 
                 return false;
@@ -1806,7 +2103,7 @@ var Mention = function () {
     }, {
         key: "showSuggestionBox",
         value: function showSuggestionBox(content) {
-            var _this2 = this;
+            var _this3 = this;
 
             this.is_inserted = false;
             $("#suggestion-container").html(content).show();
@@ -1818,13 +2115,13 @@ var Mention = function () {
             }
 
             $(".suggested-name").click(function (e) {
-                if (_this2.is_inserted) {
+                if (_this3.is_inserted) {
                     return;
                 }
-                _this2.is_inserted = true;
+                _this3.is_inserted = true;
                 var target = $(e.currentTarget);
                 target.css("background-color", "#D8F0F9");
-                _this2.setSuggestedChatText(_this2.getTypedText(), target.text(), target.data("cwui-lt-value"));
+                _this3.setSuggestedChatText(_this3.getTypedText(), target.text(), target.data("cwui-lt-value"));
             });
 
             $(".suggested-name").mouseover(function (e) {
@@ -2216,16 +2513,22 @@ var Mention = function () {
             });
         }
     }, {
+        key: "isTagAdded",
+        value: function isTagAdded() {
+            return $("._chatppbutton").length > 0 ? true : false;
+        }
+    }, {
         key: "addTagButton",
         value: function addTagButton() {
-            var _this3 = this;
+            var _this4 = this;
 
-            if ($("#_tag").length > 0) {
+            if ($("#_tag").length > 0 || this.isTagAdded()) {
                 return;
             }
+
             $("#_chatSendTool").append($("<li>", {
                 id: "infoTag",
-                class: "_showDescription",
+                class: "_showDescription _chatppbutton",
                 attr: {
                     "role": "button"
                 },
@@ -2238,7 +2541,7 @@ var Mention = function () {
             }).append("<strong>[info]</strong>")));
             $("#_chatSendTool").append($("<li>", {
                 id: "titleTag",
-                class: "_showDescription",
+                class: "_showDescription _chatppbutton",
                 attr: {
                     "role": "button"
                 },
@@ -2250,7 +2553,7 @@ var Mention = function () {
             }).append("<strong>[title]</strong>")));
             $("#_chatSendTool").append($("<li>", {
                 id: "codeTag",
-                class: "_showDescription",
+                class: "_showDescription _chatppbutton",
                 attr: {
                     "role": "button"
                 },
@@ -2262,15 +2565,15 @@ var Mention = function () {
             }).append("<strong>[code]</strong>")));
 
             $("#infoTag").click(function () {
-                _this3.setSuggestedChatTag("info");
+                _this4.setSuggestedChatTag("info");
             });
 
             $("#titleTag").click(function () {
-                _this3.setSuggestedChatTag("title");
+                _this4.setSuggestedChatTag("title");
             });
 
             $("#codeTag").click(function () {
-                _this3.setSuggestedChatTag("code");
+                _this4.setSuggestedChatTag("code");
             });
         }
     }]);
@@ -2282,7 +2585,7 @@ var mention = new Mention();
 module.exports = mention;
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2301,7 +2604,7 @@ var RoomInformation = function () {
         value: function setUp() {
             var _this = this;
 
-            if ($("#roomInfoIcon").length > 0) {
+            if ($("#_roomInfo").length > 0) {
                 return;
             }
             $("#_chatSendTool").append($("<li>", {
@@ -2376,271 +2679,6 @@ var room_information = new RoomInformation();
 module.exports = room_information;
 
 /***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var common = __webpack_require__(0);
-var chatwork = __webpack_require__(4);
-var Const = __webpack_require__(1);
-
-var support_languages = ["1c", "actionscript", "apache", "applescript", "armasm", "asciidoc", "aspectj", "autohotkey", "autoit", "avrasm", "axapta", "bash", "brainfuck", "cal", "capnproto", "ceylon", "clojure-repl", "clojure", "cmake", "coffeescript", "cpp", "cs", "css", "d", "dart", "delphi", "diff", "django", "dns", "dockerfile", "dos", "dust", "elixir", "elm", "erb", "erlang-repl", "erlang", "fix", "fortran", "fsharp", "gcode", "gherkin", "glsl", "go", "gradle", "groovy", "haml", "handlebars", "haskell", "haxe", "http", "inform7", "ini", "java", "javascript", "json", "julia", "kotlin", "lasso", "less", "lisp", "livecodeserver", "livescript", "lua", "makefile", "markdown", "mathematica", "matlab", "mel", "mercury", "mizar", "mojolicious", "monkey", "nginx", "nimrod", "nix", "nsis", "objectivec", "ocaml", "openscad", "oxygene", "parser3", "perl", "pf", "php", "powershell", "processing", "profile", "prolog", "protobuf", "puppet", "python", "q", "r", "rib", "roboconf", "rsl", "ruby", "ruleslanguage", "rust", "scala", "scheme", "scilab", "scss", "smali", "smalltalk", "sml", "sql", "stata", "step21", "stylus", "swift", "tcl", "tex", "thrift", "tp", "twig", "typescript", "vala", "vbnet", "vbscript-html", "vbscript", "verilog", "vhdl", "vim", "x86asm", "xl", "xml", "xquery", "zephir"];
-
-function insertThumbnail(dom) {
-    $(".chatwork-token-url", dom).each(function (index, link) {
-        var dom = $(link);
-        var image_link = getThumbnailLink(dom.attr("href"));
-        if (image_link) {
-            var img = "<div><img src=\"" + image_link + "\" alt=\"" + image_link + "\" style=\"max-width: 500px; max-height: 125px\"></div>";
-            dom.after(img);
-        }
-    });
-    return dom;
-}
-
-function insertChatppEmoticonClass(dom) {
-    $(".ui_emoticon", dom).each(function (index, image) {
-        var image_dom = $(image);
-        var title = image_dom.attr("title");
-        if (title.indexOf("Chatpp") > 0) {
-            image_dom.addClass("chatpp_ui_emoticon");
-        }
-    });
-    return dom;
-}
-
-function getThumbnailLink(link) {
-    var img_regex = /\.(png|jpg|gif|jpeg)$/i;
-    if (link.match(img_regex)) {
-        return link;
-    }
-
-    var fb_img_regex = /.*fbcdn.*\.(png|jpg|gif|jpeg)(\?.*)?/i;
-    if (link.match(fb_img_regex)) {
-        return link;
-    }
-
-    var media_giphy_regex = /^https:\/\/media.giphy.com\/media\/(.*)\/giphy\.gif/i;
-    var giphy_code = link.match(media_giphy_regex);
-    if (giphy_code && giphy_code[1]) {
-        return "https://i.giphy.com/" + giphy_code[1] + ".gif";
-    }
-
-    var gyazo_regex = /^https?:\/\/gyazo.com\//i;
-    if (link.match(gyazo_regex)) {
-        return link + ".png";
-    }
-
-    return false;
-}
-
-function getHighLightLanguage(language) {
-    for (var i in support_languages) {
-        if (support_languages[i] === language.toLowerCase()) {
-            return support_languages[i];
-        }
-    }
-
-    return null;
-}
-
-function getHighlightOption(text) {
-    var highlight_options = {
-        language: null,
-        nowrap: false,
-        has_valid_options: false
-    };
-    var valid_options = ["nowrap"];
-    var options = text.split("\n", 1)[0];
-    if (!options) {
-        return highlight_options;
-    }
-
-    options = options.split(" ");
-    for (var i in options) {
-        if (!options[i]) {
-            continue;
-        }
-        if (valid_options.indexOf(options[i]) > -1) {
-            highlight_options[options[i]] = true;
-            continue;
-        }
-        var language = getHighLightLanguage(options[i]);
-        if (language) {
-            highlight_options.language = language;
-            continue;
-        }
-        return {
-            language: null,
-            nowrap: false,
-            has_valid_options: false
-        };
-    }
-    highlight_options.has_valid_options = true;
-    return highlight_options;
-}
-
-var ViewEnhancer = function () {
-    function ViewEnhancer() {
-        _classCallCheck(this, ViewEnhancer);
-
-        this.thumbnail_status = common.getStatus("thumbnail");
-        this.highlight_status = common.getStatus("highlight");
-        this.to_all_status = true;
-    }
-
-    _createClass(ViewEnhancer, [{
-        key: "isActive",
-        value: function isActive() {
-            return this.to_all_status || this.thumbnail_status || this.highlight_status;
-        }
-    }, {
-        key: "updateGetContactPanelView",
-        value: function updateGetContactPanelView() {
-            AC.view.getContactPanelOld = AC.view.getContactPanel;
-            AC.view.getContactPanel = function (b, d) {
-                var panel = AC.view.getContactPanelOld(b, d);
-                if (b == chatwork.myId()) {
-                    return panel;
-                }
-                var temp = $("<div></div>");
-                var label = LANGUAGE == "ja" ? "同じグループチャットを探す" : "Search for the same Group Chat";
-                $(temp).html(panel);
-                $(".contactPanel__footerButtonContainer", temp).first().append("<div class=\"button searchSameRooms _showDescription\" aria-label=\"" + label + "\" style=\"margin: 0 10px\" data-uid=\"" + b + "\"><span class=\"icoFontAdminInfoMenu icoSizeLarge\"></span></div>");
-                return $(temp).html();
-            };
-            $(document).on("click", ".searchSameRooms", function (e) {
-                var uid = $(e.currentTarget).data("uid");
-                var username = chatwork.getUserName(uid);
-                var same_rooms = chatwork.searchRoomsByPerson(uid);
-                var result = "";
-                same_rooms.forEach(function (room) {
-                    result += "<a href=\"https://www.chatwork.com/#!rid" + room.id + "\"><div class=\"searchResultTitle _messageSearchChatGroup sameRoomInfo\" data-rid=\"" + room.id + "\"><div>" + room.getIcon() + " " + room.getName() + "</div></div></a>";
-                });
-                var delete_button = "";
-                if (result) {
-                    delete_button = '<div class="">' + ("Remove <strong>" + username + "</strong> from the Rooms where you are an Administrator!<br>Please be careful!<br>") + ("<div id=\"_removeSameRoomsBtn\" role=\"button\" tabindex=\"2\" class=\"button btnDanger _cwBN\" data-uid=\"" + uid + "\">Delete</div>") + "</div>";
-                }
-                result = '<div class="searchResultListBox">' + ("<div class=\"searchResultTitle _messageSearchChatGroup\"><strong><span id=\"_sameRoomsNumber\">" + same_rooms.length + "</span> room(s) found!</strong></div>") + ("" + result + delete_button) + "</div>";
-                CW.view.alert(result, null, true);
-            });
-            $(document).on("click", "#_removeSameRoomsBtn", function (e) {
-                var uid = $(e.currentTarget).data("uid");
-                var username = chatwork.getUserName(uid);
-                CW.confirm("Are you sure to delete " + username + " from the rooms that you are an Administrator?", function () {
-                    var same_rooms = chatwork.searchRoomsByPerson(uid);
-                    var result = "";
-                    same_rooms.forEach(function (room) {
-                        if (chatwork.removeMemberFromRoom(uid, room.id)) {
-                            $(".sameRoomInfo[data-rid=\"" + room.id + "\"]").hide();
-                            var sameRoomNumberElement = $("#_sameRoomsNumber");
-                            sameRoomNumberElement.html(sameRoomNumberElement.html() - 1);
-                            result += "<a href=\"https://www.chatwork.com/#!rid" + room.id + "\"><div class=\"searchResultTitle _messageSearchChatGroup sameRoomInfo\" data-rid=\"" + room.id + "\"><div>" + room.getIcon() + " " + room.getName() + "</div></div></a>";
-                        }
-                    });
-                    if (result) {
-                        result = '<div class="searchResultListBox">' + ("<div class=\"searchResultTitle _messageSearchChatGroup\"><strong>" + username + "</strong> has been removed from the following room(s)!</div>") + ("" + result) + "</div>";
-                        CW.view.alert(result, null, true);
-                    }
-                });
-            });
-        }
-    }, {
-        key: "updateChatSendView",
-        value: function updateChatSendView() {
-            CS.view.chatTextKeyUpOld = CS.view.chatTextKeyUp;
-            CS.view.chatTextKeyUp = function (b) {
-                var up_key = b.keyCode;
-                var d = $("#_chatText");
-                (function () {
-                    /* eslint-disable no-undef */
-                    if (!(up_key !== 13 || press_key !== 13)) {
-                        /* eslint-enable */
-                        var a = d.val(),
-                            _b = d.prop("selectionStart"),
-                            e = d.prop("selectionEnd");
-                        _b === e && (e = a.substr(0, _b), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```$/, "$1[code]\n$2\n[/code]") : e.replace(/(^|\n)``` *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[code]\n$2\n[/code]\n"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```$/, "$1[title]$2[/title]") : e.replace(/(^|\n)``t *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[title]$2[/title]"), e = $.support.isWindowsFirefox ? e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```$/, "$1[info]$2[/info]") : e.replace(/(^|\n)``i *\r?\n([\s\S]+?)\r?\n```\n$/, "$1[info]$2[/info]\n"), a = a.substr(_b), d.val(e + a), d.prop("selectionStart", e.length), d.prop("selectionEnd", e.length));
-                    }
-                })();
-                return CS.view.chatTextKeyUpOld(b);
-            };
-        }
-    }, {
-        key: "updateChatworkView",
-        value: function updateChatworkView() {
-            TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
-            TimeLineView.prototype.getMessagePanel = function (a, b) {
-                if (a.msg.indexOf(Const.TO_ALL_MARK) === 0) {
-                    a.mn = true;
-                }
-                var message_panel = this.getMessagePanelOld(a, b);
-                var temp = $("<div></div>");
-                $(temp).html(message_panel);
-                if (common.getStatus("emoticon")) {
-                    temp = insertChatppEmoticonClass(temp);
-                }
-
-                if (!common.getStatus("thumbnail") && !common.getStatus("highlight")) {
-                    return $(temp).html();
-                }
-                if (common.getStatus("thumbnail")) {
-                    temp = insertThumbnail(temp);
-                }
-                if (common.getStatus("highlight")) {
-                    $("pre code", temp).each(function (i, block) {
-                        var block_text = $(block).html();
-                        var options = getHighlightOption(block_text);
-                        if (options.has_valid_options) {
-                            var first_line = block_text.split("\n", 1)[0];
-                            /* eslint-disable prefer-template */
-                            block_text = block_text.replace(first_line + "\n", "");
-                            /* eslint-enable */
-                            $(block).html(block_text);
-                        }
-                        if (options.language) {
-                            $(block).addClass(options.language);
-                        }
-                        if (!options.nowrap) {
-                            $(block).css({ "word-wrap": "break-word", "white-space": "pre-wrap" });
-                        }
-                        hljs.highlightBlock(block);
-                    });
-                }
-                return $(temp).html();
-            };
-
-            if (common.getStatus("thumbnail_status")) {
-                TK.view.getTaskPanelOld = TK.view.getTaskPanel;
-                TK.view.getTaskPanel = function (b, d) {
-                    var task_panel = this.getTaskPanelOld(b, d);
-                    if ($(task_panel).is("div")) {
-                        return task_panel;
-                    }
-                    var temp = $("<span></span>");
-                    temp.html(task_panel);
-                    temp = insertThumbnail(temp);
-                    return temp.html();
-                };
-
-                RoomView.prototype.buildOld = RoomView.prototype.build;
-                RoomView.prototype.build = function (a) {
-                    this.buildOld(a);
-                    insertThumbnail($("#_subRoomDescription"));
-                };
-            }
-        }
-    }]);
-
-    return ViewEnhancer;
-}();
-
-var view_enhancer = new ViewEnhancer();
-module.exports = view_enhancer;
-
-/***/ }),
 /* 26 */
 /***/ (function(module, exports) {
 
@@ -2660,7 +2698,7 @@ var Advertisement = function () {
         value: function setUp() {
             var _this = this;
 
-            if ($("#chatppAdvertisement").length > 0) {
+            if ($("#_chatppSponsored").length > 0) {
                 return;
             }
             $("#_chatSendTool").append($("<li>", { id: "_chatppSponsored", class: "_showDescription", css: {

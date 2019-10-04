@@ -1,13 +1,13 @@
 {
     "name": "Chat++ for Chatwork",
     "short_name": "Chat++",
-    "version": "5.2.1",
+    "version": "5.4.0",
     "manifest_version": 2,
     "description": "An all-in-one Chatwork Enhancement Toolkit which provides many useful features!",
     "applications": {
         "gecko": {
             "id": "chatpp@thangtd.com",
-            "strict_min_version": "48.0a1"
+            "strict_min_version": "60"
         }
     },
     "content_scripts": [
