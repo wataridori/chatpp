@@ -183,7 +183,6 @@ class Mention {
                 this.fuse = new Fuse(this.member_objects, this.options);
                 this.current_RM = RM.id;
             }
-
             if (this.findAtmark()) {
                 if (this.is_displayed && this.getNearestAtmarkIndex() != -1 && this.getNearestAtmarkIndex() != this.actived_atmark_index) {
                     this.hideSuggestionBox();
@@ -247,9 +246,8 @@ class Mention {
                 this.hideSuggestionBox();
             }
 
-            return false;
+            return true;
         });
-
         this.addTagButton();
         this.ccMention();
     }

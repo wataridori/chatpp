@@ -566,7 +566,6 @@ $(function () {
                     setTimeout(function () {
                         room_information.setUp();
                         mention.setUp();
-                        console.log("Setup Finished");
                     }, 100);
                 }
             };
@@ -1841,7 +1840,6 @@ var Mention = function () {
                     _this2.fuse = new Fuse(_this2.member_objects, _this2.options);
                     _this2.current_RM = RM.id;
                 }
-
                 if (_this2.findAtmark()) {
                     if (_this2.is_displayed && _this2.getNearestAtmarkIndex() != -1 && _this2.getNearestAtmarkIndex() != _this2.actived_atmark_index) {
                         _this2.hideSuggestionBox();
@@ -1904,9 +1902,8 @@ var Mention = function () {
                     _this2.hideSuggestionBox();
                 }
 
-                return false;
+                return true;
             });
-
             this.addTagButton();
             this.ccMention();
         }

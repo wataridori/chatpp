@@ -1,5 +1,8 @@
 Chat++ Change Logs
 
+## 5.4.2
+* Fix bug can not edit message (write new or delete old) without inserting `Enter`
+
 ## 5.4.1
 * Fix bug can not use Mention feature when Emoticon feature is disabled
 * Remove Thumbnail and Highlight feature because of not being used much, and bad performance

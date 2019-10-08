@@ -38,7 +38,6 @@ $(() => {
                     setTimeout(() => {
                         room_information.setUp();
                         mention.setUp();
-                        console.log("Setup Finished");
                     }, 100);
                 }
             }
