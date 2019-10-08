@@ -109,7 +109,7 @@ class Mention {
         $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
         this.hideSuggestionBox();
         $("#_sendEnterActionArea").click(() => {
-            this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
+            this.cached_enter_action = ST.data.enter_action;
         });
         
         // hide suggestion box when click in textarea or outside
