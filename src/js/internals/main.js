@@ -36,6 +36,7 @@ $(() => {
                 if (window.chatpp_id != RM.id) {
                     window.chatpp_id = RM.id;
                     setTimeout(() => {
+                        emoticon.addExternalEmoList(false);
                         room_information.setUp();
                         mention.setUp();
                     }, 100);

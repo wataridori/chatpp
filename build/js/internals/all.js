@@ -564,6 +564,7 @@ $(function () {
                 if (window.chatpp_id != RM.id) {
                     window.chatpp_id = RM.id;
                     setTimeout(function () {
+                        emoticon.addExternalEmoList(false);
                         room_information.setUp();
                         mention.setUp();
                     }, 100);
@@ -659,7 +660,7 @@ var Emoticon = function () {
                 return _this.hideSuggestionEmotionsBox();
             });
             // Temporarily remove the emoticon suggestion list
-            // this.addExternalEmoList(true);
+            this.addExternalEmoList(true);
             this.addExternalEmo();
             this.setEmoticonTextLabel();
 
@@ -870,9 +871,10 @@ var Emoticon = function () {
     }, {
         key: "addExternalEmoList",
         value: function addExternalEmoList(bind_event) {
-            if ($("#externalEmoticonsButton").length > 0) {
+            if (!this.status || $("#externalEmoticonsButton").length > 0) {
                 return;
             }
+
             $("#_chatSendTool").append($("<li>", {
                 id: "_externalEmoticonsButton",
                 class: "_showDescription chatInput__element",
@@ -883,51 +885,6 @@ var Emoticon = function () {
                     "role": "button"
                 }
             }).append($("<span>", { id: "externalEmoticonsButton", class: "icoFontActionMore icoSizeLarge" })));
-
-            var data = [];
-            this.sorted_emoticons.forEach(function (emo) {
-                if (data.indexOf(emo.data_name) == -1) {
-                    data.push(emo.data_name);
-                }
-            });
-
-            var temp = [];
-            var arrayData = [];
-            var sorted_Emoticons = this.sorted_emoticons;
-            data.forEach(function (item) {
-                temp = [];
-                sorted_Emoticons.map(function (emo) {
-                    var encoded_text = common.htmlEncode(emo.key);
-                    var titleapp = encoded_text + " - " + emo.data_name + " - Chatpp";
-                    var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
-                    if (emo.data_name == item) {
-                        var liElement = $("<li>", {
-                            css: {
-                                "padding": "5px",
-                                "cursor": "pointer",
-                                "border": "1px solid #fff",
-                                "border-radius": "3px",
-                                "transition": "border 0.2s linear 0s"
-                            }
-                        }).append($("<img>", {
-                            id: "example",
-                            css: {
-                                "width": "100%",
-                                "max-width": "50px"
-                            },
-                            attr: {
-                                "src": img_src,
-                                "title": titleapp,
-                                "alt": encoded_text
-                            }
-                        }));
-                        temp.push(liElement);
-
-                        return liElement.prop("outerHTML");
-                    }
-                }).join("");
-                arrayData.push(temp);
-            });
 
             $("#_wrapper").append($("<style>").append("::-webkit-scrollbar {width:10px;height:10px} .w3-emotion {display:inline-block;text-align:center;min-width:80px;height:30px;border:1px solid #ccc;cursor:pointer;margin:0px 2px;border-radius:5px;font-size:10px;background-color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}"));
 
@@ -977,21 +934,72 @@ var Emoticon = function () {
                 }
             });
 
-            $("#externalEmoticonsButton").click(function (e) {
+            if (!bind_event) {
+                return;
+            }
+
+            var arrayDataName = [];
+            var sorted_emoticons = this.sorted_emoticons;
+
+            sorted_emoticons.forEach(function (emo) {
+                if (arrayDataName.indexOf(emo.data_name) == -1) {
+                    arrayDataName.push(emo.data_name);
+                }
+            });
+
+            var temp = [];
+            var arrayData = [];
+
+            arrayDataName.forEach(function (item) {
+                temp = [];
+                sorted_emoticons.map(function (emo) {
+                    var encoded_text = common.htmlEncode(emo.key);
+                    var titleapp = encoded_text + " - " + emo.data_name + " - Chatpp";
+                    var img_src = common.htmlEncode(common.getEmoUrl(emo.src));
+                    if (emo.data_name == item) {
+                        var liElement = $("<li>", {
+                            css: {
+                                "padding": "5px",
+                                "cursor": "pointer",
+                                "border": "1px solid #fff",
+                                "border-radius": "3px",
+                                "transition": "border 0.2s linear 0s"
+                            }
+                        }).append($("<img>", {
+                            id: "example",
+                            css: {
+                                "width": "100%",
+                                "max-width": "50px"
+                            },
+                            attr: {
+                                "src": img_src,
+                                "title": titleapp,
+                                "alt": encoded_text
+                            }
+                        }));
+                        temp.push(liElement);
+
+                        return liElement.prop("outerHTML");
+                    }
+                }).join("");
+                arrayData.push(temp);
+            });
+
+            $("body").on("click", "#externalEmoticonsButton", function (e) {
                 u.open($(e.currentTarget));
                 $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[0]);
                 $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
                 $("#tabEmotion0").css("background-color", "#eaeae8");
             });
 
-            data.forEach(function (item, index) {
+            arrayDataName.forEach(function (item, index) {
                 $("#_externalEmoticonList #tabEmotionBig").append($("<button>", {
                     id: "tabEmotion" + index,
                     class: "w3-bar-item w3-button w3-emotion"
                 }).append(item));
             });
 
-            data.forEach(function (item, index) {
+            arrayDataName.forEach(function (item, index) {
                 $("#tabEmotion" + index).on("click", function (event) {
                     event.preventDefault();
                     $("#_emoticonGalleryTab li").remove();
@@ -999,7 +1007,7 @@ var Emoticon = function () {
                 });
             });
 
-            data.forEach(function (item, index) {
+            arrayDataName.forEach(function (item, index) {
                 $("#_externalEmoticonList #tabEmotionBig button").on("click", function (event) {
                     $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
                     $(event.currentTarget).css("background-color", "#eaeae8");
@@ -1012,9 +1020,6 @@ var Emoticon = function () {
                 });
             });
 
-            if (!bind_event) {
-                return;
-            }
             $("#_externalEmoticonList").on("mouseenter", "li", function (e) {
                 var a = $(e.currentTarget).find("img");
                 $("#_externalEmotionDescription").text(a.attr("title"));
@@ -1764,7 +1769,7 @@ var Mention = function () {
             $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
             this.hideSuggestionBox();
             $("#_sendEnterActionArea").click(function () {
-                _this2.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
+                _this2.cached_enter_action = ST.data.enter_action;
             });
 
             // hide suggestion box when click in textarea or outside

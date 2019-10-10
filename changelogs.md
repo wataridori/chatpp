@@ -1,5 +1,8 @@
 Chat++ Change Logs
 
+## 5.4.3
+* Bring the Emoticon List button back
+
 ## 5.4.2
 * Fix bug can not edit message (write new or delete old) without inserting `Enter`
 
