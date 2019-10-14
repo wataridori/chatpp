@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -202,7 +202,7 @@ var Common = function () {
             return {
                 "name": "Chat++ for Chatwork",
                 "short_name": "Chat++",
-                "version": "5.4.0",
+                "version": "5.4.3",
                 "option_page": "option.html"
             };
         }
@@ -433,20 +433,19 @@ module.exports = Storage;
 /***/ }),
 /* 3 */,
 /* 4 */,
-/* 5 */,
-/* 6 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(7);
+module.exports = __webpack_require__(6);
 
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var common = __webpack_require__(0);
 var Storage = __webpack_require__(2);
-var ChromeStorageLocal = __webpack_require__(8);
+var ChromeStorageLocal = __webpack_require__(7);
 var Const = __webpack_require__(1);
 
 var local_stored_data = {};
@@ -491,7 +490,7 @@ function loadChatppEmoData() {
 }
 
 function updateViewData(data) {
-    var features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
+    var features = ["emoticon", "mention", "shortcut"];
     for (var i in features) {
         loadStatus(features[i], data[features[i] + "_status"]);
     }
@@ -521,7 +520,7 @@ function setVersionType() {
 }
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();

@@ -3,6 +3,9 @@ let shortcut = require("./Shortcut.js");
 let view_enhancer = require("./ViewEnhancer.js");
 let NotificationDisabler = require("./NotificationDisabler.js");
 let notify_all = require("./NotifyAll.js");
+let mention = require("./Mention.js");
+let room_information = require("./RoomInformation.js");
+let advertisement = require("./Advertisement.js");
 
 let cw_timer;
 
@@ -19,12 +22,26 @@ $(() => {
                 emoticon.setUp();
                 view_enhancer.updateChatworkView();
             }
+            advertisement.setUp();
             shortcut.setUp();
             NotificationDisabler.setUp();
             notify_all.setUp();
 
             view_enhancer.updateChatSendView();
             view_enhancer.updateGetContactPanelView();
+
+            RoomView.prototype.buildOld = RoomView.prototype.build;
+            RoomView.prototype.build = function(a) {
+                this.buildOld(a);
+                if (window.chatpp_id != RM.id) {
+                    window.chatpp_id = RM.id;
+                    setTimeout(() => {
+                        emoticon.addExternalEmoList(false);
+                        room_information.setUp();
+                        mention.setUp();
+                    }, 100);
+                }
+            }
 
             if (rebuild) {
                 RL.rooms[RM.id].build();

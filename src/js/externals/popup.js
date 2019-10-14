@@ -45,7 +45,7 @@ function loadChatppEmoData() {
 }
 
 function updateViewData(data) {
-    let features = ["emoticon", "mention", "shortcut", "thumbnail", "highlight"];
+    let features = ["emoticon", "mention", "shortcut"];
     for (let i in features) {
         loadStatus(features[i], data[`${features[i]}_status`]);
     }

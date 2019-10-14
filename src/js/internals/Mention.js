@@ -109,7 +109,7 @@ class Mention {
         $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
         this.hideSuggestionBox();
         $("#_sendEnterActionArea").click(() => {
-            this.cached_enter_action = $("#_sendEnterAction").cwCheckBox().isChecked() ? "send" : "br";
+            this.cached_enter_action = ST.data.enter_action;
         });
         
         // hide suggestion box when click in textarea or outside
@@ -183,7 +183,6 @@ class Mention {
                 this.fuse = new Fuse(this.member_objects, this.options);
                 this.current_RM = RM.id;
             }
-
             if (this.findAtmark()) {
                 if (this.is_displayed && this.getNearestAtmarkIndex() != -1 && this.getNearestAtmarkIndex() != this.actived_atmark_index) {
                     this.hideSuggestionBox();
@@ -247,9 +246,8 @@ class Mention {
                 this.hideSuggestionBox();
             }
 
-            return false;
+            return true;
         });
-
         this.addTagButton();
         this.ccMention();
     }

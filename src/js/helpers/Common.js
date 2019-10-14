@@ -113,7 +113,7 @@ class Common {
         return {
             "name": "Chat++ for Chatwork",
             "short_name": "Chat++",
-            "version": "5.4.0",
+            "version": "5.4.3",
             "option_page": "option.html"
         };
     }
