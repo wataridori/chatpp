@@ -23,7 +23,6 @@ which make life easier :D<br>
 It means that your custom data will not be synced,
 and if you use **Chat++ for Firefox** in two different computers, you must do config by your self.
 - **Chat++ for Firefox** is still in **BETA**. Please notify me if you have any troubles.
-- If you want a stable version, or do not want to use Firefox Nightly, just stick with [Chrome Version](https://chrome.google.com/webstore/detail/chat%20%20-for-chatwork/amhfnpimdfcdcpnchjionbddjjbmofnl)
 
 Change Logs
 --------------
@@ -32,6 +31,12 @@ View all change logs [here](./changelogs.md)
 Contribution
 --------------
 View contribution guidelines [here](./CONTRIBUTING.md), or check it out at [Viblo](https://viblo.asia/thangtd90/posts/157G5noZvAje)
+
+Development
+--------------
+- Run `npm install` to install all nodes dependencies
+- Start coding
+- Run `npm run dev` to build codes in the `src` folder, and transfer them into the `build` folder
 
 Main Features
 --------------
