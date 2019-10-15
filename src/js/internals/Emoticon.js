@@ -44,7 +44,7 @@ class Emoticon {
             "overflow-y": "auto",
             "z-index": "99"
         });
-        
+
         this.chat_text_jquery.click(() => this.hideSuggestionEmotionsBox());
 
         $("#_roomListArea").click(() => this.hideSuggestionEmotionsBox());
@@ -80,13 +80,13 @@ class Emoticon {
 
                 e.preventDefault();
             }
-            
-            
+
+
             if ((e.which == 13 || e.which == 9) && this.is_colon) {
                 $("#suggestion-emotion-container").find("p[data-emo-selected='true']").click();
-                
+
                 e.preventDefault();
-            }            
+            }
         });
 
         $("#suggestion-emotion-container").on("mouseenter", "p", (e) => {
@@ -127,7 +127,7 @@ class Emoticon {
 
                 return;
             }
-            
+
             if (e.which == 38 && this.is_colon) {
                 let curentScroll = $("#suggestion-emotion-container").scrollTop();
                 let scrollValue = $(".suggestion-emo-list[data-emo-selected='true']").height();
@@ -184,13 +184,13 @@ class Emoticon {
                 } else {
                     this.hideSuggestionEmotionsBox();
                 }
-                
+
                 let findEmo = $.grep(this.list_all_emo, (e) => {
                     let comp = e.key.toLowerCase();
                     return comp.indexOf(this.emo_name) > -1;
                 });
                 let toAppend = "";
-                
+
                 if(findEmo.length > 0){
                     for(let i = 0; i < findEmo.length; i++) {
                         if (i == 0) {
@@ -280,6 +280,10 @@ class Emoticon {
             )
         );
 
+        if (!bind_event) {
+            return;
+        }
+
         $("#_wrapper").append($("<style>").append("::-webkit-scrollbar {width:10px;height:10px} .w3-emotion {display:inline-block;text-align:center;min-width:80px;height:30px;border:1px solid #ccc;cursor:pointer;margin:0px 2px;border-radius:5px;font-size:10px;background-color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}"));
 
         $("#_wrapper").append(
@@ -332,10 +336,6 @@ class Emoticon {
             open: () => $("#_externalEmotionDescription").text(hint)
         });
 
-        if (!bind_event) {
-            return;
-        }
-
         let arrayDataName = [];
         let sorted_emoticons = this.sorted_emoticons;
 
@@ -385,6 +385,7 @@ class Emoticon {
 
         $("body").on("click", "#externalEmoticonsButton", ((e) => {
             u.open($(e.currentTarget));
+            $("#_emoticonGalleryTab li").remove();
             $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[0]);
             $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
             $("#tabEmotion0").css("background-color", "#eaeae8");
@@ -443,7 +444,7 @@ class Emoticon {
     setEmoticonTextLabel() {
         $("#_externalEmoticonsButton").attr("aria-label", "View Chat++ Emoticons");
     }
-    
+
     addEmo(emo) {
         for (let index = 0; index < emo.length; index++) {
             let encoded_text = common.htmlEncode(emo[index].key);
