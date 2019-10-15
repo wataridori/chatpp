@@ -886,6 +886,10 @@ var Emoticon = function () {
                 }
             }).append($("<span>", { id: "externalEmoticonsButton", class: "icoFontActionMore icoSizeLarge" })));
 
+            if (!bind_event) {
+                return;
+            }
+
             $("#_wrapper").append($("<style>").append("::-webkit-scrollbar {width:10px;height:10px} .w3-emotion {display:inline-block;text-align:center;min-width:80px;height:30px;border:1px solid #ccc;cursor:pointer;margin:0px 2px;border-radius:5px;font-size:10px;background-color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}"));
 
             $("#_wrapper").append($("<div>", {
@@ -933,10 +937,6 @@ var Emoticon = function () {
                     return $("#_externalEmotionDescription").text(hint);
                 }
             });
-
-            if (!bind_event) {
-                return;
-            }
 
             var arrayDataName = [];
             var sorted_emoticons = this.sorted_emoticons;
@@ -987,6 +987,7 @@ var Emoticon = function () {
 
             $("body").on("click", "#externalEmoticonsButton", function (e) {
                 u.open($(e.currentTarget));
+                $("#_emoticonGalleryTab li").remove();
                 $("#_externalEmoticonList #_emoticonGalleryTab").append(arrayData[0]);
                 $("#_externalEmoticonList #tabEmotionBig button").css("background-color", "white");
                 $("#tabEmotion0").css("background-color", "#eaeae8");
