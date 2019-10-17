@@ -1,3 +1,5 @@
+let Const = require("../helpers/Const.js");
+
 class NotifyAll {
     setUp() {
         this.registerRegex();
@@ -10,6 +12,31 @@ class NotifyAll {
             reptxt: "TO ALL",
             special: true
         });
+
+        window.FindReact = function(dom) {
+            let key = Object.keys(dom).find(key => key.startsWith("__reactInternalInstance$"));
+            let internalInstance = dom[key];
+            if (internalInstance == null) return null;
+
+            if (internalInstance.return) { // react 16+
+                return internalInstance._debugOwner
+                    ? internalInstance._debugOwner.stateNode
+                    : internalInstance.return.stateNode;
+            } else { // react <16
+                return internalInstance._currentElement._owner._instance;
+            }
+        }
+
+        let dom = document.getElementsByClassName('_message timelineMessage');
+        let node = FindReact(dom[dom.length-1]);
+        node.__proto__.renderOld = node.__proto__.render;
+        node.__proto__.render = function() {
+            if (this.props.message.body.indexOf(Const.TO_ALL_MARK) === 0) {
+                this.props.message.mentioned = true;
+            }
+
+            return this.renderOld();
+        };
     }
 }
 

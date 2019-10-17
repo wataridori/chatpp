@@ -111,7 +111,7 @@ class Mention {
         $("#_sendEnterActionArea").click(() => {
             this.cached_enter_action = ST.data.enter_action;
         });
-        
+
         // hide suggestion box when click in textarea or outside
         this.chat_text_jquery.click(() => this.hideSuggestionBox());
 
@@ -241,7 +241,7 @@ class Mention {
                     this.hideSuggestionBox();
                     this.holdCaretPosition(e);
                 }
-                
+
             } else {
                 this.hideSuggestionBox();
             }
@@ -348,7 +348,7 @@ class Mention {
         let position = Measurement.caretPos(this.chat_text_jquery);
         position.top -= rect.top;
         position.left -= rect.left;
-        
+
         if (rect.width - position.left < 236) {
             position.left -= 236;
         }
@@ -781,11 +781,11 @@ class Mention {
                     "role": "button"
                 },
                 css: {
-                    "display": "inline-block", 
-                    "margin-left": 5 
+                    "display": "inline-block",
+                    "margin-left": 5
                 }
             }).append(
-                $("<span>", { 
+                $("<span>", {
                     class: "chatInput__emoticon chatInput__iconContainer"
                 }).append("<strong>[info]</strong>")
             )
@@ -801,7 +801,7 @@ class Mention {
                     "display": "inline-block"
                 }
             }).append(
-                $("<span>", { 
+                $("<span>", {
                     class: "chatInput__emoticon chatInput__iconContainer"
                 }).append("<strong>[title]</strong>")
             )
@@ -817,7 +817,7 @@ class Mention {
                     "display": "inline-block"
                 }
             }).append(
-                $("<span>", { 
+                $("<span>", {
                     class: "chatInput__emoticon chatInput__iconContainer"
                 }).append("<strong>[code]</strong>")
             )
