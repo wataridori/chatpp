@@ -99,7 +99,7 @@ class ViewEnhancer {
             if (a.msg.indexOf(Const.TO_ALL_MARK) === 0) {
                 a.mn = true;
             }
-            
+
             return this.getMessagePanelOld(a, b);
         };
     }
