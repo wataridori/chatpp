@@ -88,7 +88,7 @@ var Const = {
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
     ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL >>>"
+    TO_ALL_MARK: "TO ALL &gt;&gt;&gt;"
 };
 
 module.exports = Const;
@@ -1607,11 +1607,13 @@ module.exports = NotificationDisabler;
 
 /***/ }),
 /* 25 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Const = __webpack_require__(0);
 
 var NotifyAll = function () {
     function NotifyAll() {
@@ -1632,6 +1634,33 @@ var NotifyAll = function () {
                 reptxt: "TO ALL",
                 special: true
             });
+
+            window.FindReact = function (dom) {
+                var key = Object.keys(dom).find(function (key) {
+                    return key.startsWith("__reactInternalInstance$");
+                });
+                var internalInstance = dom[key];
+                if (internalInstance == null) return null;
+
+                if (internalInstance.return) {
+                    // react 16+
+                    return internalInstance._debugOwner ? internalInstance._debugOwner.stateNode : internalInstance.return.stateNode;
+                } else {
+                    // react <16
+                    return internalInstance._currentElement._owner._instance;
+                }
+            };
+
+            var dom = document.getElementsByClassName('_message timelineMessage');
+            var node = FindReact(dom[dom.length - 1]);
+            node.__proto__.renderOld = node.__proto__.render;
+            node.__proto__.render = function () {
+                if (this.props.message.body.indexOf(Const.TO_ALL_MARK) === 0) {
+                    this.props.message.mentioned = true;
+                }
+
+                return this.renderOld();
+            };
         }
     }]);
 

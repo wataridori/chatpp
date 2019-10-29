@@ -1,5 +1,8 @@
 Chat++ Change Logs
 
+## 5.4.5
+* Fix `TO ALL >>>` does not highlight messsage
+
 ## 5.4.4
 * Fix display wrong icon in emotion tab and remove unnecessary action in emotion when change room
 
