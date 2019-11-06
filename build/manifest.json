@@ -34,7 +34,8 @@
     "permissions": [
         "storage",
         "tabs",
-        "<all_urls>"
+        "https://www.chatwork.com/*",
+        "https://kcw.kddi.ne.jp/*"
     ],
     "options_page": "html/emoticon.html",
     "icons": {
