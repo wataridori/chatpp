@@ -27,8 +27,14 @@ class NotifyAll {
             }
         }
 
-        let dom = document.getElementsByClassName('_message timelineMessage');
+        let dom = document.getElementsByClassName('_message messageHasBorder');
+        if (!dom.length) {
+            return;
+        }
         let node = FindReact(dom[dom.length-1]);
+        if (!node) {
+            return;
+        }
         node.__proto__.renderOld = node.__proto__.render;
         node.__proto__.render = function() {
             if (this.props.message.body.indexOf(Const.TO_ALL_MARK) === 0) {
