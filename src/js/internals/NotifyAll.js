@@ -13,8 +13,8 @@ class NotifyAll {
             special: true
         });
 
-        window.FindReact = function(dom) {
-            let key = Object.keys(dom).find(key => key.startsWith("__reactInternalInstance$"));
+        window.FindReact = (dom) => {
+            let key = Object.keys(dom).find((key) => key.startsWith("__reactInternalInstance$"));
             let internalInstance = dom[key];
             if (internalInstance == null) return null;
 
@@ -27,11 +27,11 @@ class NotifyAll {
             }
         }
 
-        let dom = document.getElementsByClassName('_message messageHasBorder');
+        let dom = document.getElementsByClassName("_message messageHasBorder");
         if (!dom.length) {
             return;
         }
-        let node = FindReact(dom[dom.length-1]);
+        let node = window.FindReact(dom[dom.length-1]);
         if (!node) {
             return;
         }

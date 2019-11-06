@@ -1651,11 +1651,11 @@ var NotifyAll = function () {
                 }
             };
 
-            var dom = document.getElementsByClassName('_message messageHasBorder');
+            var dom = document.getElementsByClassName("_message messageHasBorder");
             if (!dom.length) {
                 return;
             }
-            var node = FindReact(dom[dom.length - 1]);
+            var node = window.FindReact(dom[dom.length - 1]);
             if (!node) {
                 return;
             }
