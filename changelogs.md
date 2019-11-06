@@ -1,5 +1,8 @@
 Chat++ Change Logs
 
+## 5.4.6
+* Temporarily fix bug can not load Chat++ due to the change in Frontend Codes of Chatwork
+
 ## 5.4.5
 * Fix `TO ALL >>>` does not highlight messsage
 
