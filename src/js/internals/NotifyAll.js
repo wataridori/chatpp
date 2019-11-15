@@ -19,15 +19,13 @@ class NotifyAll {
             if (internalInstance == null) return null;
 
             if (internalInstance.return) { // react 16+
-                return internalInstance._debugOwner
-                    ? internalInstance._debugOwner.stateNode
-                    : internalInstance.return.stateNode;
+                return internalInstance.return.child.memoizedProps.children.find((child) => child._owner)._owner.stateNode;
             } else { // react <16
                 return internalInstance._currentElement._owner._instance;
             }
         }
 
-        let dom = document.getElementsByClassName("_message messageHasBorder");
+        let dom = document.getElementsByClassName("_message");
         if (!dom.length) {
             return;
         }
