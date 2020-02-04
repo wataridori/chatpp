@@ -3,10 +3,12 @@ If you can understand Vietnamese, please refer [this post in Viblo](https://vibl
 which describes in detail about how to contribute to Chat++.
 
 ## Setup
-- Chat++ is rewritten in [ECMAScript 6](http://www.ecma-international.org/publications/standards/Ecma-262.htm)
-and compiled by [babel](https://babeljs.io/).
-- Install `nodejs` and `gulp`, if you do not have.
-- Run `npm install` to install the required node modules.
+### Requirement
+- Nodejs: Version 10 or 11 recommended
+
+### Instalation
+- Install `nodejs` first, if you do not have.
+- You can use `npm` or `yarn` to install dependencies. Here, `yarn install` is being used to install the required node modules.
 - Chat++ uses [ESLint](http://eslint.org/) for checking code styles. It uses `eslint-babel` parser instead of the default ESLint parser.
 You have to install them first.
 ```
@@ -14,8 +16,9 @@ npm install -g eslint babel-eslint
 ```
 - You can refer the [.eslintrc.json](./.eslintrc.json) file for the rules that Chat++ is following. Check [ESLint Rules Document](http://eslint.org/docs/rules/)
 for the rules in detail.
-- Run `gulp` to build codes from `src` folder.
-- Run `npm test` or `eslint src` to check whether your codes satisfy the convention or not.
+- [Laravel Mix](https://laravel-mix.com/), a Webpack wrapper, is being used to compile assets. You can check out the usage at their [documentation page](https://laravel-mix.com/docs/2.1/mixjs). 
+- Run `npm run dev` to build codes from `src` folder.
+- Run `npm test` or `eslint src` to check whether your codes satisfy the coding conventions or not.
 
 ## Report an Issue
 
