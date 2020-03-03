@@ -45,7 +45,7 @@ function loadStatus(name, value) {
 }
 
 function updateViewData(data) {
-    let features = ["emoticon", "mention", "shortcut"];
+    let features = ["emoticon", "mention", "shortcut", "theme"];
     for (let i in features) {
         loadStatus(features[i], data[`${features[i]}_status`]);
     }
