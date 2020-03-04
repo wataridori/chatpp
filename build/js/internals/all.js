@@ -610,7 +610,7 @@ var Emoticon = function () {
         this.is_colon = false;
         this.emo_name = "";
         this.emo_cursor_loca = 0;
-        this.list_all_emo = JSON.parse(localStorage[Const["LOCAL_STORAGE_DATA_KEY"]]);
+        this.list_all_emo = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
     }
@@ -632,8 +632,9 @@ var Emoticon = function () {
                 }
                 return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
             });
+
             var html = "<div id='suggestion-emotion-container'></div>";
-            $("#_chatTextArea").append(html);
+            $(html).insertAfter("#_externalInfo");
             $("#suggestion-emotion-container").css({
                 "background": "#fff",
                 "position": "absolute",

@@ -11,7 +11,6 @@ let emo_info = {};
 let urls = {};
 
 init(true);
-
 function init(inject_script) {
     storage.get(Const.CHROME_SYNC_KEY, (info) => {
         if (!$.isEmptyObject(info)) {
@@ -33,10 +32,11 @@ function init(inject_script) {
             info.force_update_version = Const.FORCE_TURN_OFF_THUMBNAIL;
             info.thumbnail_status = false;
             info.emoticon_status = true;
+            info.theme_status = true;
         }
         emo_info = info;
         localStorage.force_update_version = info.force_update_version;
-        let features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
+        let features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon", "theme"];
         features.forEach((feature) => {
             let feature_name = `${feature}_status`;
             info[feature_name] = info[feature_name] === undefined ? true : info[feature_name];
@@ -47,6 +47,14 @@ function init(inject_script) {
             addInjectedScript();
         } else {
             getData(info, inject_script);
+        }
+        if(info.theme_status) {
+            setTimeout(() => {
+                $("<style type=\"text/css\"> .gngoBe{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
+                $("<style type=\"text/css\"> .dkNbuC{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
+                $("body").removeClass("light")
+            }, Const.DELAY_TIME + 1
+            );
         }
     });
 
