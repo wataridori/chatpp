@@ -14,7 +14,7 @@ class EmoStorage extends Storage {
     }
 
     setFeatureStatus(emo_info) {
-        let features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
+        let features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon", "legacy_theme"];
         for (let i in features) {
             let feature_name = `${features[i]}_status`;
             this.data[feature_name] = emo_info[feature_name] === undefined ? true : emo_info[feature_name];

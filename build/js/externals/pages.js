@@ -459,7 +459,7 @@ var EmoStorage = function (_Storage) {
     }, {
         key: "setFeatureStatus",
         value: function setFeatureStatus(emo_info) {
-            var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon"];
+            var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon", "legacy_theme"];
             for (var i in features) {
                 var feature_name = features[i] + "_status";
                 this.data[feature_name] = emo_info[feature_name] === undefined ? true : emo_info[feature_name];
@@ -998,7 +998,7 @@ $(function () {
 });
 
 function loadStatus(name, value) {
-    if (value !== undefined && value === false) {
+    if (value === false || value === undefined && name === "legacy_theme") {
         $("#" + name + "-status").removeClass().addClass("text-danger").html("DISABLED");
         $("#" + name + "-status-btn").removeClass().addClass("btn btn-success btn-xs").html("Enable");
     } else {
@@ -1008,7 +1008,7 @@ function loadStatus(name, value) {
 }
 
 function updateViewData(data) {
-    var features = ["emoticon", "mention", "shortcut", "theme"];
+    var features = ["emoticon", "mention", "shortcut", "legacy_theme"];
     for (var i in features) {
         loadStatus(features[i], data[features[i] + "_status"]);
     }

@@ -32,14 +32,17 @@ function init(inject_script) {
             info.force_update_version = Const.FORCE_TURN_OFF_THUMBNAIL;
             info.thumbnail_status = false;
             info.emoticon_status = true;
-            info.theme_status = true;
+            info.theme_status = false;
         }
         emo_info = info;
         localStorage.force_update_version = info.force_update_version;
-        let features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon", "theme"];
+        let features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon", "legacy_theme"];
+        let features_default_false = ["legacy_theme"];
         features.forEach((feature) => {
             let feature_name = `${feature}_status`;
-            info[feature_name] = info[feature_name] === undefined ? true : info[feature_name];
+            if (info[feature_name] === undefined) {
+                info[feature_name] = features_default_false.includes(feature) ? false : true;
+            }
             common.setStatus(feature, info[feature_name]);
         });
         emo_storage.setFeatureStatus(info);
@@ -48,7 +51,7 @@ function init(inject_script) {
         } else {
             getData(info, inject_script);
         }
-        if(info.theme_status) {
+        if(info.legacy_theme_status) {
             setTimeout(() => {
                 $("<style type=\"text/css\"> .gngoBe{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
                 $("<style type=\"text/css\"> .dkNbuC{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");

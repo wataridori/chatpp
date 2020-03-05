@@ -35,7 +35,7 @@ $(() => {
 });
 
 function loadStatus(name, value) {
-    if (value !== undefined && value === false) {
+    if (value === false || (value === undefined && name === "legacy_theme")) {
         $(`#${name}-status`).removeClass().addClass("text-danger").html("DISABLED");
         $(`#${name}-status-btn`).removeClass().addClass("btn btn-success btn-xs").html("Enable");
     } else {
@@ -45,7 +45,7 @@ function loadStatus(name, value) {
 }
 
 function updateViewData(data) {
-    let features = ["emoticon", "mention", "shortcut", "theme"];
+    let features = ["emoticon", "mention", "shortcut", "legacy_theme"];
     for (let i in features) {
         loadStatus(features[i], data[`${features[i]}_status`]);
     }
