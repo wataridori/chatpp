@@ -1,5 +1,8 @@
 Chat++ Change Logs
 
+## 5.4.8
+* Remove unnecessary extension's permission
+
 ## 5.4.7
 * On 03, March, Chatwork suddenly changed their design, which looks terrible. This patch brings some legacy styles back! Hope that Chatwork can realize their mistake and have an action soon. 
 
