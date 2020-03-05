@@ -1803,7 +1803,7 @@ var Mention = function () {
             this.chat_text_jquery = $("#_chatText");
             this.chat_text_element = document.getElementById("_chatText");
 
-            $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter("#_chatText");
+            $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter(".chatInput");
             this.hideSuggestionBox();
             $("#_sendEnterActionArea").click(function () {
                 _this2.cached_enter_action = ST.data.enter_action;
