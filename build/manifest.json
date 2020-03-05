@@ -33,7 +33,6 @@
     },
     "permissions": [
         "storage",
-        "tabs",
         "https://www.chatwork.com/*",
         "https://kcw.kddi.ne.jp/*"
     ],
