@@ -1,5 +1,8 @@
 Chat++ Change Logs
 
+## 5.4.9
+* Remove reply button description ("Replied to", "Đã trả lời cho", "返信元" ...)
+
 ## 5.4.8
 * Remove unnecessary extension's permission
 
