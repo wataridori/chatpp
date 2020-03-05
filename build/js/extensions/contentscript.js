@@ -619,6 +619,7 @@ function init(inject_script) {
             setTimeout(function () {
                 $("<style type=\"text/css\"> .gngoBe{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
                 $("<style type=\"text/css\"> .dkNbuC{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
+                $("<style type=\"text/css\"> .chatTimeLineReply__description{display: none !important;};</style>").appendTo("head");
                 $("body").removeClass("light");
             }, Const.DELAY_TIME + 1);
         }
