@@ -342,7 +342,7 @@ class Mention {
     }
 
     setSuggestionBoxPosition() {
-        let rect = this.chat_text_element.getBoundingClientRect();
+        let rect = document.getElementsByClassName("chatInput")[0].getBoundingClientRect()
         let current_pos = this.doGetCaretPosition(this.chat_text_element);
         this.setCaretPosition(this.chat_text_element, this.actived_atmark_index + 1);
         let position = Measurement.caretPos(this.chat_text_jquery);

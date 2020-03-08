@@ -2045,7 +2045,7 @@ var Mention = function () {
     }, {
         key: "setSuggestionBoxPosition",
         value: function setSuggestionBoxPosition() {
-            var rect = this.chat_text_element.getBoundingClientRect();
+            var rect = document.getElementsByClassName("chatInput")[0].getBoundingClientRect();
             var current_pos = this.doGetCaretPosition(this.chat_text_element);
             this.setCaretPosition(this.chat_text_element, this.actived_atmark_index + 1);
             var position = Measurement.caretPos(this.chat_text_jquery);
@@ -2064,6 +2064,7 @@ var Mention = function () {
                 }
                 position.top -= 118;
             } else {
+                console.log(2);
                 position.top += parseInt(this.chat_text_jquery.css("font-size")) + 5;
             }
             $("#suggestion-container").parent().css({
