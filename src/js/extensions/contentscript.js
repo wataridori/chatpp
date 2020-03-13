@@ -53,8 +53,8 @@ function init(inject_script) {
         }
         if(info.legacy_theme_status) {
             setTimeout(() => {
-                $("<style type=\"text/css\"> .gngoBe{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
-                $("<style type=\"text/css\"> .dkNbuC{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
+                $("<style type=\"text/css\"> .gehxMD{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
+                $("<style type=\"text/css\"> .eBsbzX{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
                 $("<style type=\"text/css\"> .chatTimeLineReply__description{display: none !important;};</style>").appendTo("head");
                 $("body").removeClass("light")
             }, Const.DELAY_TIME + 1
