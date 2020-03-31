@@ -617,9 +617,9 @@ function init(inject_script) {
         }
         if (info.legacy_theme_status) {
             setTimeout(function () {
-                $("<style type=\"text/css\"> .gngoBe{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
-                $("<style type=\"text/css\"> .dkNbuC{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
-                $("<style type=\"text/css\"> .chatTimeLineReply__description{display: none !important;};</style>").appendTo("head");
+                $("<style type=\"text/css\"> .iPjyiK{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
+                $("<style type=\"text/css\"> .iPjyiK{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
+                $("<style type=\"text/css\"> .chatTimeLineReply__label{display: none !important;};</style>").appendTo("head");
                 $("body").removeClass("light");
             }, Const.DELAY_TIME + 1);
         }
