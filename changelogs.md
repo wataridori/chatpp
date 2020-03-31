@@ -1,5 +1,8 @@
 Chat++ Change Logs
 
+## 5.4.10
+* Fix Legacy Style
+
 ## 5.4.9
 * Remove reply button description ("Replied to", "Đã trả lời cho", "返信元" ...)
 
