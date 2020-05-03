@@ -1,4 +1,10 @@
 Chat++ Change Logs
+## 5.5.0
+* Update Chat++ Emoticons mechanism. Instead of pushing emoticons to Chatwork's default emoticons list (which do not work anymore), Chat++ directly update text from DOM
+* TO DO List:
+  * Update Emoticons in reply popup
+  * Update Emoticons in search popup
+  * Update Emoticons in room description
 
 ## 5.4.10
 * Fix Legacy Style
