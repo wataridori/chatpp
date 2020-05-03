@@ -606,6 +606,8 @@ var Emoticon = function () {
 
         this.status = common.getStatus("emoticon");
         this.emoticons = [];
+        this.chatpp_emoticons = {};
+        this.emoticons_regex;
         this.start = /::/ig;
         this.is_colon = false;
         this.emo_name = "";
@@ -831,6 +833,7 @@ var Emoticon = function () {
                     });
                 }
             });
+            this.applyEmoticonsByModifyingDOM();
         }
     }, {
         key: "getNearestAtmarkIndex",
@@ -1051,42 +1054,40 @@ var Emoticon = function () {
     }, {
         key: "addEmo",
         value: function addEmo(emo) {
+            var _this2 = this;
+
+            this.chatpp_emoticons.baseEmoticons = [];
+            this.chatpp_emoticons.tagHash = {};
             for (var index = 0; index < emo.length; index++) {
                 var encoded_text = common.htmlEncode(emo[index].key);
                 var title = encoded_text + " - " + emo[index].data_name + " - Chatpp";
                 var src = common.htmlEncode(common.getEmoUrl(emo[index].src));
-                // Check whether Chatworks use new Javascript Code
-                if (this.isNewMechanism()) {
-                    var one_emo = {
-                        name: encoded_text,
-                        title: title,
-                        src: src,
-                        tag: emo[index].key,
-                        external: true
-                    };
-                    emoticons.baseEmoticons.push(one_emo);
-                    emoticons.tagHash[emo[index].key] = one_emo;
-                } else {
-                    if (this.isSpecialEmo(emo[index].key)) {
-                        title = "";
-                        encoded_text = "";
-                    }
-                    // If Chatwork uses old Javascript code, then use the old method
-                    var rep = "<img src=\"" + src + "\" title=\"" + title + "\" alt=\"" + encoded_text + "\" class=\"ui_emoticon\"/>";
-                    var regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
-                    CW.reg_cmp.push({
-                        key: regex,
-                        rep: rep,
-                        reptxt: emo[index].key,
-                        external: true
-                    });
-                }
+                var one_emo = {
+                    name: encoded_text,
+                    title: title,
+                    src: src,
+                    tag: emo[index].key,
+                    external: true
+                };
+                // Due to Chatwork mechanism changed, do not push external emo to Chatwork's emoticons list anymore
+                // emoticons.baseEmoticons.push(one_emo);
+                // emoticons.tagHash[emo[index].key] = one_emo;
+                this.chatpp_emoticons.baseEmoticons.push(one_emo);
+                this.chatpp_emoticons.tagHash[emo[index].key] = one_emo;
             }
-            if (this.isNewMechanism()) {
-                tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
-                    return emo.tag;
-                }));
-            }
+            this.chatpp_emoticons.getEmoticonWithTag = function (tag) {
+                return _this2.chatpp_emoticons.tagHash[tag];
+            };
+            this.chatpp_emoticons.getAllEmoticons = function () {
+                return _this2.baseEmoticons;
+            };
+            this.chatpp_emoticons.getEmoticonWithName = function (name) {
+                return _this2.chatpp_emoticons.baseEmoticons.find(function (e) {
+                    return e.name === name;
+                });
+            };
+            window.chatpp_empoticons = this.chatpp_emoticons;
+            // tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
         }
     }, {
         key: "isNewMechanism",
@@ -1102,6 +1103,93 @@ var Emoticon = function () {
             $("#suggestion-emotion-container").scrollTop(0);
             $("#suggestion-emotion-container").fadeOut(0);
             $("#suggestion-emotion-container").html("");
+        }
+
+        // Update Emoticons by new approach: directly replace text from DOM
+
+    }, {
+        key: "applyEmoticonsByModifyingDOM",
+        value: function applyEmoticonsByModifyingDOM() {
+            var _this3 = this;
+
+            this.prepareEmoticonsRegex();
+            $("#_timeLine ._message[data-mid]").each(function (index, element) {
+                _this3.applyEmoticonsForMessageDOM(element);
+            });
+            $("#_timeLine").on("DOMNodeInserted", function (e) {
+                _this3.applyEmoticonsForMessageDOM(e.target);
+            });
+        }
+    }, {
+        key: "applyEmoticonsForMessageDOM",
+        value: function applyEmoticonsForMessageDOM(target) {
+            if (!$(target).data("mid") || $(target).hasClass("chatpp-emoticon")) {
+                return;
+            }
+            $(target).addClass("chatpp-emoticon");
+            var messageElement = $(target).find("pre");
+            if (messageElement.length) {
+                var content = messageElement.html();
+                var replaced = this.applyReplacement(content);
+                messageElement.html(replaced);
+            }
+        }
+    }, {
+        key: "prepareEmoticonsRegex",
+        value: function prepareEmoticonsRegex() {
+            var patterns = [];
+            var baseEmoticons = this.chatpp_emoticons.baseEmoticons;
+            for (var i in baseEmoticons) {
+                if (baseEmoticons[i].external) {
+                    patterns.push("(" + this.generateRegexFromString(baseEmoticons[i].tag) + ")");
+                }
+            }
+            this.emoticons_regex = new RegExp(patterns.join("|"), "g");
+        }
+    }, {
+        key: "applyReplacement",
+        value: function applyReplacement(string) {
+            var current_index = -1,
+                code_tag_index = 0,
+                start = 0,
+                result = "";
+            while (code_tag_index != -1) {
+                current_index = string.indexOf("<code", code_tag_index);
+                if (current_index > -1) {
+                    result += this.replaceEmoticons(string.substring(start, current_index));
+                    start = current_index + 1;
+                    code_tag_index = string.indexOf("</code>", current_index + 5);
+                    if (code_tag_index > -1) {
+                        start = code_tag_index + 7;
+                        code_tag_index = start;
+                        result += string.substring(current_index, code_tag_index);
+                    }
+                } else {
+                    break;
+                }
+            }
+            result += this.replaceEmoticons(string.substring(start));
+
+            return result;
+        }
+    }, {
+        key: "replaceEmoticons",
+        value: function replaceEmoticons(string) {
+            var _this4 = this;
+
+            return string.replace(this.emoticons_regex, function (match) {
+                var emo = _this4.chatpp_emoticons.getEmoticonWithTag(match);
+                if (!emo) {
+                    return match;
+                }
+                var replaceText = "<img src=\"" + emo.src + "\" alt=\"" + emo.name + "\" data-cwtag=\"" + emo.tag + "\" title=\"" + emo.title + "\" class=\"ui_emoticon\">";
+                return replaceText;
+            });
+        }
+    }, {
+        key: "generateRegexFromString",
+        value: function generateRegexFromString(string) {
+            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
         }
     }]);
 
@@ -1547,12 +1635,11 @@ var ViewEnhancer = function () {
         key: "updateChatworkView",
         value: function updateChatworkView() {
             TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
-            TimeLineView.prototype.getMessagePanel = function (a, b) {
-                if (a.msg.indexOf(Const.TO_ALL_MARK) === 0) {
-                    a.mn = true;
+            TimeLineView.prototype.getMessagePanel = function (e, t, n) {
+                if (e.msg.indexOf(Const.TO_ALL_MARK) === 0) {
+                    e.mn = true;
                 }
-
-                return this.getMessagePanelOld(a, b);
+                return this.getMessagePanelOld(e, t, n);
             };
         }
     }]);

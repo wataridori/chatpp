@@ -95,12 +95,11 @@ class ViewEnhancer {
 
     updateChatworkView() {
         TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
-        TimeLineView.prototype.getMessagePanel = function(a, b) {
-            if (a.msg.indexOf(Const.TO_ALL_MARK) === 0) {
-                a.mn = true;
+        TimeLineView.prototype.getMessagePanel = function(e, t, n) {
+            if (e.msg.indexOf(Const.TO_ALL_MARK) === 0) {
+                e.mn = true;
             }
-
-            return this.getMessagePanelOld(a, b);
+            return this.getMessagePanelOld(e, t, n);
         };
     }
 }

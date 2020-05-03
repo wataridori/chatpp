@@ -7,6 +7,8 @@ class Emoticon {
     constructor() {
         this.status = common.getStatus("emoticon");
         this.emoticons = [];
+        this.chatpp_emoticons = {};
+        this.emoticons_regex;
         this.start = /::/ig;
         this.is_colon = false;
         this.emo_name = "";
@@ -223,6 +225,7 @@ class Emoticon {
                 });
             }
         });
+        this.applyEmoticonsByModifyingDOM();
     }
 
     getNearestAtmarkIndex() {
@@ -447,40 +450,30 @@ class Emoticon {
     }
 
     addEmo(emo) {
+        this.chatpp_emoticons.baseEmoticons = [];
+        this.chatpp_emoticons.tagHash = {};
         for (let index = 0; index < emo.length; index++) {
             let encoded_text = common.htmlEncode(emo[index].key);
             let title = `${encoded_text} - ${emo[index].data_name} - Chatpp`;
             let src = common.htmlEncode(common.getEmoUrl(emo[index].src));
-            // Check whether Chatworks use new Javascript Code
-            if (this.isNewMechanism()) {
-                let one_emo = {
-                    name: encoded_text,
-                    title,
-                    src,
-                    tag: emo[index].key,
-                    external: true
-                };
-                emoticons.baseEmoticons.push(one_emo);
-                emoticons.tagHash[emo[index].key] = one_emo;
-            } else {
-                if (this.isSpecialEmo(emo[index].key)) {
-                    title = "";
-                    encoded_text = "";
-                }
-                // If Chatwork uses old Javascript code, then use the old method
-                let rep = `<img src="${src}" title="${title}" alt="${encoded_text}" class="ui_emoticon"/>`;
-                let regex = common.generateEmoticonRegex(emo[index].key, emo[index].regex);
-                CW.reg_cmp.push({
-                    key: regex,
-                    rep,
-                    reptxt: emo[index].key,
-                    external: true
-                });
-            }
+            let one_emo = {
+                name: encoded_text,
+                title,
+                src,
+                tag: emo[index].key,
+                external: true
+            };
+            // Due to Chatwork mechanism changed, do not push external emo to Chatwork's emoticons list anymore
+            // emoticons.baseEmoticons.push(one_emo);
+            // emoticons.tagHash[emo[index].key] = one_emo;
+            this.chatpp_emoticons.baseEmoticons.push(one_emo);
+            this.chatpp_emoticons.tagHash[emo[index].key] = one_emo;
         }
-        if (this.isNewMechanism()) {
-            tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
-        }
+        this.chatpp_emoticons.getEmoticonWithTag = (tag) => this.chatpp_emoticons.tagHash[tag];
+        this.chatpp_emoticons.getAllEmoticons = () => this.baseEmoticons;
+        this.chatpp_emoticons.getEmoticonWithName = (name) => this.chatpp_emoticons.baseEmoticons.find((e) => e.name === name)
+        window.chatpp_empoticons = this.chatpp_emoticons;
+        // tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
     }
 
     isNewMechanism() {
@@ -494,6 +487,78 @@ class Emoticon {
         $("#suggestion-emotion-container").scrollTop(0);
         $("#suggestion-emotion-container").fadeOut(0);
         $("#suggestion-emotion-container").html("");
+    }
+
+    // Update Emoticons by new approach: directly replace text from DOM
+    applyEmoticonsByModifyingDOM() {
+        this.prepareEmoticonsRegex();
+        $("#_timeLine ._message[data-mid]").each((index, element) => {
+            this.applyEmoticonsForMessageDOM(element);
+        });
+        $("#_timeLine").on("DOMNodeInserted", (e) => {
+            this.applyEmoticonsForMessageDOM(e.target);
+        });
+    }
+
+    applyEmoticonsForMessageDOM(target) {
+        if (!$(target).data("mid") || $(target).hasClass("chatpp-emoticon")) {
+            return;
+        }
+        $(target).addClass("chatpp-emoticon");
+        let messageElement = $(target).find("pre");
+        if (messageElement.length) {
+            let content = messageElement.html();
+            let replaced = this.applyReplacement(content);
+            messageElement.html(replaced);
+        }
+    }
+
+    prepareEmoticonsRegex() {
+        let patterns = [];
+        let baseEmoticons = this.chatpp_emoticons.baseEmoticons;
+        for (let i in baseEmoticons) {
+            if (baseEmoticons[i].external) {
+                patterns.push(`(${this.generateRegexFromString(baseEmoticons[i].tag)})`);
+            }
+        }
+        this.emoticons_regex = new RegExp(patterns.join("|"), "g");
+    }
+
+    applyReplacement(string) {
+        let current_index = -1, code_tag_index = 0, start = 0, result = "";
+        while (code_tag_index != -1) {
+            current_index = string.indexOf("<code", code_tag_index);
+            if (current_index > -1) {
+                result += this.replaceEmoticons(string.substring(start, current_index));
+                start = current_index + 1;
+                code_tag_index = string.indexOf("</code>", current_index + 5);
+                if (code_tag_index > -1) {
+                    start = code_tag_index + 7;
+                    code_tag_index = start;
+                    result += string.substring(current_index, code_tag_index);
+                }
+            } else {
+                break;
+            }
+        }
+        result += this.replaceEmoticons(string.substring(start));
+
+        return result;
+    }
+
+    replaceEmoticons(string) {
+        return string.replace(this.emoticons_regex, (match) => {
+            let emo = this.chatpp_emoticons.getEmoticonWithTag(match);
+            if (!emo) {
+                return match;
+            }
+            let replaceText = `<img src="${emo.src}" alt="${emo.name}" data-cwtag="${emo.tag}" title="${emo.title}" class="ui_emoticon">`;
+            return replaceText;
+        });
+    }
+
+    generateRegexFromString(string) {
+        return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
     }
 }
 

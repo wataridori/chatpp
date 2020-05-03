@@ -1,7 +1,7 @@
 {
     "name": "Chat++ for Chatwork",
     "short_name": "Chat++",
-    "version": "5.4.10",
+    "version": "5.5.0",
     "manifest_version": 2,
     "description": "An all-in-one Chatwork Enhancement Toolkit which provides many useful features!",
     "content_scripts": [
@@ -38,7 +38,9 @@
     ],
     "options_page": "html/emoticon.html",
     "icons": {
-        "64": "img/icon64.png"
+        "32": "img/icon32.png",
+        "64": "img/icon64.png",
+        "128": "img/icon128.png"
     },
     "homepage_url": "http://chatpp.thangtd.com"
 }
