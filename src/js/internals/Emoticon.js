@@ -225,7 +225,7 @@ class Emoticon {
                 });
             }
         });
-        this.applyEmoticonsByModifyingDOM();
+        // this.applyEmoticonsByModifyingDOM();
     }
 
     getNearestAtmarkIndex() {
@@ -463,21 +463,19 @@ class Emoticon {
                 tag: emo[index].key,
                 external: true
             };
+            // Legacy mechanism, push external emo to Chatwork's emoticons list
+            emoticons.baseEmoticons.push(one_emo);
+            emoticons.tagHash[emo[index].key] = one_emo;
+
             // Due to Chatwork mechanism changed, do not push external emo to Chatwork's emoticons list anymore
-            // emoticons.baseEmoticons.push(one_emo);
-            // emoticons.tagHash[emo[index].key] = one_emo;
             this.chatpp_emoticons.baseEmoticons.push(one_emo);
             this.chatpp_emoticons.tagHash[emo[index].key] = one_emo;
         }
-        this.chatpp_emoticons.getEmoticonWithTag = (tag) => this.chatpp_emoticons.tagHash[tag];
-        this.chatpp_emoticons.getAllEmoticons = () => this.baseEmoticons;
-        this.chatpp_emoticons.getEmoticonWithName = (name) => this.chatpp_emoticons.baseEmoticons.find((e) => e.name === name)
-        window.chatpp_empoticons = this.chatpp_emoticons;
-        // tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
-    }
-
-    isNewMechanism() {
-        return typeof emoticons !== "undefined" && typeof tokenizer !== "undefined";
+        // this.chatpp_emoticons.getEmoticonWithTag = (tag) => this.chatpp_emoticons.tagHash[tag];
+        // this.chatpp_emoticons.getAllEmoticons = () => this.baseEmoticons;
+        // this.chatpp_emoticons.getEmoticonWithName = (name) => this.chatpp_emoticons.baseEmoticons.find((e) => e.name === name)
+        // window.chatpp_empoticons = this.chatpp_emoticons;
+        tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
     }
 
     hideSuggestionEmotionsBox() {

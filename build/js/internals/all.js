@@ -833,7 +833,7 @@ var Emoticon = function () {
                     });
                 }
             });
-            this.applyEmoticonsByModifyingDOM();
+            // this.applyEmoticonsByModifyingDOM();
         }
     }, {
         key: "getNearestAtmarkIndex",
@@ -1054,8 +1054,6 @@ var Emoticon = function () {
     }, {
         key: "addEmo",
         value: function addEmo(emo) {
-            var _this2 = this;
-
             this.chatpp_emoticons.baseEmoticons = [];
             this.chatpp_emoticons.tagHash = {};
             for (var index = 0; index < emo.length; index++) {
@@ -1069,30 +1067,21 @@ var Emoticon = function () {
                     tag: emo[index].key,
                     external: true
                 };
+                // Legacy mechanism, push external emo to Chatwork's emoticons list
+                emoticons.baseEmoticons.push(one_emo);
+                emoticons.tagHash[emo[index].key] = one_emo;
+
                 // Due to Chatwork mechanism changed, do not push external emo to Chatwork's emoticons list anymore
-                // emoticons.baseEmoticons.push(one_emo);
-                // emoticons.tagHash[emo[index].key] = one_emo;
                 this.chatpp_emoticons.baseEmoticons.push(one_emo);
                 this.chatpp_emoticons.tagHash[emo[index].key] = one_emo;
             }
-            this.chatpp_emoticons.getEmoticonWithTag = function (tag) {
-                return _this2.chatpp_emoticons.tagHash[tag];
-            };
-            this.chatpp_emoticons.getAllEmoticons = function () {
-                return _this2.baseEmoticons;
-            };
-            this.chatpp_emoticons.getEmoticonWithName = function (name) {
-                return _this2.chatpp_emoticons.baseEmoticons.find(function (e) {
-                    return e.name === name;
-                });
-            };
-            window.chatpp_empoticons = this.chatpp_emoticons;
-            // tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
-        }
-    }, {
-        key: "isNewMechanism",
-        value: function isNewMechanism() {
-            return typeof emoticons !== "undefined" && typeof tokenizer !== "undefined";
+            // this.chatpp_emoticons.getEmoticonWithTag = (tag) => this.chatpp_emoticons.tagHash[tag];
+            // this.chatpp_emoticons.getAllEmoticons = () => this.baseEmoticons;
+            // this.chatpp_emoticons.getEmoticonWithName = (name) => this.chatpp_emoticons.baseEmoticons.find((e) => e.name === name)
+            // window.chatpp_empoticons = this.chatpp_emoticons;
+            tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
+                return emo.tag;
+            }));
         }
     }, {
         key: "hideSuggestionEmotionsBox",
@@ -1110,14 +1099,14 @@ var Emoticon = function () {
     }, {
         key: "applyEmoticonsByModifyingDOM",
         value: function applyEmoticonsByModifyingDOM() {
-            var _this3 = this;
+            var _this2 = this;
 
             this.prepareEmoticonsRegex();
             $("#_timeLine ._message[data-mid]").each(function (index, element) {
-                _this3.applyEmoticonsForMessageDOM(element);
+                _this2.applyEmoticonsForMessageDOM(element);
             });
             $("#_timeLine").on("DOMNodeInserted", function (e) {
-                _this3.applyEmoticonsForMessageDOM(e.target);
+                _this2.applyEmoticonsForMessageDOM(e.target);
             });
         }
     }, {
@@ -1175,10 +1164,10 @@ var Emoticon = function () {
     }, {
         key: "replaceEmoticons",
         value: function replaceEmoticons(string) {
-            var _this4 = this;
+            var _this3 = this;
 
             return string.replace(this.emoticons_regex, function (match) {
-                var emo = _this4.chatpp_emoticons.getEmoticonWithTag(match);
+                var emo = _this3.chatpp_emoticons.getEmoticonWithTag(match);
                 if (!emo) {
                     return match;
                 }
