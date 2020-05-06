@@ -97,6 +97,15 @@ class ChatworkFacade {
     checkNotifyAllCondition() {
         return common.checkDevVersionInternal() || (this.getRoomMembersCount() > 100 && this.isAdmin());
     }
+
+    getMessageObjectById(mid) {
+        return RM.timeline.chat_id2chat_dat[mid];
+    }
+
+    getMessagePanelByMessageId(mid) {
+        let message = this.getMessageObjectById(mid);
+        return TimeLineView.prototype.getMessagePanel(message);
+    }
 }
 
 let chatwork = new ChatworkFacade();

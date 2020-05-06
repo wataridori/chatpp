@@ -9,6 +9,7 @@ class Emoticon {
         this.emoticons = [];
         this.chatpp_emoticons = {};
         this.emoticons_regex;
+        this.chatpp_cached_messages = {};
         this.start = /::/ig;
         this.is_colon = false;
         this.emo_name = "";
@@ -225,7 +226,9 @@ class Emoticon {
                 });
             }
         });
-        // this.applyEmoticonsByModifyingDOM();
+        if (localStorage.EMOTICON_NEW_MECHANISM_DEBUG) {
+            this.applyEmoticonsByModifyingDOM();
+        }
     }
 
     getNearestAtmarkIndex() {
@@ -463,19 +466,24 @@ class Emoticon {
                 tag: emo[index].key,
                 external: true
             };
+            if (!localStorage.EMOTICON_NEW_MECHANISM_DEBUG) {
             // Legacy mechanism, push external emo to Chatwork's emoticons list
-            emoticons.baseEmoticons.push(one_emo);
-            emoticons.tagHash[emo[index].key] = one_emo;
-
-            // Due to Chatwork mechanism changed, do not push external emo to Chatwork's emoticons list anymore
-            this.chatpp_emoticons.baseEmoticons.push(one_emo);
-            this.chatpp_emoticons.tagHash[emo[index].key] = one_emo;
+                emoticons.baseEmoticons.push(one_emo);
+                emoticons.tagHash[emo[index].key] = one_emo;
+            } else {
+                // Due to Chatwork mechanism changed, do not push external emo to Chatwork's emoticons list anymore
+                this.chatpp_emoticons.baseEmoticons.push(one_emo);
+                this.chatpp_emoticons.tagHash[emo[index].key] = one_emo;
+            }
         }
-        // this.chatpp_emoticons.getEmoticonWithTag = (tag) => this.chatpp_emoticons.tagHash[tag];
-        // this.chatpp_emoticons.getAllEmoticons = () => this.baseEmoticons;
-        // this.chatpp_emoticons.getEmoticonWithName = (name) => this.chatpp_emoticons.baseEmoticons.find((e) => e.name === name)
-        // window.chatpp_empoticons = this.chatpp_emoticons;
-        tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
+        if (localStorage.EMOTICON_NEW_MECHANISM_DEBUG) {
+            this.chatpp_emoticons.getEmoticonWithTag = (tag) => this.chatpp_emoticons.tagHash[tag];
+            this.chatpp_emoticons.getAllEmoticons = () => this.baseEmoticons;
+            this.chatpp_emoticons.getEmoticonWithName = (name) => this.chatpp_emoticons.baseEmoticons.find((e) => e.name === name)
+            window.chatpp_cached_messages = this.chatpp_cached_messages;
+        } else {
+            tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
+        }
     }
 
     hideSuggestionEmotionsBox() {
@@ -499,15 +507,24 @@ class Emoticon {
     }
 
     applyEmoticonsForMessageDOM(target) {
-        if (!$(target).data("mid") || $(target).hasClass("chatpp-emoticon")) {
+        let mid = $(target).data("mid");
+        if (!mid) {
             return;
         }
-        $(target).addClass("chatpp-emoticon");
         let messageElement = $(target).find("pre");
         if (messageElement.length) {
             let content = messageElement.html();
-            let replaced = this.applyReplacement(content);
-            messageElement.html(replaced);
+            if (this.emoticons_regex.test(content)) {
+                if (!this.chatpp_cached_messages[mid] || this.chatpp_cached_messages[mid].message_before != content || !this.chatpp_cached_messages[mid].message_after) {
+                    let replaced = this.applyReplacement(content);
+                    this.chatpp_cached_messages[mid] = {
+                        message_before: content,
+                        message_after: replaced
+                    };
+                }
+
+                messageElement.html(this.chatpp_cached_messages[mid].message_after);
+            }
         }
     }
 
