@@ -1137,6 +1137,26 @@ var Emoticon = function () {
             $("#_timeLine").on("DOMNodeInserted", function (e) {
                 _this3.applyEmoticonsForMessageDOM(e.target);
             });
+
+            // A very tricky way to override Chatwork's editMessage function to make editting message work
+            // This feature may break if Chatwork change their code structure
+            var acl = CW.application.getACL();
+            var messsageAPIService = acl.applicationServiceContext.currentSelectedRoomService.messageService.messageAPIService;
+            if (messsageAPIService) {
+                messsageAPIService.editMessageOld = messsageAPIService.editMessage;
+                var me = this;
+                messsageAPIService.editMessage = function (e, t, n) {
+                    var result = this.editMessageOld(e, t, n);
+                    var mid = t.value;
+                    var message_content = n.value;
+                    var message_element = $("#_messageId" + mid + " pre");
+                    if (message_element.length && me.emoticons_regex.test(message_content)) {
+                        var content = CW.renderMessage(message_content, { mid: mid });
+                        me.renderContentAndApplyToDOM(message_element, content, mid);
+                    }
+                    return result;
+                };
+            }
         }
     }, {
         key: "applyEmoticonsForMessageDOM",
@@ -1145,21 +1165,26 @@ var Emoticon = function () {
             if (!mid) {
                 return;
             }
-            var messageElement = $(target).find("pre");
-            if (messageElement.length) {
-                var content = messageElement.html();
+            var message_element = $(target).find("pre");
+            if (message_element.length) {
+                var content = message_element.html();
                 if (this.emoticons_regex.test(content)) {
-                    if (!this.chatpp_cached_messages[mid] || this.chatpp_cached_messages[mid].message_before != content || !this.chatpp_cached_messages[mid].message_after) {
-                        var replaced = this.applyReplacement(content);
-                        this.chatpp_cached_messages[mid] = {
-                            message_before: content,
-                            message_after: replaced
-                        };
-                    }
-
-                    messageElement.html(this.chatpp_cached_messages[mid].message_after);
+                    this.renderContentAndApplyToDOM(message_element, content, mid);
                 }
             }
+        }
+    }, {
+        key: "renderContentAndApplyToDOM",
+        value: function renderContentAndApplyToDOM(message_element, content, mid) {
+            if (!this.chatpp_cached_messages[mid] || this.chatpp_cached_messages[mid].message_before != content || !this.chatpp_cached_messages[mid].message_after) {
+                var replaced = this.applyReplacement(content);
+                this.chatpp_cached_messages[mid] = {
+                    message_before: content,
+                    message_after: replaced
+                };
+            }
+
+            message_element.html(this.chatpp_cached_messages[mid].message_after);
         }
     }, {
         key: "prepareEmoticonsRegex",

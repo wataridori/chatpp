@@ -504,6 +504,26 @@ class Emoticon {
         $("#_timeLine").on("DOMNodeInserted", (e) => {
             this.applyEmoticonsForMessageDOM(e.target);
         });
+
+        // A very tricky way to override Chatwork's editMessage function to make editting message work
+        // This feature may break if Chatwork change their code structure
+        let acl = CW.application.getACL();
+        let messsageAPIService = acl.applicationServiceContext.currentSelectedRoomService.messageService.messageAPIService;
+        if (messsageAPIService) {
+            messsageAPIService.editMessageOld = messsageAPIService.editMessage;
+            let me = this;
+            messsageAPIService.editMessage = function (e, t, n) {
+                let result = this.editMessageOld(e, t, n);
+                let mid = t.value;
+                let message_content = n.value;
+                let message_element = $(`#_messageId${mid} pre`);
+                if (message_element.length && me.emoticons_regex.test(message_content)) {
+                    let content = CW.renderMessage(message_content, {mid});
+                    me.renderContentAndApplyToDOM(message_element, content, mid);
+                }
+                return result;
+            }
+        }
     }
 
     applyEmoticonsForMessageDOM(target) {
@@ -511,21 +531,25 @@ class Emoticon {
         if (!mid) {
             return;
         }
-        let messageElement = $(target).find("pre");
-        if (messageElement.length) {
-            let content = messageElement.html();
-            if (this.emoticons_regex.test(content)) {
-                if (!this.chatpp_cached_messages[mid] || this.chatpp_cached_messages[mid].message_before != content || !this.chatpp_cached_messages[mid].message_after) {
-                    let replaced = this.applyReplacement(content);
-                    this.chatpp_cached_messages[mid] = {
-                        message_before: content,
-                        message_after: replaced
-                    };
-                }
-
-                messageElement.html(this.chatpp_cached_messages[mid].message_after);
+        let message_element = $(target).find("pre");
+        if (message_element.length) {
+            let content = message_element.html();
+            if (this.emoticons_regex.test(content)) { 
+                this.renderContentAndApplyToDOM(message_element, content, mid);
             }
         }
+    }
+
+    renderContentAndApplyToDOM(message_element, content, mid) {
+        if (!this.chatpp_cached_messages[mid] || this.chatpp_cached_messages[mid].message_before != content || !this.chatpp_cached_messages[mid].message_after) {
+            let replaced = this.applyReplacement(content);
+            this.chatpp_cached_messages[mid] = {
+                message_before: content,
+                message_after: replaced
+            };
+        }
+
+        message_element.html(this.chatpp_cached_messages[mid].message_after);
     }
 
     prepareEmoticonsRegex() {
