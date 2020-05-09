@@ -36,7 +36,7 @@ function init(inject_script) {
         }
         emo_info = info;
         localStorage.force_update_version = info.force_update_version;
-        let features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon", "legacy_theme"];
+        let features = ["mention", "shortcut", "thumbnail", "emoticon", "legacy_theme"];
         let features_default_false = ["legacy_theme"];
         features.forEach((feature) => {
             let feature_name = `${feature}_status`;
@@ -189,8 +189,6 @@ function addInjectedScript() {
     preLoad();
     injectJsFile("libraries/caretposition.js");
     injectJsFile("libraries/fuse.min.js");
-    injectJsFile("libraries/highlight.min.js");
-    injectCssFile("highlight.min.css");
     setTimeout(() => {
         injectJsFile("internals/all.js");
     }, Const.DELAY_TIME
