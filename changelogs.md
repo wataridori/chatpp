@@ -1,5 +1,8 @@
 Chat++ Change Logs
 
+## 5.6.0
+* Update new mechanism to bring the Emoticons feature back, by disabling rendering by AST. This method intervenes quite deeply into the way Chatwork's frontend works, and it probably will not be valid anymore in the future. However, we will try to fix again when it is broken.
+
 ## 5.5.1
 * Temporarily disable new emoticons mechanism due to a critical bug with editting message. The feature will be turned on again when we can find the way to fix the problem.
 

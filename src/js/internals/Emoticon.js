@@ -507,6 +507,8 @@ class Emoticon {
 
     // Enable Chatpp's Emoticons by disable rendering with AST
     disableAST() {
+        /* eslint-disable no-console */
+        /* for debugging new feature */
         console.log("Afterload Hook STARTED !!!");
         if (window.esmodules.length < 10) {
             console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
@@ -529,6 +531,7 @@ class Emoticon {
                 break;
             }
         }
+        /* eslint-enable */
     }
 
     // Update Emoticons by new approach: directly replace text from DOM

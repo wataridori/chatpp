@@ -8,9 +8,18 @@
 <body>
 <div class="container">
     <h1>Chat++ Change Logs</h1>
+    <h2>5.6.0</h2>
+    <ul>
+        <li>
+            Update new mechanism to bring the Emoticons feature back, by disabling rendering by AST.
+            This method intervenes quite deeply into the way Chatwork's frontend works, and it probably will not be valid anymore in the future.
+            However, we will try to fix again when it is broken.
+        </li>
+    </ul>
     <h2>5.5.1</h2>
     <ul>
-        <li>Temporarily disable new emoticons mechanism due to a critical bug with editting message. The feature will be turned on again when we can find the way to fix the problem.</li>
+        <li>Temporarily disable new emoticons mechanism due to a critical bug with editting message.
+            The feature will be turned on again when we can find the way to fix the problem.</li>
     </ul>
     <h2>5.5.0</h2>
     <ul>
@@ -204,8 +213,8 @@
             a message that mentions all people in the room will be created, then automatically deleted.<br>
             It's only used to gain notification from Chatwork. Your real message will be sent later.<br>
             This feature is expected to be used in the room that has too many people so the normal way to mention all can make browser freeze.<br>
-            You can make TO ALL message without notification by <strong>starting</strong> your message with <code>TO ALL 
-          
+            You can make TO ALL message without notification by <strong>starting</strong> your message with <code>TO ALL
+
           </code><br>
             For example:
             <pre>
