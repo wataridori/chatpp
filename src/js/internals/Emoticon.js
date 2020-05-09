@@ -35,6 +35,18 @@ class Emoticon {
             return a.key < b.key ? -1 : (a.key > b.key) ? 1 : 0;
         });
 
+        this.prepareChatppEmoticons();
+
+        if (this.emoticons_replace_dom_mechanism) {
+            this.applyEmoticonsByModifyingDOM();
+        }
+
+        if (this.emoticons_disable_ast_mechanism) {
+            this.disableAST();
+        }
+    }
+
+    prepareChatppEmoticons() {
         let html = "<div id='suggestion-emotion-container'></div>";
         $(html).insertAfter("#_externalInfo");
         $("#suggestion-emotion-container").css({
@@ -228,14 +240,6 @@ class Emoticon {
                 });
             }
         });
-
-        if (this.emoticons_replace_dom_mechanism) {
-            this.applyEmoticonsByModifyingDOM();
-        }
-
-        if (this.emoticons_disable_ast_mechanism) {
-            this.disableAST();
-        }
     }
 
     getNearestAtmarkIndex() {

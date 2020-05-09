@@ -459,7 +459,7 @@ var EmoStorage = function (_Storage) {
     }, {
         key: "setFeatureStatus",
         value: function setFeatureStatus(emo_info) {
-            var features = ["mention", "shortcut", "thumbnail", "highlight", "emoticon", "legacy_theme"];
+            var features = ["mention", "shortcut", "thumbnail", "emoticon", "legacy_theme"];
             for (var i in features) {
                 var feature_name = features[i] + "_status";
                 this.data[feature_name] = emo_info[feature_name] === undefined ? true : emo_info[feature_name];

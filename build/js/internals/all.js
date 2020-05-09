@@ -676,8 +676,6 @@ var Emoticon = function () {
     _createClass(Emoticon, [{
         key: "setUp",
         value: function setUp() {
-            var _this = this;
-
             if (!this.status) {
                 return;
             }
@@ -690,6 +688,21 @@ var Emoticon = function () {
                 }
                 return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
             });
+
+            this.prepareChatppEmoticons();
+
+            if (this.emoticons_replace_dom_mechanism) {
+                this.applyEmoticonsByModifyingDOM();
+            }
+
+            if (this.emoticons_disable_ast_mechanism) {
+                this.disableAST();
+            }
+        }
+    }, {
+        key: "prepareChatppEmoticons",
+        value: function prepareChatppEmoticons() {
+            var _this = this;
 
             var html = "<div id='suggestion-emotion-container'></div>";
             $(html).insertAfter("#_externalInfo");
@@ -889,14 +902,6 @@ var Emoticon = function () {
                     });
                 }
             });
-
-            if (this.emoticons_replace_dom_mechanism) {
-                this.applyEmoticonsByModifyingDOM();
-            }
-
-            if (this.emoticons_disable_ast_mechanism) {
-                this.disableAST();
-            }
         }
     }, {
         key: "getNearestAtmarkIndex",

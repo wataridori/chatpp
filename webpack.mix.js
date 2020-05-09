@@ -16,5 +16,4 @@ mix.combine([
     .js('src/js/extensions/contentscript.js', 'build/js/extensions/contentscript.js')
     .js('src/js/extensions/background.js', 'build/js/extensions/background.js')
     .js('src/js/internals/main.js', 'build/js/internals/all.js')
-    .copy("src/js/extensions/preloadHook.js", "build/js/extensions/preloadHook.js")
     .copy("src/js/extensions/injectPreloadHook.js", "build/js/extensions/injectPreloadHook.js");
