@@ -106,6 +106,25 @@ class ChatworkFacade {
         let message = this.getMessageObjectById(mid);
         return TimeLineView.prototype.getMessagePanel(message);
     }
+
+    getMyRoomId() {
+        return AC.getRoomId(AC.myid);
+    }
+
+    getTempRoomId() {
+        // Get the first room that is not the same as current room
+        let current_room = RM.id;
+        let my_room = this.getMyRoomId();
+        if (current_room != my_room) {
+            return my_room;
+        }
+        let sorted_rooms_list = RL.getSortedRoomList();
+        for (i of sorted_rooms_list) {
+            if (i !== current_room) {
+                return i;
+            }
+        }
+    }
 }
 
 let chatwork = new ChatworkFacade();

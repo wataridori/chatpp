@@ -4,5 +4,7 @@
     "/build/js/extensions/contentscript.js": "/build/js/extensions/contentscript.js",
     "/build/js/externals/popup.js": "/build/js/externals/popup.js",
     "/build/js/extensions/background.js": "/build/js/extensions/background.js",
-    "/build/js/externals/libs.js": "/build/js/externals/libs.js"
+    "/build/js/externals/libs.js": "/build/js/externals/libs.js",
+    "/build/js/extensions/preloadHook.js": "/build/js/extensions/preloadHook.js",
+    "/build/js/extensions/injectPreloadHook.js": "/build/js/extensions/injectPreloadHook.js"
 }

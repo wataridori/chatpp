@@ -1,6 +1,6 @@
 let common = require("../helpers/Common.js");
 let Const = require("../helpers/Const.js");
-
+let chatwork = require("../helpers/ChatworkFacade.js");
 let KEY_COLON = "::";
 
 class Emoticon {
@@ -17,6 +17,8 @@ class Emoticon {
         this.list_all_emo = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
+        this.emoticons_replace_dom_mechanism = false;
+        this.emoticons_disable_ast_mechanism = true;
     }
 
     setUp() {
@@ -32,7 +34,7 @@ class Emoticon {
             }
             return a.key < b.key ? -1 : (a.key > b.key) ? 1 : 0;
         });
-        
+
         let html = "<div id='suggestion-emotion-container'></div>";
         $(html).insertAfter("#_externalInfo");
         $("#suggestion-emotion-container").css({
@@ -226,8 +228,13 @@ class Emoticon {
                 });
             }
         });
-        if (localStorage.EMOTICON_NEW_MECHANISM_DEBUG) {
+
+        if (this.emoticons_replace_dom_mechanism) {
             this.applyEmoticonsByModifyingDOM();
+        }
+
+        if (this.emoticons_disable_ast_mechanism) {
+            this.disableAST();
         }
     }
 
@@ -466,21 +473,20 @@ class Emoticon {
                 tag: emo[index].key,
                 external: true
             };
-            if (!localStorage.EMOTICON_NEW_MECHANISM_DEBUG) {
-            // Legacy mechanism, push external emo to Chatwork's emoticons list
-                emoticons.baseEmoticons.push(one_emo);
-                emoticons.tagHash[emo[index].key] = one_emo;
-            } else {
+            if (this.emoticons_replace_dom_mechanism) {
                 // Due to Chatwork mechanism changed, do not push external emo to Chatwork's emoticons list anymore
                 this.chatpp_emoticons.baseEmoticons.push(one_emo);
                 this.chatpp_emoticons.tagHash[emo[index].key] = one_emo;
+            } else {
+                // Legacy mechanism, push external emo to Chatwork's emoticons list
+                emoticons.baseEmoticons.push(one_emo);
+                emoticons.tagHash[emo[index].key] = one_emo;
             }
         }
-        if (localStorage.EMOTICON_NEW_MECHANISM_DEBUG) {
+        if (this.emoticons_replace_dom_mechanism) {
             this.chatpp_emoticons.getEmoticonWithTag = (tag) => this.chatpp_emoticons.tagHash[tag];
             this.chatpp_emoticons.getAllEmoticons = () => this.baseEmoticons;
             this.chatpp_emoticons.getEmoticonWithName = (name) => this.chatpp_emoticons.baseEmoticons.find((e) => e.name === name)
-            window.chatpp_cached_messages = this.chatpp_cached_messages;
         } else {
             tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
         }
@@ -495,6 +501,32 @@ class Emoticon {
         $("#suggestion-emotion-container").html("");
     }
 
+    // Enable Chatpp's Emoticons by disable rendering with AST
+    disableAST() {
+        console.log("Afterload Hook STARTED !!!");
+        if (window.esmodules.length < 10) {
+            console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
+        }
+        for (i in window.esmodules) {
+            let m = window.esmodules[i];
+            if (m.FeatureFlags) {
+                console.log('FOUND FeatureFlags module', m);
+                console.log('Disable feature render by AST');
+                m.FeatureFlags.FRE2252 = false;
+                console.log('Clear htmlCache');
+
+                for (i in CW.application.domainLifecycleContext.messageRepository.entities[RM.id]) {
+                        let msg = CW.application.domainLifecycleContext.messageRepository.entities[RM.id][i];
+                        msg.body.body.htmlCache = null;
+                }
+                RL.rooms[RM.id].buildtime = 0;
+                console.log('Wait for Chat++ load and rebuild room to enable external Emoticons');
+
+                break;
+            }
+        }
+    }
+
     // Update Emoticons by new approach: directly replace text from DOM
     applyEmoticonsByModifyingDOM() {
         this.prepareEmoticonsRegex();
@@ -505,22 +537,45 @@ class Emoticon {
             this.applyEmoticonsForMessageDOM(e.target);
         });
 
+        this.overrideEditMessage();
+    }
+
+    overrideEditMessage() {
         // A very tricky way to override Chatwork's editMessage function to make editting message work
         // This feature may break if Chatwork change their code structure
         let acl = CW.application.getACL();
-        let messsageAPIService = acl.applicationServiceContext.currentSelectedRoomService.messageService.messageAPIService;
-        if (messsageAPIService) {
-            messsageAPIService.editMessageOld = messsageAPIService.editMessage;
+        let messageAPIService = acl.applicationServiceContext.currentSelectedRoomService.messageService.messageAPIService;
+        if (messageAPIService) {
+            messageAPIService.editMessageOld = messageAPIService.editMessage;
             let me = this;
-            messsageAPIService.editMessage = function (e, t, n) {
+            messageAPIService.editMessage = function (e, t, n) {
                 let result = this.editMessageOld(e, t, n);
                 let mid = t.value;
                 let message_content = n.value;
-                let message_element = $(`#_messageId${mid} pre`);
-                if (message_element.length && me.emoticons_regex.test(message_content)) {
-                    let content = CW.renderMessage(message_content, {mid});
-                    me.renderContentAndApplyToDOM(message_element, content, mid);
+                let rid = RM.id;
+                let message_element = $(`#_messageId${mid} pre img.chatpp_emoticon`);
+                if (message_element.length || me.emoticons_regex.test(message_content)) {
+                    let start = Date.now();
+                    $("#_loader").fadeIn(100);
+                    setTimeout(() => {
+                        let temp_room = chatwork.getTempRoomId();
+                        RL.selectRoom(temp_room);
+                        let original_onhashchange = window.onhashchange;
+                        window.chatpp_force_reloading = true;
+                        window.onhashchange = () => {
+                            if (window.chatpp_force_reloading && `#!rid${temp_room}` === location.hash) {
+                                RL.selectRoom(rid);
+                            } else if (window.chatpp_force_reloading && `#!rid${rid}` === location.hash) {
+                                let finish = Date.now();
+                                console.log("Chatpp finish reloading editted message in", finish - start, "miliseconds");
+                                $("#_loader").fadeOut("fast");
+                                window.chatpp_force_reloading = false;
+                                window.onhashchange = original_onhashchange;
+                            }
+                        };
+                    }, 100);
                 }
+
                 return result;
             }
         }
@@ -532,9 +587,9 @@ class Emoticon {
             return;
         }
         let message_element = $(target).find("pre");
-        if (message_element.length) {
+        if (message_element.length && !message_element.hasClass("chatpp_emoticon")) {
             let content = message_element.html();
-            if (this.emoticons_regex.test(content)) { 
+            if (this.emoticons_regex.test(content)) {
                 this.renderContentAndApplyToDOM(message_element, content, mid);
             }
         }
@@ -548,8 +603,8 @@ class Emoticon {
                 message_after: replaced
             };
         }
-
         message_element.html(this.chatpp_cached_messages[mid].message_after);
+        message_element.addClass("chatpp_emoticon");
     }
 
     prepareEmoticonsRegex() {
@@ -591,7 +646,7 @@ class Emoticon {
             if (!emo) {
                 return match;
             }
-            let replaceText = `<img src="${emo.src}" alt="${emo.name}" data-cwtag="${emo.tag}" title="${emo.title}" class="ui_emoticon">`;
+            let replaceText = `<img src="${emo.src}" alt="${emo.name}" data-cwtag="${emo.tag}" title="${emo.title}" class="ui_emoticon chatpp_emoticon">`;
             return replaceText;
         });
     }
