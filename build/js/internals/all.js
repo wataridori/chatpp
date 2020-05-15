@@ -872,13 +872,13 @@ var Emoticon = function () {
                     var toAppend = "";
 
                     if (findEmo.length > 0) {
-                        for (var _i = 0; _i < findEmo.length; _i++) {
-                            if (_i == 0) {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[_i].key + "\" style=\"cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
+                        for (var i = 0; i < findEmo.length; i++) {
+                            if (i == 0) {
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[i].key + "\" style=\"cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
                             } else {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[_i].key + "\" style=\"cursor: pointer; margin-top: 5px;\">";
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[i].key + "\" style=\"cursor: pointer; margin-top: 5px;\">";
                             }
-                            toAppend += "<img id=\"example\" src=\"" + common.htmlEncode(common.getEmoUrl(findEmo[_i].src)) + "\" title=\"" + findEmo[_i].key + " - " + findEmo[_i].data_name + " - Chatpp\" alt=\"" + findEmo[_i].key + "\" style=\"width: 100%; max-width: 50px;\"> <b> " + findEmo[_i].key + "</b></p>";
+                            toAppend += "<img id=\"example\" src=\"" + common.htmlEncode(common.getEmoUrl(findEmo[i].src)) + "\" title=\"" + findEmo[i].key + " - " + findEmo[i].data_name + " - Chatpp\" alt=\"" + findEmo[i].key + "\" style=\"width: 100%; max-width: 50px;\"> <b> " + findEmo[i].key + "</b></p>";
                         }
                         $("#suggestion-emotion-container").append(toAppend);
                     } else {
@@ -1187,7 +1187,7 @@ var Emoticon = function () {
             if (window.esmodules.length < 10) {
                 console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
             }
-            for (i in window.esmodules) {
+            for (var i in window.esmodules) {
                 var m = window.esmodules[i];
                 if (m.FeatureFlags) {
                     console.log("FOUND FeatureFlags module", m);
@@ -1201,7 +1201,7 @@ var Emoticon = function () {
                     }
                     RL.rooms[RM.id].buildtime = 0;
                     console.log('Wait for Chat++ load and rebuild room to enable external Emoticons');
-
+                    window.feature_flags_module = m;
                     break;
                 }
             }
@@ -1260,7 +1260,7 @@ var Emoticon = function () {
                                     window.onhashchange = original_onhashchange;
                                 }
                             };
-                        }, 100);
+                        }, 500);
                     }
 
                     return result;
@@ -1300,9 +1300,9 @@ var Emoticon = function () {
         value: function prepareEmoticonsRegex() {
             var patterns = [];
             var baseEmoticons = this.chatpp_emoticons.baseEmoticons;
-            for (var _i2 in baseEmoticons) {
-                if (baseEmoticons[_i2].external) {
-                    patterns.push("(" + this.generateRegexFromString(baseEmoticons[_i2].tag) + ")");
+            for (var i in baseEmoticons) {
+                if (baseEmoticons[i].external) {
+                    patterns.push("(" + this.generateRegexFromString(baseEmoticons[i].tag) + ")");
                 }
             }
             this.emoticons_regex = new RegExp(patterns.join("|"), "g");

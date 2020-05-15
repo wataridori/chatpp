@@ -513,7 +513,7 @@ class Emoticon {
         if (window.esmodules.length < 10) {
             console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
         }
-        for (i in window.esmodules) {
+        for (let i in window.esmodules) {
             let m = window.esmodules[i];
             if (m.FeatureFlags) {
                 console.log("FOUND FeatureFlags module", m);
@@ -527,7 +527,7 @@ class Emoticon {
                 }
                 RL.rooms[RM.id].buildtime = 0;
                 console.log('Wait for Chat++ load and rebuild room to enable external Emoticons');
-
+                window.feature_flags_module = m;
                 break;
             }
         }
@@ -580,7 +580,7 @@ class Emoticon {
                                 window.onhashchange = original_onhashchange;
                             }
                         };
-                    }, 100);
+                    }, 500);
                 }
 
                 return result;
