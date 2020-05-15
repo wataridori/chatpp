@@ -669,8 +669,8 @@ var Emoticon = function () {
         this.list_all_emo = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
-        this.emoticons_replace_dom_mechanism = false;
-        this.emoticons_disable_ast_mechanism = true;
+        this.emoticons_replace_dom_mechanism = true;
+        this.emoticons_disable_ast_mechanism = false;
     }
 
     _createClass(Emoticon, [{
@@ -1181,6 +1181,8 @@ var Emoticon = function () {
     }, {
         key: "disableAST",
         value: function disableAST() {
+            /* eslint-disable no-console */
+            /* for debugging new feature */
             console.log("Afterload Hook STARTED !!!");
             if (window.esmodules.length < 10) {
                 console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
@@ -1188,10 +1190,10 @@ var Emoticon = function () {
             for (i in window.esmodules) {
                 var m = window.esmodules[i];
                 if (m.FeatureFlags) {
-                    console.log('FOUND FeatureFlags module', m);
-                    console.log('Disable feature render by AST');
+                    console.log("FOUND FeatureFlags module", m);
+                    console.log("Disable feature render by AST");
                     m.FeatureFlags.FRE2252 = false;
-                    console.log('Clear htmlCache');
+                    console.log("Clear htmlCache");
 
                     for (i in CW.application.domainLifecycleContext.messageRepository.entities[RM.id]) {
                         var msg = CW.application.domainLifecycleContext.messageRepository.entities[RM.id][i];
@@ -1203,6 +1205,7 @@ var Emoticon = function () {
                     break;
                 }
             }
+            /* eslint-enable */
         }
 
         // Update Emoticons by new approach: directly replace text from DOM

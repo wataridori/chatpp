@@ -17,8 +17,8 @@ class Emoticon {
         this.list_all_emo = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
-        this.emoticons_replace_dom_mechanism = false;
-        this.emoticons_disable_ast_mechanism = true;
+        this.emoticons_replace_dom_mechanism = true;
+        this.emoticons_disable_ast_mechanism = false;
     }
 
     setUp() {
@@ -516,10 +516,10 @@ class Emoticon {
         for (i in window.esmodules) {
             let m = window.esmodules[i];
             if (m.FeatureFlags) {
-                console.log('FOUND FeatureFlags module', m);
-                console.log('Disable feature render by AST');
+                console.log("FOUND FeatureFlags module", m);
+                console.log("Disable feature render by AST");
                 m.FeatureFlags.FRE2252 = false;
-                console.log('Clear htmlCache');
+                console.log("Clear htmlCache");
 
                 for (i in CW.application.domainLifecycleContext.messageRepository.entities[RM.id]) {
                         let msg = CW.application.domainLifecycleContext.messageRepository.entities[RM.id][i];
