@@ -1,7 +1,14 @@
 Chat++ Change Logs
 
+## 5.6.3
+* Bring old Emoticons mechanism back
+* Bring shortcut feature for some buttons (Edit, Link, Task, Quote) back
+
+## 5.6.2
+* Little change to make DOM replaced mechanism more stable
+
 ## 5.6.1
-* Chatwork updated again!!!, which conflicts with current Chat++'s mechanism to display Emoticons, and causes errors when editting message. Therefore, we temporarily switch to DOM replaced mechanishm, which is much less efficient, but at least, it works (^^;). We will try to find other way to bring the old mechanism back.
+* Chatwork updated again!!!, which conflicts with current Chat++'s mechanism to display Emoticons, and causes errors when editting message. Therefore, we temporarily switch to DOM replaced mechanism, which is much less efficient, but at least, it works (^^;). We will try to find other way to bring the old mechanism back.
 
 ## 5.6.0
 * Update new mechanism to bring the Emoticons feature back, by disabling rendering by AST. This method intervenes quite deeply into the way Chatwork's frontend works, and it probably will not be valid anymore in the future. However, we will try to fix again when it is broken.
