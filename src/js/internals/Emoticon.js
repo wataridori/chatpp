@@ -18,7 +18,6 @@ class Emoticon {
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
         this.emoticons_replace_dom_mechanism = false;
-        this.emoticons_disable_ast_mechanism = true;
     }
 
     setUp() {
@@ -39,9 +38,7 @@ class Emoticon {
 
         if (this.emoticons_replace_dom_mechanism) {
             this.applyEmoticonsByModifyingDOM();
-        }
-
-        if (this.emoticons_disable_ast_mechanism) {
+        } else {
             this.disableAST();
         }
     }

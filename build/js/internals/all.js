@@ -670,7 +670,6 @@ var Emoticon = function () {
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
         this.emoticons_replace_dom_mechanism = false;
-        this.emoticons_disable_ast_mechanism = true;
     }
 
     _createClass(Emoticon, [{
@@ -693,9 +692,7 @@ var Emoticon = function () {
 
             if (this.emoticons_replace_dom_mechanism) {
                 this.applyEmoticonsByModifyingDOM();
-            }
-
-            if (this.emoticons_disable_ast_mechanism) {
+            } else {
                 this.disableAST();
             }
         }
@@ -1210,7 +1207,6 @@ var Emoticon = function () {
             }
 
             if (window.feature_flags_module && window.chatwork_notation_module) {
-                console.log('Overwrite getAST');
                 getAST_handler = {
                     apply: function apply(target, thisArg, args) {
                         // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
