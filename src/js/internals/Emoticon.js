@@ -17,8 +17,8 @@ class Emoticon {
         this.list_all_emo = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
-        this.emoticons_replace_dom_mechanism = true;
-        this.emoticons_disable_ast_mechanism = false;
+        this.emoticons_replace_dom_mechanism = false;
+        this.emoticons_disable_ast_mechanism = true;
     }
 
     setUp() {
@@ -528,8 +528,24 @@ class Emoticon {
                 RL.rooms[RM.id].buildtime = 0;
                 console.log('Wait for Chat++ load and rebuild room to enable external Emoticons');
                 window.feature_flags_module = m;
-                break;
             }
+
+            if (m.ChatworkNotation) {
+                window.chatwork_notation_module = m;
+            }
+        }
+
+        if (window.feature_flags_module && window.chatwork_notation_module) {
+            getAST_handler = {
+                apply: function(target, thisArg, args) {
+                    // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
+                    window.feature_flags_module.FeatureFlags.FRE2252 = true;
+                    r = target.apply(thisArg, args);
+                    window.feature_flags_module.FeatureFlags.FRE2252 = false;
+                    return r;
+                }
+            }
+            window.chatwork_notation_module.ChatworkNotation.prototype.getAST = new Proxy(window.chatwork_notation_module.ChatworkNotation.prototype.getAST, getAST_handler);
         }
         /* eslint-enable */
     }
