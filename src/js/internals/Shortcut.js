@@ -45,11 +45,23 @@ class Shortcut {
             this.room_shortcuts = JSON.parse(localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]);
         }
         this.status = common.getStatus("shortcut");
+        this.actions = {
+            quote: "quote",
+            link: "link",
+            edit: "edit",
+            task: "task",
+        };
     }
 
     setUp() {
         if (this.status) {
             this.registerShortcut();
+        }
+
+        if (window.language_module) {
+            for (i in this.actions) {
+                this.actions[i] = window.language_module.Language.getLang(`%%%chat_action_${i}%%%`);
+            }
         }
     }
 
@@ -146,11 +158,14 @@ class Shortcut {
     }
 
     triggerDefaultAction(action) {
-        let me = $("._message:hover");
-        let reply = me.find(`[data-cwui-ab-type='${action}']`);
-        if (this.isDomExists(reply)) {
-            reply.trigger("click");
-        }
+        $("._message:hover .actionNav__item").each((index, element) => {
+            let label = $(element).find(".actionNav__itemLabel");
+            if (label) {
+                if (label.text() === this.actions[action]) {
+                    $(element).trigger("click");
+                }
+            }
+        });
     }
 
     triggerMoreAction() {
@@ -237,7 +252,7 @@ class Shortcut {
         let regex_reply = new RegExp(`\\[.* aid=${AC.myid} .*\\]`);
         let regex_to = new RegExp(`\\[To:${AC.myid}\\]`);
         let regex_to_all = new RegExp("\\[toall\\]");
-        
+
         return [regex_reply, regex_to, regex_to_all].some((r) => r.test(message.msg));
     }
 

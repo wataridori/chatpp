@@ -506,43 +506,29 @@ class Emoticon {
     disableAST() {
         /* eslint-disable no-console */
         /* for debugging new feature */
-        console.log("Afterload Hook STARTED !!!");
-        if (window.esmodules.length < 10) {
-            console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
-        }
-        for (let i in window.esmodules) {
-            let m = window.esmodules[i];
-            if (m.FeatureFlags) {
-                console.log("FOUND FeatureFlags module", m);
-                console.log("Disable feature render by AST");
-                m.FeatureFlags.FRE2252 = false;
-                console.log("Clear htmlCache");
+        if (window.feature_flags_module) {
+            console.log("Disable feature render by AST");
+            window.feature_flags_module.FeatureFlags.FRE2252 = false;
+            console.log("Clear htmlCache");
 
-                for (i in CW.application.domainLifecycleContext.messageRepository.entities[RM.id]) {
-                        let msg = CW.application.domainLifecycleContext.messageRepository.entities[RM.id][i];
-                        msg.body.body.htmlCache = null;
+            for (i in CW.application.domainLifecycleContext.messageRepository.entities[RM.id]) {
+                    let msg = CW.application.domainLifecycleContext.messageRepository.entities[RM.id][i];
+                    msg.body.body.htmlCache = null;
+            }
+            RL.rooms[RM.id].buildtime = 0;
+            console.log('Wait for Chat++ load and rebuild room to enable external Emoticons');
+            if (window.chatwork_notation_module) {
+                getAST_handler = {
+                    apply: function(target, thisArg, args) {
+                        // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
+                        window.feature_flags_module.FeatureFlags.FRE2252 = true;
+                        r = target.apply(thisArg, args);
+                        window.feature_flags_module.FeatureFlags.FRE2252 = false;
+                        return r;
+                    }
                 }
-                RL.rooms[RM.id].buildtime = 0;
-                console.log('Wait for Chat++ load and rebuild room to enable external Emoticons');
-                window.feature_flags_module = m;
+                window.chatwork_notation_module.ChatworkNotation.prototype.getAST = new Proxy(window.chatwork_notation_module.ChatworkNotation.prototype.getAST, getAST_handler);
             }
-
-            if (m.ChatworkNotation) {
-                window.chatwork_notation_module = m;
-            }
-        }
-
-        if (window.feature_flags_module && window.chatwork_notation_module) {
-            getAST_handler = {
-                apply: function(target, thisArg, args) {
-                    // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
-                    window.feature_flags_module.FeatureFlags.FRE2252 = true;
-                    r = target.apply(thisArg, args);
-                    window.feature_flags_module.FeatureFlags.FRE2252 = false;
-                    return r;
-                }
-            }
-            window.chatwork_notation_module.ChatworkNotation.prototype.getAST = new Proxy(window.chatwork_notation_module.ChatworkNotation.prototype.getAST, getAST_handler);
         }
         /* eslint-enable */
     }

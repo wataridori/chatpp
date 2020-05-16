@@ -597,7 +597,7 @@ $(function () {
             window.clearInterval(cw_timer);
             $("#_chatppPreLoad").remove();
             addStyle();
-
+            exposeModules();
             if (emoticon.status) {
                 rebuild = true;
                 emoticon.setUp();
@@ -630,6 +630,26 @@ $(function () {
         }
     }, 100);
 });
+
+function exposeModules() {
+    if (window.esmodules.length < 10) {
+        console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
+    }
+    for (var i in window.esmodules) {
+        var m = window.esmodules[i];
+        if (m.FeatureFlags) {
+            window.feature_flags_module = m;
+        }
+
+        if (m.ChatworkNotation) {
+            window.chatwork_notation_module = m;
+        }
+
+        if (m.Language) {
+            window.language_module = m;
+        }
+    }
+}
 
 function addStyle() {
     $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
@@ -869,13 +889,13 @@ var Emoticon = function () {
                     var toAppend = "";
 
                     if (findEmo.length > 0) {
-                        for (var i = 0; i < findEmo.length; i++) {
-                            if (i == 0) {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[i].key + "\" style=\"cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
+                        for (var _i = 0; _i < findEmo.length; _i++) {
+                            if (_i == 0) {
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[_i].key + "\" style=\"cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
                             } else {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[i].key + "\" style=\"cursor: pointer; margin-top: 5px;\">";
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[_i].key + "\" style=\"cursor: pointer; margin-top: 5px;\">";
                             }
-                            toAppend += "<img id=\"example\" src=\"" + common.htmlEncode(common.getEmoUrl(findEmo[i].src)) + "\" title=\"" + findEmo[i].key + " - " + findEmo[i].data_name + " - Chatpp\" alt=\"" + findEmo[i].key + "\" style=\"width: 100%; max-width: 50px;\"> <b> " + findEmo[i].key + "</b></p>";
+                            toAppend += "<img id=\"example\" src=\"" + common.htmlEncode(common.getEmoUrl(findEmo[_i].src)) + "\" title=\"" + findEmo[_i].key + " - " + findEmo[_i].data_name + " - Chatpp\" alt=\"" + findEmo[_i].key + "\" style=\"width: 100%; max-width: 50px;\"> <b> " + findEmo[_i].key + "</b></p>";
                         }
                         $("#suggestion-emotion-container").append(toAppend);
                     } else {
@@ -1180,43 +1200,29 @@ var Emoticon = function () {
         value: function disableAST() {
             /* eslint-disable no-console */
             /* for debugging new feature */
-            console.log("Afterload Hook STARTED !!!");
-            if (window.esmodules.length < 10) {
-                console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
-            }
-            for (var i in window.esmodules) {
-                var m = window.esmodules[i];
-                if (m.FeatureFlags) {
-                    console.log("FOUND FeatureFlags module", m);
-                    console.log("Disable feature render by AST");
-                    m.FeatureFlags.FRE2252 = false;
-                    console.log("Clear htmlCache");
+            if (window.feature_flags_module) {
+                console.log("Disable feature render by AST");
+                window.feature_flags_module.FeatureFlags.FRE2252 = false;
+                console.log("Clear htmlCache");
 
-                    for (i in CW.application.domainLifecycleContext.messageRepository.entities[RM.id]) {
-                        var msg = CW.application.domainLifecycleContext.messageRepository.entities[RM.id][i];
-                        msg.body.body.htmlCache = null;
-                    }
-                    RL.rooms[RM.id].buildtime = 0;
-                    console.log('Wait for Chat++ load and rebuild room to enable external Emoticons');
-                    window.feature_flags_module = m;
+                for (i in CW.application.domainLifecycleContext.messageRepository.entities[RM.id]) {
+                    var msg = CW.application.domainLifecycleContext.messageRepository.entities[RM.id][i];
+                    msg.body.body.htmlCache = null;
                 }
-
-                if (m.ChatworkNotation) {
-                    window.chatwork_notation_module = m;
+                RL.rooms[RM.id].buildtime = 0;
+                console.log('Wait for Chat++ load and rebuild room to enable external Emoticons');
+                if (window.chatwork_notation_module) {
+                    getAST_handler = {
+                        apply: function apply(target, thisArg, args) {
+                            // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
+                            window.feature_flags_module.FeatureFlags.FRE2252 = true;
+                            r = target.apply(thisArg, args);
+                            window.feature_flags_module.FeatureFlags.FRE2252 = false;
+                            return r;
+                        }
+                    };
+                    window.chatwork_notation_module.ChatworkNotation.prototype.getAST = new Proxy(window.chatwork_notation_module.ChatworkNotation.prototype.getAST, getAST_handler);
                 }
-            }
-
-            if (window.feature_flags_module && window.chatwork_notation_module) {
-                getAST_handler = {
-                    apply: function apply(target, thisArg, args) {
-                        // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
-                        window.feature_flags_module.FeatureFlags.FRE2252 = true;
-                        r = target.apply(thisArg, args);
-                        window.feature_flags_module.FeatureFlags.FRE2252 = false;
-                        return r;
-                    }
-                };
-                window.chatwork_notation_module.ChatworkNotation.prototype.getAST = new Proxy(window.chatwork_notation_module.ChatworkNotation.prototype.getAST, getAST_handler);
             }
             /* eslint-enable */
         }
@@ -1313,9 +1319,9 @@ var Emoticon = function () {
         value: function prepareEmoticonsRegex() {
             var patterns = [];
             var baseEmoticons = this.chatpp_emoticons.baseEmoticons;
-            for (var i in baseEmoticons) {
-                if (baseEmoticons[i].external) {
-                    patterns.push("(" + this.generateRegexFromString(baseEmoticons[i].tag) + ")");
+            for (var _i2 in baseEmoticons) {
+                if (baseEmoticons[_i2].external) {
+                    patterns.push("(" + this.generateRegexFromString(baseEmoticons[_i2].tag) + ")");
                 }
             }
             this.emoticons_regex = new RegExp(patterns.join("|"), "g");
@@ -1430,6 +1436,12 @@ var Shortcut = function () {
             this.room_shortcuts = JSON.parse(localStorage[Const.LOCAL_STORAGE_ROOM_SHORTCUT]);
         }
         this.status = common.getStatus("shortcut");
+        this.actions = {
+            quote: "quote",
+            link: "link",
+            edit: "edit",
+            task: "task"
+        };
     }
 
     _createClass(Shortcut, [{
@@ -1437,6 +1449,12 @@ var Shortcut = function () {
         value: function setUp() {
             if (this.status) {
                 this.registerShortcut();
+            }
+
+            if (window.language_module) {
+                for (i in this.actions) {
+                    this.actions[i] = window.language_module.Language.getLang("%%%chat_action_" + i + "%%%");
+                }
             }
         }
     }, {
@@ -1521,11 +1539,11 @@ var Shortcut = function () {
                 }
             });
 
-            for (var i in this.room_shortcuts) {
-                if (this.room_shortcuts[i] && this.room_shortcuts.hasOwnProperty(i)) {
+            for (var _i in this.room_shortcuts) {
+                if (this.room_shortcuts[_i] && this.room_shortcuts.hasOwnProperty(_i)) {
                     (function () {
-                        var room = _this.room_shortcuts[i];
-                        CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(i), !1, !1, !1, !1, function () {
+                        var room = _this.room_shortcuts[_i];
+                        CW.view.registerKeyboardShortcut(DOM_VK_0 + parseInt(_i), !1, !1, !1, !1, function () {
                             RL.selectRoom(room);
                         });
                     })();
@@ -1540,11 +1558,16 @@ var Shortcut = function () {
     }, {
         key: "triggerDefaultAction",
         value: function triggerDefaultAction(action) {
-            var me = $("._message:hover");
-            var reply = me.find("[data-cwui-ab-type='" + action + "']");
-            if (this.isDomExists(reply)) {
-                reply.trigger("click");
-            }
+            var _this2 = this;
+
+            $("._message:hover .actionNav__item").each(function (index, element) {
+                var label = $(element).find(".actionNav__itemLabel");
+                if (label) {
+                    if (label.text() === _this2.actions[action]) {
+                        $(element).trigger("click");
+                    }
+                }
+            });
         }
     }, {
         key: "triggerMoreAction",
@@ -1582,9 +1605,9 @@ var Shortcut = function () {
         key: "getMessagePosition",
         value: function getMessagePosition(id) {
             var messages = RM.timeline.chat_list;
-            for (var i = messages.length - 1; i >= 0; i--) {
-                if (messages[i].id == id) {
-                    return i;
+            for (var _i2 = messages.length - 1; _i2 >= 0; _i2--) {
+                if (messages[_i2].id == id) {
+                    return _i2;
                 }
             }
 
@@ -1601,9 +1624,9 @@ var Shortcut = function () {
             var current = this.getPivotMessage();
             var position = this.getMessagePosition(current);
             var messages = RM.timeline.chat_list;
-            for (var i = position - 1; i >= 0; i--) {
-                if (this.isMentionMessage(messages[i])) {
-                    this.goToMessageInRoom(messages[i].id);
+            for (var _i3 = position - 1; _i3 >= 0; _i3--) {
+                if (this.isMentionMessage(messages[_i3])) {
+                    this.goToMessageInRoom(messages[_i3].id);
                     return true;
                 }
             }
@@ -1620,9 +1643,9 @@ var Shortcut = function () {
             var current = this.getPivotMessage();
             var position = this.getMessagePosition(current);
             var messages = RM.timeline.chat_list;
-            for (var i = position + 1; i > 0 && i < messages.length; i++) {
-                if (this.isMentionMessage(messages[i])) {
-                    this.goToMessageInRoom(messages[i].id);
+            for (var _i4 = position + 1; _i4 > 0 && _i4 < messages.length; _i4++) {
+                if (this.isMentionMessage(messages[_i4])) {
+                    this.goToMessageInRoom(messages[_i4].id);
                     return true;
                 }
             }
@@ -1665,9 +1688,9 @@ var Shortcut = function () {
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
             var rooms = RL.rooms;
-            for (var i = 0; i < sortedRooms.length; i++) {
-                if (sortedRooms[i] && sortedRooms[i] !== current_room) {
-                    var room = rooms[sortedRooms[i]];
+            for (var _i5 = 0; _i5 < sortedRooms.length; _i5++) {
+                if (sortedRooms[_i5] && sortedRooms[_i5] !== current_room) {
+                    var room = rooms[sortedRooms[_i5]];
                     var check = check_mention ? room.getMentionNum() : room.getUnreadNum();
                     if (check) {
                         return RL.selectRoom(room.id);
@@ -1681,19 +1704,19 @@ var Shortcut = function () {
             var previous = void 0;
             var current_room = RM.id;
             var sortedRooms = RL.getSortedRoomList();
-            for (var i = 0; i < sortedRooms.length; i++) {
-                if (sortedRooms[i] === current_room) {
+            for (var _i6 = 0; _i6 < sortedRooms.length; _i6++) {
+                if (sortedRooms[_i6] === current_room) {
                     if (back) {
                         if (previous) {
                             return RL.selectRoom(previous);
                         }
                     } else {
-                        if (sortedRooms[i + 1]) {
-                            return RL.selectRoom(sortedRooms[i + 1]);
+                        if (sortedRooms[_i6 + 1]) {
+                            return RL.selectRoom(sortedRooms[_i6 + 1]);
                         }
                     }
                 }
-                previous = sortedRooms[i];
+                previous = sortedRooms[_i6];
             }
         }
     }, {

@@ -16,7 +16,7 @@ $(() => {
             window.clearInterval(cw_timer);
             $("#_chatppPreLoad").remove();
             addStyle();
-
+            exposeModules();
             if (emoticon.status) {
                 rebuild = true;
                 emoticon.setUp();
@@ -49,6 +49,27 @@ $(() => {
         }
     }, 100);
 });
+
+function exposeModules() {
+    if (window.esmodules.length < 10) {
+        console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
+    }
+    for (let i in window.esmodules) {
+        let m = window.esmodules[i];
+        if (m.FeatureFlags) {
+            window.feature_flags_module = m;
+        }
+
+        if (m.ChatworkNotation) {
+            window.chatwork_notation_module = m;
+        }
+
+        if (m.Language) {
+            window.language_module = m;
+        }
+    }
+
+}
 
 function addStyle() {
     $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
