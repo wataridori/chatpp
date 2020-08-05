@@ -1,5 +1,8 @@
 Chat++ Change Logs
 
+## 5.7.0
+* Add new feature to add all Members mentioned in Chat area into the current Room. To use this feature, firstly mention all members in the Chat input area, then click Chatpp's `+` button in the Chat text toolbar.
+
 ## 5.6.3
 * Bring old Emoticons mechanism back
 * Bring shortcut feature for some buttons (Edit, Link, Task, Quote) back
