@@ -776,53 +776,62 @@ class Mention {
         $("#_chatSendTool").append(
             $("<li>", {
                 id: "infoTag",
-                class: "_showDescription _chatppbutton",
+                class: "_showDescription _chatppbutton chatInput__element",
                 attr: {
-                    "role": "button"
+                    "role": "button",
+                    "aria-label": "Add info tag"
                 },
                 css: {
                     "display": "inline-block",
                     "margin-left": 5
-                }
-            }).append(
-                $("<span>", {
-                    class: "chatInput__emoticon chatInput__iconContainer"
-                }).append("<strong>[info]</strong>")
-            )
+                },
+                html: "<strong>[info]</strong>"
+            })
         );
         $("#_chatSendTool").append(
             $("<li>", {
                 id: "titleTag",
-                class: "_showDescription _chatppbutton",
+                class: "_showDescription _chatppbutton chatInput__element",
                 attr: {
-                    "role": "button"
+                    "role": "button",
+                    "aria-label": "Add title tag"
                 },
                 css: {
                     "display": "inline-block"
-                }
-            }).append(
-                $("<span>", {
-                    class: "chatInput__emoticon chatInput__iconContainer"
-                }).append("<strong>[title]</strong>")
-            )
+                },
+                html: "<strong>[title]</strong>"
+            })
         );
         $("#_chatSendTool").append(
             $("<li>", {
                 id: "codeTag",
-                class: "_showDescription _chatppbutton",
+                class: "_showDescription _chatppbutton chatInput__element",
                 attr: {
-                    "role": "button"
+                    "role": "button",
+                    "aria-label": "Add code tag"
                 },
                 css: {
                     "display": "inline-block"
-                }
-            }).append(
-                $("<span>", {
-                    class: "chatInput__emoticon chatInput__iconContainer"
-                }).append("<strong>[code]</strong>")
-            )
+                },
+                html: "<strong>[code]</strong>"
+            })
         );
 
+        $("#_chatSendTool").append(
+            $("<li>", {
+                id: "_addUserButton",
+                class: "_showDescription chatInput__element",
+                css: {
+                    "display": "inline-block"
+                },
+                attr: {
+                    "role": "button",
+                    "aria-label": "Add all users mentioned in chat box to this Room"
+                }
+            }).append(
+                $("<span>", { class: "icoFontAddBtn icoSizeLarge" })
+            )
+        );
 
         $("#infoTag").click(() => {
             this.setSuggestedChatTag("info");
@@ -834,6 +843,10 @@ class Mention {
 
         $("#codeTag").click(() => {
             this.setSuggestedChatTag("code");
+        });
+
+        $("#_addUserButton").click(() => {
+            chatwork.addMembersFromChatTextToCurrentRoom();
         });
     }
 }

@@ -288,7 +288,8 @@ class Emoticon {
                     "display": "inline-block"
                 },
                 attr: {
-                    "role": "button"
+                    "role": "button",
+                    "aria-label": "View Chatpp Emoticons List"
                 }
             }).append(
                 $("<span>", { id: "externalEmoticonsButton", class:"icoFontActionMore icoSizeLarge" })

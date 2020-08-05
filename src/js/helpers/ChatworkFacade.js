@@ -86,6 +86,45 @@ class ChatworkFacade {
         return false;
     }
 
+    addMembersFromChatTextToCurrentRoom() {
+        let room_id = this.currentRoom();
+        let room = RL.rooms[room_id];
+        let member_dat = $.extend({}, room.member_dat);
+        if (room.type === "group" && member_dat[this.myId()] === "admin") {
+            if (!window.confirm("Are you sure to add all Users mentioned in Chatbox to this room?")) {
+                return false;
+            }
+            let text = this.getChatText();
+            let users = common.parseUsersId(text);
+            let update = false;
+            for (u of users) {
+                if (!member_dat.hasOwnProperty(u)) {
+                    member_dat[u] = "member";
+                    update = true;
+                }
+            }
+            if (update) {
+                let params = {
+                    body_params: {
+                        cmd: "update_room",
+                        room_id,
+                        role: member_dat
+                    },
+                    query_params: {}
+                };
+                CW.post("gateway.php", params, (response) => {
+                    if (response.status && !response.status.success) {
+                        window.alert(response.status.message);
+                    }
+                });
+            } else {
+                window.alert("There are no new mentioned Members to add into this Room");
+            }
+
+            return true;
+        }
+    }
+
     getChatText() {
         return $("#_chatText").val();
     }

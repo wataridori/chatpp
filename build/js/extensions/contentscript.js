@@ -218,6 +218,18 @@ var Common = function () {
             return null;
         }
     }, {
+        key: "parseUsersId",
+        value: function parseUsersId(text) {
+            var regex = /\[[a-zA-Z]+:([0-9]+)\]/g;
+            var match = void 0;
+            var users = [];
+            while ((match = regex.exec(text)) != null) {
+                users.push(match[1]);
+            }
+
+            return users;
+        }
+    }, {
         key: "reload",
         value: function reload() {
             location.reload();

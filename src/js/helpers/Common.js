@@ -101,6 +101,17 @@ class Common {
         return null;
     }
 
+    parseUsersId(text) {
+        let regex = /\[[a-zA-Z]+:([0-9]+)\]/g;
+        let match;
+        let users = [];
+        while ((match = regex.exec(text)) != null) {
+            users.push(match[1]);
+        }
+
+        return users;
+    }
+
     reload() {
         location.reload();
     }

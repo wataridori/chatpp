@@ -5,7 +5,6 @@ let NotificationDisabler = require("./NotificationDisabler.js");
 let notify_all = require("./NotifyAll.js");
 let mention = require("./Mention.js");
 let room_information = require("./RoomInformation.js");
-let advertisement = require("./Advertisement.js");
 
 let cw_timer;
 
@@ -22,7 +21,6 @@ $(() => {
                 emoticon.setUp();
                 view_enhancer.updateChatworkView();
             }
-            advertisement.setUp();
             shortcut.setUp();
             NotificationDisabler.setUp();
             notify_all.setUp();

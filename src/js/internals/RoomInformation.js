@@ -11,6 +11,10 @@ class RoomInformation {
                 class: "_showDescription chatInput__element",
                 css: {
                     "display": "inline-block"
+                },
+                attr: {
+                    "role": "button",
+                    "aria-label": "View Room Information"
                 }
             }).append(
                 $("<span>", { class: "icoFontAdminInfoMenu icoSizeLarge" })

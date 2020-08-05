@@ -218,6 +218,18 @@ var Common = function () {
             return null;
         }
     }, {
+        key: "parseUsersId",
+        value: function parseUsersId(text) {
+            var regex = /\[[a-zA-Z]+:([0-9]+)\]/g;
+            var match = void 0;
+            var users = [];
+            while ((match = regex.exec(text)) != null) {
+                users.push(match[1]);
+            }
+
+            return users;
+        }
+    }, {
         key: "reload",
         value: function reload() {
             location.reload();
@@ -480,6 +492,68 @@ var ChatworkFacade = function () {
             return false;
         }
     }, {
+        key: "addMembersFromChatTextToCurrentRoom",
+        value: function addMembersFromChatTextToCurrentRoom() {
+            var room_id = this.currentRoom();
+            var room = RL.rooms[room_id];
+            var member_dat = $.extend({}, room.member_dat);
+            if (room.type === "group" && member_dat[this.myId()] === "admin") {
+                if (!window.confirm("Are you sure to add all Users mentioned in Chatbox to this room?")) {
+                    return false;
+                }
+                var text = this.getChatText();
+                var users = common.parseUsersId(text);
+                var update = false;
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = users[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        u = _step.value;
+
+                        if (!member_dat.hasOwnProperty(u)) {
+                            member_dat[u] = "member";
+                            update = true;
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+
+                if (update) {
+                    var params = {
+                        body_params: {
+                            cmd: "update_room",
+                            room_id: room_id,
+                            role: member_dat
+                        },
+                        query_params: {}
+                    };
+                    CW.post("gateway.php", params, function (response) {
+                        if (response.status && !response.status.success) {
+                            window.alert(response.status.message);
+                        }
+                    });
+                } else {
+                    window.alert("There are no new mentioned Members to add into this Room");
+                }
+
+                return true;
+            }
+        }
+    }, {
         key: "getChatText",
         value: function getChatText() {
             return $("#_chatText").val();
@@ -520,29 +594,29 @@ var ChatworkFacade = function () {
                 return my_room;
             }
             var sorted_rooms_list = RL.getSortedRoomList();
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
 
             try {
-                for (var _iterator = sorted_rooms_list[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    i = _step.value;
+                for (var _iterator2 = sorted_rooms_list[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    i = _step2.value;
 
                     if (i !== current_room) {
                         return i;
                     }
                 }
             } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
                     }
                 } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
                     }
                 }
             }
@@ -586,7 +660,6 @@ var NotificationDisabler = __webpack_require__(24);
 var notify_all = __webpack_require__(25);
 var mention = __webpack_require__(26);
 var room_information = __webpack_require__(27);
-var advertisement = __webpack_require__(28);
 
 var cw_timer = void 0;
 
@@ -603,7 +676,6 @@ $(function () {
                 emoticon.setUp();
                 view_enhancer.updateChatworkView();
             }
-            advertisement.setUp();
             shortcut.setUp();
             NotificationDisabler.setUp();
             notify_all.setUp();
@@ -971,7 +1043,8 @@ var Emoticon = function () {
                     "display": "inline-block"
                 },
                 attr: {
-                    "role": "button"
+                    "role": "button",
+                    "aria-label": "View Chatpp Emoticons List"
                 }
             }).append($("<span>", { id: "externalEmoticonsButton", class: "icoFontActionMore icoSizeLarge" })));
 
@@ -2789,41 +2862,53 @@ var Mention = function () {
 
             $("#_chatSendTool").append($("<li>", {
                 id: "infoTag",
-                class: "_showDescription _chatppbutton",
+                class: "_showDescription _chatppbutton chatInput__element",
                 attr: {
-                    "role": "button"
+                    "role": "button",
+                    "aria-label": "Add info tag"
                 },
                 css: {
                     "display": "inline-block",
                     "margin-left": 5
-                }
-            }).append($("<span>", {
-                class: "chatInput__emoticon chatInput__iconContainer"
-            }).append("<strong>[info]</strong>")));
+                },
+                html: "<strong>[info]</strong>"
+            }));
             $("#_chatSendTool").append($("<li>", {
                 id: "titleTag",
-                class: "_showDescription _chatppbutton",
+                class: "_showDescription _chatppbutton chatInput__element",
                 attr: {
-                    "role": "button"
+                    "role": "button",
+                    "aria-label": "Add title tag"
                 },
                 css: {
                     "display": "inline-block"
-                }
-            }).append($("<span>", {
-                class: "chatInput__emoticon chatInput__iconContainer"
-            }).append("<strong>[title]</strong>")));
+                },
+                html: "<strong>[title]</strong>"
+            }));
             $("#_chatSendTool").append($("<li>", {
                 id: "codeTag",
-                class: "_showDescription _chatppbutton",
+                class: "_showDescription _chatppbutton chatInput__element",
                 attr: {
-                    "role": "button"
+                    "role": "button",
+                    "aria-label": "Add code tag"
                 },
                 css: {
                     "display": "inline-block"
+                },
+                html: "<strong>[code]</strong>"
+            }));
+
+            $("#_chatSendTool").append($("<li>", {
+                id: "_addUserButton",
+                class: "_showDescription chatInput__element",
+                css: {
+                    "display": "inline-block"
+                },
+                attr: {
+                    "role": "button",
+                    "aria-label": "Add all users mentioned in chat box to this Room"
                 }
-            }).append($("<span>", {
-                class: "chatInput__emoticon chatInput__iconContainer"
-            }).append("<strong>[code]</strong>")));
+            }).append($("<span>", { class: "icoFontAddBtn icoSizeLarge" })));
 
             $("#infoTag").click(function () {
                 _this4.setSuggestedChatTag("info");
@@ -2835,6 +2920,10 @@ var Mention = function () {
 
             $("#codeTag").click(function () {
                 _this4.setSuggestedChatTag("code");
+            });
+
+            $("#_addUserButton").click(function () {
+                chatwork.addMembersFromChatTextToCurrentRoom();
             });
         }
     }]);
@@ -2873,6 +2962,10 @@ var RoomInformation = function () {
                 class: "_showDescription chatInput__element",
                 css: {
                     "display": "inline-block"
+                },
+                attr: {
+                    "role": "button",
+                    "aria-label": "View Room Information"
                 }
             }).append($("<span>", { class: "icoFontAdminInfoMenu icoSizeLarge" })));
             $("body").append($("<div>", {
@@ -2938,64 +3031,6 @@ var RoomInformation = function () {
 
 var room_information = new RoomInformation();
 module.exports = room_information;
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports) {
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ADVERTISEMENT_CHANGE_TIME = 1000 * 30;
-
-var Advertisement = function () {
-    function Advertisement() {
-        _classCallCheck(this, Advertisement);
-    }
-
-    _createClass(Advertisement, [{
-        key: "setUp",
-        value: function setUp() {
-            var _this = this;
-
-            if ($("#_chatppSponsored").length > 0) {
-                return;
-            }
-            $("#_chatSendTool").append($("<li>", { id: "_chatppSponsored", class: "_showDescription", css: {
-                    "display": "inline-block"
-                }, attr: {
-                    "role": "button",
-                    "aria-label": "Chat Plus Plus Information"
-                } }).append($("<span>", { id: "chatppPreLoad", class: "icoSizeSmall" })).append(this.getAdvertisementText()));
-            setInterval(function () {
-                _this.changeRandomAdvertisement();
-            }, ADVERTISEMENT_CHANGE_TIME);
-        }
-    }, {
-        key: "changeRandomAdvertisement",
-        value: function changeRandomAdvertisement() {
-            var text = this.getAdvertisementText();
-            $("#chatppAdvertisement").html(text);
-        }
-    }, {
-        key: "getAdvertisementText",
-        value: function getAdvertisementText() {
-            if (localStorage["chatpp_advertisement"] !== undefined && localStorage["chatpp_advertisement"]) {
-                var ads = JSON.parse(localStorage["chatpp_advertisement"]);
-                if (ads.length > 0) {
-                    return ads[Math.floor(Math.random() * ads.length)];
-                }
-            }
-            return "Advertisement Here!";
-        }
-    }]);
-
-    return Advertisement;
-}();
-
-var advertisement = new Advertisement();
-module.exports = advertisement;
 
 /***/ })
 /******/ ]);
