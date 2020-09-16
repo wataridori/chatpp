@@ -49,24 +49,32 @@ $(() => {
 });
 
 function exposeModules() {
+    /* eslint-disable no-console */
+    /* for debugging new feature */
     if (window.esmodules.length < 10) {
         console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
     }
     for (let i in window.esmodules) {
         let m = window.esmodules[i];
-        if (m.FeatureFlags) {
+        if (m.a && m.a.FRE2252) {
+            console.log("Find feature flag module");
             window.feature_flags_module = m;
+            continue;
         }
 
-        if (m.ChatworkNotation) {
-            window.chatwork_notation_module = m;
-        }
-
-        if (m.Language) {
+        if (m.a && m.a.langMap) {
+            console.log("Find Language module");
             window.language_module = m;
+            continue;
+        }
+
+        if (typeof m.a == "function" && typeof m.a.prototype != "undefined" && 'getAST' in m.a.prototype) {
+            console.log("Find Notation module");
+            window.chatwork_notation_module = m;
+            break;
         }
     }
-
+    /* eslint-enable */
 }
 
 function addStyle() {

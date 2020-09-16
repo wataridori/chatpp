@@ -704,23 +704,32 @@ $(function () {
 });
 
 function exposeModules() {
+    /* eslint-disable no-console */
+    /* for debugging new feature */
     if (window.esmodules.length < 10) {
         console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
     }
     for (var i in window.esmodules) {
         var m = window.esmodules[i];
-        if (m.FeatureFlags) {
+        if (m.a && m.a.FRE2252) {
+            console.log("Find feature flag module");
             window.feature_flags_module = m;
+            continue;
         }
 
-        if (m.ChatworkNotation) {
-            window.chatwork_notation_module = m;
-        }
-
-        if (m.Language) {
+        if (m.a && m.a.langMap) {
+            console.log("Find Language module");
             window.language_module = m;
+            continue;
+        }
+
+        if (typeof m.a == "function" && typeof m.a.prototype != "undefined" && 'getAST' in m.a.prototype) {
+            console.log("Find Notation module");
+            window.chatwork_notation_module = m;
+            break;
         }
     }
+    /* eslint-enable */
 }
 
 function addStyle() {
@@ -1274,28 +1283,27 @@ var Emoticon = function () {
             /* eslint-disable no-console */
             /* for debugging new feature */
             if (window.feature_flags_module) {
-                console.log("Disable feature render by AST");
-                window.feature_flags_module.FeatureFlags.FRE2252 = false;
-                console.log("Clear htmlCache");
+                window.feature_flags_module.a.FRE2252 = false;
+                console.log('Clear htmlCache');
 
                 for (i in CW.application.domainLifecycleContext.messageRepository.entities[RM.id]) {
                     var msg = CW.application.domainLifecycleContext.messageRepository.entities[RM.id][i];
                     msg.body.body.htmlCache = null;
                 }
                 RL.rooms[RM.id].buildtime = 0;
-                console.log('Wait for Chat++ load and rebuild room to enable external Emoticons');
-                if (window.chatwork_notation_module) {
-                    getAST_handler = {
-                        apply: function apply(target, thisArg, args) {
-                            // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
-                            window.feature_flags_module.FeatureFlags.FRE2252 = true;
-                            r = target.apply(thisArg, args);
-                            window.feature_flags_module.FeatureFlags.FRE2252 = false;
-                            return r;
-                        }
-                    };
-                    window.chatwork_notation_module.ChatworkNotation.prototype.getAST = new Proxy(window.chatwork_notation_module.ChatworkNotation.prototype.getAST, getAST_handler);
-                }
+            }
+
+            if (window.chatwork_notation_module) {
+                getAST_handler = {
+                    apply: function apply(target, thisArg, args) {
+                        // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
+                        window.feature_flags_module.a.FRE2252 = true;
+                        r = target.apply(thisArg, args);
+                        window.feature_flags_module.a.FRE2252 = false;
+                        return r;
+                    }
+                };
+                window.chatwork_notation_module.a.prototype.getAST = new Proxy(window.chatwork_notation_module.a.prototype.getAST, getAST_handler);
             }
             /* eslint-enable */
         }
@@ -1526,7 +1534,7 @@ var Shortcut = function () {
 
             if (window.language_module) {
                 for (i in this.actions) {
-                    this.actions[i] = window.language_module.Language.getLang("%%%chat_action_" + i + "%%%");
+                    this.actions[i] = window.language_module.a.getLang("%%%chat_action_" + i + "%%%");
                 }
             }
         }

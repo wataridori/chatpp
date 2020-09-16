@@ -60,7 +60,7 @@ class Shortcut {
 
         if (window.language_module) {
             for (i in this.actions) {
-                this.actions[i] = window.language_module.Language.getLang(`%%%chat_action_${i}%%%`);
+                this.actions[i] = window.language_module.a.getLang(`%%%chat_action_${i}%%%`);
             }
         }
     }

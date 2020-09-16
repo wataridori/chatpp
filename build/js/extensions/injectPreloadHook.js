@@ -5,7 +5,7 @@ window.esmodules = [];
 apply_handler = {
     apply: function(target, thisArg, args) {
         r = target.apply(thisArg, args);
-        if (args[1] == '__esModule') {
+        if (args[1] == 'a') {
             window.esmodules.push(r);
         };
         return r;

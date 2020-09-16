@@ -508,28 +508,27 @@ class Emoticon {
         /* eslint-disable no-console */
         /* for debugging new feature */
         if (window.feature_flags_module) {
-            console.log("Disable feature render by AST");
-            window.feature_flags_module.FeatureFlags.FRE2252 = false;
-            console.log("Clear htmlCache");
+            window.feature_flags_module.a.FRE2252 = false;
+            console.log('Clear htmlCache');
 
             for (i in CW.application.domainLifecycleContext.messageRepository.entities[RM.id]) {
                     let msg = CW.application.domainLifecycleContext.messageRepository.entities[RM.id][i];
                     msg.body.body.htmlCache = null;
             }
             RL.rooms[RM.id].buildtime = 0;
-            console.log('Wait for Chat++ load and rebuild room to enable external Emoticons');
-            if (window.chatwork_notation_module) {
-                getAST_handler = {
-                    apply: function(target, thisArg, args) {
-                        // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
-                        window.feature_flags_module.FeatureFlags.FRE2252 = true;
-                        r = target.apply(thisArg, args);
-                        window.feature_flags_module.FeatureFlags.FRE2252 = false;
-                        return r;
-                    }
+        }
+
+        if (window.chatwork_notation_module) {
+            getAST_handler = {
+                apply: function(target, thisArg, args) {
+                    // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
+                    window.feature_flags_module.a.FRE2252 = true;
+                    r = target.apply(thisArg, args);
+                    window.feature_flags_module.a.FRE2252 = false;
+                    return r;
                 }
-                window.chatwork_notation_module.ChatworkNotation.prototype.getAST = new Proxy(window.chatwork_notation_module.ChatworkNotation.prototype.getAST, getAST_handler);
             }
+            window.chatwork_notation_module.a.prototype.getAST = new Proxy(window.chatwork_notation_module.a.prototype.getAST, getAST_handler);
         }
         /* eslint-enable */
     }
