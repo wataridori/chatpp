@@ -5,11 +5,11 @@ let NotificationDisabler = require("./NotificationDisabler.js");
 let notify_all = require("./NotifyAll.js");
 let mention = require("./Mention.js");
 let room_information = require("./RoomInformation.js");
+const common = require("../helpers/Common.js");
 
 let cw_timer;
 
 $(() => {
-    let rebuild = false;
     cw_timer = setInterval(() => {
         if (typeof CW !== "undefined" && typeof RM !== "undefined") {
             window.clearInterval(cw_timer);
@@ -17,7 +17,6 @@ $(() => {
             addStyle();
             exposeModules();
             if (emoticon.status) {
-                rebuild = true;
                 emoticon.setUp();
                 view_enhancer.updateChatworkView();
             }
@@ -41,9 +40,7 @@ $(() => {
                 }
             }
 
-            if (rebuild) {
-                RL.rooms[RM.id].build();
-            }
+            RL.rooms[RM.id].build();
         }
     }, 100);
 });

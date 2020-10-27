@@ -660,11 +660,11 @@ var NotificationDisabler = __webpack_require__(24);
 var notify_all = __webpack_require__(25);
 var mention = __webpack_require__(26);
 var room_information = __webpack_require__(27);
+var common = __webpack_require__(1);
 
 var cw_timer = void 0;
 
 $(function () {
-    var rebuild = false;
     cw_timer = setInterval(function () {
         if (typeof CW !== "undefined" && typeof RM !== "undefined") {
             window.clearInterval(cw_timer);
@@ -672,7 +672,6 @@ $(function () {
             addStyle();
             exposeModules();
             if (emoticon.status) {
-                rebuild = true;
                 emoticon.setUp();
                 view_enhancer.updateChatworkView();
             }
@@ -696,9 +695,7 @@ $(function () {
                 }
             };
 
-            if (rebuild) {
-                RL.rooms[RM.id].build();
-            }
+            RL.rooms[RM.id].build();
         }
     }, 100);
 });
