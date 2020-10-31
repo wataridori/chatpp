@@ -45,8 +45,6 @@ function init(inject_script) {
             }
             common.setStatus(feature, info[feature_name]);
         });
-        // Temporarily disable emoticon feature due to Chatwork's code changed
-        common.setStatus("emoticon", false);
 
         emo_storage.setFeatureStatus(info);
         if (info.emoticon_status == false) {

@@ -708,22 +708,10 @@ function exposeModules() {
     }
     for (var i in window.esmodules) {
         var m = window.esmodules[i];
-        if (m.a && m.a.FRE2252) {
-            console.log("Find feature flag module");
-            window.feature_flags_module = m;
-            continue;
-        }
-
         if (m.a && m.a.langMap) {
             console.log("Find Language module");
             window.language_module = m;
             continue;
-        }
-
-        if (typeof m.a == "function" && typeof m.a.prototype != "undefined" && 'getAST' in m.a.prototype) {
-            console.log("Find Notation module");
-            window.chatwork_notation_module = m;
-            break;
         }
     }
     /* eslint-enable */
@@ -741,6 +729,8 @@ function addStyle() {
 /***/ }),
 /* 21 */
 /***/ (function(module, exports, __webpack_require__) {
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -767,7 +757,6 @@ var Emoticon = function () {
         this.list_all_emo = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
-        this.emoticons_replace_dom_mechanism = false;
     }
 
     _createClass(Emoticon, [{
@@ -787,12 +776,8 @@ var Emoticon = function () {
             });
 
             this.prepareChatppEmoticons();
-
-            if (this.emoticons_replace_dom_mechanism) {
-                this.applyEmoticonsByModifyingDOM();
-            } else {
-                this.disableAST();
-            }
+            this.prepareEmoticonsRegex();
+            this.overrideAST();
         }
     }, {
         key: "prepareChatppEmoticons",
@@ -967,13 +952,13 @@ var Emoticon = function () {
                     var toAppend = "";
 
                     if (findEmo.length > 0) {
-                        for (var _i = 0; _i < findEmo.length; _i++) {
-                            if (_i == 0) {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[_i].key + "\" style=\"cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
+                        for (var i = 0; i < findEmo.length; i++) {
+                            if (i == 0) {
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo-selected=\"true\" data-emo=\"" + findEmo[i].key + "\" style=\"cursor: pointer; margin-top: 5px; background-color: rgb(216, 240, 249);\">";
                             } else {
-                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[_i].key + "\" style=\"cursor: pointer; margin-top: 5px;\">";
+                                toAppend += "<p class=\"suggestion-emo-list\" data-emo=\"" + findEmo[i].key + "\" style=\"cursor: pointer; margin-top: 5px;\">";
                             }
-                            toAppend += "<img id=\"example\" src=\"" + common.htmlEncode(common.getEmoUrl(findEmo[_i].src)) + "\" title=\"" + findEmo[_i].key + " - " + findEmo[_i].data_name + " - Chatpp\" alt=\"" + findEmo[_i].key + "\" style=\"width: 100%; max-width: 50px;\"> <b> " + findEmo[_i].key + "</b></p>";
+                            toAppend += "<img id=\"example\" src=\"" + common.htmlEncode(common.getEmoUrl(findEmo[i].src)) + "\" title=\"" + findEmo[i].key + " - " + findEmo[i].data_name + " - Chatpp\" alt=\"" + findEmo[i].key + "\" style=\"width: 100%; max-width: 50px;\"> <b> " + findEmo[i].key + "</b></p>";
                         }
                         $("#suggestion-emotion-container").append(toAppend);
                     } else {
@@ -1224,42 +1209,41 @@ var Emoticon = function () {
             this.chatpp_emoticons.tagHash = {};
             for (var index = 0; index < emo.length; index++) {
                 var encoded_text = common.htmlEncode(emo[index].key);
+                var name = this.getEmoNameFromTag(emo[index].key);
                 var title = encoded_text + " - " + emo[index].data_name + " - Chatpp";
                 var src = common.htmlEncode(common.getEmoUrl(emo[index].src));
                 var one_emo = {
-                    name: encoded_text,
+                    name: name,
                     title: title,
                     src: src,
                     tag: emo[index].key,
                     external: true
                 };
-                if (this.emoticons_replace_dom_mechanism) {
-                    // Due to Chatwork mechanism changed, do not push external emo to Chatwork's emoticons list anymore
-                    this.chatpp_emoticons.baseEmoticons.push(one_emo);
-                    this.chatpp_emoticons.tagHash[emo[index].key] = one_emo;
-                } else {
-                    // Legacy mechanism, push external emo to Chatwork's emoticons list
-                    emoticons.baseEmoticons.push(one_emo);
-                    emoticons.tagHash[emo[index].key] = one_emo;
-                }
+                this.chatpp_emoticons.baseEmoticons.push(one_emo);
+                this.chatpp_emoticons.tagHash[emo[index].key] = one_emo;
+                window.emoticon_tag_hash_list[name] = one_emo;
+                emoticons.baseEmoticons.push(one_emo);
+                emoticons.tagHash[emo[index].key] = one_emo;
             }
-            if (this.emoticons_replace_dom_mechanism) {
-                this.chatpp_emoticons.getEmoticonWithTag = function (tag) {
-                    return _this2.chatpp_emoticons.tagHash[tag];
-                };
-                this.chatpp_emoticons.getAllEmoticons = function () {
-                    return _this2.baseEmoticons;
-                };
-                this.chatpp_emoticons.getEmoticonWithName = function (name) {
-                    return _this2.chatpp_emoticons.baseEmoticons.find(function (e) {
-                        return e.name === name;
-                    });
-                };
-            } else {
-                tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
-                    return emo.tag;
-                }));
-            }
+            this.chatpp_emoticons.getEmoticonWithTag = function (tag) {
+                return _this2.chatpp_emoticons.tagHash[tag];
+            };
+            this.chatpp_emoticons.getAllEmoticons = function () {
+                return _this2.baseEmoticons;
+            };
+            this.chatpp_emoticons.getEmoticonWithName = function (name) {
+                return _this2.chatpp_emoticons.baseEmoticons.find(function (e) {
+                    return e.name === name;
+                });
+            };
+            tokenizer.setEmoticons(emoticons.getAllEmoticons().map(function (emo) {
+                return emo.tag;
+            }));
+        }
+    }, {
+        key: "getEmoNameFromTag",
+        value: function getEmoNameFromTag(tag) {
+            return "chatpp-" + common.htmlEncode(tag);
         }
     }, {
         key: "hideSuggestionEmotionsBox",
@@ -1272,177 +1256,105 @@ var Emoticon = function () {
             $("#suggestion-emotion-container").html("");
         }
 
-        // Enable Chatpp's Emoticons by disable rendering with AST
+        // Enable Chatpp's Emoticons by overriding getAST function
 
     }, {
-        key: "disableAST",
-        value: function disableAST() {
-            /* eslint-disable no-console */
-            /* for debugging new feature */
-            if (window.feature_flags_module) {
-                window.feature_flags_module.a.FRE2252 = false;
-                console.log('Clear htmlCache');
-
-                for (i in CW.application.domainLifecycleContext.messageRepository.entities[RM.id]) {
-                    var msg = CW.application.domainLifecycleContext.messageRepository.entities[RM.id][i];
-                    msg.body.body.htmlCache = null;
-                }
-                RL.rooms[RM.id].buildtime = 0;
-            }
-
-            if (window.chatwork_notation_module) {
-                getAST_handler = {
-                    apply: function apply(target, thisArg, args) {
-                        // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
-                        window.feature_flags_module.a.FRE2252 = true;
-                        r = target.apply(thisArg, args);
-                        window.feature_flags_module.a.FRE2252 = false;
-                        return r;
-                    }
-                };
-                window.chatwork_notation_module.a.prototype.getAST = new Proxy(window.chatwork_notation_module.a.prototype.getAST, getAST_handler);
-            }
-            /* eslint-enable */
-        }
-
-        // Update Emoticons by new approach: directly replace text from DOM
-
-    }, {
-        key: "applyEmoticonsByModifyingDOM",
-        value: function applyEmoticonsByModifyingDOM() {
+        key: "overrideAST",
+        value: function overrideAST() {
             var _this3 = this;
 
-            this.prepareEmoticonsRegex();
-            $("#_timeLine ._message[data-mid]").each(function (index, element) {
-                _this3.applyEmoticonsForMessageDOM(element);
-            });
-            $("#_timeLine").on("DOMNodeInserted", function (e) {
-                _this3.applyEmoticonsForMessageDOM(e.target);
-            });
-
-            this.overrideEditMessage();
-        }
-    }, {
-        key: "overrideEditMessage",
-        value: function overrideEditMessage() {
-            // A very tricky way to override Chatwork's editMessage function to make editting message work
-            // This feature may break if Chatwork change their code structure
-            var acl = CW.application.getACL();
-            var messageAPIService = acl.applicationServiceContext.currentSelectedRoomService.messageService.messageAPIService;
-            if (messageAPIService) {
-                messageAPIService.editMessageOld = messageAPIService.editMessage;
-                var me = this;
-                messageAPIService.editMessage = function (e, t, n) {
-                    var result = this.editMessageOld(e, t, n);
-                    var mid = t.value;
-                    var message_content = n.value;
-                    var rid = RM.id;
-                    var message_element = $("#_messageId" + mid + " pre img.chatpp_emoticon");
-                    if (message_element.length || me.emoticons_regex.test(message_content)) {
-                        var start = Date.now();
-                        $("#_loader").fadeIn(100);
-                        setTimeout(function () {
-                            var temp_room = chatwork.getTempRoomId();
-                            RL.selectRoom(temp_room);
-                            var original_onhashchange = window.onhashchange;
-                            window.chatpp_force_reloading = true;
-                            window.onhashchange = function () {
-                                if (window.chatpp_force_reloading && "#!rid" + temp_room === location.hash) {
-                                    RL.selectRoom(rid);
-                                } else if (window.chatpp_force_reloading && "#!rid" + rid === location.hash) {
-                                    var finish = Date.now();
-                                    console.log("Chatpp finish reloading editted message in", finish - start, "miliseconds");
-                                    $("#_loader").fadeOut("fast");
-                                    window.chatpp_force_reloading = false;
-                                    window.onhashchange = original_onhashchange;
-                                }
-                            };
-                        }, 500);
+            RL.rooms[RM.id].buildtime = 0;
+            /* eslint-disable no-console */
+            /* for debugging new feature */
+            getAST_handler = {
+                apply: function apply(target, thisArg, args) {
+                    var r = target.apply(thisArg, args);
+                    var raw_text = thisArg.value;
+                    var matches = raw_text.match(_this3.emoticons_regex);
+                    if (matches) {
+                        var emoticons_regex = _this3.generateEmoticonsRegexFromArray(matches);
+                        r = _this3.findTextToken(r, emoticons_regex);
                     }
-
-                    return result;
-                };
-            }
-        }
-    }, {
-        key: "applyEmoticonsForMessageDOM",
-        value: function applyEmoticonsForMessageDOM(target) {
-            var mid = $(target).data("mid");
-            if (!mid) {
-                return;
-            }
-            var message_element = $(target).find("pre");
-            if (message_element.length && !message_element.hasClass("chatpp_emoticon")) {
-                var content = message_element.html();
-                if (this.emoticons_regex.test(content)) {
-                    this.renderContentAndApplyToDOM(message_element, content, mid);
+                    return r;
                 }
-            }
+            };
+
+            window.notation_module.getAST = new Proxy(window.notation_module.getAST, getAST_handler);
+            /* eslint-enable */
         }
     }, {
-        key: "renderContentAndApplyToDOM",
-        value: function renderContentAndApplyToDOM(message_element, content, mid) {
-            if (!this.chatpp_cached_messages[mid] || this.chatpp_cached_messages[mid].message_before != content || !this.chatpp_cached_messages[mid].message_after) {
-                var replaced = this.applyReplacement(content);
-                this.chatpp_cached_messages[mid] = {
-                    message_before: content,
-                    message_after: replaced
-                };
+        key: "findTextToken",
+        value: function findTextToken(tokenized_objects, emoticons_regex) {
+            var _this4 = this;
+
+            // list token that directly contain text or have children that contain text
+            var list_types = ['tokens', 'messageQuote', 'quotedTokens', 'info', 'title', 'message'];
+            list_types.forEach(function (key, index) {
+                if (tokenized_objects[key]) {
+                    if (Array.isArray(tokenized_objects[key])) {
+                        // find nested text token
+                        if (tokenized_objects[key].some(function (z) {
+                            return z.text;
+                        })) {
+                            // last level reached
+                            for (var _index = 0; _index < tokenized_objects[key].length; _index++) {
+                                if (tokenized_objects[key][_index].text) {
+                                    var head = tokenized_objects[key].slice(0, _index);
+                                    var body = _this4.parseMoreEmo(tokenized_objects[key][_index], emoticons_regex);
+                                    var tail = tokenized_objects[key].slice(_index + 1);
+                                    tokenized_objects[key] = head.concat(body).concat(tail);
+                                    _index += body.length - 1;
+                                }
+                            }
+                        } else {
+                            // not yet, continue check
+                            tokenized_objects[key] = tokenized_objects[key].map(function (item) {
+                                return _this4.findTextToken(item, emoticons_regex);
+                            });
+                        }
+                    } else if (_typeof(tokenized_objects[key]) == 'object') {
+                        // an object, continue check
+                        tokenized_objects[key] = _this4.findTextToken(tokenized_objects[key], emoticons_regex);
+                    }
+                }
+            });
+
+            return tokenized_objects;
+        }
+    }, {
+        key: "parseMoreEmo",
+        value: function parseMoreEmo(token, emoticons_regex) {
+            var ret = [];
+            var pos = 0;
+            while ((match = emoticons_regex.exec(token.text)) !== null) {
+                if (token.text.slice(pos, match.index)) {
+                    ret.push({ text: token.text.slice(pos, match.index) });
+                }
+                ret.push({ emoticon: { value: this.getEmoNameFromTag(match[0]) } });
+                pos = emoticons_regex.lastIndex;
             }
-            message_element.html(this.chatpp_cached_messages[mid].message_after);
-            message_element.addClass("chatpp_emoticon");
+            return ret.length ? ret : [token];
         }
     }, {
         key: "prepareEmoticonsRegex",
         value: function prepareEmoticonsRegex() {
             var patterns = [];
             var baseEmoticons = this.chatpp_emoticons.baseEmoticons;
-            for (var _i2 in baseEmoticons) {
-                if (baseEmoticons[_i2].external) {
-                    patterns.push("(" + this.generateRegexFromString(baseEmoticons[_i2].tag) + ")");
+            for (var i in baseEmoticons) {
+                if (baseEmoticons[i].external) {
+                    patterns.push("(" + this.generateRegexFromString(baseEmoticons[i].tag) + ")");
                 }
             }
             this.emoticons_regex = new RegExp(patterns.join("|"), "g");
         }
     }, {
-        key: "applyReplacement",
-        value: function applyReplacement(string) {
-            var current_index = -1,
-                code_tag_index = 0,
-                start = 0,
-                result = "";
-            while (code_tag_index != -1) {
-                current_index = string.indexOf("<code", code_tag_index);
-                if (current_index > -1) {
-                    result += this.replaceEmoticons(string.substring(start, current_index));
-                    start = current_index + 1;
-                    code_tag_index = string.indexOf("</code>", current_index + 5);
-                    if (code_tag_index > -1) {
-                        start = code_tag_index + 7;
-                        code_tag_index = start;
-                        result += string.substring(current_index, code_tag_index);
-                    }
-                } else {
-                    break;
-                }
+        key: "generateEmoticonsRegexFromArray",
+        value: function generateEmoticonsRegexFromArray(emoticon_list) {
+            var patterns = [];
+            for (var i in emoticon_list) {
+                patterns.push("(" + this.generateRegexFromString(emoticon_list[i]) + ")");
             }
-            result += this.replaceEmoticons(string.substring(start));
-
-            return result;
-        }
-    }, {
-        key: "replaceEmoticons",
-        value: function replaceEmoticons(string) {
-            var _this4 = this;
-
-            return string.replace(this.emoticons_regex, function (match) {
-                var emo = _this4.chatpp_emoticons.getEmoticonWithTag(match);
-                if (!emo) {
-                    return match;
-                }
-                var replaceText = "<img src=\"" + emo.src + "\" alt=\"" + emo.name + "\" data-cwtag=\"" + emo.tag + "\" title=\"" + emo.title + "\" class=\"ui_emoticon chatpp_emoticon\">";
-                return replaceText;
-            });
+            return new RegExp(patterns.join("|"), "g");
         }
     }, {
         key: "generateRegexFromString",

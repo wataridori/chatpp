@@ -53,22 +53,10 @@ function exposeModules() {
     }
     for (let i in window.esmodules) {
         let m = window.esmodules[i];
-        if (m.a && m.a.FRE2252) {
-            console.log("Find feature flag module");
-            window.feature_flags_module = m;
-            continue;
-        }
-
         if (m.a && m.a.langMap) {
             console.log("Find Language module");
             window.language_module = m;
             continue;
-        }
-
-        if (typeof m.a == "function" && typeof m.a.prototype != "undefined" && 'getAST' in m.a.prototype) {
-            console.log("Find Notation module");
-            window.chatwork_notation_module = m;
-            break;
         }
     }
     /* eslint-enable */

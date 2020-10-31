@@ -17,7 +17,6 @@ class Emoticon {
         this.list_all_emo = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
-        this.emoticons_replace_dom_mechanism = false;
     }
 
     setUp() {
@@ -35,12 +34,8 @@ class Emoticon {
         });
 
         this.prepareChatppEmoticons();
-
-        if (this.emoticons_replace_dom_mechanism) {
-            this.applyEmoticonsByModifyingDOM();
-        } else {
-            this.disableAST();
-        }
+        this.prepareEmoticonsRegex();
+        this.overrideAST();
     }
 
     prepareChatppEmoticons() {
@@ -466,32 +461,30 @@ class Emoticon {
         this.chatpp_emoticons.tagHash = {};
         for (let index = 0; index < emo.length; index++) {
             let encoded_text = common.htmlEncode(emo[index].key);
+            let name = this.getEmoNameFromTag(emo[index].key);
             let title = `${encoded_text} - ${emo[index].data_name} - Chatpp`;
             let src = common.htmlEncode(common.getEmoUrl(emo[index].src));
             let one_emo = {
-                name: encoded_text,
+                name,
                 title,
                 src,
                 tag: emo[index].key,
                 external: true
             };
-            if (this.emoticons_replace_dom_mechanism) {
-                // Due to Chatwork mechanism changed, do not push external emo to Chatwork's emoticons list anymore
-                this.chatpp_emoticons.baseEmoticons.push(one_emo);
-                this.chatpp_emoticons.tagHash[emo[index].key] = one_emo;
-            } else {
-                // Legacy mechanism, push external emo to Chatwork's emoticons list
-                emoticons.baseEmoticons.push(one_emo);
-                emoticons.tagHash[emo[index].key] = one_emo;
-            }
+            this.chatpp_emoticons.baseEmoticons.push(one_emo);
+            this.chatpp_emoticons.tagHash[emo[index].key] = one_emo;
+            window.emoticon_tag_hash_list[name] = one_emo;
+            emoticons.baseEmoticons.push(one_emo);
+            emoticons.tagHash[emo[index].key] = one_emo;
         }
-        if (this.emoticons_replace_dom_mechanism) {
-            this.chatpp_emoticons.getEmoticonWithTag = (tag) => this.chatpp_emoticons.tagHash[tag];
-            this.chatpp_emoticons.getAllEmoticons = () => this.baseEmoticons;
-            this.chatpp_emoticons.getEmoticonWithName = (name) => this.chatpp_emoticons.baseEmoticons.find((e) => e.name === name)
-        } else {
-            tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
-        }
+        this.chatpp_emoticons.getEmoticonWithTag = (tag) => this.chatpp_emoticons.tagHash[tag];
+        this.chatpp_emoticons.getAllEmoticons = () => this.baseEmoticons;
+        this.chatpp_emoticons.getEmoticonWithName = (name) => this.chatpp_emoticons.baseEmoticons.find((e) => e.name === name)
+        tokenizer.setEmoticons(emoticons.getAllEmoticons().map((emo) => emo.tag));
+    }
+
+    getEmoNameFromTag(tag) {
+        return `chatpp-${common.htmlEncode(tag)}`;
     }
 
     hideSuggestionEmotionsBox() {
@@ -503,114 +496,80 @@ class Emoticon {
         $("#suggestion-emotion-container").html("");
     }
 
-    // Enable Chatpp's Emoticons by disable rendering with AST
-    disableAST() {
+    // Enable Chatpp's Emoticons by overriding getAST function
+    overrideAST() {
+        RL.rooms[RM.id].buildtime = 0;
         /* eslint-disable no-console */
         /* for debugging new feature */
-        if (window.feature_flags_module) {
-            window.feature_flags_module.a.FRE2252 = false;
-            console.log('Clear htmlCache');
-
-            for (i in CW.application.domainLifecycleContext.messageRepository.entities[RM.id]) {
-                    let msg = CW.application.domainLifecycleContext.messageRepository.entities[RM.id][i];
-                    msg.body.body.htmlCache = null;
-            }
-            RL.rooms[RM.id].buildtime = 0;
-        }
-
-        if (window.chatwork_notation_module) {
-            getAST_handler = {
-                apply: function(target, thisArg, args) {
-                    // temporary enable FeatureFlags.FRE2252 to make getAST() works then disable it
-                    window.feature_flags_module.a.FRE2252 = true;
-                    r = target.apply(thisArg, args);
-                    window.feature_flags_module.a.FRE2252 = false;
-                    return r;
+        getAST_handler = {
+            apply: (target, thisArg, args) => {
+                let r = target.apply(thisArg, args);
+                let raw_text = thisArg.value;
+                let matches = raw_text.match(this.emoticons_regex);
+                if (matches) {
+                    let emoticons_regex = this.generateEmoticonsRegexFromArray(matches);
+                    r = this.findTextToken(r, emoticons_regex);
                 }
-            }
-            window.chatwork_notation_module.a.prototype.getAST = new Proxy(window.chatwork_notation_module.a.prototype.getAST, getAST_handler);
-        }
+                return r;
+            },
+        };
+
+        window.notation_module.getAST = new Proxy(window.notation_module.getAST, getAST_handler);
         /* eslint-enable */
     }
 
-    // Update Emoticons by new approach: directly replace text from DOM
-    applyEmoticonsByModifyingDOM() {
-        this.prepareEmoticonsRegex();
-        $("#_timeLine ._message[data-mid]").each((index, element) => {
-            this.applyEmoticonsForMessageDOM(element);
-        });
-        $("#_timeLine").on("DOMNodeInserted", (e) => {
-            this.applyEmoticonsForMessageDOM(e.target);
-        });
-
-        this.overrideEditMessage();
-    }
-
-    overrideEditMessage() {
-        // A very tricky way to override Chatwork's editMessage function to make editting message work
-        // This feature may break if Chatwork change their code structure
-        let acl = CW.application.getACL();
-        let messageAPIService = acl.applicationServiceContext.currentSelectedRoomService.messageService.messageAPIService;
-        if (messageAPIService) {
-            messageAPIService.editMessageOld = messageAPIService.editMessage;
-            let me = this;
-            messageAPIService.editMessage = function (e, t, n) {
-                let result = this.editMessageOld(e, t, n);
-                let mid = t.value;
-                let message_content = n.value;
-                let rid = RM.id;
-                let message_element = $(`#_messageId${mid} pre img.chatpp_emoticon`);
-                if (message_element.length || me.emoticons_regex.test(message_content)) {
-                    let start = Date.now();
-                    $("#_loader").fadeIn(100);
-                    setTimeout(() => {
-                        let temp_room = chatwork.getTempRoomId();
-                        RL.selectRoom(temp_room);
-                        let original_onhashchange = window.onhashchange;
-                        window.chatpp_force_reloading = true;
-                        window.onhashchange = () => {
-                            if (window.chatpp_force_reloading && `#!rid${temp_room}` === location.hash) {
-                                RL.selectRoom(rid);
-                            } else if (window.chatpp_force_reloading && `#!rid${rid}` === location.hash) {
-                                let finish = Date.now();
-                                console.log("Chatpp finish reloading editted message in", finish - start, "miliseconds");
-                                $("#_loader").fadeOut("fast");
-                                window.chatpp_force_reloading = false;
-                                window.onhashchange = original_onhashchange;
+    findTextToken(tokenized_objects, emoticons_regex) {
+        // list token that directly contain text or have children that contain text
+        let list_types = [
+            'tokens',
+            'messageQuote',
+            'quotedTokens',
+            'info',
+            'title',
+            'message',
+        ];
+        list_types.forEach((key, index) => {
+            if (tokenized_objects[key]) {
+                if (Array.isArray(tokenized_objects[key])) {
+                    // find nested text token
+                    if (tokenized_objects[key].some((z) => z.text)) {
+                        // last level reached
+                        for (let index = 0; index < tokenized_objects[key].length; index++) {
+                            if (tokenized_objects[key][index].text) {
+                                let head = tokenized_objects[key].slice(0, index);
+                                let body = this.parseMoreEmo(tokenized_objects[key][index], emoticons_regex);
+                                let tail = tokenized_objects[key].slice(index + 1);
+                                tokenized_objects[key] = head.concat(body).concat(tail);
+                                index += body.length - 1;
                             }
-                        };
-                    }, 500);
+                        }
+                    } else {
+                        // not yet, continue check
+                        tokenized_objects[key] = tokenized_objects[key].map((item) => {
+                            return this.findTextToken(item, emoticons_regex);
+                        })
+                    }
+                } else if (typeof tokenized_objects[key] == 'object') {
+                    // an object, continue check
+                    tokenized_objects[key] = this.findTextToken(tokenized_objects[key], emoticons_regex);
                 }
-
-                return result;
             }
-        }
+        })
+
+        return tokenized_objects;
     }
 
-    applyEmoticonsForMessageDOM(target) {
-        let mid = $(target).data("mid");
-        if (!mid) {
-            return;
-        }
-        let message_element = $(target).find("pre");
-        if (message_element.length && !message_element.hasClass("chatpp_emoticon")) {
-            let content = message_element.html();
-            if (this.emoticons_regex.test(content)) {
-                this.renderContentAndApplyToDOM(message_element, content, mid);
+    parseMoreEmo(token, emoticons_regex) {
+        let ret = [];
+        let pos = 0;
+        while ((match = emoticons_regex.exec(token.text)) !== null) {
+            if (token.text.slice(pos, match.index)) {
+                ret.push({ text: token.text.slice(pos, match.index) });
             }
+            ret.push({ emoticon: { value: this.getEmoNameFromTag(match[0]) } });
+            pos = emoticons_regex.lastIndex;
         }
-    }
-
-    renderContentAndApplyToDOM(message_element, content, mid) {
-        if (!this.chatpp_cached_messages[mid] || this.chatpp_cached_messages[mid].message_before != content || !this.chatpp_cached_messages[mid].message_after) {
-            let replaced = this.applyReplacement(content);
-            this.chatpp_cached_messages[mid] = {
-                message_before: content,
-                message_after: replaced
-            };
-        }
-        message_element.html(this.chatpp_cached_messages[mid].message_after);
-        message_element.addClass("chatpp_emoticon");
+        return ret.length ? ret : [token];
     }
 
     prepareEmoticonsRegex() {
@@ -624,37 +583,12 @@ class Emoticon {
         this.emoticons_regex = new RegExp(patterns.join("|"), "g");
     }
 
-    applyReplacement(string) {
-        let current_index = -1, code_tag_index = 0, start = 0, result = "";
-        while (code_tag_index != -1) {
-            current_index = string.indexOf("<code", code_tag_index);
-            if (current_index > -1) {
-                result += this.replaceEmoticons(string.substring(start, current_index));
-                start = current_index + 1;
-                code_tag_index = string.indexOf("</code>", current_index + 5);
-                if (code_tag_index > -1) {
-                    start = code_tag_index + 7;
-                    code_tag_index = start;
-                    result += string.substring(current_index, code_tag_index);
-                }
-            } else {
-                break;
-            }
+    generateEmoticonsRegexFromArray(emoticon_list) {
+        let patterns = [];
+        for (let i in emoticon_list) {
+            patterns.push(`(${this.generateRegexFromString(emoticon_list[i])})`);
         }
-        result += this.replaceEmoticons(string.substring(start));
-
-        return result;
-    }
-
-    replaceEmoticons(string) {
-        return string.replace(this.emoticons_regex, (match) => {
-            let emo = this.chatpp_emoticons.getEmoticonWithTag(match);
-            if (!emo) {
-                return match;
-            }
-            let replaceText = `<img src="${emo.src}" alt="${emo.name}" data-cwtag="${emo.tag}" title="${emo.title}" class="ui_emoticon chatpp_emoticon">`;
-            return replaceText;
-        });
+        return new RegExp(patterns.join("|"), "g");
     }
 
     generateRegexFromString(string) {
