@@ -1302,6 +1302,7 @@ var Emoticon = function () {
                                     var body = _this4.parseMoreEmo(tokenized_objects[key][_index], emoticons_regex);
                                     var tail = tokenized_objects[key].slice(_index + 1);
                                     tokenized_objects[key] = head.concat(body).concat(tail);
+                                    console.log(tokenized_objects[key]);
                                     _index += body.length - 1;
                                 }
                             }
@@ -1325,9 +1326,15 @@ var Emoticon = function () {
         value: function parseMoreEmo(token, emoticons_regex) {
             var ret = [];
             var pos = 0;
-            while ((match = emoticons_regex.exec(token.text)) !== null) {
-                if (token.text.slice(pos, match.index)) {
-                    ret.push({ text: token.text.slice(pos, match.index) });
+            while (true) {
+                var match = emoticons_regex.exec(token.text);
+                var end_pos = match ? match.index : token.text.length;
+                var text = token.text.slice(pos, end_pos);
+                if (text) {
+                    ret.push({ text: text });
+                }
+                if (!match) {
+                    break;
                 }
                 ret.push({ emoticon: { value: this.getEmoNameFromTag(match[0]) } });
                 pos = emoticons_regex.lastIndex;

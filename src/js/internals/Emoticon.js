@@ -561,9 +561,15 @@ class Emoticon {
     parseMoreEmo(token, emoticons_regex) {
         let ret = [];
         let pos = 0;
-        while ((match = emoticons_regex.exec(token.text)) !== null) {
-            if (token.text.slice(pos, match.index)) {
-                ret.push({ text: token.text.slice(pos, match.index) });
+        while (true) {
+            let match = emoticons_regex.exec(token.text);
+            let end_pos = match ? match.index : token.text.length;
+            let text = token.text.slice(pos, end_pos);
+            if (text) {
+                ret.push({ text });
+            }
+            if (!match) {
+                break;
             }
             ret.push({ emoticon: { value: this.getEmoNameFromTag(match[0]) } });
             pos = emoticons_regex.lastIndex;
