@@ -498,7 +498,6 @@ class Emoticon {
 
     // Enable Chatpp's Emoticons by overriding getAST function
     overrideAST() {
-        RL.rooms[RM.id].buildtime = 0;
         /* eslint-disable no-console */
         /* for debugging new feature */
         getAST_handler = {

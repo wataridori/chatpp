@@ -1,5 +1,9 @@
 Chat++ Change Logs
 
+## 5.8.1
+* Update new Mechanism to bring the Emoticons feature back again. However, the new Mechanism does not have as good performance as the old one (which does not work anymore), so you you should consider turning the Emoticon Feature off if you find that it makes your Chatwork become too slow.
+* **Known Problem:** Chat++'s emoticons in the current room are not displayed when Chatwork is first loaded. We will try to fix this problem in the next release.
+
 ## 5.8.0
 * Temporarily disable emoticon feature due to Chatwork's code changed
 

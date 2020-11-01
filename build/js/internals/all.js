@@ -1263,7 +1263,6 @@ var Emoticon = function () {
         value: function overrideAST() {
             var _this3 = this;
 
-            RL.rooms[RM.id].buildtime = 0;
             /* eslint-disable no-console */
             /* for debugging new feature */
             getAST_handler = {
