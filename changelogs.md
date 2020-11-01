@@ -1,4 +1,6 @@
 Chat++ Change Logs
+## 5.8.2
+* Fix bug missing message content when rendering Chat++ emoticons
 
 ## 5.8.1
 * Update new Mechanism to bring the Emoticons feature back again. However, the new Mechanism does not have as good performance as the old one (which does not work anymore), so you you should consider turning the Emoticon Feature off if you find that it makes your Chatwork become too slow.
