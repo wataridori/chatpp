@@ -1,4 +1,8 @@
 Chat++ Change Logs
+## 5.8.3
+* Fix bug with duplicate messages in Reply Message Panel
+* Vertically align text in the same line with Chat++ emoticons
+
 ## 5.8.2
 * Fix bug missing message content when rendering Chat++ emoticons
 
