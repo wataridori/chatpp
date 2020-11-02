@@ -18,7 +18,6 @@ $(() => {
             exposeModules();
             if (emoticon.status) {
                 emoticon.setUp();
-                view_enhancer.updateChatworkView();
             }
             shortcut.setUp();
             NotificationDisabler.setUp();
@@ -68,5 +67,6 @@ function addStyle() {
     $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> img.ui_emoticon:not([src^='https://assets.chatwork']) {width: auto !important;height: auto !important;}</style>").appendTo("head");
+    $("<style type=\"text/css\"> img.ui_emoticon {vertical-align: middle !important;}</style>").appendTo("head");
+    $("<style type=\"text/css\"> img.ui_emoticon:not([src^='https://assets.chatwork']) {width: auto !important;height: auto !important; vertical-align: middle;}</style>").appendTo("head");
 }

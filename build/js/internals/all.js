@@ -673,7 +673,6 @@ $(function () {
             exposeModules();
             if (emoticon.status) {
                 emoticon.setUp();
-                view_enhancer.updateChatworkView();
             }
             shortcut.setUp();
             NotificationDisabler.setUp();
@@ -723,7 +722,8 @@ function addStyle() {
     $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
     $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> img.ui_emoticon:not([src^='https://assets.chatwork']) {width: auto !important;height: auto !important;}</style>").appendTo("head");
+    $("<style type=\"text/css\"> img.ui_emoticon {vertical-align: middle !important;}</style>").appendTo("head");
+    $("<style type=\"text/css\"> img.ui_emoticon:not([src^='https://assets.chatwork']) {width: auto !important;height: auto !important; vertical-align: middle;}</style>").appendTo("head");
 }
 
 /***/ }),
@@ -1302,7 +1302,6 @@ var Emoticon = function () {
                                     var body = _this4.parseMoreEmo(tokenized_objects[key][_index], emoticons_regex);
                                     var tail = tokenized_objects[key].slice(_index + 1);
                                     tokenized_objects[key] = head.concat(body).concat(tail);
-                                    console.log(tokenized_objects[key]);
                                     _index += body.length - 1;
                                 }
                             }
@@ -1822,17 +1821,6 @@ var ViewEnhancer = function () {
                     }
                 })();
                 return CS.view.chatTextKeyUpOld(b);
-            };
-        }
-    }, {
-        key: "updateChatworkView",
-        value: function updateChatworkView() {
-            TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
-            TimeLineView.prototype.getMessagePanel = function (e, t, n) {
-                if (e.msg.indexOf(Const.TO_ALL_MARK) === 0) {
-                    e.mn = true;
-                }
-                return this.getMessagePanelOld(e, t, n);
             };
         }
     }]);

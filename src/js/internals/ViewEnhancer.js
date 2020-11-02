@@ -92,16 +92,6 @@ class ViewEnhancer {
             return CS.view.chatTextKeyUpOld(b);
         };
     }
-
-    updateChatworkView() {
-        TimeLineView.prototype.getMessagePanelOld = TimeLineView.prototype.getMessagePanel;
-        TimeLineView.prototype.getMessagePanel = function(e, t, n) {
-            if (e.msg.indexOf(Const.TO_ALL_MARK) === 0) {
-                e.mn = true;
-            }
-            return this.getMessagePanelOld(e, t, n);
-        };
-    }
 }
 
 let view_enhancer = new ViewEnhancer();
