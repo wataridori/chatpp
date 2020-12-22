@@ -22,7 +22,7 @@
     "babel-preset-react": "^6.3.13",
     "good-listener": "^1.2.2",
     "gulp": "^3.9.1",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "laravel-elixir": "6.0.0-9",
     "laravel-mix": "^2.1.11",
     "select": "^1.1.2",
