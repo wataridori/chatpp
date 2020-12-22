@@ -1699,10 +1699,10 @@ var Shortcut = function () {
             var data = RM.timeline.chat_id2chat_dat[message];
             if (data) {
                 emoticon.emoticons_regex.lastIndex = 0;
+                // Apply Chatpp's own inserting logic when quoting a message which has Chatpp's emoticons
                 if (skipable && !emoticon.emoticons_regex.test(data.msg)) {
                     return;
                 }
-                console.log("Inserting");
                 $("#_chatText").focus();
                 /* eslint-disable no-useless-concat */
                 CS.view.setChatText("[" + L.chatsend_quote + " aid=" + data.aid + " time=" + data.tm + "]" + data.msg + "[/" + L.chatsend_quote + "]" + "\n", !0);
