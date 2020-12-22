@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 19);
+/******/ 	return __webpack_require__(__webpack_require__.s = 20);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -630,104 +630,7 @@ var chatwork = new ChatworkFacade();
 module.exports = chatwork;
 
 /***/ }),
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */,
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */,
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(20);
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var emoticon = __webpack_require__(21);
-var shortcut = __webpack_require__(22);
-var view_enhancer = __webpack_require__(23);
-var NotificationDisabler = __webpack_require__(24);
-var notify_all = __webpack_require__(25);
-var mention = __webpack_require__(26);
-var room_information = __webpack_require__(27);
-var common = __webpack_require__(1);
-
-var cw_timer = void 0;
-
-$(function () {
-    cw_timer = setInterval(function () {
-        if (typeof CW !== "undefined" && typeof RM !== "undefined") {
-            window.clearInterval(cw_timer);
-            $("#_chatppPreLoad").remove();
-            addStyle();
-            exposeModules();
-            if (emoticon.status) {
-                emoticon.setUp();
-            }
-            shortcut.setUp();
-            NotificationDisabler.setUp();
-            notify_all.setUp();
-
-            view_enhancer.updateChatSendView();
-            view_enhancer.updateGetContactPanelView();
-
-            RoomView.prototype.buildOld = RoomView.prototype.build;
-            RoomView.prototype.build = function (a) {
-                this.buildOld(a);
-                if (window.chatpp_id != RM.id) {
-                    window.chatpp_id = RM.id;
-                    setTimeout(function () {
-                        emoticon.addExternalEmoList(false);
-                        room_information.setUp();
-                        mention.setUp();
-                    }, 100);
-                }
-            };
-
-            RL.rooms[RM.id].build();
-        }
-    }, 100);
-});
-
-function exposeModules() {
-    /* eslint-disable no-console */
-    /* for debugging new feature */
-    if (window.esmodules.length < 10) {
-        console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
-    }
-    for (var i in window.esmodules) {
-        var m = window.esmodules[i];
-        if (m.a && m.a.langMap) {
-            console.log("Find Language module");
-            window.language_module = m;
-            continue;
-        }
-    }
-    /* eslint-enable */
-}
-
-function addStyle() {
-    $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
-    $("<style type=\"text/css\"> img.ui_emoticon {vertical-align: middle !important;}</style>").appendTo("head");
-    $("<style type=\"text/css\"> img.ui_emoticon:not([src^='https://assets.chatwork']) {width: auto !important;height: auto !important; vertical-align: middle;}</style>").appendTo("head");
-}
-
-/***/ }),
-/* 21 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -1375,6 +1278,104 @@ var emoticon = new Emoticon();
 module.exports = emoticon;
 
 /***/ }),
+/* 7 */,
+/* 8 */,
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */,
+/* 13 */,
+/* 14 */,
+/* 15 */,
+/* 16 */,
+/* 17 */,
+/* 18 */,
+/* 19 */,
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(21);
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var emoticon = __webpack_require__(6);
+var shortcut = __webpack_require__(22);
+var view_enhancer = __webpack_require__(23);
+var NotificationDisabler = __webpack_require__(24);
+var notify_all = __webpack_require__(25);
+var mention = __webpack_require__(26);
+var room_information = __webpack_require__(27);
+var common = __webpack_require__(1);
+
+var cw_timer = void 0;
+
+$(function () {
+    cw_timer = setInterval(function () {
+        if (typeof CW !== "undefined" && typeof RM !== "undefined") {
+            window.clearInterval(cw_timer);
+            $("#_chatppPreLoad").remove();
+            addStyle();
+            exposeModules();
+            if (emoticon.status) {
+                emoticon.setUp();
+            }
+            shortcut.setUp();
+            NotificationDisabler.setUp();
+            notify_all.setUp();
+
+            view_enhancer.updateChatSendView();
+            view_enhancer.updateGetContactPanelView();
+
+            RoomView.prototype.buildOld = RoomView.prototype.build;
+            RoomView.prototype.build = function (a) {
+                this.buildOld(a);
+                if (window.chatpp_id != RM.id) {
+                    window.chatpp_id = RM.id;
+                    setTimeout(function () {
+                        emoticon.addExternalEmoList(false);
+                        room_information.setUp();
+                        mention.setUp();
+                    }, 100);
+                }
+            };
+
+            RL.rooms[RM.id].build();
+        }
+    }, 100);
+});
+
+function exposeModules() {
+    /* eslint-disable no-console */
+    /* for debugging new feature */
+    if (window.esmodules.length < 10) {
+        console.log("Exposing esmodules failed! Chat++ Emoticons will not work! Try to reload browser by Ctrl + Shift + R");
+    }
+    for (var i in window.esmodules) {
+        var m = window.esmodules[i];
+        if (m.a && m.a.langMap) {
+            console.log("Find Language module");
+            window.language_module = m;
+            continue;
+        }
+    }
+    /* eslint-enable */
+}
+
+function addStyle() {
+    $("<style type=\"text/css\"> .emoticonTextEnable{font-weight: bold;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatppErrorsText{font-weight: bold; color: red;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .chatInput__element{opacity: 0.8;display: inline-block;padding: 0 5px;cursor: pointer;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .messageBadge{vertical-align: middle !important;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> .timelineLinkTrim{vertical-align: middle !important;};</style>").appendTo("head");
+    $("<style type=\"text/css\"> img.ui_emoticon {vertical-align: middle !important;}</style>").appendTo("head");
+    $("<style type=\"text/css\"> img.ui_emoticon:not([src^='https://assets.chatwork']) {width: auto !important;height: auto !important; vertical-align: middle;}</style>").appendTo("head");
+    $("<style type=\"text/css\"> div[data-cwtag]:not([data-cwtag='']) {width: auto !important;height: auto !important; vertical-align: middle;}</style>").appendTo("head");
+}
+
+/***/ }),
 /* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1384,6 +1385,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Const = __webpack_require__(0);
 var common = __webpack_require__(1);
+var emoticon = __webpack_require__(6);
 
 var DOM_VK_SPACE = 32,
     DOM_VK_0 = 48,
@@ -1464,8 +1466,22 @@ var Shortcut = function () {
             });
 
             CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, function () {
-                _this.triggerDefaultAction("quote");
+                var message_id = _this.getHoverMessageId();
+                _this.quoteMessage(message_id, false);
+                // this.triggerDefaultAction("quote");
             });
+
+            if (emoticon.status) {
+                $("#_chatContent").on("click", "li.actionNav__item", function (e) {
+                    var target = e.currentTarget;
+                    e.preventDefault();
+                    var label = $(target).find(".actionNav__itemLabel");
+                    if (label && label.text() === _this.actions.quote) {
+                        var message_id = _this.getHoverMessageId();
+                        _this.quoteMessage(message_id, true);
+                    }
+                });
+            }
 
             CW.view.registerKeyboardShortcut(shortcuts_default.link, !1, !1, !1, !1, function () {
                 _this.triggerDefaultAction("link");
@@ -1674,6 +1690,22 @@ var Shortcut = function () {
                 var name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
                 /* eslint-disable no-useless-concat */
                 CS.view.setChatText("[" + L.chatsend_reply + " aid=" + data.aid + " to=" + RM.id + "-" + message + "] " + name + "\n", !0);
+                /* eslint-enable */
+            }
+        }
+    }, {
+        key: "quoteMessage",
+        value: function quoteMessage(message, skipable) {
+            var data = RM.timeline.chat_id2chat_dat[message];
+            if (data) {
+                emoticon.emoticons_regex.lastIndex = 0;
+                if (skipable && !emoticon.emoticons_regex.test(data.msg)) {
+                    return;
+                }
+                console.log("Inserting");
+                $("#_chatText").focus();
+                /* eslint-disable no-useless-concat */
+                CS.view.setChatText("[" + L.chatsend_quote + " aid=" + data.aid + " time=" + data.tm + "]" + data.msg + "[/" + L.chatsend_quote + "]" + "\n", !0);
                 /* eslint-enable */
             }
         }

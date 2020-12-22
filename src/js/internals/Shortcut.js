@@ -1,5 +1,6 @@
 let Const = require("../helpers/Const.js");
 let common = require("../helpers/Common.js");
+let emoticon = require("./Emoticon.js");
 
 let DOM_VK_SPACE = 32,
     DOM_VK_0 = 48,
@@ -73,8 +74,22 @@ class Shortcut {
         });
 
         CW.view.registerKeyboardShortcut(shortcuts_default.quote, !1, !1, !1, !1, () => {
-            this.triggerDefaultAction("quote");
+            let message_id = this.getHoverMessageId();
+            this.quoteMessage(message_id, false);
+            // this.triggerDefaultAction("quote");
         });
+
+        if (emoticon.status) {
+            $("#_chatContent").on("click", "li.actionNav__item", (e) => {
+                let target = e.currentTarget;
+                e.preventDefault();
+                let label = $(target).find(".actionNav__itemLabel");
+                if (label && label.text() === this.actions.quote) {
+                    let message_id = this.getHoverMessageId();
+                    this.quoteMessage(message_id, true);
+                }
+            });
+        }
 
         CW.view.registerKeyboardShortcut(shortcuts_default.link, !1, !1, !1, !1, () => {
             this.triggerDefaultAction("link");
@@ -263,6 +278,21 @@ class Shortcut {
             let name = ST.data.private_nickname && !RM.isInternal() ? AC.getDefaultNickName(data.aid) : AC.getNickName(data.aid);
             /* eslint-disable no-useless-concat */
             CS.view.setChatText(`[${L.chatsend_reply} aid=${data.aid} to=${RM.id}-${message}] ${name}` + "\n", !0);
+            /* eslint-enable */
+        }
+    }
+
+    quoteMessage(message, skipable) {
+        let data = RM.timeline.chat_id2chat_dat[message];
+        if (data) {
+            emoticon.emoticons_regex.lastIndex = 0;
+            // Apply Chatpp's own inserting logic when quoting a message which has Chatpp's emoticons
+            if (skipable && !emoticon.emoticons_regex.test(data.msg)) {
+                return;
+            }
+            $("#_chatText").focus();
+            /* eslint-disable no-useless-concat */
+            CS.view.setChatText(`[${L.chatsend_quote} aid=${data.aid} time=${data.tm}]${data.msg}[/${L.chatsend_quote}]` + "\n", !0);
             /* eslint-enable */
         }
     }
