@@ -285,9 +285,8 @@ class Shortcut {
     quoteMessage(message, skipable) {
         let data = RM.timeline.chat_id2chat_dat[message];
         if (data) {
-            emoticon.emoticons_regex.lastIndex = 0;
             // Apply Chatpp's own inserting logic when quoting a message which has Chatpp's emoticons
-            if (skipable && !emoticon.emoticons_regex.test(data.msg)) {
+            if (skipable && $(`#_messageId${message}`).find('img.ui_emoticon[data-cwtag^="chatpp-"]').length == 0) {
                 return;
             }
             $("#_chatText").focus();
