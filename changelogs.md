@@ -1,5 +1,9 @@
 Chat++ Change Logs
 
+## 5.9.1
+
+- Fix bug duplicate Quote message
+
 ## 5.9.0
 
 - Chatwork updated again, which applied an extremely confusing logic which then made the quote feature broken. We added our own quote message feature to fix this.
