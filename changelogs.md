@@ -1,4 +1,6 @@
 Chat++ Change Logs
+## 5.9.2
+- Chatwork update their UI again, which made Chat++'s custom buttons in Chat Send Tool disapprear. The new version bring them back
 
 ## 5.9.1
 
