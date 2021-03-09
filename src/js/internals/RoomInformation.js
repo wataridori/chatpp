@@ -5,7 +5,7 @@ class RoomInformation {
         if ($("#_roomInfo").length > 0) {
             return;
         }
-        $("#_chatSendTool").append(
+        $(".chatInput ul").first().append(
             $("<li>", {
                 id: "_roomInfo",
                 class: "_showDescription chatInput__element",

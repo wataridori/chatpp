@@ -930,7 +930,7 @@ var Emoticon = function () {
                 return;
             }
 
-            $("#_chatSendTool").append($("<li>", {
+            $(".chatInput ul").first().append($("<li>", {
                 id: "_externalEmoticonsButton",
                 class: "_showDescription chatInput__element",
                 css: {
@@ -2801,8 +2801,8 @@ var Mention = function () {
             if ($("#_tag").length > 0 || this.isTagAdded()) {
                 return;
             }
-
-            $("#_chatSendTool").append($("<li>", {
+            var chat_send_tool = $(".chatInput ul").first();
+            chat_send_tool.append($("<li>", {
                 id: "infoTag",
                 class: "_showDescription _chatppbutton chatInput__element",
                 attr: {
@@ -2815,7 +2815,7 @@ var Mention = function () {
                 },
                 html: "<strong>[info]</strong>"
             }));
-            $("#_chatSendTool").append($("<li>", {
+            chat_send_tool.append($("<li>", {
                 id: "titleTag",
                 class: "_showDescription _chatppbutton chatInput__element",
                 attr: {
@@ -2827,7 +2827,7 @@ var Mention = function () {
                 },
                 html: "<strong>[title]</strong>"
             }));
-            $("#_chatSendTool").append($("<li>", {
+            chat_send_tool.append($("<li>", {
                 id: "codeTag",
                 class: "_showDescription _chatppbutton chatInput__element",
                 attr: {
@@ -2840,7 +2840,7 @@ var Mention = function () {
                 html: "<strong>[code]</strong>"
             }));
 
-            $("#_chatSendTool").append($("<li>", {
+            chat_send_tool.append($("<li>", {
                 id: "_addUserButton",
                 class: "_showDescription chatInput__element",
                 css: {
@@ -2899,7 +2899,7 @@ var RoomInformation = function () {
             if ($("#_roomInfo").length > 0) {
                 return;
             }
-            $("#_chatSendTool").append($("<li>", {
+            $(".chatInput ul").first().append($("<li>", {
                 id: "_roomInfo",
                 class: "_showDescription chatInput__element",
                 css: {

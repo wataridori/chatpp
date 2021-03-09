@@ -275,7 +275,7 @@ class Emoticon {
             return;
         }
 
-        $("#_chatSendTool").append(
+        $(".chatInput ul").first().append(
             $("<li>", {
                 id: "_externalEmoticonsButton",
                 class:"_showDescription chatInput__element",

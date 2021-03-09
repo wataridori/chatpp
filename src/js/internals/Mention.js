@@ -772,8 +772,8 @@ class Mention {
         if ($("#_tag").length > 0 || this.isTagAdded()) {
             return;
         }
-
-        $("#_chatSendTool").append(
+        let chat_send_tool = $(".chatInput ul").first();
+        chat_send_tool.append(
             $("<li>", {
                 id: "infoTag",
                 class: "_showDescription _chatppbutton chatInput__element",
@@ -788,7 +788,7 @@ class Mention {
                 html: "<strong>[info]</strong>"
             })
         );
-        $("#_chatSendTool").append(
+        chat_send_tool.append(
             $("<li>", {
                 id: "titleTag",
                 class: "_showDescription _chatppbutton chatInput__element",
@@ -802,7 +802,7 @@ class Mention {
                 html: "<strong>[title]</strong>"
             })
         );
-        $("#_chatSendTool").append(
+        chat_send_tool.append(
             $("<li>", {
                 id: "codeTag",
                 class: "_showDescription _chatppbutton chatInput__element",
@@ -817,7 +817,7 @@ class Mention {
             })
         );
 
-        $("#_chatSendTool").append(
+        chat_send_tool.append(
             $("<li>", {
                 id: "_addUserButton",
                 class: "_showDescription chatInput__element",

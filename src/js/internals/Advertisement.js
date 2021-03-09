@@ -5,7 +5,7 @@ class Advertisement {
         if ($("#_chatppSponsored").length > 0) {
             return;
         }
-        $("#_chatSendTool").append(
+        $(".chatInput ul").first().append(
             $("<li>", { id: "_chatppSponsored", class: "_showDescription", css: {
                 "display": "inline-block"
             }, attr:{
