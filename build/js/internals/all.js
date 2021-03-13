@@ -660,6 +660,7 @@ var Emoticon = function () {
         this.list_all_emo = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
+        window.emoticon_tag_hash_list = {};
     }
 
     _createClass(Emoticon, [{
@@ -1168,6 +1169,9 @@ var Emoticon = function () {
 
             /* eslint-disable no-console */
             /* for debugging new feature */
+            if (!window.notation_module) {
+                return;
+            }
             getAST_handler = {
                 apply: function apply(target, thisArg, args) {
                     var r = target.apply(thisArg, args);
@@ -1358,7 +1362,7 @@ function exposeModules() {
         if (m.a && m.a.langMap) {
             console.log("Find Language module");
             window.language_module = m;
-            continue;
+            break;
         }
     }
     /* eslint-enable */

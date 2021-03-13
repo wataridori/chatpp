@@ -17,6 +17,7 @@ class Emoticon {
         this.list_all_emo = JSON.parse(localStorage[Const.LOCAL_STORAGE_DATA_KEY]);
         this.chat_text_jquery = $("#_chatText");
         this.chat_text_element = document.getElementById("_chatText");
+        window.emoticon_tag_hash_list = {};
     }
 
     setUp() {
@@ -500,6 +501,9 @@ class Emoticon {
     overrideAST() {
         /* eslint-disable no-console */
         /* for debugging new feature */
+        if (!window.notation_module) {
+            return;
+        }
         getAST_handler = {
             apply: (target, thisArg, args) => {
                 let r = target.apply(thisArg, args);

@@ -55,7 +55,7 @@ function exposeModules() {
         if (m.a && m.a.langMap) {
             console.log("Find Language module");
             window.language_module = m;
-            continue;
+            break;
         }
     }
     /* eslint-enable */
