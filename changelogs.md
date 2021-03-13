@@ -1,6 +1,9 @@
 Chat++ Change Logs
+## 5.9.3
+- Chatwork updated again, which made Chat++ break. This small path brings some Chat++'s features back. However the emoticon feature does not work, and it will be fixed in another update later, when we manage to find how to handle Chatwork's changes.
+
 ## 5.9.2
-- Chatwork update their UI again, which made Chat++'s custom buttons in Chat Send Tool disapprear. The new version bring them back
+- Chatwork updated their UI again, which made Chat++'s custom buttons in Chat Send Tool disapprear. The new version bring them back
 
 ## 5.9.1
 
