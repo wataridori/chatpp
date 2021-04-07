@@ -56,8 +56,7 @@ function init(inject_script) {
             setTimeout(() => {
                 $("<style type=\"text/css\"> .iPjyiK{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
                 $("<style type=\"text/css\"> .iPjyiK{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
-                $("<style type=\"text/css\"> .chatTimeLineReply__label{display: none !important;};</style>").appendTo("head");
-                $("body").removeClass("light")
+                $("<style type=\"text/css\"> .chatTimeLineReply p{display: none !important;};</style>").appendTo("head");
             }, Const.DELAY_TIME + 1
             );
         }
