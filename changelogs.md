@@ -1,4 +1,7 @@
 Chat++ Change Logs
+## 5.9.4
+- Fix legacy's styles
+
 ## 5.9.3
 - Chatwork updated again, which made Chat++ break. This small path brings some Chat++'s features back. However the emoticon feature does not work, and it will be fixed in another update later, when we manage to find how to handle Chatwork's changes.
 
