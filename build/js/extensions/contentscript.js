@@ -88,7 +88,9 @@ var Const = {
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
     ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL &gt;&gt;&gt;"
+    TO_ALL_MARK: "TO ALL &gt;&gt;&gt;",
+    SAL_URL: 'https://sal.vn/api/url/submit',
+    LIMIT_STRING: 50
 };
 
 module.exports = Const;
@@ -511,7 +513,7 @@ var EmoStorage = function (_Storage) {
     }, {
         key: "setFeatureStatus",
         value: function setFeatureStatus(emo_info) {
-            var features = ["mention", "shortcut", "thumbnail", "emoticon", "legacy_theme"];
+            var features = ["mention", "shortcut", "thumbnail", "emoticon", "legacy_theme", "shorten_link"];
             for (var i in features) {
                 var feature_name = features[i] + "_status";
                 this.data[feature_name] = emo_info[feature_name] === undefined ? true : emo_info[feature_name];
@@ -580,7 +582,6 @@ var common = __webpack_require__(1);
 var Storage = __webpack_require__(2);
 var EmoStorage = __webpack_require__(4);
 var ChromeStorageLocal = __webpack_require__(3);
-
 var storage = new Storage();
 var emo_storage = new EmoStorage();
 var emoticons = [];
@@ -613,8 +614,8 @@ function init(inject_script) {
         }
         emo_info = info;
         localStorage.force_update_version = info.force_update_version;
-        var features = ["mention", "shortcut", "thumbnail", "emoticon", "legacy_theme"];
-        var features_default_false = ["legacy_theme"];
+        var features = ["mention", "shortcut", "thumbnail", "emoticon", "legacy_theme", "shorten_link"];
+        var features_default_false = ["legacy_theme", "shorten_link"];
         features.forEach(function (feature) {
             var feature_name = feature + "_status";
             if (info[feature_name] === undefined) {
@@ -634,6 +635,33 @@ function init(inject_script) {
                 $("<style type=\"text/css\"> .iPjyiK{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
                 $("<style type=\"text/css\"> .iPjyiK{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
                 $("<style type=\"text/css\"> .chatTimeLineReply p{display: none !important;};</style>").appendTo("head");
+            }, Const.DELAY_TIME + 1);
+        };
+
+        if (info.shorten_link_status) {
+            setTimeout(function () {
+                var target = document.getElementsByClassName("chatInput__textarea");
+                target[0].addEventListener('paste', function (event) {
+                    var pastedData = event.clipboardData.getData('text');
+                    var longUrl = getFirstUrl(pastedData);
+
+                    if (!longUrl || longUrl.length < Const.LIMIT_STRING) {
+                        return;
+                    }
+
+                    var urlEndPoint = Const.SAL_URL;
+                    chrome.runtime.sendMessage({ contentScriptQuery: "fetchShortenLink", urlEndPoint: urlEndPoint, longUrl: longUrl }, function (data) {
+                        if (data) {
+                            if (target[0].value == pastedData) {
+                                var message = String(pastedData).replace(data.target, data.shortUrl);
+                            } else {
+                                var message = String(target[0].value).replace(data.target, ' ') + String(pastedData).replace(data.target, data.shortUrl);
+                            }
+
+                            target[0].value = message;
+                        }
+                    });
+                });
             }, Const.DELAY_TIME + 1);
         }
     });
@@ -831,6 +859,16 @@ function loadAdvertisement() {
             localStorage["chatpp_advertisement"] = JSON.stringify(data);
         }
     });
+}
+
+function getFirstUrl(string) {
+    var pattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+    var match = string.match(pattern);
+    if (match) {
+        return match[0];
+    }
+
+    return match;
 }
 
 /***/ })

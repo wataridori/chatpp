@@ -89,7 +89,9 @@ var Const = {
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
     ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL &gt;&gt;&gt;"
+    TO_ALL_MARK: "TO ALL &gt;&gt;&gt;",
+    SAL_URL: 'https://sal.vn/api/url/submit',
+    LIMIT_STRING: 50
 };
 
 module.exports = Const;
@@ -426,6 +428,23 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             }
             responseData.success = true;
             sendResponse(responseData);
+        });
+    }
+
+    if (request.contentScriptQuery == "fetchShortenLink") {
+        fetch(request.urlEndPoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-Key': 'J23iXkC50XsR8YdVq4lQtuelmhAq9E87SlwsrdAw'
+            },
+            body: JSON.stringify({ target: request.longUrl })
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            sendResponse(data);
+        }).catch(function (error) {
+            console.error('Error:', error);
         });
     }
 

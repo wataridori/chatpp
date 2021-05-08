@@ -31,6 +31,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
     }
 
+    if (request.contentScriptQuery == "fetchShortenLink") {
+        fetch(request.urlEndPoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': 'J23iXkC50XsR8YdVq4lQtuelmhAq9E87SlwsrdAw',
+        },
+        body: JSON.stringify({target: request.longUrl}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            sendResponse(data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
     if (request.contentScriptQuery == "fetchAdvertisementData") {
         getJSON(Const.ADVERTISEMENT_URL, (error, responseData) => {
             sendResponse(responseData);
@@ -54,3 +72,4 @@ function getJSON(url, callback) {
     };
     xhr.send();
 }
+
