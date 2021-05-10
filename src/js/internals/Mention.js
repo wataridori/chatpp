@@ -819,6 +819,20 @@ class Mention {
 
         chat_send_tool.append(
             $("<li>", {
+                id: "salTag",
+                class: "_showDescription _chatppbutton chatInput__element",
+                attr: {
+                    "role": "button",
+                    "aria-label": "Add sal tag"
+                },
+                css: {
+                    "display": "inline-block"
+                },
+                html: "<strong>[sal]</strong>"
+            })
+        );
+        chat_send_tool.append(
+            $("<li>", {
                 id: "_addUserButton",
                 class: "_showDescription chatInput__element",
                 css: {

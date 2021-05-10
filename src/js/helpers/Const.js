@@ -19,7 +19,9 @@ let Const = {
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
     ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL &gt;&gt;&gt;"
+    TO_ALL_MARK: "TO ALL &gt;&gt;&gt;",
+    SAL_URL: 'https://sal.vn/api/url/submit',
+    LIMIT_STRING: 50,
 };
 
 module.exports = Const;

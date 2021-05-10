@@ -88,7 +88,9 @@ var Const = {
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
     ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL &gt;&gt;&gt;"
+    TO_ALL_MARK: "TO ALL &gt;&gt;&gt;",
+    SAL_URL: 'https://sal.vn/api/url/submit',
+    LIMIT_STRING: 50
 };
 
 module.exports = Const;
@@ -471,7 +473,7 @@ var EmoStorage = function (_Storage) {
     }, {
         key: "setFeatureStatus",
         value: function setFeatureStatus(emo_info) {
-            var features = ["mention", "shortcut", "thumbnail", "emoticon", "legacy_theme"];
+            var features = ["mention", "shortcut", "thumbnail", "emoticon", "legacy_theme", "shorten_link"];
             for (var i in features) {
                 var feature_name = features[i] + "_status";
                 this.data[feature_name] = emo_info[feature_name] === undefined ? true : emo_info[feature_name];
@@ -1011,7 +1013,7 @@ $(function () {
 });
 
 function loadStatus(name, value) {
-    if (value === false || value === undefined && name === "legacy_theme") {
+    if (value === false || value === undefined && name === "legacy_theme" || value === undefined && name === "shorten_link") {
         $("#" + name + "-status").removeClass().addClass("text-danger").html("DISABLED");
         $("#" + name + "-status-btn").removeClass().addClass("btn btn-success btn-xs").html("Enable");
     } else {
@@ -1021,7 +1023,7 @@ function loadStatus(name, value) {
 }
 
 function updateViewData(data) {
-    var features = ["emoticon", "mention", "shortcut", "legacy_theme"];
+    var features = ["emoticon", "mention", "shortcut", "legacy_theme", "shorten_link"];
     for (var i in features) {
         loadStatus(features[i], data[features[i] + "_status"]);
     }

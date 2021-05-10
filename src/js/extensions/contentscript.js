@@ -3,7 +3,6 @@ let common = require("../helpers/Common.js");
 let Storage = require("../helpers/Storage.js");
 let EmoStorage = require("../helpers/EmoStorage.js");
 let ChromeStorageLocal = require("../helpers/ChromeStorageLocal.js");
-
 let storage = new Storage();
 let emo_storage = new EmoStorage();
 let emoticons = [];
@@ -36,8 +35,8 @@ function init(inject_script) {
         }
         emo_info = info;
         localStorage.force_update_version = info.force_update_version;
-        let features = ["mention", "shortcut", "thumbnail", "emoticon", "legacy_theme"];
-        let features_default_false = ["legacy_theme"];
+        let features = ["mention", "shortcut", "thumbnail", "emoticon", "legacy_theme", "shorten_link"];
+        let features_default_false = ["legacy_theme", "shorten_link"];
         features.forEach((feature) => {
             let feature_name = `${feature}_status`;
             if (info[feature_name] === undefined) {
@@ -58,8 +57,63 @@ function init(inject_script) {
                 $("<style type=\"text/css\"> .iPjyiK{background: rgb(221, 235, 215) !important;};</style>").appendTo("head");
                 $("<style type=\"text/css\"> .chatTimeLineReply p{display: none !important;};</style>").appendTo("head");
             }, Const.DELAY_TIME + 1
-            );
-        }
+        )};
+
+        setTimeout(() => {
+            let target = document.getElementById("salTag");
+            target.addEventListener('click', (event) => {
+                var textArea = document.getElementsByClassName("chatInput__textarea");
+                let start = textArea[0].selectionStart;
+                let finish = textArea[0].selectionEnd;
+                var selectedData = textArea[0].value.substring(start, finish);
+                let longUrl = getFirstUrl(selectedData);
+
+                if (!longUrl) {
+                    return;
+                }
+
+                let urlEndPoint = Const.SAL_URL;
+                chrome.runtime.sendMessage({contentScriptQuery: "fetchShortenLink", urlEndPoint, longUrl}, (data) => {
+                    if (data) {
+                        if (textArea[0].value == selectedData) {
+                            var message = String(selectedData).replace(data.target, data.shortUrl);
+                        } else {
+                            var message = String(textArea[0].value).replace(data.target, data.shortUrl);
+                        }
+    
+                        textArea[0].value = message;
+                    }
+                });
+            })
+
+        }, Const.DELAY_TIME + 1000);
+
+        if (info.shorten_link_status) {
+            setTimeout(() => {
+                var target = document.getElementsByClassName("chatInput__textarea");
+                target[0].addEventListener('paste', (event) => {
+                    let pastedData = event.clipboardData.getData('text');
+                    let longUrl = getFirstUrl(pastedData);
+        
+                    if (!longUrl || longUrl.length < Const.LIMIT_STRING) {
+                        return;
+                    }
+        
+                    let urlEndPoint = Const.SAL_URL;
+                    chrome.runtime.sendMessage({contentScriptQuery: "fetchShortenLink", urlEndPoint, longUrl}, (data) => {
+                        if (data) {
+                            if (target[0].value == pastedData) {
+                                var message = String(pastedData).replace(data.target, data.shortUrl);
+                            } else {
+                                var message = String(target[0].value).replace(data.target, data.shortUrl);
+                            }
+        
+                            target[0].value = message;
+                        }
+                    });
+                });
+            }, Const.DELAY_TIME + 1);
+        };
     });
 
     localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = [];
@@ -239,4 +293,14 @@ function loadAdvertisement() {
             localStorage["chatpp_advertisement"] = JSON.stringify(data);
         }
     });
+}
+
+function getFirstUrl(string) {
+    var pattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#!=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#!?&//=]*)/;
+    var match = string.match(pattern);
+    if (match) {
+        return match[0];
+    }
+
+    return match;
 }

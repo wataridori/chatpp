@@ -41,7 +41,8 @@
     "permissions": [
         "storage",
         "https://www.chatwork.com/*",
-        "https://kcw.kddi.ne.jp/*"
+        "https://kcw.kddi.ne.jp/*",
+        "https://sal.vn/*"
     ],
     "options_page": "html/emoticon.html",
     "icons": {

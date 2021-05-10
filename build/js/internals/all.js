@@ -88,7 +88,9 @@ var Const = {
     DELAY_TIME: 6000,
     FORCE_TURN_OFF_THUMBNAIL: 1,
     ADVERTISEMENT_LOAD_TIMEOUT: 1000 * 60 * 30,
-    TO_ALL_MARK: "TO ALL &gt;&gt;&gt;"
+    TO_ALL_MARK: "TO ALL &gt;&gt;&gt;",
+    SAL_URL: 'https://sal.vn/api/url/submit',
+    LIMIT_STRING: 50
 };
 
 module.exports = Const;
@@ -2844,6 +2846,18 @@ var Mention = function () {
                 html: "<strong>[code]</strong>"
             }));
 
+            chat_send_tool.append($("<li>", {
+                id: "salTag",
+                class: "_showDescription _chatppbutton chatInput__element",
+                attr: {
+                    "role": "button",
+                    "aria-label": "Add sal tag"
+                },
+                css: {
+                    "display": "inline-block"
+                },
+                html: "<strong>[sal]</strong>"
+            }));
             chat_send_tool.append($("<li>", {
                 id: "_addUserButton",
                 class: "_showDescription chatInput__element",
