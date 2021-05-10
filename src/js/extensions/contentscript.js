@@ -59,6 +59,35 @@ function init(inject_script) {
             }, Const.DELAY_TIME + 1
         )};
 
+        setTimeout(() => {
+            let target = document.getElementById("salTag");
+            target.addEventListener('click', (event) => {
+                var textArea = document.getElementsByClassName("chatInput__textarea");
+                let start = textArea[0].selectionStart;
+                let finish = textArea[0].selectionEnd;
+                var selectedData = textArea[0].value.substring(start, finish);
+                let longUrl = getFirstUrl(selectedData);
+
+                if (!longUrl) {
+                    return;
+                }
+
+                let urlEndPoint = Const.SAL_URL;
+                chrome.runtime.sendMessage({contentScriptQuery: "fetchShortenLink", urlEndPoint, longUrl}, (data) => {
+                    if (data) {
+                        if (textArea[0].value == selectedData) {
+                            var message = String(selectedData).replace(data.target, data.shortUrl);
+                        } else {
+                            var message = String(textArea[0].value).replace(data.target, data.shortUrl);
+                        }
+    
+                        textArea[0].value = message;
+                    }
+                });
+            })
+
+        }, Const.DELAY_TIME + 1000);
+
         if (info.shorten_link_status) {
             setTimeout(() => {
                 var target = document.getElementsByClassName("chatInput__textarea");
@@ -76,7 +105,7 @@ function init(inject_script) {
                             if (target[0].value == pastedData) {
                                 var message = String(pastedData).replace(data.target, data.shortUrl);
                             } else {
-                                var message = String(target[0].value).replace(data.target, ' ') + String(pastedData).replace( data.target, data.shortUrl);
+                                var message = String(target[0].value).replace(data.target, data.shortUrl);
                             }
         
                             target[0].value = message;
@@ -84,7 +113,7 @@ function init(inject_script) {
                     });
                 });
             }, Const.DELAY_TIME + 1);
-        }
+        };
     });
 
     localStorage[Const.LOCAL_STORAGE_GROUP_MENTION] = [];
@@ -267,7 +296,7 @@ function loadAdvertisement() {
 }
 
 function getFirstUrl(string) {
-    var pattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+    var pattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#!=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#!?&//=]*)/;
     var match = string.match(pattern);
     if (match) {
         return match[0];

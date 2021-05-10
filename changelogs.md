@@ -2,6 +2,7 @@ Chat++ Change Logs
 
 ## 5.10.0
 - Auto Shorten Link Feature Added.
+- Quick Title Tag
 
 ## 5.9.4
 - Fix legacy's styles
