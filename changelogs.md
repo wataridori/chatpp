@@ -1,4 +1,8 @@
 Chat++ Change Logs
+
+## 5.10.0
+- Auto Shorten Link Feature Added.
+
 ## 5.9.4
 - Fix legacy's styles
 
