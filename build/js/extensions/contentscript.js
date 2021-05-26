@@ -794,7 +794,7 @@ function addInjectedScript() {
 }
 
 function preLoad() {
-    var chat_send_tool = $(".chatInput div").first();
+    var chat_send_tool = $("#_chatSendArea ul").first();
     chat_send_tool.append($("<li>", { id: "_chatppPreLoad", css: {
             "display": "inline-block"
         } }).append($("<span>", { id: "chatppPreLoad" })));

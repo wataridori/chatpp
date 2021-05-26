@@ -2106,7 +2106,8 @@ var Mention = function () {
             this.chat_text_jquery = $("#_chatText");
             this.chat_text_element = document.getElementById("_chatText");
 
-            $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter(".chatInput");
+            var chat_input = $("#_chatText").parent();
+            $("<div id='suggestion-container' class='toSelectorTooltip tooltipListWidth tooltip tooltip--white' role='tooltip'></div>").insertAfter(chat_input);
             this.hideSuggestionBox();
             $("#_sendEnterActionArea").click(function () {
                 _this2.cached_enter_action = ST.data.enter_action;
@@ -2134,7 +2135,6 @@ var Mention = function () {
                 } else {
                     _this2.is_colon = false;
                 }
-
                 if (e.which == 9 || e.which == 13) {
                     if ((_this2.insert_type == "all" || _this2.insert_type == "group") && _this2.is_displayed) {
                         _this2.setSuggestedChatText(_this2.getTypedText(), null, null);
@@ -2171,7 +2171,6 @@ var Mention = function () {
                 if (e.which == 9 || e.which == 13) {
                     return;
                 }
-
                 if ((e.which == 38 || e.which == 40) && _this2.is_displayed) {
                     _this2.is_navigated = true;
                     _this2.holdCaretPosition(e);
@@ -2805,7 +2804,7 @@ var Mention = function () {
             if ($("#_tag").length > 0 || this.isTagAdded()) {
                 return;
             }
-            var chat_send_tool = $(".chatInput ul").first();
+            var chat_send_tool = $("#_chatSendArea ul").first();
             chat_send_tool.append($("<li>", {
                 id: "infoTag",
                 class: "_showDescription _chatppbutton chatInput__element",
