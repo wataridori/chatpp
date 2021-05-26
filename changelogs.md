@@ -1,4 +1,9 @@
 Chat++ Change Logs
+## 5.9.5
+- Chatwork updated again, which made some feature break. This release fixed these errors.
+- Fix mention feature
+- Fix quick tag feature (`[info]`, `[title]`, `[code]` ...)
+
 ## 5.9.4
 - Fix legacy's styles
 
