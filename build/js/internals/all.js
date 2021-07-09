@@ -681,7 +681,8 @@ var Emoticon = function () {
 
             this.prepareChatppEmoticons();
             this.prepareEmoticonsRegex();
-            this.overrideAST();
+            // this.overrideAST();
+            this.applyEmoticonsByModifyingDOM();
         }
     }, {
         key: "prepareChatppEmoticons",
@@ -1246,6 +1247,143 @@ var Emoticon = function () {
                 pos = emoticons_regex.lastIndex;
             }
             return ret.length ? ret : [token];
+        }
+
+        // New method to apply Emoticons by replacing Node text
+        // Thanks to Bui The Hanh for the idea
+
+    }, {
+        key: "textNodesUnder",
+        value: function textNodesUnder(node) {
+            var all = [];
+            for (node = node.firstChild; node; node = node.nextSibling) {
+                // if node is #text
+                if (node.nodeType == 3) {
+                    all.push(node);
+                } else {
+                    all = all.concat(this.textNodesUnder(node));
+                }
+            }
+            return all;
+        }
+    }, {
+        key: "applyEmoticons",
+        value: function applyEmoticons(node) {
+            var all_text_nodes = this.textNodesUnder(node);
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = all_text_nodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var text_node = _step.value;
+
+                    var text_node_content = text_node.textContent;
+                    var replacement = this.applyReplacement(text_node_content);
+                    var txt = document.createElement('span');
+                    txt.innerHTML = replacement;
+                    text_node.replaceWith(txt);
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+        }
+    }, {
+        key: "applyReplacement",
+        value: function applyReplacement(string) {
+            var current_index = -1,
+                code_tag_index = 0,
+                start = 0,
+                result = "";
+            while (code_tag_index != -1) {
+                current_index = string.indexOf("<code", code_tag_index);
+                if (current_index > -1) {
+                    result += this.replaceEmoticons(string.substring(start, current_index));
+                    start = current_index + 1;
+                    code_tag_index = string.indexOf("</code>", current_index + 5);
+                    if (code_tag_index > -1) {
+                        start = code_tag_index + 7;
+                        code_tag_index = start;
+                        result += string.substring(current_index, code_tag_index);
+                    }
+                } else {
+                    break;
+                }
+            }
+            result += this.replaceEmoticons(string.substring(start));
+
+            return result;
+        }
+    }, {
+        key: "replaceEmoticons",
+        value: function replaceEmoticons(string) {
+            var _this5 = this;
+
+            return string.replace(this.emoticons_regex, function (match) {
+                var emo = _this5.chatpp_emoticons.getEmoticonWithTag(match);
+                if (!emo) {
+                    return match;
+                }
+                var replaceText = "<img src=\"" + emo.src + "\" alt=\"" + emo.name + "\" data-cwtag=\"" + emo.tag + "\" title=\"" + emo.title + "\" class=\"ui_emoticon chatpp_emoticon\">";
+                return replaceText;
+            });
+        }
+    }, {
+        key: "applyEmoticonsByModifyingDOM",
+        value: function applyEmoticonsByModifyingDOM() {
+            var _this6 = this;
+
+            window.nodes = [];
+            var single_chat_elm_class_name = '_message';
+            var observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    var nodes = Array.from(mutation.addedNodes);
+                    var _iteratorNormalCompletion2 = true;
+                    var _didIteratorError2 = false;
+                    var _iteratorError2 = undefined;
+
+                    try {
+                        for (var _iterator2 = nodes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                            var node = _step2.value;
+
+                            if (!node.className) {
+                                continue;
+                            }
+                            if (node.className.indexOf(single_chat_elm_class_name) > -1) {
+                                var message_node = node.getElementsByTagName("PRE");
+                                message_node.length && _this6.applyEmoticons(message_node[0]);
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError2 = true;
+                        _iteratorError2 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                _iterator2.return();
+                            }
+                        } finally {
+                            if (_didIteratorError2) {
+                                throw _iteratorError2;
+                            }
+                        }
+                    }
+
+                    ;
+                });
+            });
+            observer.observe(document.documentElement, { childList: true, subtree: true });
         }
     }, {
         key: "prepareEmoticonsRegex",

@@ -36,7 +36,8 @@ class Emoticon {
 
         this.prepareChatppEmoticons();
         this.prepareEmoticonsRegex();
-        this.overrideAST();
+        // this.overrideAST();
+        this.applyEmoticonsByModifyingDOM();
     }
 
     prepareChatppEmoticons() {
@@ -579,6 +580,86 @@ class Emoticon {
             pos = emoticons_regex.lastIndex;
         }
         return ret.length ? ret : [token];
+    }
+
+    // New method to apply Emoticons by replacing Node text
+    // Thanks to Bui The Hanh for the idea
+    textNodesUnder(node) {
+        let all = [];
+        for (node = node.firstChild; node; node = node.nextSibling) {
+            // if node is #text
+            if (node.nodeType == 3) {
+                all.push(node);
+            }
+            else {
+                all = all.concat(this.textNodesUnder(node));
+            }
+        }
+        return all;
+    }
+
+    applyEmoticons(node) {
+        const all_text_nodes = this.textNodesUnder(node);
+        for (const text_node of all_text_nodes) {
+            const text_node_content = text_node.textContent;
+            let replacement = this.applyReplacement(text_node_content);
+            let txt = document.createElement('span');
+            txt.innerHTML = replacement;
+            text_node.replaceWith(txt);
+        }
+    }
+
+    applyReplacement(string) {
+        let current_index = -1, code_tag_index = 0, start = 0, result = "";
+        while (code_tag_index != -1) {
+            current_index = string.indexOf("<code", code_tag_index);
+            if (current_index > -1) {
+                result += this.replaceEmoticons(string.substring(start, current_index));
+                start = current_index + 1;
+                code_tag_index = string.indexOf("</code>", current_index + 5);
+                if (code_tag_index > -1) {
+                    start = code_tag_index + 7;
+                    code_tag_index = start;
+                    result += string.substring(current_index, code_tag_index);
+                }
+            } else {
+                break;
+            }
+        }
+        result += this.replaceEmoticons(string.substring(start));
+
+        return result;
+    }
+
+    replaceEmoticons(string) {
+        return string.replace(this.emoticons_regex, (match) => {
+            let emo = this.chatpp_emoticons.getEmoticonWithTag(match);
+            if (!emo) {
+                return match;
+            }
+            let replaceText = `<img src="${emo.src}" alt="${emo.name}" data-cwtag="${emo.tag}" title="${emo.title}" class="ui_emoticon chatpp_emoticon">`;
+            return replaceText;
+        });
+    }
+
+    applyEmoticonsByModifyingDOM() {
+        window.nodes = [];
+        const single_chat_elm_class_name = '_message';
+        let observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                let nodes = Array.from(mutation.addedNodes);
+                for (let node of nodes) {
+                    if (!node.className) {
+                        continue;
+                    }
+                    if (node.className.indexOf(single_chat_elm_class_name) > -1) {
+                        let message_node = node.getElementsByTagName("PRE");
+                        message_node.length && this.applyEmoticons(message_node[0]);
+                    }
+                };
+            });
+        });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
     }
 
     prepareEmoticonsRegex() {
