@@ -1,4 +1,7 @@
 Chat++ Change Logs
+## 5.10.0
+- Update new mechanism to display Chat++'s emoticons, by modifying Node text. Thanks to **Bui The Hanh** for the idea
+
 ## 5.9.5
 - Chatwork updated again, which made some feature break. This release fixed these errors.
 - Fix mention feature
