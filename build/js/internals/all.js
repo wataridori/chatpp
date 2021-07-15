@@ -932,7 +932,7 @@ var Emoticon = function () {
                 return;
             }
 
-            $(".chatInput ul").first().append($("<li>", {
+            $("#_chatSendArea ul").first().append($("<li>", {
                 id: "_externalEmoticonsButton",
                 class: "_showDescription chatInput__element",
                 css: {
@@ -1243,7 +1243,7 @@ var Emoticon = function () {
                 if (!match) {
                     break;
                 }
-                ret.push({ emoticon: { value: this.getEmoNameFromTag(match[0]) } });
+                ret.push({ emoticon: { value: this.getEmoNameFromTag(match[0]), tag: match[0] } });
                 pos = emoticons_regex.lastIndex;
             }
             return ret.length ? ret : [token];
@@ -1257,6 +1257,10 @@ var Emoticon = function () {
         value: function textNodesUnder(node) {
             var all = [];
             for (node = node.firstChild; node; node = node.nextSibling) {
+                if (node.nodeType == 1 && node.tagName == 'CODE') {
+                    continue;
+                }
+
                 // if node is #text
                 if (node.nodeType == 3) {
                     all.push(node);
@@ -1301,81 +1305,84 @@ var Emoticon = function () {
         }
     }, {
         key: "applyReplacement",
-        value: function applyReplacement(string) {
-            var current_index = -1,
-                code_tag_index = 0,
-                start = 0,
-                result = "";
-            while (code_tag_index != -1) {
-                current_index = string.indexOf("<code", code_tag_index);
-                if (current_index > -1) {
-                    result += this.replaceEmoticons(string.substring(start, current_index));
-                    start = current_index + 1;
-                    code_tag_index = string.indexOf("</code>", current_index + 5);
-                    if (code_tag_index > -1) {
-                        start = code_tag_index + 7;
-                        code_tag_index = start;
-                        result += string.substring(current_index, code_tag_index);
+        value: function applyReplacement(text) {
+            var newContentParts = [];
+            var parsedNodecontent = this.parseMoreEmo({ text: text }, this.emoticons_regex);
+
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = parsedNodecontent[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var part = _step2.value;
+
+                    if (part.text) {
+                        newContentParts.push(common.htmlEncode(part.text));
+                    } else if (part.emoticon) {
+                        var emo = this.chatpp_emoticons.getEmoticonWithTag(part.emoticon.tag);
+
+                        if (emo) {
+                            newContentParts.push('<img' + ("src=\"" + emo.src + "\" alt=\"" + emo.name + "\" data-cwtag=\"" + common.htmlEncode(emo.tag) + "\" title=\"" + emo.title + "\"") + 'class="ui_emoticon chatpp_emoticon">');
+                        } else {
+                            newContentParts.push(common.htmlEncode(part.emoticon.tag));
+                        }
                     }
-                } else {
-                    break;
+                }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
                 }
             }
-            result += this.replaceEmoticons(string.substring(start));
 
-            return result;
-        }
-    }, {
-        key: "replaceEmoticons",
-        value: function replaceEmoticons(string) {
-            var _this5 = this;
-
-            return string.replace(this.emoticons_regex, function (match) {
-                var emo = _this5.chatpp_emoticons.getEmoticonWithTag(match);
-                if (!emo) {
-                    return match;
-                }
-                var replaceText = "<img src=\"" + emo.src + "\" alt=\"" + emo.name + "\" data-cwtag=\"" + emo.tag + "\" title=\"" + emo.title + "\" class=\"ui_emoticon chatpp_emoticon\">";
-                return replaceText;
-            });
+            return newContentParts.join('');
         }
     }, {
         key: "applyEmoticonsByModifyingDOM",
         value: function applyEmoticonsByModifyingDOM() {
-            var _this6 = this;
+            var _this5 = this;
 
             window.nodes = [];
             var single_chat_elm_class_name = '_message';
             var observer = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     var nodes = Array.from(mutation.addedNodes);
-                    var _iteratorNormalCompletion2 = true;
-                    var _didIteratorError2 = false;
-                    var _iteratorError2 = undefined;
+                    var _iteratorNormalCompletion3 = true;
+                    var _didIteratorError3 = false;
+                    var _iteratorError3 = undefined;
 
                     try {
-                        for (var _iterator2 = nodes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                            var node = _step2.value;
+                        for (var _iterator3 = nodes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                            var node = _step3.value;
 
                             if (!node.className) {
                                 continue;
                             }
                             if (node.className.indexOf(single_chat_elm_class_name) > -1) {
                                 var message_node = node.getElementsByTagName("PRE");
-                                message_node.length && _this6.applyEmoticons(message_node[0]);
+                                message_node.length && _this5.applyEmoticons(message_node[0]);
                             }
                         }
                     } catch (err) {
-                        _didIteratorError2 = true;
-                        _iteratorError2 = err;
+                        _didIteratorError3 = true;
+                        _iteratorError3 = err;
                     } finally {
                         try {
-                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                                _iterator2.return();
+                            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                                _iterator3.return();
                             }
                         } finally {
-                            if (_didIteratorError2) {
-                                throw _iteratorError2;
+                            if (_didIteratorError3) {
+                                throw _iteratorError3;
                             }
                         }
                     }

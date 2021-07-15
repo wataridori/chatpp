@@ -277,7 +277,7 @@ class Emoticon {
             return;
         }
 
-        $(".chatInput ul").first().append(
+        $("#_chatSendArea ul").first().append(
             $("<li>", {
                 id: "_externalEmoticonsButton",
                 class:"_showDescription chatInput__element",
@@ -576,7 +576,7 @@ class Emoticon {
             if (!match) {
                 break;
             }
-            ret.push({ emoticon: { value: this.getEmoNameFromTag(match[0]) } });
+            ret.push({ emoticon: { value: this.getEmoNameFromTag(match[0]), tag: match[0] } });
             pos = emoticons_regex.lastIndex;
         }
         return ret.length ? ret : [token];
@@ -587,6 +587,10 @@ class Emoticon {
     textNodesUnder(node) {
         let all = [];
         for (node = node.firstChild; node; node = node.nextSibling) {
+            if (node.nodeType == 1 && node.tagName == 'CODE') {
+                continue;
+            }
+
             // if node is #text
             if (node.nodeType == 3) {
                 all.push(node);
@@ -609,37 +613,29 @@ class Emoticon {
         }
     }
 
-    applyReplacement(string) {
-        let current_index = -1, code_tag_index = 0, start = 0, result = "";
-        while (code_tag_index != -1) {
-            current_index = string.indexOf("<code", code_tag_index);
-            if (current_index > -1) {
-                result += this.replaceEmoticons(string.substring(start, current_index));
-                start = current_index + 1;
-                code_tag_index = string.indexOf("</code>", current_index + 5);
-                if (code_tag_index > -1) {
-                    start = code_tag_index + 7;
-                    code_tag_index = start;
-                    result += string.substring(current_index, code_tag_index);
+    applyReplacement(text) {
+        let newContentParts = [];
+        const parsedNodecontent = this.parseMoreEmo({ text }, this.emoticons_regex);
+
+        for (const part of parsedNodecontent) {
+            if (part.text) {
+              newContentParts.push(common.htmlEncode(part.text));
+            } else if (part.emoticon) {
+                let emo = this.chatpp_emoticons.getEmoticonWithTag(part.emoticon.tag);
+
+                if (emo) {
+                    newContentParts.push(
+                        '<img' +
+                        `src="${emo.src}" alt="${emo.name}" data-cwtag="${common.htmlEncode(emo.tag)}" title="${emo.title}"` +
+                        'class="ui_emoticon chatpp_emoticon">'
+                    );
+                } else {
+                    newContentParts.push(common.htmlEncode(part.emoticon.tag))
                 }
-            } else {
-                break;
             }
         }
-        result += this.replaceEmoticons(string.substring(start));
 
-        return result;
-    }
-
-    replaceEmoticons(string) {
-        return string.replace(this.emoticons_regex, (match) => {
-            let emo = this.chatpp_emoticons.getEmoticonWithTag(match);
-            if (!emo) {
-                return match;
-            }
-            let replaceText = `<img src="${emo.src}" alt="${emo.name}" data-cwtag="${emo.tag}" title="${emo.title}" class="ui_emoticon chatpp_emoticon">`;
-            return replaceText;
-        });
+        return newContentParts.join('');
     }
 
     applyEmoticonsByModifyingDOM() {
