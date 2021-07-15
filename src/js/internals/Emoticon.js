@@ -594,8 +594,7 @@ class Emoticon {
             // if node is #text
             if (node.nodeType == 3) {
                 all.push(node);
-            }
-            else {
+            } else {
                 all = all.concat(this.textNodesUnder(node));
             }
         }
@@ -625,9 +624,7 @@ class Emoticon {
 
                 if (emo) {
                     newContentParts.push(
-                        '<img' +
-                        `src="${emo.src}" alt="${emo.name}" data-cwtag="${common.htmlEncode(emo.tag)}" title="${emo.title}"` +
-                        'class="ui_emoticon chatpp_emoticon">'
+                        `<img src="${emo.src}" alt="${emo.tag}" data-cwtag="${emo.tag}" title="${emo.title}" class="ui_emoticon chatpp_emoticon">`
                     );
                 } else {
                     newContentParts.push(common.htmlEncode(part.emoticon.tag))

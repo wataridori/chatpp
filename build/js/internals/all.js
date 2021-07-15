@@ -1323,7 +1323,7 @@ var Emoticon = function () {
                         var emo = this.chatpp_emoticons.getEmoticonWithTag(part.emoticon.tag);
 
                         if (emo) {
-                            newContentParts.push('<img' + ("src=\"" + emo.src + "\" alt=\"" + emo.name + "\" data-cwtag=\"" + common.htmlEncode(emo.tag) + "\" title=\"" + emo.title + "\"") + 'class="ui_emoticon chatpp_emoticon">');
+                            newContentParts.push("<img src=\"" + emo.src + "\" alt=\"" + emo.tag + "\" data-cwtag=\"" + emo.tag + "\" title=\"" + emo.title + "\" class=\"ui_emoticon chatpp_emoticon\">");
                         } else {
                             newContentParts.push(common.htmlEncode(part.emoticon.tag));
                         }

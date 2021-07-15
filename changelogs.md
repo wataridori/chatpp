@@ -1,4 +1,10 @@
 Chat++ Change Logs
+## 5.10.2
+- Fix XSS bug
+
+## 5.10.1
+- Fix emoticons title
+
 ## 5.10.0
 - Update new mechanism to display Chat++'s emoticons, by modifying Node text. Thanks to **Bui The Hanh** for the idea
 
